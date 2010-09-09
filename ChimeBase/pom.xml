@@ -6,7 +6,8 @@
   <packaging>jar</packaging>
   <version>1.0-SNAPSHOT</version>
   <name>ChimeBase</name>
-  <url>http://maven.apache.org</url>
+  <description>ChimeBase contains the domain and messaging classes used by Chime.</description>
+  <url>http://www.paxxis.org</url>
   <dependencies>
     <dependency>
       <groupId>junit</groupId>
@@ -15,8 +16,6 @@
       <scope>test</scope>
     </dependency>
   </dependencies>
-    <description>ChimeBase contains the domain and messaging classes used by Chime.
-</description>
     <build>
         <plugins>
             <plugin>
@@ -39,6 +38,22 @@
             </plugin>
         </plugins>
     </build>
+    <distributionManagement>
+        <repository>
+            <uniqueVersion>true</uniqueVersion>
+            <id>releases</id>
+            <name>Releases</name>
+            <url>http://www.paxxis.com:8081/nexus/content/repositories/releases/</url>
+            <layout>default</layout>
+        </repository>
+        <snapshotRepository>
+            <uniqueVersion>true</uniqueVersion>
+            <id>snapshots</id>
+            <name>Snapshots</name>
+            <url>http://www.paxxis.com:8081/nexus/content/repositories/snapshots/</url>
+            <layout>default</layout>
+        </snapshotRepository>
+    </distributionManagement>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>

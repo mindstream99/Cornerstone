@@ -48,14 +48,14 @@
             <uniqueVersion>true</uniqueVersion>
             <id>releases</id>
             <name>Releases</name>
-            <url>http://www.paxxis.com/nexus/content/repositories/releases/</url>
+            <url>http://repo.paxxis.com/content/repositories/releases/</url>
             <layout>default</layout>
         </repository>
         <snapshotRepository>
             <uniqueVersion>true</uniqueVersion>
             <id>snapshots</id>
             <name>Snapshots</name>
-            <url>http://www.paxxis.com/nexus/content/repositories/snapshots/</url>
+            <url>http://repo.paxxis.com/content/repositories/snapshots/</url>
             <layout>default</layout>
         </snapshotRepository>
     </distributionManagement>

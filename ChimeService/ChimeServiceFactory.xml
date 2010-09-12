@@ -158,6 +158,7 @@ set the bean's chimeConfiguration property.
         <property name="templateFiles">
             <list>
                 <value>ChimeTemplates.xml</value>
+                <value>MozartTemplates.xml</value>
             </list>
         </property>
     </bean>
@@ -183,6 +184,18 @@ set the bean's chimeConfiguration property.
     <bean id="chimeUpdateNotifier" class="com.paxxis.chime.service.NotificationTopicSender">
         <property name="chimeConfiguration" ref="chimeConfiguration"/>
         <property name="notificationTopicName" value="ChimeUpdateTopic"/>
+    </bean>
+
+    <!-- the extension manager -->
+    <bean id="extensionManager" class="com.paxxis.chime.extension.ChimeExtensionManager">
+        <property name="extensions">
+            <list>
+            </list>
+        </property>
+        <property name="connectionPool" ref="connectionPool"/>
+        <property name="updateNotifier" ref="chimeUpdateNotifier"/>
+        <property name="editNotifier" ref="chimeEventNotifier"/>
+        <property name="eventNotifier" ref="chimeEventSender"/>
     </bean>
 
     <!-- the service object itself -->

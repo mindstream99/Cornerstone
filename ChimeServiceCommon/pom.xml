@@ -38,14 +38,14 @@
     <distributionManagement>
         <repository>
             <uniqueVersion>true</uniqueVersion>
-            <id>releases</id>
+            <id>paxxis-contrib</id>
             <name>Releases</name>
             <url>http://repo.paxxis.com/content/repositories/releases/</url>
             <layout>default</layout>
         </repository>
         <snapshotRepository>
             <uniqueVersion>true</uniqueVersion>
-            <id>snapshots</id>
+            <id>paxxis-contrib-snapshot</id>
             <name>Snapshots</name>
             <url>http://repo.paxxis.com/content/repositories/snapshots/</url>
             <layout>default</layout>

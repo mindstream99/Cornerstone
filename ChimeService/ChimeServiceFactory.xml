@@ -208,6 +208,13 @@ set the bean's chimeConfiguration property.
         </property>
     </bean>
 
+    <!--  The startup indexer builds/rebuilds the index when the service starts.
+          Comment out this bean if you don't want this behavior -->
+    <bean id="startupIndexer" class="com.paxxis.chime.indexing.StartupIndexer">
+        <property name="connectionPool" ref="connectionPool"/>
+        <property name="optimize" value="true"/>
+    </bean>
+
     <!-- the service request message handler -->
     <bean id="messageHandler" class="com.paxxis.chime.service.RequestMessageHandler">
         <property name="configurationPropertyMap">

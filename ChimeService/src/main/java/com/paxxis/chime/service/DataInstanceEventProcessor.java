@@ -74,7 +74,7 @@ public class DataInstanceEventProcessor extends MessageProcessor {
                         break;
                         
                     case BuildIndex:
-                        Indexer.instance().rebuildIndex(eventMessage.getUser(), _pool);
+                        Indexer.instance().rebuildIndex(false, eventMessage.getUser(), _pool);
                         break;
 
                     case NewType:

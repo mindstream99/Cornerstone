@@ -34,6 +34,7 @@ import com.paxxis.chime.client.common.Tag;
 import com.paxxis.chime.client.common.User;
 import com.paxxis.chime.database.DataSet;
 import com.paxxis.chime.database.DatabaseConnection;
+import java.io.File;
 import java.util.List;
 import java.util.UUID;
 import org.apache.log4j.Logger;
@@ -148,7 +149,26 @@ public class Tools {
         
         return result;
     }
-    
+
+    /**
+     * A utility method for deleting directories and their contents.
+     *
+     */
+    public static boolean deleteDirectory(File path) {
+        if( path.exists() ) {
+            File[] files = path.listFiles();
+            for(int i=0; i<files.length; i++) {
+                if(files[i].isDirectory()) {
+                    deleteDirectory(files[i]);
+                }
+                else {
+                    files[i].delete();
+                }
+            }
+        }
+        return( path.delete() );
+    }
+
     public static Class getClass(Shape type) {
 
         if (type.getName().equals("Tag"))

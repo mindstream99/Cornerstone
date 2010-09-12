@@ -134,11 +134,11 @@ public class Indexer {
         _executor = Executors.newFixedThreadPool(1);
     }
     
-    public void rebuildIndex(User user, DatabaseConnectionPool pool)
+    public void rebuildIndex(boolean optimize, User user, DatabaseConnectionPool pool)
     {
         if (user.isAdmin()) {
             user.setIndexing(true);
-            _executor.submit(new IndexBuilder(user, pool));
+            _executor.submit(new IndexBuilder(optimize, user, pool));
         }
     }
 
@@ -698,11 +698,13 @@ class IndexBuilder extends IndexerBase {
 
     DataInstance _type = null;
     User _user = null;
-    
-    public IndexBuilder(User user, DatabaseConnectionPool pool)
+    boolean optimize = false;
+
+    public IndexBuilder(boolean opt, User user, DatabaseConnectionPool pool)
     {
         super(pool);
         _user = user;
+        optimize = opt;
     }
     
     public IndexBuilder(DataInstance type, DatabaseConnectionPool pool)
@@ -715,43 +717,48 @@ class IndexBuilder extends IndexerBase {
     {
         DatabaseConnection database = _pool.borrowInstance(this);
         
-        long Xstart = System.currentTimeMillis();
         try 
         {
             long start = System.currentTimeMillis();
-            //if (!indexDir.exists())
+            try
             {
-                try
-                {
-                    String[] indexNames = Indexer.getIndexNames();
-                    IndexWriter[] indexWriters = new IndexWriter[indexNames.length];
-                    for (int i = 0; i < indexNames.length; i++) {
-                        File indexDir = new File("index/" + indexNames[i]);
-                        StandardAnalyzer analyzer = new StandardAnalyzer();
-                        IndexWriter writer = new IndexWriter(indexDir, analyzer);
-                        indexWriters[i] = writer;
-                    }
+                // delete everything in the index directory
+                File indexRoot = new File("index");
+                Tools.deleteDirectory(indexRoot);
 
-                    _logger.info("Indexing...");
-                    int count = doIndex(indexWriters, database);
-                    _logger.info("Optimizing...");
-                    
+                String[] indexNames = Indexer.getIndexNames();
+                IndexWriter[] indexWriters = new IndexWriter[indexNames.length];
+                for (int i = 0; i < indexNames.length; i++) {
+                    File indexDir = new File("index/" + indexNames[i]);
+                    StandardAnalyzer analyzer = new StandardAnalyzer();
+                    IndexWriter writer = new IndexWriter(indexDir, analyzer);
+                    indexWriters[i] = writer;
+                }
+
+                _logger.info("Rebuilding Index");
+                int count = doIndex(indexWriters, database);
+
+                if (optimize) {
+                    _logger.info("Optimizing Index");
                     for (IndexWriter writer : indexWriters) {
                         writer.optimize();
-                        writer.close();
                     }
-
-                    _logger.info("Done indexing " + count + " items");
-
                 }
-                catch (Exception e)
-                {
-                   _logger.error("Indexing Exception", e);
+
+                for (IndexWriter writer : indexWriters) {
+                    writer.close();
                 }
+
+                _logger.info("Done indexing " + count + " items");
+
+            }
+            catch (Exception e)
+            {
+               _logger.error("Indexing Exception", e);
             }
 
             long end = System.currentTimeMillis();
-            _logger.info("Indexed in " + (end - start) + " msecs");
+            _logger.info("System Indexed in " + (end - start) + " msecs");
         }
         catch (Exception e)
         {
@@ -760,8 +767,6 @@ class IndexBuilder extends IndexerBase {
         
         _pool.returnInstance(database, this);
         
-        long Xend = System.currentTimeMillis();
-        _logger.info("System Indexed in " + (Xend - Xstart) / 1000 + " seconds");
     }
     
     private int doIndex(IndexWriter[] writers, DatabaseConnection database) throws Exception

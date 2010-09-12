@@ -71,7 +71,7 @@ public class BuildIndexRequestProcessor extends MessageProcessor {
             
             try
             {
-                Indexer.instance().rebuildIndex(null, _pool);
+                Indexer.instance().rebuildIndex(true, null, _pool);
             }
             catch (Exception e)
             {

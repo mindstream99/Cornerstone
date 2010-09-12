@@ -566,7 +566,7 @@ public class TagUtils
             sql = "select distinct(B.id) Bid, A.count Contextcount, B.name, B.intVal Bcount, 0 isPrivate "
                     + " from " + tableSet + "_tag_metrics A, Chime.DataInstance B, Chime.DataInstance_community C"
                     + " where B.id = A.tag_id and A.instance_id = '" + instanceId +
-                    "' and C.instance_id = B.id and C.community_id = 1 order by name";
+                    "' and C.instance_id = B.id and C.community_id = '100' order by name";
         } else if (user.isAdmin() && user.isIndexing()) {
             sql = "select distinct(B.id) Bid, A.count Contextcount, B.name, B.intVal Bcount, 0 isPrivate "
                     + " from " + tableSet + "_tag_metrics A, Chime.DataInstance B"

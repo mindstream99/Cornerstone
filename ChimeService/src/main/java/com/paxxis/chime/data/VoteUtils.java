@@ -56,19 +56,19 @@ public class VoteUtils {
         switch (voteType) {
             case ReviewVotesWritten:
                 sql = "select count(id) count from " + Tools.getTableSet() + "_positive where value = '" +
-                        vote.toString() + "' and user_id = '" + user.getId() + "' and instance_typeId = 5";
+                        vote.toString() + "' and user_id = '" + user.getId() + "' and instance_typeId = '500'";
                 break;
             case CommentVotesWritten:
                 sql = "select count(id) count from " + Tools.getTableSet() + "_positive where value = '" +
-                        vote.toString() + "' and user_id = '" + user.getId() + "' and instance_typeId = 6";
+                        vote.toString() + "' and user_id = '" + user.getId() + "' and instance_typeId = '600'";
                 break;
             case ReviewVotesReceived:
                 sql = "select count(id) count from " + Tools.getTableSet() + "_positive where value = '" +
-                        vote.toString() + "' and instance_userId = '" + user.getId() + "' and instance_typeId = 5";
+                        vote.toString() + "' and instance_userId = '" + user.getId() + "' and instance_typeId = '500'";
                 break;
             case CommentVotesReceived:
                 sql = "select count(id) count from " + Tools.getTableSet() + "_positive where value = '" +
-                        vote.toString() + "' and instance_userId = '" + user.getId() + "' and instance_typeId = 6";
+                        vote.toString() + "' and instance_userId = '" + user.getId() + "' and instance_typeId = '600'";
                 break;
         }
 

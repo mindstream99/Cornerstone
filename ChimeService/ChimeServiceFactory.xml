@@ -87,23 +87,23 @@ set the bean's chimeConfiguration property.
                 <entry key="chime.database.dateFormat" value="yyyy-MM-dd"/>
                 <entry key="chime.database.dateTimeFormat" value="yyyy-MM-dd HH:mm:ss"/>
 
-                <!-- Embedded Derby
+                <!-- Embedded Derby -->
                 <entry key="chime.database.urlPrefix" value="jdbc:derby:"/>
                 <entry key="chime.database.driver" value="org.apache.derby.jdbc.EmbeddedDriver"/>
                 <entry key="chime.database.hostName" value="embedded"/>
-                <entry key="chime.database.name" value="ChimeDB/Chime"/>
+                <entry key="chime.database.name" value="ChimeDB"/>
                 <entry key="chime.database.userName" value="chime"/>
                 <entry key="chime.database.password" value="chime"/>
-                -->
+                <!-- -->
 
-                <!-- MySQL -->
+                <!-- MySQL 
                 <entry key="chime.database.urlPrefix" value="jdbc:mysql:"/>
                 <entry key="chime.database.driver" value="com.mysql.jdbc.Driver"/>
                 <entry key="chime.database.hostName" value="localhost"/>
                 <entry key="chime.database.name" value="Chime"/>
                 <entry key="chime.database.userName" value="chime"/>
                 <entry key="chime.database.password" value="chime"/>
-                <!-- -->
+                -->
 
                 <entry key="chime.database.idleThreshold" value="5"/>
                 <entry key="chime.database.maxPoolSize" value="25"/>

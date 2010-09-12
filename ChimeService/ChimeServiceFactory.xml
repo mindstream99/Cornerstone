@@ -1,0 +1,454 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+ * Copyright 2010 Robert Englander
+ * Copyright 2009 Paxxis Technology LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+-->
+
+
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
+
+<!--
+Root application context for the Chime Service.
+
+Many of the classes have a chimeConfiguration property that
+takes an instance of com.paxxis.chime.service.chimeConfiguration.  This
+allows an object to use the configuration database to get some of its property
+values.  The properties of a class whose values can be set using the
+configuration object should be documented as such in the javadocs.
+
+Setting the chimeConfiguration property causes the bean to fetch
+property values from the configuration immediately; i.e. once the chimeConfiguration
+property is set.  Set all property values that you want to be overriden by configuration
+values BEFORE setting chimeConfiguration.  If you want to override any property
+values from the configuration set them AFTER setting chimeConfiguration.
+If you don't want to use values from the configuration database at all, simply don't
+set the bean's chimeConfiguration property.
+-->
+
+<beans default-init-method="initialize" default-destroy-method="destroy">
+
+    <!-- configuration database connection pool -->
+    <!--
+    <bean id="configPool" class="com.paxxis.chime.database.DatabaseConnectionPool">
+        <property name="dbHostname" value="rye"/>
+        <property name="dbUsername" value="cornerstone"/>
+        <property name="dbPassword" value="cornerstone"/>
+        <property name="dbName" value="Cornerstone"/>
+        <property name="dbDriver" value="com.mysql.jdbc.Driver"/>
+        <property name="dbUrlPrefix" value="jdbc:mysql:"/>
+        <property name="maxPoolSize" value="1"/>
+        <property name="minPoolSize" value="0"/>
+        <property name="idleThreshold" value="1"/>
+    </bean>
+    -->
+
+    <!-- NOTE:  this is first so that it's setup before the service objects need it -->
+    <!-- an instance of the chime configuration object -->
+    <bean id="chimeConfiguration" class="com.paxxis.chime.service.ChimeConfiguration">
+        <!--
+        <property name="databasePool" ref="configPool"/>
+        <property name="dbQuery" value="select name, value from Configuration"/>
+        <property name="keyColumn" value="name"/>
+        <property name="valueColumn" value="value"/>
+        -->
+
+        <!-- you can override configuration parameter values here if you want.  this is useful
+             during development so that you can override everything you need to from one spot.
+             this requires that you know the fully qualified parameter names.  otherwise you can
+             override them individually within the bean definition. -->
+        <property name="parameters">
+            <map>
+
+                <!-- events/notification -->
+                <entry key="chime.notification.email.sender" value="notifier@paxxis.com"/>
+                <entry key="chime.notification.email.senderpw" value="paxxis!"/>
+                <entry key="chime.notification.email.host" value="smtp.paxxis.com"/>
+                <entry key="chime.notification.email.replyto" value="chime-noreply@paxxis.com"/>
+
+                <entry key="chime.notification.urlHost" value="http://localhost:8080"/>
+                <entry key="chime.notification.watchNotification" value="1"/>
+                <entry key="chime.notification.eventPurge" value="60"/>
+                <entry key="chime.notification.periodicNotification" value="60"/>
+                <entry key="chime.notification.periodicSummarize" value="true"/>
+
+                <entry key="chime.database.dateFormat" value="yyyy-MM-dd"/>
+                <entry key="chime.database.dateTimeFormat" value="yyyy-MM-dd HH:mm:ss"/>
+
+                <!-- Embedded Derby
+                <entry key="chime.database.urlPrefix" value="jdbc:derby:"/>
+                <entry key="chime.database.driver" value="org.apache.derby.jdbc.EmbeddedDriver"/>
+                <entry key="chime.database.hostName" value="embedded"/>
+                <entry key="chime.database.name" value="ChimeDB/Chime"/>
+                <entry key="chime.database.userName" value="chime"/>
+                <entry key="chime.database.password" value="chime"/>
+                -->
+
+                <!-- MySQL -->
+                <entry key="chime.database.urlPrefix" value="jdbc:mysql:"/>
+                <entry key="chime.database.driver" value="com.mysql.jdbc.Driver"/>
+                <entry key="chime.database.hostName" value="localhost"/>
+                <entry key="chime.database.name" value="Chime"/>
+                <entry key="chime.database.userName" value="chime"/>
+                <entry key="chime.database.password" value="chime"/>
+                <!-- -->
+
+                <entry key="chime.database.idleThreshold" value="5"/>
+                <entry key="chime.database.maxPoolSize" value="25"/>
+                <entry key="chime.database.minPoolSize" value="10"/>
+                <entry key="chime.database.sweepRate" value="0.5"/>
+
+                <entry key="chime.service.connectionFactory" value="chimeFactory"/>
+                <entry key="chime.service.connectOnStartup" value="true"/>
+                <entry key="chime.service.indexerQueueName" value="ChimeIndexingQueue"/>
+                <entry key="chime.service.logLevel" value="INFO"/>
+                <entry key="chime.service.poolSize" value="1"/>
+                <entry key="chime.service.requestQueueName" value="ChimeRequestQueue"/>
+                <entry key="chime.service.eventQueueName" value="chimeEventQueue"/>
+
+                <entry key="chime.service.JndiInitialContextFactory.contextFactory" value="org.apache.activemq.jndi.ActiveMQInitialContextFactory"/>
+                <!--
+                <entry key="chime.service.JndiInitialContextFactory.providerUrl" value="vm://localhost"/>
+                -->
+                <!--
+                <entry key="chime.service.JndiInitialContextFactory.providerUrl" value="discovery://(multicast://default)"/>
+                -->
+                <entry key="chime.service.JndiInitialContextFactory.providerUrl" value="vm://localhost"/>
+            </map>
+        </property>
+    </bean>
+
+    <!-- Chime database connection pool -->
+    <bean id="connectionPool" class="com.paxxis.chime.database.DatabaseConnectionPool">
+        <property name="configurationPropertyMap">
+            <map>
+                <entry key="dbHostname" value="chime.database.hostName"/>
+                <entry key="dbUsername" value="chime.database.userName"/>
+                <entry key="dbPassword" value="chime.database.password"/>
+                <entry key="dbName" value="chime.database.name"/>
+                <entry key="dbDriver" value="chime.database.driver"/>
+                <entry key="dbUrlPrefix" value="chime.database.urlPrefix"/>
+                <entry key="minPoolSize" value="chime.database.minPoolSize"/>
+                <entry key="maxPoolSize" value="chime.database.maxPoolSize"/>
+                <entry key="idleThreshold" value="chime.database.idleThreshold"/>
+                <entry key="sweepCycle" value="chime.database.sweepCycle"/>
+            </map>
+        </property>
+        <property name="chimeConfiguration" ref="chimeConfiguration"/>
+
+        <!-- override some configuration database values -->
+        <property name="minPoolSize" value="5"/>
+        <property name="maxPoolSize" value="10"/>
+        <property name="sweepCycle" value="0.5"/>
+    </bean>
+
+    <bean id="templateLoader" class="com.paxxis.chime.service.TemplateLoader">
+        <property name="templateFiles">
+            <list>
+                <value>ChimeTemplates.xml</value>
+            </list>
+        </property>
+    </bean>
+
+    <!-- the service version instance -->
+    <bean id="serviceVersion" class="com.paxxis.chime.service.Version">
+    </bean>
+
+    <bean id="messageBroker" class="com.paxxis.chime.service.MessageBroker">
+    </bean>
+
+    <bean id="appServer" class="com.paxxis.chime.service.AppServer">
+        <property name="port" value="8080"/>
+        <property name="warFile" value="./webapps/Chime.war"/>
+    </bean>
+
+    <bean id="notifier" class="com.paxxis.chime.notification.Notifier">
+        <property name="chimeConfiguration" ref="chimeConfiguration"/>
+        <property name="connectionPool" ref="connectionPool"/>
+
+    </bean>
+
+    <bean id="chimeUpdateNotifier" class="com.paxxis.chime.service.NotificationTopicSender">
+        <property name="chimeConfiguration" ref="chimeConfiguration"/>
+        <property name="notificationTopicName" value="ChimeUpdateTopic"/>
+    </bean>
+
+    <!-- the service object itself -->
+    <bean id="chimeService" class="com.paxxis.chime.service.spring.ChimeService">
+        <property name="displayName" value="Chime Data"/>
+        <property name="serviceVersion" ref="serviceVersion"/>
+        <property name="connectionManagers">
+            <list>
+                <ref bean="serviceBusController"/>
+            </list>
+        </property>
+    </bean>
+
+    <!-- the service request message handler -->
+    <bean id="messageHandler" class="com.paxxis.chime.service.RequestMessageHandler">
+        <property name="configurationPropertyMap">
+            <map>
+                <entry key="poolSize" value="chime.service.queryPoolSize"/>
+            </map>
+        </property>
+        <property name="chimeConfiguration" ref="chimeConfiguration"/>
+        <property name="connectionPool" ref="connectionPool"/>
+        <property name="eventNotifier" ref="chimeEventNotifier"/>
+
+        <!-- override configuration values -->
+        <property name="poolSize" value="5"/>
+    </bean>
+
+    <bean id="eventQueueHandler" class="com.paxxis.chime.service.EventQueueMessageHandler">
+        <property name="configurationPropertyMap">
+            <map>
+                <entry key="poolSize" value="chime.service.queryPoolSize"/>
+            </map>
+        </property>
+        <property name="chimeConfiguration" ref="chimeConfiguration"/>
+        <property name="connectionPool" ref="connectionPool"/>
+
+        <!-- override configuration values -->
+        <property name="poolSize" value="5"/>
+    </bean>
+
+    <!-- the event message handler -->
+    <bean id="eventHandler" class="com.paxxis.chime.service.EventMessageHandler">
+        <property name="chimeConfiguration" ref="chimeConfiguration"/>
+        <property name="connectionPool" ref="connectionPool"/>
+        <property name="eventNotifier" ref="chimeEventNotifier"/>
+    </bean>
+
+    <bean id="contextFactory" class="com.paxxis.chime.service.JndiInitialContextFactory">
+        <property name="chimeConfiguration" ref="chimeConfiguration"/>
+        <property name="destinations">
+            <map>
+            </map>
+        </property>
+    </bean>
+
+    <!-- the request queue receiver sets up the message handler for receiving and handling
+         messages from the service request queue. it gets connected to a RequestQueueConnector
+         by listing it in the connectors requestQueueConnectorClients property. -->
+    <bean id="serviceRequestQueueReceiver" class="com.paxxis.chime.service.ServiceBusMessageReceiver">
+        <property name="configurationPropertyMap">
+            <map>
+                <entry key="destinationName" value="chime.service.requestQueueName"/>
+            </map>
+        </property>
+        <property name="chimeConfiguration" ref="chimeConfiguration"/>
+        <property name="messageHandler" ref="messageHandler"/>
+        <!--
+        <property name="messageSelector" value=" not (MSGTYPE = 'BuildIndexRequest') and not (MSGTYPE = 'Chime.DataInstanceRequest') and not (MSGTYPE = 'Chime.FindInstancesRequest')"/>
+        -->
+    </bean>
+
+    <!-- the event queue receiver sets up the message handler for receiving and handling
+         chime events from the event request queue. it gets connected to a RequestQueueConnector
+         by listing it in the connectors requestQueueConnectorClients property. -->
+    <bean id="eventQueueReceiver" class="com.paxxis.chime.service.ServiceBusMessageReceiver">
+        <property name="configurationPropertyMap">
+            <map>
+                <entry key="destinationName" value="chime.service.eventQueueName"/>
+            </map>
+        </property>
+        <!-- only 1 service instance at a time can be handling messages on the event queue, otherwise
+             the notifier process would duplicate the effort.  setting this receiver to exclusive
+             ensures that only 1 (and always the same 1) receives these messages, while at the same
+             time failing over if this service instance goes down. -->
+        <property name="exclusive" value="true"/>
+        <property name="chimeConfiguration" ref="chimeConfiguration"/>
+        <property name="messageHandler" ref="eventQueueHandler"/>
+    </bean>
+
+    <bean id="chimeEventSender" class="com.paxxis.chime.service.RequestQueueSender">
+        <property name="chimeConfiguration" ref="chimeConfiguration"/>
+        <property name="requestQueueName" value="ChimeEventQueue"/>
+    </bean>
+
+    <!-- the connector sets up the JMS connection for receiving and handling
+         messages from the service bus. -->
+    <bean id="serviceBusConnector" class="com.paxxis.chime.service.ServiceBusConnector">
+        <property name="configurationPropertyMap">
+            <map>
+                <entry key="connectionFactoryName" value="chime.service.connectionFactory"/>
+                <entry key="connectOnStartup" value="chime.service.connectOnStartup"/>
+            </map>
+        </property>
+        <property name="chimeConfiguration" ref="chimeConfiguration"/>
+        <property name="initialContextFactory" ref="contextFactory"/>
+
+        <property name="serviceBusConnectorClients">
+            <list>
+                <ref bean="serviceRequestQueueReceiver"/>
+            </list>
+        </property>
+    </bean>
+
+    <bean id="chimeEventNotifier" class="com.paxxis.chime.service.NotificationTopicSender">
+        <property name="chimeConfiguration" ref="chimeConfiguration"/>
+        <property name="notificationTopicName" value="ChimeEventTopic"/>
+    </bean>
+
+    <bean id="serviceEventTopicConnector" class="com.paxxis.chime.service.ServiceBusConnector">
+        <property name="configurationPropertyMap">
+            <map>
+                <entry key="connectionFactoryName" value="chime.service.connectionFactory"/>
+                <entry key="connectOnStartup" value="chime.service.connectOnStartup"/>
+            </map>
+        </property>
+        <property name="chimeConfiguration" ref="chimeConfiguration"/>
+        <property name="initialContextFactory" ref="contextFactory"/>
+
+        <property name="serviceBusConnectorClients">
+            <list>
+                <ref bean="chimeEventNotifier"/>
+                <ref bean="chimeUpdateNotifier"/>
+                <ref bean="chimeEventSender"/>
+            </list>
+        </property>
+    </bean>
+
+    <!-- the request queue receiver sets up the message handler for receiving and handling
+         messages from the service request queue. it gets connected to a RequestQueueConnector
+         by listing it in the connectors requestQueueConnectorClients property. -->
+    <bean id="eventTopicReceiver" class="com.paxxis.chime.service.ServiceBusMessageReceiver">
+        <property name="chimeConfiguration" ref="chimeConfiguration"/>
+        <property name="messageHandler" ref="eventHandler"/>
+        <property name="destinationName" value="ChimeEventTopic"/>
+    </bean>
+
+    <!-- the connector sets up the JMS connection for receiving and handling
+         messages from the service bus. -->
+    <bean id="serviceBusConnector2" class="com.paxxis.chime.service.ServiceBusConnector">
+        <property name="configurationPropertyMap">
+            <map>
+                <entry key="connectionFactoryName" value="chime.service.connectionFactory"/>
+                <entry key="connectOnStartup" value="chime.service.connectOnStartup"/>
+            </map>
+        </property>
+        <property name="chimeConfiguration" ref="chimeConfiguration"/>
+        <property name="initialContextFactory" ref="contextFactory"/>
+        <property name="serviceBusConnectorClients">
+            <list>
+                <ref bean="eventTopicReceiver"/>
+            </list>
+        </property>
+    </bean>
+
+    <bean id="serviceBusConnector3" class="com.paxxis.chime.service.ServiceBusConnector">
+        <property name="configurationPropertyMap">
+            <map>
+                <entry key="connectionFactoryName" value="chime.service.connectionFactory"/>
+                <entry key="connectOnStartup" value="chime.service.connectOnStartup"/>
+            </map>
+        </property>
+        <property name="chimeConfiguration" ref="chimeConfiguration"/>
+        <property name="initialContextFactory" ref="contextFactory"/>
+        <property name="serviceBusConnectorClients">
+            <list>
+                <ref bean="eventQueueReceiver"/>
+            </list>
+        </property>
+    </bean>
+
+   <!-- the index optimizer -->
+   <bean id="indexOptimizer" class="com.paxxis.chime.indexing.IndexingOptimizer">
+       <property name="cycle" value="5"/>
+   </bean>
+
+   <!-- this will start a local rmi registry on port 1099 if one isn't already detected. -->
+   <bean id="registry" class="org.springframework.remoting.rmi.RmiRegistryFactoryBean">
+       <property name="port" value="1098"/>
+   </bean>
+
+   <!-- this creates a JMX server connector.  the service URL is used by JMX clients
+        for gaining access to the management beans exposed by this service. -->
+   <bean id="serverConnector" class="org.springframework.jmx.support.ConnectorServerFactoryBean">
+       <property name="objectName" value="connector:name=rmi"/>
+       <property name="serviceUrl" value="service:jmx:rmi://localhost/jndi/rmi://localhost:1098/ChimeService"/>
+   </bean>
+
+   <!-- this is the management object for the service bus connector -->
+   <bean id="serviceBusController" class="com.paxxis.chime.service.ServiceBusManagementBean">
+       <property name="connector" ref="serviceBusConnector"/>
+   </bean>
+
+   <!-- this is the spring specific management controller for exposing the management
+        interfaces for the queue connector -->
+   <bean id="serviceBusManager" class="com.paxxis.chime.service.spring.ServiceBusManager">
+       <property name="collaborator" ref="serviceBusController"/>
+   </bean>
+
+   <!-- this is the management object for the notification topic sender -->
+   <bean id="eventTopicController" class="com.paxxis.chime.service.ServiceBusManagementBean">
+       <property name="connector" ref="serviceEventTopicConnector"/>
+   </bean>
+
+   <!-- this is the spring specific management controller for exposing the management
+        interfaces for the topic connector -->
+   <bean id="eventTopicManager" class="com.paxxis.chime.service.spring.ServiceBusManager">
+       <property name="collaborator" ref="eventTopicController"/>
+   </bean>
+
+   <!-- this object exports request queue management objects to the mbean server.  the assembler used here
+        exposes methods and properties based on the managed interfaces listed.  this technique is used
+        to constrain the exposed interface...constrained to what's available in the interfaces. -->
+    <bean id="connectorExporter" class="org.springframework.jmx.export.MBeanExporter" lazy-init="false">
+        <property name="beans">
+            <map>
+                <entry key="ChimeService:name=Request Connector" value-ref="serviceBusManager"/>
+                <entry key="ChimeService:name=Notification Connector" value-ref="eventTopicManager"/>
+            </map>
+        </property>
+        <property name="assembler">
+            <bean class="org.springframework.jmx.export.assembler.InterfaceBasedMBeanInfoAssembler">
+                <property name="managedInterfaces">
+                    <value>com.paxxis.chime.service.IServiceBusManager</value>
+                </property>
+            </bean>
+        </property>
+    </bean>
+
+   <!-- this object exports service management objects to the mbean server. -->
+    <bean id="serviceExporter" class="org.springframework.jmx.export.MBeanExporter" lazy-init="false">
+        <property name="beans">
+            <map>
+                <entry key="ChimeService:name=Service Manager" value-ref="chimeService"/>
+            </map>
+        </property>
+        <property name="assembler">
+            <bean class="org.springframework.jmx.export.assembler.InterfaceBasedMBeanInfoAssembler">
+                <property name="managedInterfaces">
+                    <value>com.paxxis.chime.service.IServiceController</value>
+                </property>
+            </bean>
+        </property>
+    </bean>
+
+    <!-- the bootstrapper gets the supplied service bus connectors started.  NOT SURE
+         THIS IS NEEDED.  DOESN'T THE CALL TO initialize SUFFICE? -->
+    <bean id="bootstrapper" class="com.paxxis.chime.service.ServiceBusBootstrapper">
+        <property name="serviceBusConnectors">
+            <list>
+                <ref bean="serviceBusConnector"/>
+                <ref bean="serviceBusConnector2"/>
+                <ref bean="serviceBusConnector3"/>
+                <ref bean="serviceEventTopicConnector"/>
+            </list>
+        </property>
+    </bean>
+</beans>
+

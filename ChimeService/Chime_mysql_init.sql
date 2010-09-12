@@ -276,8 +276,8 @@ CREATE TABLE  `Chime`.`DataInstance_Reference` (
 
 /*!40000 ALTER TABLE `DataInstance_Reference` DISABLE KEYS */;
 LOCK TABLES `DataInstance_Reference` WRITE;
-INSERT INTO `Chime`.`DataInstance_Reference` VALUES  ('100','19800','800',4,'10100','2010-02-26 09:56:40'),
- ('200','19800','800',1,'10200','2010-02-26 10:33:50');
+INSERT INTO `Chime`.`DataInstance_Reference` VALUES  ('100','19800','800',4,'10100','2010-02-26 09:56:40',NULL),
+ ('200','19800','800',1,'10200','2010-02-26 10:33:50',NULL);
 UNLOCK TABLES;
 /*!40000 ALTER TABLE `DataInstance_Reference` ENABLE KEYS */;
 
@@ -307,7 +307,7 @@ CREATE TABLE  `Chime`.`DataInstance_Text` (
 
 /*!40000 ALTER TABLE `DataInstance_Text` DISABLE KEYS */;
 LOCK TABLES `DataInstance_Text` WRITE;
-INSERT INTO `Chime`.`DataInstance_Text` VALUES  ('100000100','100000300','1200',1,'{\"columns\":[{\"portlets\":[{\"properties\":[{\"content\":\"<div id=##QUOTE##portal##QUOTE##><div style=##QUOTE##text-align: center;##QUOTE##>Welcome to <span style=##QUOTE##font-weight: bold; font-style: italic;##QUOTE##>Chime</span>.&nbsp; This is the default page presented to users that have not saved any other pages in the favorites.<br><br><br></div></div>\"}],\"pinned\":false,\"type\":\"RichText\",\"showHeader\":true,\"id\":1}],\"width\":1.0}],\"id\":-1}','2010-02-26 14:20:54');
+INSERT INTO `Chime`.`DataInstance_Text` VALUES  ('100000100','100000300','1200',1,'{\"columns\":[{\"portlets\":[{\"properties\":[{\"content\":\"<div id=##QUOTE##portal##QUOTE##><div style=##QUOTE##text-align: center;##QUOTE##>Welcome to <span style=##QUOTE##font-weight: bold; font-style: italic;##QUOTE##>Chime</span>.&nbsp; This is the default page presented to users that have not saved any other pages in the favorites.<br><br><br></div></div>\"}],\"pinned\":false,\"type\":\"RichText\",\"showHeader\":true,\"id\":1}],\"width\":1.0}],\"id\":-1}','2010-02-26 14:20:54',NULL);
 UNLOCK TABLES;
 /*!40000 ALTER TABLE `DataInstance_Text` ENABLE KEYS */;
 
@@ -335,36 +335,36 @@ CREATE TABLE  `Chime`.`DataInstance_Type` (
 
 /*!40000 ALTER TABLE `DataInstance_Type` DISABLE KEYS */;
 LOCK TABLES `DataInstance_Type` WRITE;
-INSERT INTO `Chime`.`DataInstance_Type` VALUES  ('000','19900','system','800','2010-02-24 12:45:29'),
- ('100','100','Shape','100','2010-02-24 12:23:15'),
- ('1000','1000','Discussion','100','2010-02-24 12:27:25'),
- ('100000700','100000300','Default Home Page','1200',NULL),
- ('100000800','100000400','Chime Home','1200',NULL),
- ('100000900','100000500','About Chime Page','1200',NULL),
- ('100001000','100000600','Chime Help','1200',NULL),
- ('10100','10100','Admin Home Page','1200',NULL),
- ('10200','10200','Chime Administrators','900',NULL),
- ('1100','1100','Rich Text','100','2010-02-24 12:27:47'),
- ('1200','1200','Portal Page','100','2010-02-24 12:28:02'),
- ('1300','1300','Named Search','100','2010-02-24 12:28:34'),
- ('1600','1600','Search Collection','100','2010-02-24 12:29:10'),
- ('1700','1700','User Collection','100','2010-02-24 12:29:32'),
- ('1800','1400','Image','100','2010-02-24 12:46:39'),
- ('1900','1500','File','100','2010-02-24 12:46:48'),
- ('200','200','Text','100','2010-02-24 12:23:38'),
- ('2000','1900','Analytic','100','2010-02-25 16:16:56'),
- ('2100','19800','admin','800','2010-02-26 09:46:24'),
- ('2200','2000','Reference','100','2010-02-24 12:27:10'),
- ('2300','2100','Folder','100','2010-02-24 12:25:19'),
- ('300','300','Number','100','2010-02-24 12:23:57'),
- ('400','400','URL','100','2010-02-24 12:25:19'),
- ('500','500','Review','100','2010-02-24 12:26:19'),
- ('600','600','Comment','100','2010-02-24 12:26:33'),
- ('700','700','Tag','100','2010-02-24 12:26:47'),
- ('772caaead0074d7d96cb9e345ef95c9900','f574d270d05146ba9fe55bbbeacec8e300','Event Type','100',NULL),
- ('800','800','User','100','2010-02-24 12:26:59'),
- ('900','900','Community','100','2010-02-24 12:27:10'),
- ('c9e6b95ca0574bb785803595884cfff200','a97381dce3d44e139823679460d2a5f100','Event','100',NULL);
+INSERT INTO `Chime`.`DataInstance_Type` VALUES  ('000','19900','system','800','2010-02-24 12:45:29',NULL),
+ ('100','100','Shape','100','2010-02-24 12:23:15',NULL),
+ ('1000','1000','Discussion','100','2010-02-24 12:27:25',NULL),
+ ('100000700','100000300','Default Home Page','1200',NULL,NULL),
+ ('100000800','100000400','Chime Home','1200',NULL,NULL),
+ ('100000900','100000500','About Chime Page','1200',NULL,NULL),
+ ('100001000','100000600','Chime Help','1200',NULL,NULL),
+ ('10100','10100','Admin Home Page','1200',NULL,NULL),
+ ('10200','10200','Chime Administrators','900',NULL,NULL),
+ ('1100','1100','Rich Text','100','2010-02-24 12:27:47',NULL),
+ ('1200','1200','Portal Page','100','2010-02-24 12:28:02',NULL),
+ ('1300','1300','Named Search','100','2010-02-24 12:28:34',NULL),
+ ('1600','1600','Search Collection','100','2010-02-24 12:29:10',NULL),
+ ('1700','1700','User Collection','100','2010-02-24 12:29:32',NULL),
+ ('1800','1400','Image','100','2010-02-24 12:46:39',NULL),
+ ('1900','1500','File','100','2010-02-24 12:46:48',NULL),
+ ('200','200','Text','100','2010-02-24 12:23:38',NULL),
+ ('2000','1900','Analytic','100','2010-02-25 16:16:56',NULL),
+ ('2100','19800','admin','800','2010-02-26 09:46:24',NULL),
+ ('2200','2000','Reference','100','2010-02-24 12:27:10',NULL),
+ ('2300','2100','Folder','100','2010-02-24 12:25:19',NULL),
+ ('300','300','Number','100','2010-02-24 12:23:57',NULL),
+ ('400','400','URL','100','2010-02-24 12:25:19',NULL),
+ ('500','500','Review','100','2010-02-24 12:26:19',NULL),
+ ('600','600','Comment','100','2010-02-24 12:26:33',NULL),
+ ('700','700','Tag','100','2010-02-24 12:26:47',NULL),
+ ('772caaead0074d7d96cb9e345ef95c9900','f574d270d05146ba9fe55bbbeacec8e300','Event Type','100','2010-02-24 12:26:47',NULL),
+ ('800','800','User','100','2010-02-24 12:26:59',NULL),
+ ('900','900','Community','100','2010-02-24 12:27:10',NULL),
+ ('c9e6b95ca0574bb785803595884cfff200','a97381dce3d44e139823679460d2a5f100','Event','100','2010-02-24 12:26:47',NULL);
 UNLOCK TABLES;
 /*!40000 ALTER TABLE `DataInstance_Type` ENABLE KEYS */;
 

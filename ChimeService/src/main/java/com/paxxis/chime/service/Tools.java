@@ -93,7 +93,7 @@ public class Tools {
         long value = Long.valueOf(part);
         if (isNegative)
         {
-            value = (Long.MAX_VALUE - value);;
+            value = (Long.MAX_VALUE - value);
         }
         
         value = value / factor;
@@ -122,7 +122,7 @@ public class Tools {
         int need = (LONGCHARS - x.length());
         if (need > 0)
         {
-            StringBuffer buf = new StringBuffer();
+            StringBuilder buf = new StringBuilder();
             for (int i = 0; i < need; i++)
             {
                 buf.append('0');
@@ -134,27 +134,11 @@ public class Tools {
         return (pre + x);
     }
 
-    public static boolean isPrimitive(String typeName)
-    {
-        boolean result = false;
-        
-        if (typeName.equals("Number") ||
-            typeName.equals("Text") ||
-            typeName.equals("Rich Text") ||
-            typeName.equals("Reference") ||
-            typeName.equals("URL") )
-        {
-            result = true;
-        }
-        
-        return result;
-    }
-
     /**
-     * A utility method for deleting directories and their contents.
+     * A utility method for deleting directory contents.
      *
      */
-    public static boolean deleteDirectory(File path) {
+    public static void deleteDirectory(File path) {
         if( path.exists() ) {
             File[] files = path.listFiles();
             for(int i=0; i<files.length; i++) {
@@ -166,48 +150,47 @@ public class Tools {
                 }
             }
         }
-        return( path.delete() );
     }
 
     public static Class getClass(Shape type) {
 
-        if (type.getName().equals("Tag"))
+        if (type.getId().equals(Shape.TAG_ID))
         {
             return Tag.class;
         }
-        else if (type.getName().equals("User"))
+        else if (type.getId().equals(Shape.USER_ID))
         {
             return User.class;
         }
-        else if (type.getName().equals("Shape"))
+        else if (type.getId().equals(Shape.SHAPE_ID))
         {
             return Shape.class;
         }
-        else if (type.getName().equals("Community"))
+        else if (type.getId().equals(Shape.COMMUNITY_ID))
         {
             return Community.class;
         }
-        else if (type.getName().equals("Comment"))
+        else if (type.getId().equals(Shape.COMMENT_ID))
         {
             return Comment.class;
         }
-        else if (type.getName().equals("Discussion"))
+        else if (type.getId().equals(Shape.DISCUSSION_ID))
         {
             return Discussion.class;
         }
-        else if (type.getName().equals("Review"))
+        else if (type.getId().equals(Shape.REVIEW_ID))
         {
             return Review.class;
         }
-        else if (type.getName().equals("Named Search"))
+        else if (type.getId().equals(Shape.NAMEDSEARCH_ID))
         {
             return NamedSearch.class;
         }
-        else if (type.getName().equals("Dashboard"))
+        else if (type.getId().equals(Shape.DASHBOARD_ID))
         {
             return Dashboard.class;
         }
-        else if (type.getName().equals("Folder"))
+        else if (type.getId().equals(Shape.FOLDER_ID))
         {
             return Folder.class;
         }
@@ -280,28 +263,6 @@ public class Tools {
         UUID uuid = UUID.randomUUID();
         String converted = uuid.toString().replaceAll("-", "");
         return InstanceId.create(converted + source);
-    }
-
-    public static String getPreviousIdXXXX(DatabaseConnection db, String table) throws Exception
-    {
-        String sql;
-        if (db.getConnectionURL().startsWith("jdbc:mysql:")) {
-            sql = "select LAST_INSERT_ID() id from " + table + " limit 1";
-
-        } else {
-            sql = "select IDENTITY_VAL_LOCAL() id from " + table;
-        }
-        DataSet dataSet = db.getDataSet(sql, true);
-        boolean found = dataSet.next();
-        if (!found)
-        {
-            throw new Exception("Failed to retrieve next chime id");
-        }
-        
-        String result = dataSet.getFieldValue("id").asString();
-        dataSet.close();
-        
-        return result;
     }
 
     public static String getLimitClause(DatabaseConnection db, long limit) {

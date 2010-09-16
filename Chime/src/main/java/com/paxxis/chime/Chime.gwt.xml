@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module rename-to="chime">
+ 		<inherits name="de.novanic.eventservice.GWTEventService"/>		
+ 		<inherits name='com.google.gwt.visualization.Visualization'/>
+ 		<inherits name="com.google.gwt.json.JSON"/>
+
+ 		<inherits name='com.extjs.gxt.ui.GXT'/>
+		<inherits name='com.extjs.gxt.charts.Chart'/>
+        <inherits name='com.extjs.gxt.themes.Themes' />
+
+        <inherits name="com.paxxis.chime.ChimeBase"/>
+
+        <entry-point class="com.paxxis.chime.client.webappEntryPoint"/>
+	<!-- Do not define servlets here, use web.xml -->
+</module>

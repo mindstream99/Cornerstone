@@ -1,0 +1,4 @@
+mvn -Dexec.classpathScope=runtime \
+-Dexec.args="-Xms256m -Xmx384m -classpath %classpath com.paxxis.chime.service.spring.ChimeService ChimeServiceFactory.xml" \
+-Dexec.executable=$JAVA_HOME/bin/java \
+process-classes org.codehaus.mojo:exec-maven-plugin:1.1.1:exec

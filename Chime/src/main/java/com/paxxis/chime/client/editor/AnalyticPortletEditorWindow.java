@@ -209,11 +209,9 @@ public class AnalyticPortletEditorWindow extends ChimeWindow
 
         	validate();
     	}
-    
     }
     
-    protected void init()
-    {
+    protected void init() {
         _form.setHeaderVisible(false);
         _form.setBorders(false);
         _form.setBodyBorder(false);

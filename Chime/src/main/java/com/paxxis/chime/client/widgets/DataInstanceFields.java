@@ -113,7 +113,7 @@ public class DataInstanceFields extends LayoutContainer
         // has changed.  so for now there's no reason to remove the fields.  instead,
         // add them if this is the first time.  actually, if this is a different instance
         // then we do remove the fields and start over
-        boolean startOver = oldInstance == null || newInstance.getId() != oldInstance.getId();
+        boolean startOver = oldInstance == null || !newInstance.getId().equals(oldInstance.getId());
         if (startOver) {
             removeAll();
 

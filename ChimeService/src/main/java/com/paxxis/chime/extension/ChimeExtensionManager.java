@@ -51,6 +51,7 @@ import com.paxxis.chime.service.ServiceBusMessageProducer;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -235,16 +236,10 @@ public class ChimeExtensionManager implements ExtensionContext {
                 ext.setCommunity(extcomm);
 
                 for (ExtensionShapeMapping mapping : def.getShapeMapList()) {
+
                     String id = mapping.getShapeId();
-                    ext.setShapeId(InstanceId.create(id));
-
                     String objectName = mapping.getObjectName();
-                    ext.setObjectName(objectName);
-
-                    for (String fieldName : mapping.getFieldMap().keySet()) {
-                        String shapeFieldName = mapping.getFieldMap().get(fieldName);
-                        ext.addFieldMapping(fieldName, shapeFieldName);
-                    }
+                    ext.addMapping(objectName, InstanceId.create(id), mapping.getFieldMap());
                 }
 
                 ext.initialize();

@@ -21,19 +21,19 @@ import javax.mail.internet.MimeMessage;
 import org.apache.log4j.Logger;
 
 /**
- * This is the base class for all types of email notifiers.
+ * This is the base class for all types of message notifiers.
  *
  * @author Robert Englander
  */
-public abstract class EmailNotifier implements Runnable {
-    private static final Logger _logger = Logger.getLogger(EmailNotifier.class);
+public abstract class MessageNotifier implements Runnable {
+    private static final Logger _logger = Logger.getLogger(MessageNotifier.class);
 
     /**
      * Basic struct that pairs an id (a user id actually) with an email address.
      */
     protected static class Pair {
-        String id;
-        String email;
+        InstanceId id;
+        String email = null;
     }
 
     /**
@@ -56,7 +56,7 @@ public abstract class EmailNotifier implements Runnable {
     /** the chime config that contains email notification properties */
     private ChimeConfiguration config;
 
-    protected EmailNotifier(ChimeConfiguration config) {
+    protected MessageNotifier(ChimeConfiguration config) {
         this.config = config;
     }
 
@@ -96,11 +96,13 @@ public abstract class EmailNotifier implements Runnable {
             for (Pair pair : pairs) {
                 InstanceId id = com.paxxis.chime.service.Tools.getNewId(Tools.DEFAULT_EXTID);
                 String sql = "insert into Chime.MessageJournal set id = '" + id + "'," +
-                        "user_id = '" + pair.id + "', subject = '" + subject + "'," +
+                        "user_id = '" + pair.id.getValue() + "', subject = '" + subject + "'," +
                         "message = '" + body + "', timestamp = CURRENT_TIMESTAMP, seen = 'N'";
                 dbconn.executeStatement(sql);
 
-                message.addRecipient(Message.RecipientType.TO, new InternetAddress(pair.email));
+                if (pair.email != null) {
+                    message.addRecipient(Message.RecipientType.TO, new InternetAddress(pair.email));
+                }
             }
 
             tr.send(message); //, message.getRecipients(Message.RecipientType.TO));

@@ -38,7 +38,7 @@ import org.apache.log4j.Logger;
  *
  * @author Robert Englander
  */
-class ImmediateNotificationProcessor extends EmailNotifier {
+class ImmediateNotificationProcessor extends MessageNotifier {
     private static final Logger _logger = Logger.getLogger(ImmediateNotificationProcessor.class);
 
     private DataInstance instance;
@@ -83,12 +83,13 @@ class ImmediateNotificationProcessor extends EmailNotifier {
                         }
 
                         String emailAddr = u.getEmailAddress();
+                        Pair p = new Pair();
                         if (emailAddr != null && !emailAddr.isEmpty()) {
-                            Pair p = new Pair();
                             p.email = emailAddr;
-                            p.id = u.getId().getValue();
-                            pairs.add(p);
                         }
+
+                        p.id = u.getId();
+                        pairs.add(p);
                     }
 
                     if (!pairs.isEmpty()) {

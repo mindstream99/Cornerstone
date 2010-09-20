@@ -27,7 +27,7 @@ import com.paxxis.chime.service.ChimeConfiguration;
 import java.util.HashMap;
 import org.apache.log4j.Logger;
 
-class WatchNotificationProcessor extends EmailNotifier {
+class WatchNotificationProcessor extends MessageNotifier {
     private static final Logger _logger = Logger.getLogger(WatchNotificationProcessor.class);
 
     private DatabaseConnectionPool dbPool;
@@ -47,7 +47,7 @@ class WatchNotificationProcessor extends EmailNotifier {
 
                 String sql = "select user_id, instance_id, instance_name from Chime.RegisteredInterest where last_update > last_notification order by user_id";
                 DataSet dataSet = dbconn.getDataSet(sql, true);
-                String currentUserId = null;
+                InstanceId currentUserId = null;
                 HashMap<String, StringBuilder> msgMap = new HashMap<String, StringBuilder>();
                 StringBuilder msg = new StringBuilder();
 
@@ -55,21 +55,22 @@ class WatchNotificationProcessor extends EmailNotifier {
                 admin.setId(User.SYSTEM);
 
                 while (dataSet.next()) {
-                    String userId = dataSet.getFieldValue("user_id").asString();
+                    InstanceId userId = InstanceId.create(dataSet.getFieldValue("user_id").asString());
                     String instanceId = dataSet.getFieldValue("instance_id").asString();
                     String instanceName = dataSet.getFieldValue("instance_name").asString();
                     if (!userId.equals(currentUserId)) {
                         if (currentUserId != null) {
-                            User user = UserUtils.getUserById(InstanceId.create(userId), admin, dbconn);
+                            User user = UserUtils.getUserById(userId, admin, dbconn);
                             String email = user.getEmailAddress();
+                            Pair p = new Pair();
                             if (email != null && !email.isEmpty()) {
                                 // send what we have
-                                Pair p = new Pair();
                                 p.email = email;
-                                p.id = userId;
-                                String body = "The following data instances have had recent activity:\n\n" + msg.toString();
-                                send(p, dbconn, "Chime Watch Notification", body);
                             }
+
+                            p.id = userId;
+                            String body = "The following data instances have had recent activity:\n\n" + msg.toString();
+                            send(p, dbconn, "Chime Watch Notification", body);
                         }
 
                         currentUserId = userId;
@@ -89,16 +90,17 @@ class WatchNotificationProcessor extends EmailNotifier {
                 dbconn.executeStatement(sql);
 
                 if (msg.length() > 0) {
-                    User user = UserUtils.getUserById(InstanceId.create(currentUserId), admin, dbconn);
+                    User user = UserUtils.getUserById(currentUserId, admin, dbconn);
                     String email = user.getEmailAddress();
+                    Pair p = new Pair();
                     if (email != null && !email.isEmpty()) {
                         // send what we have
-                        Pair p = new Pair();
                         p.email = email;
-                        p.id = currentUserId;
-                        String body = "The following data instances have had recent activity:\n\n" + msg.toString();
-                        send(p, dbconn, "Chime Watch Notification", body);
                     }
+
+                    p.id = currentUserId;
+                    String body = "The following data instances have had recent activity:\n\n" + msg.toString();
+                    send(p, dbconn, "Chime Watch Notification", body);
                 }
 
                 dbconn.commitTransaction();

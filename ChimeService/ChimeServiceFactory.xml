@@ -171,7 +171,7 @@ set the bean's chimeConfiguration property.
 
     <bean id="appServer" class="com.paxxis.chime.service.AppServer">
         <property name="port" value="8080"/>
-        <property name="warFile" value="./webapps/Chime.war"/>
+	<property name="warFile" value="./webapps/Chime.war"/>
     </bean>
 
     <bean id="notifier" class="com.paxxis.chime.notification.Notifier">

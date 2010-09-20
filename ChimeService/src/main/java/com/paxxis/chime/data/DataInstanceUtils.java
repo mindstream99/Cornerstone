@@ -42,6 +42,7 @@ import com.paxxis.chime.client.common.Scope;
 import com.paxxis.chime.client.common.Tag;
 import com.paxxis.chime.client.common.TagContext;
 import com.paxxis.chime.client.common.User;
+import com.paxxis.chime.client.common.UserMessagesBundle;
 import com.paxxis.chime.client.common.UserSocialContext;
 import com.paxxis.chime.client.common.portal.PortalTemplate;
 import com.paxxis.chime.database.DataSet;
@@ -72,6 +73,7 @@ public class DataInstanceUtils {
     private static final int ROWLIMIT = 1000;
     private static final int REVIEWLIMIT = 20;
     private static final int DISCUSSIONLIMIT = 20;
+    private static final int USRMSGLIMIT = 20;
     
     
     private DataInstanceUtils()
@@ -739,7 +741,8 @@ public class DataInstanceUtils {
 
                     userData.setFavorites(favorites);
 
-                    // grab Home
+                    UserMessagesBundle msgsBundle = UserMessageUtils.getMessages(userData, new Cursor(USRMSGLIMIT), database);
+                    userData.setUserMessagesBundle(msgsBundle);
                 }
 
                 if (instance instanceof Community) {

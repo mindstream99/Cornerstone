@@ -39,7 +39,7 @@ import org.apache.log4j.Logger;
  *
  * @author Robert Englander
  */
-class JournalNotificationProcessor extends EmailNotifier {
+class JournalNotificationProcessor extends MessageNotifier {
     private static final Logger _logger = Logger.getLogger(JournalNotificationProcessor.class);
 
     private DatabaseConnectionPool dbPool;
@@ -109,12 +109,13 @@ class JournalNotificationProcessor extends EmailNotifier {
                         }
 
                         String emailAddr = u.getEmailAddress();
+                        Pair p = new Pair();
                         if (emailAddr != null && !emailAddr.isEmpty()) {
-                            Pair p = new Pair();
                             p.email = emailAddr;
-                            p.id = u.getId().getValue();
-                            pairs.add(p);
                         }
+
+                        p.id = u.getId();
+                        pairs.add(p);
                     }
 
                     if (!pairs.isEmpty()) {

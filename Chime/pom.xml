@@ -142,6 +142,22 @@
             <target>${maven.compiler.target}</target>
           </configuration>
       </plugin>
+         <plugin>
+            <artifactId>maven-clean-plugin</artifactId>
+            <configuration>
+               <filesets>
+                  <fileset>
+                     <directory>
+                        src/main/webapp/WEB-INF/
+                     </directory>
+                     <includes>
+                        <include>lib/</include>
+                        <include>classes</include>
+                     </includes>
+                  </fileset>
+               </filesets>
+            </configuration>
+         </plugin>
     </plugins>
   </build>
     <name>Chime Web App</name>

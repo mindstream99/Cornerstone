@@ -17,6 +17,7 @@
 
 package com.paxxis.chime.client.common;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -26,6 +27,7 @@ import java.util.List;
  * @author Robert Englander
  */
 public class User extends DataInstance {
+    private static final long serialVersionUID = 1L;
 
     public static final String COMMUNITY_FIELD = "Community";
     public static final String COMMUNITYMODERATOR_FIELD = "Community Moderator";
@@ -46,6 +48,8 @@ public class User extends DataInstance {
     private boolean isIndexing = false;
 
     private List<DataInstance> favorites = new ArrayList<DataInstance>();
+
+    private UserMessagesBundle messagesBundle = null;
 
     @Override
     public User copy() {
@@ -301,6 +305,14 @@ public class User extends DataInstance {
         }
 
         return result;
+    }
+
+    public UserMessagesBundle getUserMessagesBundle() {
+        return messagesBundle;
+    }
+
+    public void setUserMessagesBundle(UserMessagesBundle bundle) {
+        messagesBundle = bundle;
     }
 
     public static User createInstance(Object source)

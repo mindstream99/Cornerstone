@@ -106,9 +106,8 @@ public class MessageConstants
     private final static int UNSUPPORTEDREQUEST = 3047;
     private final static int USERCONTEXTREQUEST = 3048;
     private final static int USERCONTEXTRESPONSE = 3049;
-
-    private final static int MOZART_GRIDSTATEREQUEST = 4001;
-    private final static int MOZART_GRIDSTATERESPONSE = 4002;
+    private final static int USERMESSAGESREQUEST = 3050;
+    private final static int USERMESSAGESRESPONSE = 3051;
 
     private MessageConstants() {
     }
@@ -183,8 +182,8 @@ public class MessageConstants
         UnsupportedRequest(UNSUPPORTEDREQUEST),
         UserContextRequest(USERCONTEXTREQUEST),
         UserContextResponse(USERCONTEXTRESPONSE),
-        MozartGridStateRequest(MOZART_GRIDSTATEREQUEST),
-        MozartGridStateResponse(MOZART_GRIDSTATERESPONSE);
+        UserMessagesRequest(USERMESSAGESREQUEST),
+        UserMessagesResponse(USERMESSAGESRESPONSE);
 
         private int value;
 
@@ -394,13 +393,13 @@ public class MessageConstants
                 case USERCONTEXTRESPONSE:
                     result = UserContextResponse;
                     break;
+                case USERMESSAGESREQUEST:
+                    result = UserMessagesRequest;
+                    break;
+                case USERMESSAGESRESPONSE:
+                    result = UserMessagesResponse;
+                    break;
 
-                case MOZART_GRIDSTATEREQUEST:
-                    result = MozartGridStateRequest;
-                    break;
-                case MOZART_GRIDSTATERESPONSE:
-                    result = MozartGridStateResponse;
-                    break;
             }
 
             return result;

@@ -34,12 +34,10 @@ public abstract class ChimeExtension {
     private ExtensionContext context = null;
     private User user = null;
     private Community community = null;
-    private HashMap<String, String> shapeFieldMap = new HashMap<String, String>();
-
-    private String objectName = null;
-    private InstanceId shapeId = null;
     private String calClassName = null;
     private HashMap<String, String> propertyMap = new HashMap<String, String>();
+    private HashMap<String, InstanceId> idMap = new HashMap<String, InstanceId>();
+    private HashMap<String, HashMap<String, String>> fieldMap = new HashMap<String, HashMap<String, String>>();
 
     protected ChimeExtension() {
     }
@@ -47,7 +45,20 @@ public abstract class ChimeExtension {
     public abstract void initialize();
     public abstract DataInstance getDataInstance(InstanceId id);
     public abstract CALExtension getCalExtension();
-    
+
+    public void addMapping(String objectName, InstanceId shapeId, HashMap<String, String> fieldMap) {
+        this.idMap.put(objectName, shapeId);
+        this.fieldMap.put(objectName, fieldMap);
+    }
+
+    public InstanceId getShapeId(String objectName) {
+        return idMap.get(objectName);
+    }
+
+    public String getShapeFieldName(String objectName, String fieldName) {
+        return fieldMap.get(objectName).get(fieldName);
+    }
+
     public void setPropertyMap(HashMap<String, String> map) {
         propertyMap.clear();
         propertyMap.putAll(map);
@@ -63,30 +74,6 @@ public abstract class ChimeExtension {
 
     public String getCalClassName() {
         return calClassName;
-    }
-
-    public void setObjectName(String name) {
-        objectName = name;
-    }
-
-    public String getObjectname() {
-        return objectName;
-    }
-
-    public void setShapeId(InstanceId id) {
-        shapeId = id;
-    }
-
-    public InstanceId getShapeId() {
-        return shapeId;
-    }
-    
-    public void addFieldMapping(String fieldName, String shapeFieldName) {
-        shapeFieldMap.put(fieldName, shapeFieldName);
-    }
-
-    public String getShapeFieldName(String fieldName) {
-        return shapeFieldMap.get(fieldName);
     }
 
     public void setCommunity(Community community) {

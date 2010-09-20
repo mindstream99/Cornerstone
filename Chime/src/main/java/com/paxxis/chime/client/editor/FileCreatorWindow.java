@@ -46,7 +46,6 @@ import com.google.gwt.json.client.JSONValue;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.DeferredCommand;
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.paxxis.chime.client.DataInputListener;
 import com.paxxis.chime.client.DataInstanceResponseObject;
 import com.paxxis.chime.client.LoginResponseObject;
 import com.paxxis.chime.client.ServiceManager;
@@ -91,7 +90,6 @@ public class FileCreatorWindow extends ChimeWindow
     private TextField<String> nameField;
     private DataInstance dataInstance;
     private FileUploadField file;
-    private DataInstance licenseInstance = null;
     private ProgressBar progressBar = new ProgressBar();
     private FileCreationListener createListener;
     private FileType fileType;
@@ -115,12 +113,11 @@ public class FileCreatorWindow extends ChimeWindow
 
      protected void init() {
       	postInit();
-         AsyncCallback callback = new AsyncCallback() {
+         AsyncCallback<ShapeResponseObject> callback = new AsyncCallback<ShapeResponseObject>() {
              public void onFailure(Throwable result) {
              }
 
-             public void onSuccess(final Object result) {
-                 ShapeResponseObject resp = (ShapeResponseObject)result;
+             public void onSuccess(final ShapeResponseObject resp) {
                  if (resp.isResponse()) {
                  	fileShape = resp.getResponse().getShape();
                  	validate();
@@ -182,7 +179,7 @@ public class FileCreatorWindow extends ChimeWindow
 
         nameField = new TextField<String>();
         nameField.setFieldLabel("Name");
-        new KeyNav(nameField) {
+        new KeyNav<ComponentEvent>(nameField) {
             @Override
             public void onKeyPress(final ComponentEvent cd) {
                 DeferredCommand.addCommand(
@@ -218,18 +215,6 @@ public class FileCreatorWindow extends ChimeWindow
                 }
             }
          );
-
-        DataInputListener listener = new DataInputListener() {
-
-            public void onDataInstance(DataInstance instance) {
-                licenseInstance = instance;
-                validate();
-            }
-
-            public void onStringData(String text) {
-            }
-
-        };
 
         _buttonBar = new ButtonBar();
         _buttonBar.setAlignment(HorizontalAlignment.CENTER);
@@ -289,13 +274,12 @@ public class FileCreatorWindow extends ChimeWindow
     }
 
     protected void createInstance(final EditDataInstanceRequest req, final String fileId, final String mimeType, final String extension, final long size) {
-        AsyncCallback callback = new AsyncCallback() {
+        AsyncCallback<DataInstanceResponseObject> callback = new AsyncCallback<DataInstanceResponseObject>() {
             public void onFailure(Throwable result) {
                 ChimeMessageBox.alert("Error", result.getMessage(), null);
             }
 
-            public void onSuccess(final Object result) {
-                DataInstanceResponseObject resp = (DataInstanceResponseObject)result;
+            public void onSuccess(final DataInstanceResponseObject resp) {
                 if (resp.isResponse()) {
                     DataInstanceResponse response = resp.getResponse();
                     List<DataInstance> instances = response.getDataInstances();
@@ -338,17 +322,16 @@ public class FileCreatorWindow extends ChimeWindow
     }
 
     protected void doCreate(EditDataInstanceRequest req, String fileId, String mimeType, String extension, long size) {
-        AsyncCallback callback = new AsyncCallback() {
+        AsyncCallback<ServiceResponseObject<EditDataInstanceResponse>> callback = 
+        	              new AsyncCallback<ServiceResponseObject<EditDataInstanceResponse>>() {
             public void onFailure(Throwable result) {
             }
 
-            public void onSuccess(final Object result) {
-                ServiceResponseObject<EditDataInstanceResponse> resp = (ServiceResponseObject<EditDataInstanceResponse>)result;
+            public void onSuccess(final ServiceResponseObject<EditDataInstanceResponse> resp) {
                 if (resp.isResponse()) {
                     EditDataInstanceResponse response = resp.getResponse();
                     DataInstance imageDataInstance = response.getDataInstance();
                     notifyResults(imageDataInstance);
-                    //PageManager.instance().openDetail(true, inst);
                     doCancel();
                 } else {
                     ChimeMessageBox.alert("Error", resp.getError().getMessage(), null);
@@ -374,9 +357,6 @@ public class FileCreatorWindow extends ChimeWindow
         req.addFieldData(fileShape, fileShape.getField("MIME Type"), mimeType);
         req.addFieldData(fileShape, fileShape.getField("Size"), String.valueOf(size));
 
-        // add the license
-        //req.addFieldData(dataType, dataType.getField("License"), licenseInstance);
-
         appendRequest(req);
 
         ServiceManager.getService().sendEditDataInstanceRequest(req, callback);
@@ -386,7 +366,6 @@ public class FileCreatorWindow extends ChimeWindow
         String name = nameField.getValue();
         boolean validName = name != null && name.trim().length() > 0 && fileShape != null;
 
-        //boolean canUpload = licenseInstance != null && file.getValue() != null
         boolean canUpload = file.getValue() != null && file.getValue().length() > 0;
 
         _okButton.setEnabled(validName && canUpload && fileShape != null);

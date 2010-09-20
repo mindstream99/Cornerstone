@@ -15,33 +15,15 @@
  * limitations under the License.
  */
 
-package com.paxxis.chime.client;
+package com.paxxis.chime.server;
 
-import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.paxxis.chime.client.common.DataInstanceEvent;
 
 /**
  * 
  * @author Robert Englander
  *
  */
-@SuppressWarnings("unchecked")
-public class EmptyCallback implements AsyncCallback<Object> {
-
-	private static final EmptyCallback INSTANCE = new EmptyCallback();
-	
-	public static EmptyCallback instance() {
-		return INSTANCE;
-	}
-	
-	private EmptyCallback() {
-	}
-
-	@Override  
-	public void onFailure(Throwable caught) {
-	}
-
-	@Override
-	public void onSuccess(Object result) {
-	}
-
+public interface UpdateEventListener {
+	public void onDataInstanceUpdate(DataInstanceEvent event);
 }

@@ -178,6 +178,10 @@ public class PortalViewPage extends LayoutContainer
         return isHome;
     }
 
+    public void replaceDataInstance(DataInstance instance) {
+    	detailPanel.setDataInstance(instance, UpdateReason.Silent);
+    }
+    
     public DataInstance getDataInstance() {
         return detailPanel.getDataInstance();
     }

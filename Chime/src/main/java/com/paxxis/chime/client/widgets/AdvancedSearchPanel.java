@@ -206,9 +206,6 @@ public class AdvancedSearchPanel extends ChimeLayoutContainer
         RowLayout layout = new RowLayout(Orientation.VERTICAL);
         setLayout(layout);
         
-        _sortOrderLabel = new Html("<div id='endslice-form-label'>Sort Order:</div>");
-        add(_sortOrderLabel, new RowData(-1, -1, new Margins(5, 5, 2, 5)));
-        
         _sortOrderComboBox = new ComboBox<SearchCriteriaSortOrderModel>();
         _sortOrderStore = new ChimeListStore<SearchCriteriaSortOrderModel>();
         _sortOrderStore.add(_sortOrderList);
@@ -234,12 +231,9 @@ public class AdvancedSearchPanel extends ChimeLayoutContainer
             }
         );
         
-        add(_sortOrderComboBox, new RowData(1, -1, new Margins(5, 5, 5, 5)));
-        _sortOrderComboBox.setValue(_sortOrderStore.getAt(0));
-
         ToolBar bar = new ToolBar();
-        _addFilterButton = new Button("Add Filter");
-        _clearFiltersButton = new Button("Clear Filters");
+        _addFilterButton = new Button("Filter");
+        _clearFiltersButton = new Button("Clear");
         _refreshSearchButton = new Button("Refresh");
         _saveButton = new Button("Save");
         _matchAllAnyToggle = new Button("Matching All");
@@ -257,6 +251,13 @@ public class AdvancedSearchPanel extends ChimeLayoutContainer
 
         bar.add(_refreshSearchButton);
         add(bar, new RowData(1, -1, new Margins(5, 0, 5, 0)));
+ 
+        _sortOrderLabel = new Html("<div id='endslice-form-label'>Sort Order:</div>");
+        add(_sortOrderLabel, new RowData(-1, -1, new Margins(5, 5, 2, 5)));
+        
+        add(_sortOrderComboBox, new RowData(1, -1, new Margins(5, 5, 5, 5)));
+        _sortOrderComboBox.setValue(_sortOrderStore.getAt(0));
+
         
         buildFilterMenu();
         

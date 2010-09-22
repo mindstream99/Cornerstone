@@ -104,7 +104,14 @@
         </snapshotRepository>
     </distributionManagement>
 
-  <build>
+    <scm>
+    	<url>svn://www.paxxis.com/Chime</url>
+    </scm>
+    <organization>
+    	<name>Paxxis Technology LLC</name>
+    	<url>www.paxxis.com</url>
+    </organization>
+    <build>
     <outputDirectory>src/main/webapp/WEB-INF/classes</outputDirectory>
     <plugins>
       <plugin>
@@ -148,11 +155,12 @@
                <filesets>
                   <fileset>
                      <directory>
-                        src/main/webapp/WEB-INF/
+                        src/main/webapp
                      </directory>
                      <includes>
-                        <include>lib/</include>
-                        <include>classes</include>
+                        <include>chime</include>
+                        <include>WEB-INF/lib</include>
+                        <include>WEB-INF/classes</include>
                      </includes>
                   </fileset>
                </filesets>

@@ -52,6 +52,8 @@ import com.paxxis.chime.client.common.ShapeRequest;
 import com.paxxis.chime.client.common.SubscribeRequest;
 import com.paxxis.chime.client.common.SubscribeResponse;
 import com.paxxis.chime.client.common.User;
+import com.paxxis.chime.client.common.UserMessagesRequest;
+import com.paxxis.chime.client.common.UserMessagesResponse;
 
 /**
  *
@@ -59,6 +61,7 @@ import com.paxxis.chime.client.common.User;
  */
 public interface endsliceService extends RemoteService
 {
+    public ServiceResponseObject<UserMessagesResponse> sendUserMessagesRequest(UserMessagesRequest request);
     public ServiceResponseObject<EditCommunityResponse> sendEditCommunityRequest(EditCommunityRequest request);
     public ServiceResponseObject<EditUserResponse> sendEditUserRequest(EditUserRequest request);
     public ServiceResponseObject<RunCALScriptResponse> sendRunCALScriptRequest(RunCALScriptRequest request);

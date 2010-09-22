@@ -19,6 +19,7 @@ package com.paxxis.chime.client.pages;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import com.extjs.gxt.ui.client.Style.LayoutRegion;
@@ -70,6 +71,7 @@ import com.paxxis.chime.client.portal.PagePortlet;
 import com.paxxis.chime.client.portal.PortalContainer;
 import com.paxxis.chime.client.portal.PortalUtils;
 import com.paxxis.chime.client.portal.UpdateReason;
+import com.paxxis.chime.client.portal.UserMessagesPortlet;
 import com.paxxis.chime.client.widgets.ChimeLayoutContainer;
 import com.paxxis.chime.client.widgets.ChimeMessageBox;
 
@@ -206,31 +208,17 @@ public class DataDetailPanel extends ChimeLayoutContainer implements InstanceUpd
     
     public boolean setDataInstance(DataInstance instance, UpdateReason reason) {
 
-        boolean updated = false;
+        refreshInstance = null;
+        _dataInstance = instance;
+        _origDataInstance = _dataInstance.copy();
 
-        //boolean newInstance = _dataInstance == null || instance.getId() != _dataInstance.getId();
-
-        if (true) { //newInstance || _dataInstance.isChangedSince(instance)) {
-
-            updated = true;
-
-            refreshInstance = null;
-            _dataInstance = instance;
-            _origDataInstance = _dataInstance.copy();
-
-            if (!PortalUtils.updatePortal(_portal, instance, reason))
-            {
-            	if (reason == UpdateReason.UpdateEvent) {
-            		InfoConfig cfg = new InfoConfig("Rebuilding", "");
-            		Info.display(cfg);
-            	}
+        if (reason != UpdateReason.Silent) {
+            if (!PortalUtils.updatePortal(_portal, instance, reason)) {
                 _portal = PortalUtils.buildPortal(instance, this);
 
                 DeferredCommand.addCommand(
-                    new Command()
-                    {
-                        public void execute()
-                        {
+                    new Command() {
+                        public void execute() {
                             resultPanel.removeAll();
                             resultPanel.add(_portal);
                             resultPanel.layout();
@@ -240,7 +228,7 @@ public class DataDetailPanel extends ChimeLayoutContainer implements InstanceUpd
             }
         }
 
-        return updated;
+        return true;
     }
 
     public void onShow() {
@@ -253,6 +241,15 @@ public class DataDetailPanel extends ChimeLayoutContainer implements InstanceUpd
     public void compareForRefresh(DataInstance instance) {
     	try {
             if (_dataInstance.getId().equals(instance.getId())) {
+            	if (userMessagesUpdated(instance)) {
+                	if (isVisible()) {
+                        UserMessagesPortlet portlet = _portal.getUserMessagesPortlet();
+                        if (portlet != null) {
+                            portlet.setStale();
+                        }
+                	}
+            	}
+            	
                 if (instance.getUpdated().after(_dataInstance.getUpdated())) {
                 	if (isVisible()) {
                 		doRefresh(instance);
@@ -266,6 +263,24 @@ public class DataDetailPanel extends ChimeLayoutContainer implements InstanceUpd
     	}
     }
 
+    private boolean userMessagesUpdated(DataInstance newInstance) {
+    	boolean result = false;
+    	
+    	if (newInstance instanceof User) {
+    		User newUser = (User)newInstance;
+    		User oldUser = (User)_dataInstance;
+    		Date newDate = newUser.getUserMessagesBundle().getLatestUpdate();
+    		Date oldDate = oldUser.getUserMessagesBundle().getLatestUpdate();
+    		if ( (oldDate == null && newDate != null) || (newDate == null && oldDate != null)) {
+    			result = true;
+    		} else if (oldDate != null && newDate != null) {
+    			result = newDate.after(oldDate);
+    		}
+    	}
+    	
+    	return result;
+    }
+    
     private void doRefresh(DataInstance instance) {
     	refreshInstance = null;
     	if (instance.getPortalTemplate().isAutoUpdate()) {

@@ -38,14 +38,15 @@ import com.paxxis.chime.client.common.RunCALScriptRequest;
 import com.paxxis.chime.client.common.ShapeRequest;
 import com.paxxis.chime.client.common.SubscribeRequest;
 import com.paxxis.chime.client.common.User;
+import com.paxxis.chime.client.common.UserMessagesRequest;
 
 
 /**
  *
  * @author Robert Englander
  */
-public interface endsliceServiceAsync 
-{
+public interface endsliceServiceAsync {
+    public void sendUserMessagesRequest(UserMessagesRequest request, AsyncCallback callback);
     public void sendEditCommunityRequest(EditCommunityRequest request, AsyncCallback callback);
     public void sendEditUserRequest(EditUserRequest request, AsyncCallback callback);
     public void sendRunCALScriptRequest(RunCALScriptRequest request, AsyncCallback callback);

@@ -203,6 +203,18 @@ public class PortalContainer extends ChimeLayoutContainer {
         return null;
     }
 
+    public UserMessagesPortlet getUserMessagesPortlet() {
+        Set<Entry<Long, PortletContainer>> set = _portletMap.entrySet();
+        for (Entry<Long, PortletContainer> entry : set) {
+            PortletContainer cont = entry.getValue();
+            if (cont instanceof UserMessagesPortlet) {
+                return (UserMessagesPortlet)cont;
+            }
+        }
+
+        return null;
+    }
+
     public PagePortlet getPagePortlet() {
         Set<Entry<Long, PortletContainer>> set = _portletMap.entrySet();
         for (Entry<Long, PortletContainer> entry : set) {

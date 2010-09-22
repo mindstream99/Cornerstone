@@ -124,6 +124,16 @@ root {
   background-image: url(resources/images/chime/disabled.gif) !important;
 }
 
+.sort-icon {
+  background-image: url(resources/images/chime/sort16.png) !important;
+    background-position: left bottom;
+}
+
+.filter-icon {
+  background-image: url(resources/images/chime/filter16.gif) !important;
+    background-position: left bottom;
+}
+
 .delete-icon {
   background-image: url(resources/images/chime/Delete16.gif) !important;
     background-position: left bottom;

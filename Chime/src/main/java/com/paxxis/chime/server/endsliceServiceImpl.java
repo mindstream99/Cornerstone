@@ -64,6 +64,7 @@ import com.paxxis.chime.client.ServiceResponseObject;
 import com.paxxis.chime.client.ShapeResponseHandler;
 import com.paxxis.chime.client.ShapeResponseObject;
 import com.paxxis.chime.client.SubscribeResponseHandler;
+import com.paxxis.chime.client.UserMessagesResponseHandler;
 import com.paxxis.chime.client.endsliceService;
 import com.paxxis.chime.client.common.AddCommentRequest;
 import com.paxxis.chime.client.common.AddCommentResponse;
@@ -113,6 +114,8 @@ import com.paxxis.chime.client.common.ShapeResponse;
 import com.paxxis.chime.client.common.SubscribeRequest;
 import com.paxxis.chime.client.common.SubscribeResponse;
 import com.paxxis.chime.client.common.User;
+import com.paxxis.chime.client.common.UserMessagesRequest;
+import com.paxxis.chime.client.common.UserMessagesResponse;
 import com.paxxis.chime.common.JavaObjectPayload;
 import com.paxxis.chime.server.ServiceBusSenderPool.PoolEntry;
 import com.paxxis.chime.service.JndiInitialContextFactory;
@@ -625,6 +628,33 @@ public class endsliceServiceImpl extends RemoteEventServiceServlet implements en
         if (response instanceof AddCommentResponse)
         {
             AddCommentResponse resp = (AddCommentResponse)response;
+            obj.setResponse(resp);
+        }
+        else if (response instanceof ErrorMessage)
+        {
+            ErrorMessage resp = (ErrorMessage)response;
+            obj.setError(resp);
+        }
+        else
+        {
+            obj.setResponse(null);
+        }
+        
+        return obj;
+    }
+    
+    public ServiceResponseObject<UserMessagesResponse> sendUserMessagesRequest(UserMessagesRequest request)  {
+        ServiceResponseObject<UserMessagesResponse> obj = new ServiceResponseObject<UserMessagesResponse>();
+        
+        PoolEntry entry = senderPool.borrowInstance(this);
+        ChimeClient client = new ChimeClient(new JavaObjectPayload(), entry.getSender(), 30000);
+
+        Message response = client.execute(request, new UserMessagesResponseHandler());
+        senderPool.returnInstance(entry, this);
+
+        if (response instanceof UserMessagesResponse)
+        {
+        	UserMessagesResponse resp = (UserMessagesResponse)response;
             obj.setResponse(resp);
         }
         else if (response instanceof ErrorMessage)

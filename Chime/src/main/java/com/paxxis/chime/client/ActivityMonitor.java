@@ -88,10 +88,10 @@ public class ActivityMonitor {
         };
 
         t2.scheduleRepeating(STALEFREQUENCY);
-        XXXregisterForEvents();
+        registerForEvents();
     }
 
-    public void XXXregisterForEvents() {
+    public void registerForEvents() {
         theRemoteEventService = RemoteEventServiceFactory.getInstance().getRemoteEventService();
     	eventListener = new RemoteEventListener() {
 			public void apply(Event eventWrapper) {
@@ -132,16 +132,15 @@ public class ActivityMonitor {
     }
     
     private void processSession() {
-        final AsyncCallback callback = new AsyncCallback()
+        final AsyncCallback<ServiceResponseObject<PingResponse>> callback = new AsyncCallback<ServiceResponseObject<PingResponse>>()
         {
             public void onFailure(Throwable arg0)
             {
             }
 
             @SuppressWarnings("unchecked")
-			public void onSuccess(Object obj)
+			public void onSuccess(ServiceResponseObject<PingResponse> response)
             {
-                ServiceResponseObject<PingResponse> response = (ServiceResponseObject<PingResponse>)obj;
                 if (response.isResponse()) {
                     PingResponse resp = response.getResponse();
                     if (resp.isPendingTimeout()) {
@@ -178,16 +177,15 @@ public class ActivityMonitor {
     }
     
     private void processStale() {
-        final AsyncCallback callback = new AsyncCallback()
+        final AsyncCallback<ServiceResponseObject<PingResponse>> callback = new AsyncCallback<ServiceResponseObject<PingResponse>>()
         {
             public void onFailure(Throwable arg0)
             {
                 //ChimeMessageBox.alert("System Error", "Please contact the system administrator.", null);
             }
 
-            public void onSuccess(Object obj)
+            public void onSuccess(ServiceResponseObject<PingResponse> response)
             {
-                ServiceResponseObject<PingResponse> response = (ServiceResponseObject<PingResponse>)obj;
                 if (response.isResponse())
                 {
                     PingResponse resp = response.getResponse();
@@ -197,6 +195,9 @@ public class ActivityMonitor {
                         // tell the portal page about this instance
                         PageManager.instance().getActiveNavigatorPage().compareForRefresh(inst);
                     }
+                    
+                    // update the user
+                    ServiceManager.updateActiveUser(resp.getUser());
                 }
                 else 
                 {

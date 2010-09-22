@@ -219,6 +219,10 @@ public class PortalUtils {
             	
             case InstanceField:
 	        	{
+	        		// TODO decide if this portlet should be shown to anyone other than the
+	        		// user and admins.  instead of removing the code, it's commented out to make
+	        		// it easier to put it back.
+	        		/*
 	        		User user = ServiceManager.getActiveUser();
 	        		boolean isUserInstance = instance.getShapes().get(0).getId().equals(Shape.USER_ID);
 	        		if (isUserInstance) {
@@ -231,6 +235,8 @@ public class PortalUtils {
 	        		} else {
 	                    ((TypeFieldGroupsPortlet)portlet).setDataInstance(instance, reason);
 	        		}
+	        		*/
+                    ((TypeFieldGroupsPortlet)portlet).setDataInstance(instance, reason);
 	        	}
                 break;
 
@@ -414,6 +420,7 @@ public class PortalUtils {
             	
             case InstanceField:
             	{
+            		/*
             		User user = ServiceManager.getActiveUser();
             		boolean isUserInstance = instance.getShapes().get(0).getId().equals(Shape.USER_ID);
             		if (isUserInstance) {
@@ -423,6 +430,8 @@ public class PortalUtils {
             		} else {
                         portlet = createInstanceFieldPortlet(spec, instance, autoLayout, listener);
             		}
+            		*/
+                    portlet = createInstanceFieldPortlet(spec, instance, autoLayout, listener);
             	}
                 break;
 

@@ -62,16 +62,25 @@ public class UserMessagesRequestProcessor extends MessageProcessor {
             try
             {
                 User userInstance = requestMessage.getDataInstance();
-                Cursor cursor = requestMessage.getCursor();
-                long start = System.currentTimeMillis();
+                if (requestMessage.getType() == UserMessagesRequest.Type.Query) {
+                    Cursor cursor = requestMessage.getCursor();
+                    long start = System.currentTimeMillis();
 
-                UserMessagesBundle msgBundle = UserMessageUtils.getMessages(userInstance, cursor, database);
+                    UserMessagesBundle msgBundle = UserMessageUtils.getMessages(userInstance, cursor, database);
+                    userInstance.setUserMessagesBundle(msgBundle);
 
-                long end = System.currentTimeMillis();
-                _logger.info(msgBundle.getMessages().size() + " of " + msgBundle.getCursor().getTotal() + " User Message(s) retrieved in " + (end - start) + " msecs");
+                    long end = System.currentTimeMillis();
+                    _logger.info(msgBundle.getMessages().size() + " of " + msgBundle.getCursor().getTotal() + " User Message(s) retrieved in " + (end - start) + " msecs");
+                } else {
+                    long start = System.currentTimeMillis();
 
-                dtr.setUserMessages(msgBundle.getMessages());
-                dtr.setCursor(msgBundle.getCursor());
+                    userInstance = UserMessageUtils.deleteMessages(requestMessage.getUser(), userInstance, requestMessage.getDeleteList(), database);
+
+                    long end = System.currentTimeMillis();
+                    _logger.info("User Message(s) deleted in " + (end - start) + " msecs");
+                }
+
+                dtr.setUser(userInstance);
             }
             catch (Exception e)
             {

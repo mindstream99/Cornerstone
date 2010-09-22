@@ -19,6 +19,7 @@ package com.paxxis.chime.client.common;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -29,26 +30,27 @@ public class UserMessagesBundle implements Serializable {
 
     private List<UserMessage> messages = null;
     private Cursor _cursor = null;
+    private Date latestUpdate;
 
-    public UserMessagesBundle()
-    {
-
+    public UserMessagesBundle() {
     }
 
-    public UserMessagesBundle(List<UserMessage> msgs, Cursor cursor)
-    {
+    public UserMessagesBundle(List<UserMessage> msgs, Cursor cursor, Date latest) {
         messages = new ArrayList<UserMessage>();
         messages.addAll(msgs);
         _cursor = cursor;
+        latestUpdate = latest;
     }
 
-    public List<UserMessage> getMessages()
-    {
+    public List<UserMessage> getMessages() {
         return messages;
     }
 
-    public Cursor getCursor()
-    {
+    public Cursor getCursor() {
         return _cursor;
+    }
+
+    public Date getLatestUpdate() {
+        return latestUpdate;
     }
 }

@@ -26,6 +26,7 @@ import java.util.Date;
  */
 public class UserMessage implements Serializable {
 
+    private InstanceId id;
     private String subject;
     private String body;
     private Date timestamp;
@@ -34,11 +35,16 @@ public class UserMessage implements Serializable {
     public UserMessage() {
     }
 
-    public UserMessage(String subject, String body, Date timestamp, boolean seen) {
+    public UserMessage(InstanceId id, String subject, String body, Date timestamp, boolean seen) {
+        this.id = id;
         this.subject = subject;
         this.body = body;
         this.timestamp = timestamp;
         this.seen = seen;
+    }
+
+    public InstanceId getId() {
+        return id;
     }
 
     public String getSubject() {

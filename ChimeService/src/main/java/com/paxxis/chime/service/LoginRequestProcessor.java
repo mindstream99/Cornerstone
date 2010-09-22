@@ -26,9 +26,9 @@ import com.paxxis.chime.client.common.User;
 import com.paxxis.chime.database.DatabaseConnection;
 import com.paxxis.chime.database.DatabaseConnectionPool;
 import com.paxxis.chime.client.common.ErrorMessage;
+import com.paxxis.chime.client.common.InstanceId;
 import com.paxxis.chime.client.common.Message;
 import com.paxxis.chime.common.MessagePayload;
-import com.paxxis.chime.service.MessageProcessor;
 import org.apache.log4j.Logger;
 /**
  *
@@ -76,7 +76,10 @@ public class LoginRequestProcessor extends MessageProcessor {
                 {
                     // look for the match in the cache
                     user = CacheManager.instance().getUserSession(user);
-                    
+                    if (user != null) {
+                        // this forces the user object to be updated
+                        user = UserUtils.getUserById(user.getId(), user, database);
+                    }
                     // if the response is null this is perfectly valid.  it means
                     // that the session doesn't exist.  if that's the case we want to
                     // return a LoginResponse with a null user, indicating to the caller
@@ -93,12 +96,13 @@ public class LoginRequestProcessor extends MessageProcessor {
                         throw new Exception("The user name and/or password are not valid.");
                     }
 
-                    user.setSessionToken(generateSessionToken(user));
+                }
 
-                    // put this user into the session cache
+                if (user != null) {
+                    user.setSessionToken(generateSessionToken(user));
                     CacheManager.instance().putUserSession(user);
                 }
-                
+
                 lr.setUser(user);
             }
             catch (Exception e)

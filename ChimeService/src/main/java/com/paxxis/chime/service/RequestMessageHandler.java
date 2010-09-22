@@ -42,18 +42,15 @@ import com.paxxis.chime.client.common.MultiRequest;
 import com.paxxis.chime.client.common.ReviewsRequest;
 import com.paxxis.chime.client.common.UserContextRequest;
 import com.paxxis.chime.database.DatabaseConnectionPool;
-import com.paxxis.chime.service.ErrorProcessor;
-import com.paxxis.chime.service.MessageProcessor;
-import com.paxxis.chime.service.NotificationTopicSender;
 import com.paxxis.chime.client.common.MessageConstants;
 import com.paxxis.chime.client.common.MessageConstants.MessageType;
 import com.paxxis.chime.client.common.MessageConstants.PayloadType;
 import com.paxxis.chime.client.common.PingRequest;
 import com.paxxis.chime.client.common.RunCALScriptRequest;
 import com.paxxis.chime.client.common.SubscribeRequest;
+import com.paxxis.chime.client.common.UserMessagesRequest;
 import com.paxxis.chime.common.JavaObjectPayload;
 import com.paxxis.chime.common.MessagePayload;
-import com.paxxis.chime.service.ServiceBusMessageHandler;
 import com.paxxis.chime.indexing.BuildIndexRequestProcessor;
 import java.util.HashMap;
 import org.apache.log4j.Logger;
@@ -104,6 +101,7 @@ public class RequestMessageHandler extends ServiceBusMessageHandler {
         _messageTypes.put(RunCALScriptRequest.messageType(), RunCALScriptRequest.messageVersion());
         _messageTypes.put(EditUserRequest.messageType(), EditUserRequest.messageVersion());
         _messageTypes.put(EditCommunityRequest.messageType(), EditCommunityRequest.messageVersion());
+        _messageTypes.put(UserMessagesRequest.messageType(), UserMessagesRequest.messageVersion());
         
         CacheManager.instance();
     }
@@ -225,6 +223,10 @@ public class RequestMessageHandler extends ServiceBusMessageHandler {
                     else if (mtype == EditCommunityRequest.messageType())
                     {
                         return new EditCommunityRequestProcessor(mPayload, _databasePool, _topicSender);
+                    }
+                    else if (mtype == UserMessagesRequest.messageType())
+                    {
+                        return new UserMessagesRequestProcessor(mPayload, _databasePool);
                     }
                 }
             }

@@ -7,6 +7,7 @@ package com.paxxis.chime.notification;
 
 import com.paxxis.chime.client.common.InstanceId;
 import com.paxxis.chime.database.DatabaseConnection;
+import com.paxxis.chime.database.StringData;
 import com.paxxis.chime.service.ChimeConfiguration;
 import com.paxxis.chime.service.Tools;
 import java.util.ArrayList;
@@ -93,19 +94,26 @@ public abstract class MessageNotifier implements Runnable {
             message.setSubject(subject);
             message.setText(body);
 
+            body = body.replaceAll("\n", "<br>");
+            String bodyText = new StringData(body).asSQLValue();
+            boolean sendEmail = false;
             for (Pair pair : pairs) {
                 InstanceId id = com.paxxis.chime.service.Tools.getNewId(Tools.DEFAULT_EXTID);
-                String sql = "insert into Chime.MessageJournal set id = '" + id + "'," +
-                        "user_id = '" + pair.id.getValue() + "', subject = '" + subject + "'," +
-                        "message = '" + body + "', timestamp = CURRENT_TIMESTAMP, seen = 'N'";
+                String sql = "insert into Chime.MessageJournal (id,user_id,subject,message,timestamp,seen) values ('"
+                        + id + "','" + pair.id.getValue() + "', '" + subject
+                        + "'," + bodyText + ", CURRENT_TIMESTAMP, 'N')";
                 dbconn.executeStatement(sql);
 
                 if (pair.email != null) {
+                    sendEmail = true;
                     message.addRecipient(Message.RecipientType.TO, new InternetAddress(pair.email));
                 }
             }
 
-            tr.send(message); //, message.getRecipients(Message.RecipientType.TO));
+            if (sendEmail) {
+                tr.send(message); //, message.getRecipients(Message.RecipientType.TO));
+            }
+            
             dbconn.commitTransaction();
         } catch (Exception e) {
             _logger.error(e);

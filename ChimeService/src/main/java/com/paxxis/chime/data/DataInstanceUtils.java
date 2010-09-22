@@ -73,7 +73,8 @@ public class DataInstanceUtils {
     private static final int ROWLIMIT = 1000;
     private static final int REVIEWLIMIT = 20;
     private static final int DISCUSSIONLIMIT = 20;
-    private static final int USRMSGLIMIT = 20;
+    
+    public static final int USRMSGLIMIT = 20;
     
     
     private DataInstanceUtils()
@@ -418,6 +419,10 @@ public class DataInstanceUtils {
                                     {
                                         ShapeUtils.getUserShapeContexts(user, tag, database);
                                     }
+                                } else if (cachedInstance instanceof User) {
+                                    User u = (User)cachedInstance;
+                                    UserMessagesBundle bundle = UserMessageUtils.getMessages(u, new Cursor(DataInstanceUtils.USRMSGLIMIT), database);
+                                    u.setUserMessagesBundle(bundle);
                                 }
 
                                 boolean regInterest = RegisteredInterestUtils.isRegisteredInterest(cachedInstance, user, database);

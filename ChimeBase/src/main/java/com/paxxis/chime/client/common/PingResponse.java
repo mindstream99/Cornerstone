@@ -46,6 +46,15 @@ public class PingResponse extends ResponseMessage<PingRequest> {
     DataInstance activePortalInstance = null;
     boolean pendingTimeout = false;
     boolean expired = false;
+    User user;
+
+    public void setUser(User u) {
+        user = u;
+    }
+
+    public User getUser() {
+        return user;
+    }
 
     public void setExpired() {
         expired = true;

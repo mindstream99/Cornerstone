@@ -23,12 +23,14 @@
         <specification name="userDetail">
             <column width="1.0">
                 <portlet type="InstanceHeader" headerType="shaded" showHeader="false" />
+                <portlet type="UserMessages" showHeader="true" />
+<!--
                 <portlet type="UserDetail" title="User Details" />
+-->
                 <portlet type="InstanceField" title="User" />
                 <portlet type="InstanceSocialActivity" />
             </column>
             <column width="300">
-                <portlet type="UserMessages" showHeader="true" />
                 <portlet type="ImageGallery" showHeader="true" />
                 <portlet type="FileGallery" showHeader="true" />
                 <portlet type="InstanceReferrers" showHeader="true" />

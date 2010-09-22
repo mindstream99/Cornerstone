@@ -92,7 +92,7 @@ public class Notifier {
     }
 
     void initScheduledWatchNotification() {
-        scheduledExecutor.schedule(new WatchNotificationProcessor(dbPool, config), watchNotificationFreq, TimeUnit.HOURS);
+        scheduledExecutor.schedule(new WatchNotificationProcessor(dbPool, config), watchNotificationFreq, TimeUnit.MINUTES);
     }
 
     public void process(DataInstance inst, User user) {

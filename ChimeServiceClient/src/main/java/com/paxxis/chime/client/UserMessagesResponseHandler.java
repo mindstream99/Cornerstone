@@ -17,7 +17,6 @@
 
 package com.paxxis.chime.client;
 
-import com.paxxis.chime.client.common.AddCommentResponse;
 import com.paxxis.chime.client.common.MessageConstants.MessageType;
 import com.paxxis.chime.client.common.UserMessagesResponse;
 import com.paxxis.chime.common.JavaObjectPayload;
@@ -31,8 +30,8 @@ import com.paxxis.chime.service.SimpleMessageProcessor;
  */
 public class UserMessagesResponseHandler extends ResponseHandler<UserMessagesResponse>
 {
-    private static MessageType _supportedType = AddCommentResponse.messageType();
-    private static int _supportedVersion = AddCommentResponse.messageVersion();
+    private static MessageType _supportedType = UserMessagesResponse.messageType();
+    private static int _supportedVersion = UserMessagesResponse.messageVersion();
 
     @Override
     protected SimpleMessageProcessor getProcessor(int type, int version, int payloadType)

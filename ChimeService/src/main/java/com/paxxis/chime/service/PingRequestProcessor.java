@@ -27,6 +27,7 @@ import com.paxxis.chime.client.common.PingRequest;
 import com.paxxis.chime.client.common.PingResponse;
 import com.paxxis.chime.client.common.User;
 import com.paxxis.chime.common.MessagePayload;
+import com.paxxis.chime.data.UserUtils;
 import com.paxxis.chime.database.DatabaseConnection;
 import com.paxxis.chime.database.DatabaseConnectionPool;
 import org.apache.log4j.Logger;
@@ -73,8 +74,7 @@ public class PingRequestProcessor extends MessageProcessor {
             {
                 User user = requestMessage.getUser();
                 if (requestMessage.isSessionPing()) {
-                    if (user != null)
-                    {
+                    if (user != null) {
                         if (requestMessage.getUserActivity()) {
                             if (CacheManager.instance().isExpiringUserSession(user)) {
                                 // saved :)
@@ -92,13 +92,11 @@ public class PingRequestProcessor extends MessageProcessor {
                             if (CacheManager.instance().isExpiringUserSession(user)) {
                                 lr.setPendingTimeout(true);
                                 _logger.info("Ping received for user " + user.getName() + ". Session Expiring");
-                            } // else if (!CacheManager.instance().hasUserSession(user)) {
-                                // this is an invalid session, so set it as expired
-                                //lr.setExpired();
-                                //_logger.info("Ping received for user " + user.getName() + ". Session Expired");
-                            //}
+                            }
                         }
 
+                        user = UserUtils.getUserById(user.getId(), user, database);
+                        lr.setUser(user);
                     }
                 } else {
                     // if the message includes an active detail id, fetch the instance and return it in the response
@@ -113,6 +111,9 @@ public class PingRequestProcessor extends MessageProcessor {
                         DataInstance inst = DataInstanceUtils.getInstance(id, user, database, true, true);
                         lr.setActivePortalInstance(inst);
                     }
+                    
+                    user = UserUtils.getUserById(user.getId(), user, database);
+                    lr.setUser(user);
                 }
             }
             catch (Exception e)

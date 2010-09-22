@@ -17,11 +17,19 @@
 
 package com.paxxis.chime.client.common;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  *
  * @author Robert Englander
  */
 public class UserMessagesRequest extends RequestMessage {
+    public enum Type {
+        Query,
+        Delete
+    }
+
     private final static int VERSION = 1;
 
     @Override
@@ -42,38 +50,50 @@ public class UserMessagesRequest extends RequestMessage {
         return VERSION;
     }
 
-
+    private Type type = Type.Query;
     private User instance = null;
     private Cursor cursor = null;
     private User user = null;
+    private List<UserMessage> deleteList = new ArrayList<UserMessage>();
 
-    public User getUser()
-    {
+    public void setType(Type t) {
+        type = t;
+    }
+
+    public Type getType() {
+        return type;
+    }
+
+    public void setDeleteList(List<UserMessage> list) {
+        deleteList.clear();
+        deleteList.addAll(list);
+    }
+
+    public List<UserMessage> getDeleteList() {
+        return deleteList;
+    }
+
+    public User getUser() {
         return user;
     }
 
-    public void setUser(User user)
-    {
+    public void setUser(User user) {
         this.user = user;
     }
 
-    public void setCursor(Cursor cursor)
-    {
+    public void setCursor(Cursor cursor) {
         this.cursor = cursor;
     }
 
-    public Cursor getCursor()
-    {
+    public Cursor getCursor() {
         return cursor;
     }
 
-    public void setDataInstance(User instance)
-    {
+    public void setDataInstance(User instance) {
         this.instance = instance;
     }
 
-    public User getDataInstance()
-    {
+    public User getDataInstance() {
         return instance;
     }
 

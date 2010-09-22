@@ -24,6 +24,7 @@ import com.paxxis.chime.database.DatabaseConnection;
 import com.paxxis.chime.database.DatabaseConnectionPool;
 import com.paxxis.chime.data.UserUtils;
 import com.paxxis.chime.service.ChimeConfiguration;
+import java.util.Date;
 import java.util.HashMap;
 import org.apache.log4j.Logger;
 
@@ -45,7 +46,7 @@ class WatchNotificationProcessor extends MessageNotifier {
             try {
                 dbconn.startTransaction();
 
-                String sql = "select user_id, instance_id, instance_name from Chime.RegisteredInterest where last_update > last_notification order by user_id";
+                String sql = "select user_id, instance_id, instance_name, last_update from Chime.RegisteredInterest where last_update > last_notification order by user_id";
                 DataSet dataSet = dbconn.getDataSet(sql, true);
                 InstanceId currentUserId = null;
                 HashMap<String, StringBuilder> msgMap = new HashMap<String, StringBuilder>();
@@ -58,6 +59,7 @@ class WatchNotificationProcessor extends MessageNotifier {
                     InstanceId userId = InstanceId.create(dataSet.getFieldValue("user_id").asString());
                     String instanceId = dataSet.getFieldValue("instance_id").asString();
                     String instanceName = dataSet.getFieldValue("instance_name").asString();
+                    Date lastUpdate = dataSet.getFieldValue("last_update").asDate();
                     if (!userId.equals(currentUserId)) {
                         if (currentUserId != null) {
                             User user = UserUtils.getUserById(userId, admin, dbconn);
@@ -80,10 +82,11 @@ class WatchNotificationProcessor extends MessageNotifier {
                     String link = "";
                     String urlHost = config.getStringValue("chime.notification.urlHost", "");
                     if (!urlHost.isEmpty()) {
-                        link = " (" + urlHost + "/#detail:" + instanceId;
+                        link = NotificationUtils.toHoverUrl(urlHost, InstanceId.create(instanceId), instanceName);
                     }
 
-                    msg.append(instanceName).append(link).append("\n");
+                    String entry = "The data named " + link + " was updated on " + lastUpdate.toLocaleString();
+                    msg.append(entry).append("\n");
                 }
                 dataSet.close();
                 sql = "update Chime.RegisteredInterest set last_notification = CURRENT_TIMESTAMP where last_update > last_notification";

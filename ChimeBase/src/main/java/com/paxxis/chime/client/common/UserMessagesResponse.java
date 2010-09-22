@@ -45,29 +45,15 @@ public class UserMessagesResponse extends ResponseMessage<UserMessagesRequest> {
     }
 
 
-    // the resulting list
-    private List<UserMessage> userMessages = null;
+    // the resulting user with the bundle updated
+    private User user = null;
 
-    private Cursor cursor = null;
-
-    public void setCursor(Cursor cursor)
-    {
-        this.cursor = cursor;
+    public void setUser(User u) {
+        user = u;
     }
 
-    public Cursor getCursor()
-    {
-        return cursor;
-    }
-
-    public List<UserMessage> getUserMessages()
-    {
-        return userMessages;
-    }
-
-    public void setUserMessages(List<UserMessage> msg)
-    {
-        userMessages = msg;
+    public User getUser() {
+        return user;
     }
 }
 

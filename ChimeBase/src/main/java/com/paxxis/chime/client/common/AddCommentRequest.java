@@ -19,7 +19,7 @@ package com.paxxis.chime.client.common;
 
 
 /**
- *
+ *vvv
  * @author Robert Englanderert Englander
  */
 public class AddCommentRequest extends RequestMessage {

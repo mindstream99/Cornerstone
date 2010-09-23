@@ -487,6 +487,7 @@ public class InstanceHeaderPortlet extends PortletContainer
         };
 
         t.scheduleRepeating(10000);
+        PortalUtils.registerTimer(t);
     }
 
     public void sendVoteRequest(ApplyVoteRequest request)

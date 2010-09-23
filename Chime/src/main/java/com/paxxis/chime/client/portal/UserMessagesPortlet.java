@@ -312,6 +312,7 @@ public class UserMessagesPortlet extends PortletContainer {
         };
 
         t.scheduleRepeating(10000);
+        PortalUtils.registerTimer(t);
 
         layout();
         updateToolbatState();

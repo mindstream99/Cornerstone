@@ -17,6 +17,7 @@
 
 package com.paxxis.chime.service;
 
+import com.paxxis.chime.client.common.Cursor;
 import com.paxxis.chime.data.CacheManager;
 import com.paxxis.chime.data.DataInstanceUtils;
 import com.paxxis.chime.client.common.DataInstance;
@@ -26,7 +27,9 @@ import com.paxxis.chime.client.common.Message;
 import com.paxxis.chime.client.common.PingRequest;
 import com.paxxis.chime.client.common.PingResponse;
 import com.paxxis.chime.client.common.User;
+import com.paxxis.chime.client.common.UserMessagesBundle;
 import com.paxxis.chime.common.MessagePayload;
+import com.paxxis.chime.data.UserMessageUtils;
 import com.paxxis.chime.data.UserUtils;
 import com.paxxis.chime.database.DatabaseConnection;
 import com.paxxis.chime.database.DatabaseConnectionPool;
@@ -95,8 +98,11 @@ public class PingRequestProcessor extends MessageProcessor {
                             }
                         }
 
-                        user = UserUtils.getUserById(user.getId(), user, database);
-                        lr.setUser(user);
+                    UserMessagesBundle bundle = UserMessageUtils.getMessages(user, new Cursor(DataInstanceUtils.USRMSGLIMIT), database);
+                    user.setUserMessagesBundle(bundle);
+                    //user = UserUtils.getUserById(user.getId(), user, database);
+                    lr.setUser(user);
+
                     }
                 } else {
                     // if the message includes an active detail id, fetch the instance and return it in the response
@@ -111,9 +117,12 @@ public class PingRequestProcessor extends MessageProcessor {
                         DataInstance inst = DataInstanceUtils.getInstance(id, user, database, true, true);
                         lr.setActivePortalInstance(inst);
                     }
-                    
-                    user = UserUtils.getUserById(user.getId(), user, database);
+
+                    UserMessagesBundle bundle = UserMessageUtils.getMessages(user, new Cursor(DataInstanceUtils.USRMSGLIMIT), database);
+                    user.setUserMessagesBundle(bundle);
+                    //user = UserUtils.getUserById(user.getId(), user, database);
                     lr.setUser(user);
+                    
                 }
             }
             catch (Exception e)

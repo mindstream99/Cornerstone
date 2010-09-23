@@ -19,8 +19,8 @@ package com.paxxis.chime.client.common;
 
 
 /**
- *vvv
- * @author Robert Englanderert Englander
+ *
+ * @author Robert Englander
  */
 public class AddCommentRequest extends RequestMessage {
     private final static int VERSION = 1;

@@ -27,13 +27,13 @@ USE Chime;
 
 DROP TABLE IF EXISTS `Chime`.`ChimeSchema`;
 CREATE TABLE  `Chime`.`ChimeSchema` (
-  `ID` char(40) NOT NULL,
-  `DATATYPE_ID` char(40) DEFAULT NULL,
+  `ID` varchar(40) NOT NULL,
+  `DATATYPE_ID` varchar(40) DEFAULT NULL,
   `DISPLAYFORMAT` varchar(16) DEFAULT NULL,
   `COL` int(11) DEFAULT NULL,
   `DISPLAYCOL` int(11) DEFAULT NULL,
   `FIELDNAME` varchar(64) DEFAULT NULL,
-  `FIELD_TYPEID` char(40) DEFAULT NULL,
+  `FIELD_TYPEID` varchar(40) DEFAULT NULL,
   `MAXVALUES` int(11) DEFAULT '0',
   `FIELDDESCRIPTION` varchar(128) DEFAULT NULL,
   `PRIVATE` char(1) DEFAULT 'N',
@@ -83,28 +83,28 @@ UNLOCK TABLES;
 
 DROP TABLE IF EXISTS `Chime`.`DataInstance`;
 CREATE TABLE  `Chime`.`DataInstance` (
-  `ID` char(40) NOT NULL,
+  `ID` varchar(40) NOT NULL,
   `NAME` varchar(254) DEFAULT NULL,
   `DESCRIPTION` mediumtext,
   `CREATED` timestamp NULL DEFAULT NULL,
-  `CREATEDBY` char(40) DEFAULT NULL,
+  `CREATEDBY` varchar(40) DEFAULT NULL,
   `CREATEDBYNAME` varchar(254) DEFAULT NULL,
   `UPDATED` timestamp NULL DEFAULT NULL,
-  `UPDATEDBY` char(40) DEFAULT NULL,
+  `UPDATEDBY` varchar(40) DEFAULT NULL,
   `UPDATEDBYNAME` varchar(254) DEFAULT NULL,
   `AVERAGERATING` double DEFAULT NULL,
   `RATINGCOUNT` int(11) DEFAULT NULL,
   `COMMENTCOUNT` int(11) DEFAULT NULL,
   `TAGCOUNT` int(11) DEFAULT NULL,
   `COMMENTED` timestamp NULL DEFAULT NULL,
-  `COMMENTEDBY` char(40) DEFAULT NULL,
+  `COMMENTEDBY` varchar(40) DEFAULT NULL,
   `COMMENTEDBYNAME` varchar(254) DEFAULT NULL,
   `REVIEWED` timestamp NULL DEFAULT NULL,
-  `REVIEWEDBY` char(40) DEFAULT NULL,
+  `REVIEWEDBY` varchar(40) DEFAULT NULL,
   `REVIEWEDBYNAME` varchar(254) DEFAULT NULL,
   `REVIEWEDBYACTION` char(1) DEFAULT NULL,
   `TAGGED` timestamp NULL DEFAULT NULL,
-  `TAGGEDBY` char(40) DEFAULT NULL,
+  `TAGGEDBY` varchar(40) DEFAULT NULL,
   `TAGGEDBYNAME` varchar(254) DEFAULT NULL,
   `TAGGEDACTION` char(1) DEFAULT NULL,
   `POSITIVECOUNT` bigint(20) DEFAULT '0',
@@ -114,10 +114,10 @@ CREATE TABLE  `Chime`.`DataInstance` (
   `INTVAL2` bigint(20) DEFAULT '0',
   `CHARVAL` varchar(254) DEFAULT NULL,
   `LOCKTYPE` varchar(4) DEFAULT 'NONE',
-  `LOCKEDBY` char(40) DEFAULT NULL,
+  `LOCKEDBY` varchar(40) DEFAULT NULL,
   `LOCKEDBYNAME` varchar(254) DEFAULT NULL,
   `LOCKED` timestamp NULL DEFAULT NULL,
-  `backRef` char(40) DEFAULT NULL,
+  `backRef` varchar(40) DEFAULT NULL,
   `EXPIRATION` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`ID`),
   KEY `IDX2` (`NAME`)
@@ -167,11 +167,11 @@ UNLOCK TABLES;
 
 DROP TABLE IF EXISTS `Chime`.`DataInstance_Attachment`;
 CREATE TABLE  `Chime`.`DataInstance_Attachment` (
-  `ID` char(40) NOT NULL,
-  `INSTANCE_ID` char(40) DEFAULT NULL,
+  `ID` varchar(40) NOT NULL,
+  `INSTANCE_ID` varchar(40) DEFAULT NULL,
   `FILETYPE` char(1) DEFAULT NULL,
   `FILENUM` int(11) DEFAULT NULL,
-  `FOREIGN_ID` char(40) DEFAULT NULL,
+  `FOREIGN_ID` varchar(40) DEFAULT NULL,
   `TIMESTAMP` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`ID`),
   KEY `IDX3` (`INSTANCE_ID`,`FILETYPE`)
@@ -193,9 +193,9 @@ UNLOCK TABLES;
 
 DROP TABLE IF EXISTS `Chime`.`DataInstance_History`;
 CREATE TABLE  `Chime`.`DataInstance_History` (
-  `ID` char(40) NOT NULL,
-  `INSTANCE_ID` char(40) DEFAULT NULL,
-  `USER_ID` char(40) DEFAULT NULL,
+  `ID` varchar(40) NOT NULL,
+  `INSTANCE_ID` varchar(40) DEFAULT NULL,
+  `USER_ID` varchar(40) DEFAULT NULL,
   `USER_NAME` varchar(254) DEFAULT NULL,
   `EVENTTYPE` varchar(10) DEFAULT NULL,
   `TIMESTAMP` timestamp NULL DEFAULT NULL,
@@ -228,9 +228,9 @@ UNLOCK TABLES;
 
 DROP TABLE IF EXISTS `Chime`.`DataInstance_Number`;
 CREATE TABLE  `Chime`.`DataInstance_Number` (
-  `ID` char(40) NOT NULL,
-  `INSTANCE_ID` char(40) DEFAULT NULL,
-  `DATATYPE_ID` char(40) DEFAULT NULL,
+  `ID` varchar(40) NOT NULL,
+  `INSTANCE_ID` varchar(40) DEFAULT NULL,
+  `DATATYPE_ID` varchar(40) DEFAULT NULL,
   `DATATYPE_COLUMN` int(11) DEFAULT NULL,
   `VALUE` double DEFAULT NULL,
   `TIMESTAMP` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -257,11 +257,11 @@ UNLOCK TABLES;
 
 DROP TABLE IF EXISTS `Chime`.`DataInstance_Reference`;
 CREATE TABLE  `Chime`.`DataInstance_Reference` (
-  `ID` char(40) NOT NULL,
-  `INSTANCE_ID` char(40) DEFAULT NULL,
-  `DATATYPE_ID` char(40) DEFAULT NULL,
+  `ID` varchar(40) NOT NULL,
+  `INSTANCE_ID` varchar(40) DEFAULT NULL,
+  `DATATYPE_ID` varchar(40) DEFAULT NULL,
   `DATATYPE_COLUMN` int(11) DEFAULT NULL,
-  `FOREIGN_ID` char(40) DEFAULT NULL,
+  `FOREIGN_ID` varchar(40) DEFAULT NULL,
   `TIMESTAMP` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `POSITION` int(11) DEFAULT NULL,
   PRIMARY KEY (`ID`),
@@ -288,9 +288,9 @@ UNLOCK TABLES;
 
 DROP TABLE IF EXISTS `Chime`.`DataInstance_Text`;
 CREATE TABLE  `Chime`.`DataInstance_Text` (
-  `ID` char(40) NOT NULL,
-  `INSTANCE_ID` char(40) DEFAULT NULL,
-  `DATATYPE_ID` char(40) DEFAULT NULL,
+  `ID` varchar(40) NOT NULL,
+  `INSTANCE_ID` varchar(40) DEFAULT NULL,
+  `DATATYPE_ID` varchar(40) DEFAULT NULL,
   `DATATYPE_COLUMN` int(11) DEFAULT NULL,
   `VALUE` mediumtext,
   `TIMESTAMP` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -318,10 +318,10 @@ UNLOCK TABLES;
 
 DROP TABLE IF EXISTS `Chime`.`DataInstance_Type`;
 CREATE TABLE  `Chime`.`DataInstance_Type` (
-  `ID` char(40) NOT NULL,
-  `INSTANCE_ID` char(40) DEFAULT NULL,
+  `ID` varchar(40) NOT NULL,
+  `INSTANCE_ID` varchar(40) DEFAULT NULL,
   `NAME` varchar(254) DEFAULT NULL,
-  `DATATYPE_ID` char(40) DEFAULT NULL,
+  `DATATYPE_ID` varchar(40) DEFAULT NULL,
   `TIMESTAMP` timestamp NULL DEFAULT NULL,
   `POSITION` int(11) DEFAULT NULL,
   PRIMARY KEY (`ID`),
@@ -375,9 +375,9 @@ UNLOCK TABLES;
 
 DROP TABLE IF EXISTS `Chime`.`DataInstance_community`;
 CREATE TABLE  `Chime`.`DataInstance_community` (
-  `ID` char(40) NOT NULL,
-  `INSTANCE_ID` char(40) DEFAULT NULL,
-  `COMMUNITY_ID` char(40) DEFAULT NULL,
+  `ID` varchar(40) NOT NULL,
+  `INSTANCE_ID` varchar(40) DEFAULT NULL,
+  `COMMUNITY_ID` varchar(40) DEFAULT NULL,
   `PERMISSIONS` varchar(3) DEFAULT NULL,
   PRIMARY KEY (`ID`),
   KEY `IDX18` (`COMMUNITY_ID`),
@@ -414,13 +414,13 @@ UNLOCK TABLES;
 
 DROP TABLE IF EXISTS `Chime`.`DataInstance_positive`;
 CREATE TABLE  `Chime`.`DataInstance_positive` (
-  `ID` char(40) NOT NULL,
-  `INSTANCE_ID` char(40) DEFAULT NULL,
-  `USER_ID` char(40) DEFAULT NULL,
+  `ID` varchar(40) NOT NULL,
+  `INSTANCE_ID` varchar(40) DEFAULT NULL,
+  `USER_ID` varchar(40) DEFAULT NULL,
   `VALUE` char(1) DEFAULT NULL,
   `TIMESTAMP` timestamp NULL DEFAULT NULL,
-  `INSTANCE_USERID` char(40) NOT NULL DEFAULT '0',
-  `INSTANCE_TYPEID` char(40) NOT NULL DEFAULT '0',
+  `INSTANCE_USERID` varchar(40) NOT NULL DEFAULT '0',
+  `INSTANCE_TYPEID` varchar(40) NOT NULL DEFAULT '0',
   PRIMARY KEY (`ID`),
   UNIQUE KEY `IDX19` (`INSTANCE_ID`,`USER_ID`),
   KEY `IDX15A` (`INSTANCE_USERID`,`INSTANCE_TYPEID`)
@@ -442,11 +442,11 @@ UNLOCK TABLES;
 
 DROP TABLE IF EXISTS `Chime`.`DataInstance_tag`;
 CREATE TABLE  `Chime`.`DataInstance_tag` (
-  `ID` char(40) NOT NULL,
-  `INSTANCE_ID` char(40) DEFAULT NULL,
-  `USER_ID` char(40) DEFAULT NULL,
+  `ID` varchar(40) NOT NULL,
+  `INSTANCE_ID` varchar(40) DEFAULT NULL,
+  `USER_ID` varchar(40) DEFAULT NULL,
   `TIMESTAMP` timestamp NULL DEFAULT NULL,
-  `TAG_ID` char(40) DEFAULT NULL,
+  `TAG_ID` varchar(40) DEFAULT NULL,
   `PRIVATE` char(1) DEFAULT 'N',
   PRIMARY KEY (`ID`),
   KEY `IDX20` (`INSTANCE_ID`)
@@ -468,9 +468,9 @@ UNLOCK TABLES;
 
 DROP TABLE IF EXISTS `Chime`.`DataInstance_tag_metrics`;
 CREATE TABLE  `Chime`.`DataInstance_tag_metrics` (
-  `ID` char(40) NOT NULL,
-  `INSTANCE_ID` char(40) DEFAULT NULL,
-  `TAG_ID` char(40) DEFAULT NULL,
+  `ID` varchar(40) NOT NULL,
+  `INSTANCE_ID` varchar(40) DEFAULT NULL,
+  `TAG_ID` varchar(40) DEFAULT NULL,
   `COUNT` int(11) DEFAULT NULL,
   PRIMARY KEY (`ID`),
   KEY `IDX21` (`INSTANCE_ID`)
@@ -492,8 +492,8 @@ UNLOCK TABLES;
 
 DROP TABLE IF EXISTS `Chime`.`EventJournal`;
 CREATE TABLE  `Chime`.`EventJournal` (
-  `id` char(40) NOT NULL,
-  `type_id` char(40) NOT NULL,
+  `id` varchar(40) NOT NULL,
+  `type_id` varchar(40) NOT NULL,
   `message` mediumtext NOT NULL,
   `timestamp` datetime DEFAULT NULL,
   PRIMARY KEY (`id`),
@@ -517,8 +517,8 @@ UNLOCK TABLES;
 
 DROP TABLE IF EXISTS `Chime`.`MessageJournal`;
 CREATE TABLE  `Chime`.`MessageJournal` (
-  `ID` char(40) NOT NULL,
-  `USER_ID` char(40) NOT NULL,
+  `ID` varchar(40) NOT NULL,
+  `USER_ID` varchar(40) NOT NULL,
   `SUBJECT` varchar(254) NOT NULL,
   `MESSAGE` text NOT NULL,
   `TIMESTAMP` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
@@ -543,10 +543,10 @@ UNLOCK TABLES;
 
 DROP TABLE IF EXISTS `Chime`.`RegisteredInterest`;
 CREATE TABLE  `Chime`.`RegisteredInterest` (
-  `ID` char(40) NOT NULL,
-  `INSTANCE_ID` char(40) DEFAULT NULL,
+  `ID` varchar(40) NOT NULL,
+  `INSTANCE_ID` varchar(40) DEFAULT NULL,
   `INSTANCE_NAME` varchar(254) DEFAULT NULL,
-  `USER_ID` char(40) DEFAULT NULL,
+  `USER_ID` varchar(40) DEFAULT NULL,
   `last_update` timestamp NULL DEFAULT NULL,
   `last_notification` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`ID`),
@@ -570,9 +570,9 @@ UNLOCK TABLES;
 
 DROP TABLE IF EXISTS `Chime`.`Template`;
 CREATE TABLE  `Chime`.`Template` (
-  `ID` char(40) NOT NULL,
-  `TYPE_ID` char(40) DEFAULT NULL,
-  `INSTANCE_ID` char(40) DEFAULT NULL,
+  `ID` varchar(40) NOT NULL,
+  `TYPE_ID` varchar(40) DEFAULT NULL,
+  `INSTANCE_ID` varchar(40) DEFAULT NULL,
   `TEMPLATE` mediumtext,
   PRIMARY KEY (`ID`),
   KEY `IDX25` (`TYPE_ID`),
@@ -606,9 +606,9 @@ UNLOCK TABLES;
 
 DROP TABLE IF EXISTS `Chime`.`Type_tag_usage`;
 CREATE TABLE  `Chime`.`Type_tag_usage` (
-  `ID` char(40) NOT NULL,
-  `TYPE_ID` char(40) DEFAULT NULL,
-  `TAG_ID` char(40) DEFAULT NULL,
+  `ID` varchar(40) NOT NULL,
+  `TYPE_ID` varchar(40) DEFAULT NULL,
+  `TAG_ID` varchar(40) DEFAULT NULL,
   `USAGECOUNT` int(11) DEFAULT '0',
   PRIMARY KEY (`ID`),
   UNIQUE KEY `IDX26` (`TAG_ID`,`TYPE_ID`)
@@ -630,8 +630,8 @@ UNLOCK TABLES;
 
 DROP TABLE IF EXISTS `Chime`.`UserProfile`;
 CREATE TABLE  `Chime`.`UserProfile` (
-  `ID` char(40) NOT NULL,
-  `USER_ID` char(40) DEFAULT NULL,
+  `ID` varchar(40) NOT NULL,
+  `USER_ID` varchar(40) DEFAULT NULL,
   `EMAILADDRESS` varchar(254) DEFAULT NULL,
   `EMAILNOTIFICATION` char(1) DEFAULT 'Y',
   PRIMARY KEY (`ID`),
@@ -654,10 +654,10 @@ UNLOCK TABLES;
 
 DROP TABLE IF EXISTS `Chime`.`User_tag_applied`;
 CREATE TABLE  `Chime`.`User_tag_applied` (
-  `ID` char(40) NOT NULL,
-  `USER_ID` char(40) NOT NULL,
-  `TAG_ID` char(40) NOT NULL,
-  `INSTANCE_ID` char(40) NOT NULL,
+  `ID` varchar(40) NOT NULL,
+  `USER_ID` varchar(40) NOT NULL,
+  `TAG_ID` varchar(40) NOT NULL,
+  `INSTANCE_ID` varchar(40) NOT NULL,
   PRIMARY KEY (`ID`),
   UNIQUE KEY `IDX30` (`USER_ID`,`TAG_ID`,`INSTANCE_ID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
@@ -678,10 +678,10 @@ UNLOCK TABLES;
 
 DROP TABLE IF EXISTS `Chime`.`User_tag_usage`;
 CREATE TABLE  `Chime`.`User_tag_usage` (
-  `ID` char(40) NOT NULL,
-  `USER_ID` char(40) DEFAULT NULL,
-  `TAG_ID` char(40) DEFAULT NULL,
-  `TYPE_ID` char(40) DEFAULT NULL,
+  `ID` varchar(40) NOT NULL,
+  `USER_ID` varchar(40) DEFAULT NULL,
+  `TAG_ID` varchar(40) DEFAULT NULL,
+  `TYPE_ID` varchar(40) DEFAULT NULL,
   `USAGECOUNT` int(11) DEFAULT '0',
   PRIMARY KEY (`ID`),
   UNIQUE KEY `IDX28` (`USER_ID`,`TAG_ID`,`TYPE_ID`)

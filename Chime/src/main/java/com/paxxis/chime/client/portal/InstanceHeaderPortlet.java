@@ -17,24 +17,28 @@
 
 package com.paxxis.chime.client.portal;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import com.extjs.gxt.ui.client.core.Template;
 import com.extjs.gxt.ui.client.event.IconButtonEvent;
 import com.extjs.gxt.ui.client.event.MenuEvent;
 import com.extjs.gxt.ui.client.event.SelectionListener;
 import com.extjs.gxt.ui.client.fx.FxConfig;
+import com.extjs.gxt.ui.client.store.ListStore;
 import com.extjs.gxt.ui.client.util.Margins;
-import com.extjs.gxt.ui.client.util.Params;
-import com.extjs.gxt.ui.client.widget.LayoutContainer;
 import com.extjs.gxt.ui.client.widget.button.ToolButton;
-import com.extjs.gxt.ui.client.widget.layout.ColumnData;
-import com.extjs.gxt.ui.client.widget.layout.ColumnLayout;
+import com.extjs.gxt.ui.client.widget.grid.ColumnConfig;
+import com.extjs.gxt.ui.client.widget.grid.ColumnModel;
+import com.extjs.gxt.ui.client.widget.grid.Grid;
 import com.extjs.gxt.ui.client.widget.layout.RowData;
 import com.extjs.gxt.ui.client.widget.layout.RowLayout;
 import com.extjs.gxt.ui.client.widget.menu.Menu;
 import com.extjs.gxt.ui.client.widget.menu.MenuItem;
 import com.extjs.gxt.ui.client.widget.menu.SeparatorMenuItem;
+import com.google.gwt.user.client.Command;
+import com.google.gwt.user.client.DeferredCommand;
 import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.paxxis.chime.client.InstanceUpdateListener;
@@ -63,11 +67,10 @@ import com.paxxis.chime.client.editor.MultiReferenceEditorWindow;
 import com.paxxis.chime.client.editor.SingleLineTextEditorWindow;
 import com.paxxis.chime.client.editor.TextEditorWindow;
 import com.paxxis.chime.client.widgets.ChimeMessageBox;
-import com.paxxis.chime.client.widgets.InterceptedHtml;
+import com.paxxis.chime.client.widgets.InterceptedHtmlGridCellRenderer;
 import com.paxxis.chime.client.widgets.LockPanel;
 import com.paxxis.chime.client.widgets.PasswordWindow;
 import com.paxxis.chime.client.widgets.SubscribePanel;
-import com.paxxis.chime.client.widgets.UsefulVoterPanel;
 import com.paxxis.chime.client.widgets.PasswordWindow.PasswordChangeListener;
 
 /**
@@ -100,8 +103,6 @@ public class InstanceHeaderPortlet extends PortletContainer
     private ToolButton refreshButton;
     private ToolButton actionsButton;
     private DataInstance _instance = null;
-    private InterceptedHtml _header;
-    private InterceptedHtml _description;
     private Menu actionMenu;
     private MenuItem addTypeMenuItem;
     private MenuItem editNameItem;
@@ -113,14 +114,13 @@ public class InstanceHeaderPortlet extends PortletContainer
     private MenuItem permissionItem;
     private InstanceUpdateListener updateListener;
     private boolean showDescription = true;
-    //private Button pageFavoriteButton = null;
-    //private InterceptedHtml rule = null;
-    //private boolean isFavorite = false;
     private boolean isStale = false;
-    private LayoutContainer mainPanel;
     private LockPanel lockPanel;
     private SubscribePanel subscribePanel;
     //private FavoritePanel favoritePanel;
+
+    private Grid<DataRowModel> grid;
+    private ListStore<DataRowModel> listStore;
     
     public InstanceHeaderPortlet(PortletSpecification spec, HeaderType type, InstanceUpdateListener listener)
     {
@@ -155,35 +155,53 @@ public class InstanceHeaderPortlet extends PortletContainer
     	        setHeading(name, "detail-header-name");
     	        _instance = instance;
 
-    	        Params params = new Params();
-    	        
+    	        listStore.removeAll();
     	        if (fullView()) {
-        	        params.set("types", getTypes(_instance));
-        	        params.set("backRef", getBackReference(_instance));
-        	        params.set("byline", getByLine(_instance));
-        	        params.set("usefulness", getUsefulness(_instance));
+    	        	DataRowModel model = new DataRowModel(DataRowModel.NAME, "Updated By:");
+    	        	model.set(DataRowModel.VALUE, getByLine(_instance));
+    	        	listStore.add(model);
+
+    	            Date expiration = instance.getExpiration();
+    	            if (expiration != null) {
+        	        	model = new DataRowModel(DataRowModel.NAME, "Expires On:");
+        	        	model.set(DataRowModel.VALUE, expiration.toLocaleString());
+        	        	listStore.add(model);
+    	            }
+    	            
+    	        	model = new DataRowModel(DataRowModel.NAME, "Applied Shapes:");
+    	        	model.set(DataRowModel.VALUE, getTypes(_instance));
+    	        	listStore.add(model);
+        	        
+    	        	if (_instance instanceof BackReferencingDataInstance) {
+        	        	model = new DataRowModel(DataRowModel.NAME, "Applied To:");
+        	        	model.set(DataRowModel.VALUE, getBackReference(_instance));
+        	        	listStore.add(model);
+    	        	}
     	        }
     	        
-    	        String content = _template.applyTemplate(params);
-    	        _header.setHtml(content);
-
     	        if (showDescription) {
-    	            params = new Params();
-    	            params.set("desc", getDescription(_instance));
-
-    	            content = _descTemplate.applyTemplate(params);
-    	            _description.setHtml(content);
+    	        	DataRowModel model = new DataRowModel(DataRowModel.NAME, "Description:");
+    	        	model.set(DataRowModel.VALUE, getDescription(_instance));
+    	        	listStore.add(model);
     	        }
 
-    	        // anything can be a favorite
-    	        boolean vis = true; //(instance instanceof Dashboard);
-    	        //favoritePanel.setVisible(vis);
-
+    	        listStore.commitChanges();
+    	        
     	        subscribePanel.setDataInstance(instance);
     	        lockPanel.setDataInstance(instance);
     	        //favoritePanel.setDataInstance(instance);
 
     	        updateActions();
+    	        
+    	        // I don't know why this is necessary, but for some reason the grid is not sizing its
+    	        // width correctly.
+    	        DeferredCommand.addCommand(
+    	        	new Command() {
+    	        		public void execute() {
+    	        	    	grid.setWidth(getWidth());
+    	        		}
+    	        	}
+    	        );
     		}
     	};
     	
@@ -194,10 +212,13 @@ public class InstanceHeaderPortlet extends PortletContainer
     	}
     }
 
+    public void onResize(int width, int height) {
+    	super.onResize(width, height);
+    	//grid.setWidth(width);
+    }
+    
     private boolean fullView() {
-    	boolean full = true;
     	boolean isUserInstance = _instance.getShapes().get(0).getName().equals("User");
-    		
     	if (isUserInstance) {
         	User user = ServiceManager.getActiveUser();
         	return user.isAdmin() || user.getId().equals(_instance.getId());
@@ -392,25 +413,7 @@ public class InstanceHeaderPortlet extends PortletContainer
         }
 
         getBody().setStyleAttribute("backgroundColor", "#f1f1f1");
-
-        mainPanel = new LayoutContainer();
-        mainPanel.setLayout(new RowLayout());
-        mainPanel.setStyleAttribute("backgroundColor", "transparent");
-        
-        getBody().setLayout(new ColumnLayout());
-        getBody().add(mainPanel, new ColumnData(1.0));
-
-        /*
-        favoritePanel = new FavoritePanel(
-            new FavoritePanel.FavoritePanelListener() {
-                public void onFavorite(boolean fav) {
-                    updateListener.onUpdateFavorite(_instance, fav);
-                }
-            }
-        );
-
-        addToolbarItem(favoritePanel, 30);
-		*/
+        getBody().setLayout(new RowLayout());
         
         subscribePanel = new SubscribePanel(
             new SubscribePanel.SubscribePanelListener() {
@@ -445,38 +448,37 @@ public class InstanceHeaderPortlet extends PortletContainer
         addHeaderItem(refreshButton);
         setupRefresh();
 
-        _header = new InterceptedHtml();
+        List<ColumnConfig> configs = new ArrayList<ColumnConfig>();
+        ColumnConfig column = new ColumnConfig();
+        column.setId(DataRowModel.NAME);
+        column.setFixed(true);
+        column.setHeader("");
+        column.setWidth(150);
+        column.setSortable(false);
+        column.setMenuDisabled(true);
+        configs.add(column);
         
-        if (true)
-        {
-            mainPanel.add(_header, new RowData(1, -1, new Margins(5, 5, 0, 5)));
-        }
-        else
-        {
-            mainPanel.add(_header, new RowData(1, -1));
-        }
-
-        UsefulVoterPanel.VoteListener listener = new UsefulVoterPanel.VoteListener() {
-            public void onVote(boolean positive) {
-                ApplyVoteRequest req = new ApplyVoteRequest();
-                req.setData(_instance);
-                req.setPositive(positive);
-                sendVoteRequest(req);
-            }
-        };
-
-        if (showDescription) {
-            _description = new InterceptedHtml();
-            if (true)
-            {
-                mainPanel.add(_description, new RowData(1, -1, new Margins(0, 5, 5, 5)));
-            }
-            else
-            {
-                mainPanel.add(_description, new RowData(1, -1));
-            }
-        }
-
+        column = new ColumnConfig();
+        column.setId(DataRowModel.VALUE);
+        column.setHeader("");
+        column.setWidth(300);
+        column.setSortable(false);
+        column.setMenuDisabled(true);
+        column.setRenderer(new InterceptedHtmlGridCellRenderer());
+        configs.add(column);
+        
+        ColumnModel cm = new ColumnModel(configs);
+        
+        listStore = new ListStore<DataRowModel>();
+        grid = new Grid<DataRowModel>(listStore, cm);
+        grid.getView().setAutoFill(true);
+        grid.setSelectionModel(null);
+        grid.getView().setForceFit(true);
+        grid.setHideHeaders(true);
+        grid.setTrackMouseOver(false);
+        
+        getBody().add(grid, new RowData(1, -1, new Margins(0)));
+                
         Timer t = new Timer() {
             @Override
             public void run() {
@@ -490,24 +492,16 @@ public class InstanceHeaderPortlet extends PortletContainer
         PortalUtils.registerTimer(t);
     }
 
-    public void sendVoteRequest(ApplyVoteRequest request)
-    {
-        final AsyncCallback callback = new AsyncCallback()
-        {
-            public void onFailure(Throwable arg0)
-            {
+    public void sendVoteRequest(ApplyVoteRequest request) {
+        final AsyncCallback<ServiceResponseObject<ApplyVoteResponse>> callback = new AsyncCallback<ServiceResponseObject<ApplyVoteResponse>>() {
+            public void onFailure(Throwable arg0) {
                 ChimeMessageBox.alert("System Error", "Please contact the system administrator.", null);
             }
 
-            public void onSuccess(Object obj)
-            {
-                ServiceResponseObject<ApplyVoteResponse> response = (ServiceResponseObject<ApplyVoteResponse>)obj;
-                if (response.isResponse())
-                {
+            public void onSuccess(ServiceResponseObject<ApplyVoteResponse> response) {
+                if (response.isResponse()) {
                     setDataInstance(response.getResponse().getDataInstance(), UpdateReason.InstanceChange);
-                }
-                else
-                {
+                } else {
                     ChimeMessageBox.alert("Error", response.getError().getMessage(), null);
                 }
             }
@@ -521,18 +515,14 @@ public class InstanceHeaderPortlet extends PortletContainer
         StringBuffer buf = new StringBuffer();
         if (instance instanceof BackReferencingDataInstance) {
             BackReferencingDataInstance inst = (BackReferencingDataInstance)instance;
-            buf.append("<br><b>Applied to:</b> " + Utils.toHoverUrl(inst.getBackRefId(), inst.getBackRefName()));
+            buf.append( Utils.toHoverUrl(inst.getBackRefId(), inst.getBackRefName()));
         }
 
         return buf.toString();
     }
 
     private String getDescription(DataInstance instance) {
-    	if (fullView()) {
-            return "<b>Description:</b> " + instance.getDescription();
-    	} else {
-            return instance.getDescription();
-    	}
+        return instance.getDescription();
     }
 
     private String getTypes(DataInstance instance) {
@@ -544,7 +534,7 @@ public class InstanceHeaderPortlet extends PortletContainer
             sep = "  ";
         }
 
-        return "<br><b>Applied Shapes:</b> " + buf.toString();
+        return buf.toString();
     }
 
     private String getByLine(DataInstance instance)
@@ -554,35 +544,12 @@ public class InstanceHeaderPortlet extends PortletContainer
         Date updated = instance.getUpdated();
         if (created.equals(updated))
         {
-            txt = "<b>Created by:</b> " + Utils.toHoverUrl(instance.getCreatedBy()) + " on " + created.toLocaleString();
+            txt = Utils.toHoverUrl(instance.getCreatedBy()) + " on " + created.toLocaleString();
         }
         else
         {
-            txt = "<b>Updated by:</b> " + Utils.toHoverUrl(instance.getUpdatedBy()) + " on " + updated.toLocaleString();
+            txt = Utils.toHoverUrl(instance.getUpdatedBy()) + " on " + updated.toLocaleString();
         }
-
-        Date expiration = instance.getExpiration();
-        if (expiration != null) {
-        	txt += "<br><b>Expires on:</b> " + expiration.toLocaleString();
-        }
-        
         return txt;
-    }
-
-    private String getUsefulness(DataInstance instance)
-    {
-        String s = "";
-
-        int pos = instance.getPositiveCount();
-        int neg = instance.getNegativeCount();
-        int cnt = pos + neg;
-
-        if (cnt == 1) {
-            s = "<br>" + pos + " of " + cnt + " person found this data useful";
-        } else if (cnt > 1) {
-            s = "<br>" + pos + " of " + cnt + " people found this data useful";
-        }
-
-        return s;
     }
 }

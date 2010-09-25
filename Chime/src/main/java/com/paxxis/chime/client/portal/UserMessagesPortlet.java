@@ -256,7 +256,7 @@ public class UserMessagesPortlet extends PortletContainer {
         	new SelectionChangedListener<UserMessageModel>() {
 				@Override
 				public void selectionChanged(SelectionChangedEvent<UserMessageModel> se) {
-					updateToolbatState();
+					updateToolbarState();
 				}
         	}
         );
@@ -315,7 +315,7 @@ public class UserMessagesPortlet extends PortletContainer {
         PortalUtils.registerTimer(t);
 
         layout();
-        updateToolbatState();
+        updateToolbarState();
     }
     
     public void setStale() {
@@ -438,7 +438,7 @@ public class UserMessagesPortlet extends PortletContainer {
     	ServiceManager.getService().sendUserMessagesRequest(req, cb);
     }
     
-    protected void updateToolbatState() {
+    protected void updateToolbarState() {
     
     	if (user != null) {
         	int total = user.getUserMessagesBundle().getCursor().getTotal();
@@ -479,7 +479,7 @@ public class UserMessagesPortlet extends PortletContainer {
         	        listStore.add(new UserMessageModel(msg));
     	    	}
     	    	listStore.commitChanges();
-    	    	updateToolbatState();
+    	    	updateToolbarState();
     		}
     	};
     	

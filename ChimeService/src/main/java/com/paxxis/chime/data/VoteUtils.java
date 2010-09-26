@@ -78,6 +78,7 @@ public class VoteUtils {
             count = dataSet.getFieldValue("count").asLong();
         }
 
+        dataSet.close();
         return count;
     }
 

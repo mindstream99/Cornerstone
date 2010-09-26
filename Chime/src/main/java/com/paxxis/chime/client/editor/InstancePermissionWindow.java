@@ -91,7 +91,7 @@ public class InstancePermissionWindow extends ChimeWindow
         if (currentScope.isGlobalCommunity()) {
         	currentScopes.add(new Scope(Community.Global, Permission.R));
         } else {
-            if (currentScope.getCommunity().getId() != user.getId()) {
+            if (!currentScope.getCommunity().getId().equals(user.getId())) {
             	// currently scoped to a community
                 List<Community> communities = user.getCommunities();
                 for (Community community : communities) {
@@ -138,7 +138,6 @@ public class InstancePermissionWindow extends ChimeWindow
     }
 
     private Community getLimitingScope(List<Shape> types) {
-    	List<Scope> scopes = new ArrayList<Scope>();
     	Community result = Community.Global;
     	User user = ServiceManager.getActiveUser();
     	
@@ -147,7 +146,7 @@ public class InstancePermissionWindow extends ChimeWindow
     		Scope scope = getReadScope(typeScopes);
     		if (scope.getCommunity().getId().equals(user.getId())) {
     			return scope.getCommunity();
-    		} else if (scope.getCommunity().getId() != Community.Global.getId()) {
+    		} else if (!scope.getCommunity().getId().equals(Community.Global.getId())) {
     			if (result.getId().equals(Community.Global.getId())) {
     				result = scope.getCommunity();
     			}
@@ -161,10 +160,10 @@ public class InstancePermissionWindow extends ChimeWindow
     	boolean valid = true;
     	User user = ServiceManager.getActiveUser();
     	if (limitingCommunity.getId().equals(user.getId())) {
-    		if (community.getId() != user.getId()) {
+    		if (!community.getId().equals(user.getId())) {
     			valid = false;
     		}
-    	} else if (limitingCommunity.getId() != Community.Global.getId()) {
+    	} else if (!limitingCommunity.getId().equals(Community.Global.getId())) {
     		// the community can't be global
     		if (community.getId().equals(Community.Global.getId())) {
     			valid = false;
@@ -305,8 +304,8 @@ public class InstancePermissionWindow extends ChimeWindow
     private void validate() {
         DataInstance c = visibilityCombo.getSelection().get(0).getDataInstance();
         DataInstance c2 = editableCombo.getSelection().get(0).getDataInstance();
-        boolean valid = (c.getId() != currentScope.getCommunity().getId() ||
-        		           c2.getId() != currentEditScope.getCommunity().getId());
+        boolean valid = (!c.getId().equals(currentScope.getCommunity().getId()) ||
+        		           !c2.getId().equals(currentEditScope.getCommunity().getId()));
         _okButton.setEnabled(valid);
     }
 
@@ -322,7 +321,6 @@ public class InstancePermissionWindow extends ChimeWindow
 
         SimpleDataInstanceModel model = visibilityStore.findModel("id", currentScope.getCommunity().getId().getValue());
         visibilityCombo.setValue(model);
-
         setupEditable();
     }
 
@@ -341,7 +339,7 @@ public class InstancePermissionWindow extends ChimeWindow
         if (visible.getId().equals(user.getId())) {
         	// private visibility
         	theScopes.add(new Scope(new Community(user.getId()), Scope.Permission.RU));
-        } else if (visible.getId() != Community.Global.getId()) {
+        } else if (!visible.getId().equals(Community.Global.getId())) {
         	// single community visibility
         	theScopes.add(new Scope(new Community(user.getId()), Scope.Permission.RU));
         	

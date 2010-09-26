@@ -106,7 +106,7 @@ public class UserUtils {
     {
         User result = null;
 
-        result = (User)DataInstanceUtils.getInstance(userId, user, database, true, false);
+        result = (User)DataInstanceUtils.getInstance(userId, user, database, true, true);
 
         updateUserProfile(result, database);
 

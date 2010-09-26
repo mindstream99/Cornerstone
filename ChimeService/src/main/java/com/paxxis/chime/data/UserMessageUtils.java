@@ -133,6 +133,8 @@ public class UserMessageUtils {
             latestUpdate = dataSet.getFieldValue("latest").asDate();
         }
 
+        dataSet.close();
+
         // create the return cursor
         Cursor newCursor = null;
 

@@ -25,11 +25,11 @@ import com.extjs.gxt.ui.client.util.Margins;
 import com.extjs.gxt.ui.client.util.Params;
 import com.extjs.gxt.ui.client.widget.LayoutContainer;
 import com.extjs.gxt.ui.client.widget.button.Button;
-import com.extjs.gxt.ui.client.widget.button.ButtonBar;
 import com.extjs.gxt.ui.client.widget.layout.RowData;
 import com.extjs.gxt.ui.client.widget.layout.RowLayout;
 import com.extjs.gxt.ui.client.widget.menu.CheckMenuItem;
 import com.extjs.gxt.ui.client.widget.menu.Menu;
+import com.extjs.gxt.ui.client.widget.toolbar.ToolBar;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.paxxis.chime.client.ServiceManager;
 import com.paxxis.chime.client.ServiceResponseObject;
@@ -44,8 +44,7 @@ import com.paxxis.chime.client.portal.UpdateReason;
  *
  * @author Robert Englander
  */
-public class TagsHeader extends LayoutContainer
-{
+public class TagsHeader extends LayoutContainer {
     public interface TagsChangedListener {
         public void onTagsChanged(DataInstance instance);
     }
@@ -77,22 +76,16 @@ public class TagsHeader extends LayoutContainer
     
     public void sendRequest(ApplyTagRequest request)
     {
-        final AsyncCallback callback = new AsyncCallback()
-        {
-            public void onFailure(Throwable arg0)
-            {
+        final AsyncCallback<ServiceResponseObject<ApplyTagResponse>> callback = 
+        		new AsyncCallback<ServiceResponseObject<ApplyTagResponse>>() {
+            public void onFailure(Throwable arg0) {
                 ChimeMessageBox.alert("System Error", "Please contact the system administrator.", null);
             }
 
-            public void onSuccess(Object obj)
-            {
-                ServiceResponseObject<ApplyTagResponse> response = (ServiceResponseObject<ApplyTagResponse>)obj;
-                if (response.isResponse())
-                {
+            public void onSuccess(ServiceResponseObject<ApplyTagResponse> response) {
+                if (response.isResponse()) {
                     _tagsChangedListener.onTagsChanged(response.getResponse().getDataInstance());
-                }
-                else
-                {
+                } else {
                     ChimeMessageBox.alert("Error", response.getError().getMessage(), null);
                 }
             }
@@ -108,13 +101,7 @@ public class TagsHeader extends LayoutContainer
         setBorders(false);
         setStyleAttribute("backgroundColor", "white");
         
-        LayoutContainer upper = new LayoutContainer();
-
-        _html = new InterceptedHtml();
-        upper.add(_html);
-        add(_html, new RowData(1, -1, new Margins(5)));
-        
-        final ButtonBar bar = new ButtonBar();
+        final ToolBar bar = new ToolBar();
         _tagButton = new Button("Apply a tag...");
         _tagButton.addSelectionListener(
             new SelectionListener<ButtonEvent>()
@@ -136,14 +123,6 @@ public class TagsHeader extends LayoutContainer
                             }
                         }
                     );
-                    
-                    /*
-                    int left = _tagButton.getAbsoluteLeft();
-                    int top = _tagButton.getAbsoluteTop();
-                    int height = bar.getSize().height;
-                    
-                    tagWindow.setPosition(left, top + height);
-                    */
                     
                     tagWindow.show();
                 }
@@ -201,6 +180,9 @@ public class TagsHeader extends LayoutContainer
         bar.add(_sortButton);
 
         add(bar, new RowData(1, -1, new Margins(5, 5, 5, 5)));
+        _html = new InterceptedHtml();
+        add(_html, new RowData(1, -1, new Margins(5)));
+        
     }
     
     public void setDataInstance(DataInstance instance, UpdateReason reason)
@@ -217,14 +199,6 @@ public class TagsHeader extends LayoutContainer
 
             String content = _template.applyTemplate(params);
             _html.setHtml(content);
-
-            if (ServiceManager.getActiveUser() == null) {
-                _tagButton.setEnabled(false);
-                //_tagButton.setToolTip("You must be logged in to apply a tag.");
-            } else {
-                _tagButton.setEnabled(true);
-                //_tagButton.setToolTip((String)null);
-            }
         }
     }
 

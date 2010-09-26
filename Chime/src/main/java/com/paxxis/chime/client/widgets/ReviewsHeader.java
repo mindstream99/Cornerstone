@@ -28,12 +28,12 @@ import com.extjs.gxt.ui.client.util.Margins;
 import com.extjs.gxt.ui.client.util.Params;
 import com.extjs.gxt.ui.client.widget.LayoutContainer;
 import com.extjs.gxt.ui.client.widget.button.Button;
-import com.extjs.gxt.ui.client.widget.button.ButtonBar;
 import com.extjs.gxt.ui.client.widget.layout.RowData;
 import com.extjs.gxt.ui.client.widget.layout.RowLayout;
 import com.extjs.gxt.ui.client.widget.menu.CheckMenuItem;
 import com.extjs.gxt.ui.client.widget.menu.Menu;
 import com.extjs.gxt.ui.client.widget.toolbar.FillToolItem;
+import com.extjs.gxt.ui.client.widget.toolbar.ToolBar;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.paxxis.chime.client.SearchFilterModifyListener;
 import com.paxxis.chime.client.SearchFilterPanel;
@@ -81,7 +81,6 @@ public class ReviewsHeader extends LayoutContainer
     private InterceptedHtml _html;
     private Button _reviewButton;
     private Button _filterButton;
-    private Button refreshButton;
     private LayoutContainer _filterContainer;
     private SearchFilter _filter = null;
     private ReviewsChangedListener _reviewsChangedListener;
@@ -98,24 +97,20 @@ public class ReviewsHeader extends LayoutContainer
     
     public void sendRequest(ApplyReviewRequest request)
     {
-        final AsyncCallback callback = new AsyncCallback()
+        final AsyncCallback<ServiceResponseObject<ApplyReviewResponse>> callback = 
+        					new AsyncCallback<ServiceResponseObject<ApplyReviewResponse>>()
         {
             public void onFailure(Throwable arg0)
             {
                 ChimeMessageBox.alert("System Error", "Please contact the system administrator.", null);
             }
 
-            public void onSuccess(Object obj)
-            {
-                ServiceResponseObject<ApplyReviewResponse> response = (ServiceResponseObject<ApplyReviewResponse>)obj;
-                if (response.isResponse())
-                {
+            public void onSuccess(ServiceResponseObject<ApplyReviewResponse> response) {
+                if (response.isResponse()) {
                     _reviewsChangedListener.onReviewsChanged(response.getResponse().getDataInstance());
                     sortByRecentItem.setChecked(true);
                     sortButton.setText("Sort by Most Recent");
-                }
-                else
-                {
+                } else {
                     ChimeMessageBox.alert("Error", response.getError().getMessage(), null);
                 }
             }
@@ -131,10 +126,7 @@ public class ReviewsHeader extends LayoutContainer
         setBorders(false);
         setStyleAttribute("backgroundColor", "white");
         
-        _html = new InterceptedHtml();
-        add(_html, new RowData(1, -1, new Margins(5)));
-        
-        final ButtonBar bar = new ButtonBar();
+        final ToolBar bar = new ToolBar();
         _reviewButton = new Button("Write a review...");
         bar.add(_reviewButton);
         
@@ -291,25 +283,14 @@ public class ReviewsHeader extends LayoutContainer
 
         bar.add(new FillToolItem());
 
-        /*
-        refreshButton = new Button("");
-        refreshButton.setIconStyle("refresh24-icon");
-        refreshButton.addSelectionListener(
-            new SelectionListener<ComponentEvent>() {
-                @Override
-                public void componentSelected(ComponentEvent evt) {
-                    _reviewsChangedListener.onRefresh();
-                }
-            }
-        );
-
-        bar.add(refreshButton);
-        */
-        
         add(bar, new RowData(1, -1, new Margins(5, 5, 5, 5)));
+        _html = new InterceptedHtml();
+        add(_html, new RowData(1, -1, new Margins(5)));
+        
         _filterContainer = new LayoutContainer();
         _filterContainer.setLayout(new RowLayout());
         add(_filterContainer, new RowData(1, -1, new Margins(5)));
+
         addListener(Events.Resize,
             new Listener<BoxComponentEvent>() {
 

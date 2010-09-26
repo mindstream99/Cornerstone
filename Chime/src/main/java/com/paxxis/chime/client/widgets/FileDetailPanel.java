@@ -17,19 +17,29 @@
 
 package com.paxxis.chime.client.widgets;
 
+import java.util.ArrayList;
 import java.util.List;
 
-import com.extjs.gxt.ui.client.core.Template;
+import com.extjs.gxt.ui.client.event.BoxComponentEvent;
+import com.extjs.gxt.ui.client.event.Events;
+import com.extjs.gxt.ui.client.event.Listener;
+import com.extjs.gxt.ui.client.store.ListStore;
 import com.extjs.gxt.ui.client.util.Margins;
-import com.extjs.gxt.ui.client.util.Params;
 import com.extjs.gxt.ui.client.widget.LayoutContainer;
-import com.extjs.gxt.ui.client.widget.layout.FlowData;
+import com.extjs.gxt.ui.client.widget.grid.ColumnConfig;
+import com.extjs.gxt.ui.client.widget.grid.ColumnModel;
+import com.extjs.gxt.ui.client.widget.grid.Grid;
+import com.extjs.gxt.ui.client.widget.layout.RowData;
+import com.extjs.gxt.ui.client.widget.layout.RowLayout;
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.user.client.Command;
+import com.google.gwt.user.client.DeferredCommand;
 import com.paxxis.chime.client.Utils;
 import com.paxxis.chime.client.common.DataField;
 import com.paxxis.chime.client.common.DataFieldValue;
 import com.paxxis.chime.client.common.DataInstance;
 import com.paxxis.chime.client.common.Shape;
+import com.paxxis.chime.client.portal.DataRowModel;
 
 /**
  *
@@ -37,19 +47,9 @@ import com.paxxis.chime.client.common.Shape;
  */
 public class FileDetailPanel extends LayoutContainer {
 
-    private static final String TEMPLATE = "<div id='review'>"  +
-        "<span id='review-detail-msg'><b>MIME Type:</b>&nbsp;{mimeType}&nbsp;&nbsp;<b>File Size:</b>&nbsp;{size} Bytes&nbsp;&nbsp;{downloadLink}</span></div>";
-
-    private static Template template;
-
-    static
-    {
-        template = new Template(TEMPLATE);
-        template.compile();
-    }
-
     private DataInstance dataInstance;
-    private InterceptedHtml html;
+    private Grid<DataRowModel> grid;
+    private ListStore<DataRowModel> listStore;
 
     public FileDetailPanel(DataInstance instance) {
         super();
@@ -59,23 +59,88 @@ public class FileDetailPanel extends LayoutContainer {
     }
 
     private void init() {
-        LayoutContainer cont = new LayoutContainer();
 
-        html = new InterceptedHtml();
-        cont.add(html, new FlowData(0, 5, 0, 5));
+    	LayoutContainer cont = new LayoutContainer();
+    	cont.setLayout(new RowLayout());
+    	
+        List<ColumnConfig> configs = new ArrayList<ColumnConfig>();
+        ColumnConfig column = new ColumnConfig();
+        column.setId(DataRowModel.NAME);
+        column.setFixed(true);
+        column.setHeader("");
+        column.setWidth(150);
+        column.setSortable(false);
+        column.setMenuDisabled(true);
+        column.setRenderer(new InterceptedHtmlGridCellRenderer());
+        configs.add(column);
+        
+        column = new ColumnConfig();
+        column.setId(DataRowModel.VALUE);
+        column.setHeader("");
+        column.setWidth(300);
+        column.setSortable(false);
+        column.setMenuDisabled(true);
+        column.setRenderer(new InterceptedHtmlGridCellRenderer());
+        configs.add(column);
+        
+        ColumnModel cm = new ColumnModel(configs);
+        
+        listStore = new ListStore<DataRowModel>();
+        grid = new Grid<DataRowModel>(listStore, cm);
+        grid.getView().setAutoFill(true);
+        grid.setSelectionModel(null);
+        grid.getView().setForceFit(true);
+        grid.setHideHeaders(true);
+        grid.setTrackMouseOver(false);
+        grid.setAutoHeight(true);
+        grid.setAutoExpandColumn(DataRowModel.VALUE);
+        
+        cont.add(grid, new RowData(1, -1, new Margins(0)));
 
-        add(cont, new FlowData(new Margins(5)));
+        add(cont, new RowData(1, -1));
+        addListener(Events.Resize,
+            new Listener<BoxComponentEvent>() {
+                public void handleEvent(BoxComponentEvent evt) {
+                	DeferredCommand.addCommand(
+                		new Command() {
+                			public void execute() {
+                                layout();
+                                grid.setWidth(getWidth());
+                                grid.getView().refresh(false);
+                			}
+                		}
+                	);
+                }
+            }
+        );
     }
 
-    public void update()
-    {
-        Params params = new Params();
-        params.set("mimeType", getMimeType());
-        params.set("size", getFileSize());
-        params.set("downloadLink", getDownloadLink());
+    public void update() {
+        listStore.removeAll();
+    	DataRowModel model = new DataRowModel(DataRowModel.NAME, "<b>MIME Type:</b>");
+    	model.set(DataRowModel.VALUE, getMimeType());
+    	listStore.add(model);
+        
+    	model = new DataRowModel(DataRowModel.NAME, "<b>File Size:</b>");
+    	model.set(DataRowModel.VALUE, getFileSize());
+    	listStore.add(model);
+        
+    	model = new DataRowModel(DataRowModel.NAME, "<b>Download:</b>");
+    	model.set(DataRowModel.VALUE, getDownloadLink());
+    	listStore.add(model);
+    	
+        listStore.commitChanges();
 
-        String content = template.applyTemplate(params);
-        html.setHtml(content);
+        // I don't know why this is necessary, but for some reason the grid is not sizing its
+        // width correctly.
+        DeferredCommand.addCommand(
+        	new Command() {
+        		public void execute() {
+        	    	grid.setWidth(getWidth());
+                	grid.getView().refresh(false);
+        		}
+        	}
+        );
     }
 
     private String getMimeType() {
@@ -108,7 +173,7 @@ public class FileDetailPanel extends LayoutContainer {
             }
         }
 
-        return result;
+        return result + " Bytes";
     }
 
     private String getDownloadLink() {
@@ -133,7 +198,7 @@ public class FileDetailPanel extends LayoutContainer {
             }
             
             link += "/FileManager/" + fileName + "?id=" + id;
-            result = Utils.toExternalUrl(link, "Download...");
+            result = Utils.toExternalUrl(link, "Click here...");
         }
 
         return result;

@@ -24,9 +24,9 @@ import com.extjs.gxt.ui.client.util.Margins;
 import com.extjs.gxt.ui.client.util.Params;
 import com.extjs.gxt.ui.client.widget.LayoutContainer;
 import com.extjs.gxt.ui.client.widget.button.Button;
-import com.extjs.gxt.ui.client.widget.button.ButtonBar;
 import com.extjs.gxt.ui.client.widget.layout.RowData;
 import com.extjs.gxt.ui.client.widget.layout.RowLayout;
+import com.extjs.gxt.ui.client.widget.toolbar.ToolBar;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.paxxis.chime.client.ServiceManager;
 import com.paxxis.chime.client.ServiceResponseObject;
@@ -40,8 +40,7 @@ import com.paxxis.chime.client.portal.UpdateReason;
  *
  * @author Robert Englander
  */
-public class DiscussionsHeader extends LayoutContainer
-{
+public class DiscussionsHeader extends LayoutContainer {
     public interface DiscussionsChangedListener {
         public void onDiscussionsChanged(DataInstance instance);
     }
@@ -73,10 +72,7 @@ public class DiscussionsHeader extends LayoutContainer
         setBorders(false);
         setStyleAttribute("backgroundColor", "white");
 
-        _html = new InterceptedHtml();
-        add(_html, new RowData(1, -1, new Margins(5)));
-
-        final ButtonBar bar = new ButtonBar();
+        final ToolBar bar = new ToolBar();
         _discussionButton = new Button("Create a discussion...");
         bar.add(_discussionButton);
 
@@ -98,38 +94,24 @@ public class DiscussionsHeader extends LayoutContainer
             }
         );
 
-        /*
-        Button sort = new Button("Sort by Most Recent");
-        Menu menu = new Menu();
-        menu.add(new CheckMenuItem("Sort by Most Recent"));
-        menu.add(new CheckMenuItem("Sort by Most Helpful"));
-        menu.add(new CheckMenuItem("Sort By Rating"));
-        sort.setMenu(menu);
-        bar.add(sort);
-        */
-        //bar.setStyleAttribute("background", "transparent");
-        //bar.setBorders(false);
-
-        //LabelButton button = new LabelButton("edit-icon", "Write a review...");
         add(bar, new RowData(1, -1, new Margins(5, 5, 5, 5)));
+        _html = new InterceptedHtml();
+        add(_html, new RowData(1, -1, new Margins(5)));
+
     }
 
     private void processRequest(String title, String initialComment) {
 
-        final AsyncCallback callback = new AsyncCallback() {
+        final AsyncCallback<ServiceResponseObject<CreateDiscussionResponse>> callback = 
+        		new AsyncCallback<ServiceResponseObject<CreateDiscussionResponse>>() {
             public void onFailure(Throwable arg0) {
                 ChimeMessageBox.alert("System Error", "Please contact the system administrator.", null);
             }
 
-            public void onSuccess(Object obj) {
-                ServiceResponseObject<CreateDiscussionResponse> response = (ServiceResponseObject<CreateDiscussionResponse>)obj;
-                if (response.isResponse())
-                {
+            public void onSuccess(ServiceResponseObject<CreateDiscussionResponse> response) {
+                if (response.isResponse()) {
                     _discussionsChangedListener.onDiscussionsChanged(response.getResponse().getDataInstance());
-                    //setDataInstance(response.getResponse().getDataInstance());
-                }
-                else
-                {
+                } else {
                     ChimeMessageBox.alert("Error", response.getError().getMessage(), null);
                 }
             }
@@ -156,15 +138,6 @@ public class DiscussionsHeader extends LayoutContainer
 
         String content = _template.applyTemplate(params);
         _html.setHtml(content);
-
-        if (ServiceManager.getActiveUser() == null) {
-            _discussionButton.setEnabled(false);
-            //_discussionButton.setToolTip("You must be logged in to write a review.");
-        } else {
-            _discussionButton.setEnabled(true);
-            //_discussionButton.setToolTip((String)null);
-        }
-
     }
 
     private static String getHeading(DataInstance instance)

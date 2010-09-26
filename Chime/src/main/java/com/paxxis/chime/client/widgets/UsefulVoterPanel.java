@@ -62,18 +62,6 @@ public class UsefulVoterPanel extends LayoutContainer {
         init(txt);
     }
 
-    /*
-    public UsefulVoterPanel(String txt, String suffixText,
-            boolean yesEnabled, boolean noEnabled, VoteListener listener) {
-        this.listener = listener;
-        this.suffixText = suffixText;
-        this.yesEnabled = yesEnabled;
-        this.noEnabled = noEnabled;
-        throttleUser = false;
-        init(txt);
-    }
-    */
-    
     public void updatePrefix(String txt) {
         label.setHtml("<span class=\"useful-voter\">" + txt + "&nbsp;&nbsp;</span>");
     }
@@ -104,14 +92,18 @@ public class UsefulVoterPanel extends LayoutContainer {
                 @Override
                 public void run() {
                     yes.changeStyle("yes-icon");
+                    yes.setEnabled(true);
                     no.changeStyle("no-icon");
+                    no.setEnabled(true);
                     updateSuffix(suffixText, yesEnabled, noEnabled);
                     throttleUser = true;
                 }
             };
 
             yes.changeStyle("yesDisabled-icon");
+            yes.setEnabled(false);
             no.changeStyle("noDisabled-icon");
+            no.setEnabled(false);
             suffix.setHtml("<span class=\"useful-voter-red\">&nbsp;&nbsp;Thank you for contributing!</span>");
             t.schedule(5000);
         }

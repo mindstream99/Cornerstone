@@ -28,11 +28,11 @@ import com.extjs.gxt.ui.client.util.Margins;
 import com.extjs.gxt.ui.client.util.Params;
 import com.extjs.gxt.ui.client.widget.LayoutContainer;
 import com.extjs.gxt.ui.client.widget.button.Button;
-import com.extjs.gxt.ui.client.widget.button.ButtonBar;
 import com.extjs.gxt.ui.client.widget.layout.RowData;
 import com.extjs.gxt.ui.client.widget.layout.RowLayout;
 import com.extjs.gxt.ui.client.widget.menu.CheckMenuItem;
 import com.extjs.gxt.ui.client.widget.menu.Menu;
+import com.extjs.gxt.ui.client.widget.toolbar.ToolBar;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.DeferredCommand;
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -118,22 +118,17 @@ public class CommentsHeader extends LayoutContainer {
     
     public void sendRequest(AddCommentRequest request)
     {
-        final AsyncCallback callback = new AsyncCallback()
+        final AsyncCallback<ServiceResponseObject<AddCommentResponse>> callback = 
+        		new AsyncCallback<ServiceResponseObject<AddCommentResponse>>()
         {
-            public void onFailure(Throwable arg0)
-            {
+            public void onFailure(Throwable arg0) {
                 ChimeMessageBox.alert("System Error", "Please contact the system administrator.", null);
             }
 
-            public void onSuccess(Object obj)
-            {
-                ServiceResponseObject<AddCommentResponse> response = (ServiceResponseObject<AddCommentResponse>)obj;
-                if (response.isResponse())
-                {
+            public void onSuccess(ServiceResponseObject<AddCommentResponse> response) {
+                if (response.isResponse()) {
                     _commentsChangedListener.onCommentsChanged(response.getResponse().getDataInstance());
-                }
-                else
-                {
+                } else {
                     ChimeMessageBox.alert("Error", response.getError().getMessage(), null);
                 }
             }
@@ -149,10 +144,7 @@ public class CommentsHeader extends LayoutContainer {
         setBorders(false);
         setStyleAttribute("backgroundColor", "white");
         
-        _html = new InterceptedHtml();
-        add(_html, new RowData(1, -1, new Margins(5)));
-
-        final ButtonBar bar = new ButtonBar();
+        final ToolBar bar = new ToolBar();
         _commentButton = new Button(addButtonText);
 
         bar.add(_commentButton);
@@ -301,6 +293,8 @@ public class CommentsHeader extends LayoutContainer {
 
 
         add(bar, new RowData(1, -1, new Margins(5, 5, 5, 5)));
+        _html = new InterceptedHtml();
+        add(_html, new RowData(1, -1, new Margins(5)));
         add(_filterContainer, new RowData(1, -1, new Margins(5)));
         addListener(Events.Resize,
             new Listener<BoxComponentEvent>() {

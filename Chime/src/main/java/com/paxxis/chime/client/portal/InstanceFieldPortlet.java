@@ -19,9 +19,14 @@ package com.paxxis.chime.client.portal;
 
 import java.util.List;
 
+import com.extjs.gxt.ui.client.event.BoxComponentEvent;
+import com.extjs.gxt.ui.client.event.Events;
+import com.extjs.gxt.ui.client.event.Listener;
 import com.extjs.gxt.ui.client.util.Margins;
 import com.extjs.gxt.ui.client.widget.layout.RowData;
 import com.extjs.gxt.ui.client.widget.layout.RowLayout;
+import com.google.gwt.user.client.Command;
+import com.google.gwt.user.client.DeferredCommand;
 import com.paxxis.chime.client.InstanceUpdateListener;
 import com.paxxis.chime.client.common.DataInstance;
 import com.paxxis.chime.client.common.Shape;
@@ -60,6 +65,20 @@ public class InstanceFieldPortlet extends PortletContainer
     	}
     }
     
+    public void onResizeXXX(int width, int height) {
+    	super.onResize(width, height);
+    	if (_fields != null) {
+        	DeferredCommand.addCommand(
+        		new Command() {
+        			public void execute() {
+        	        	_fields.setWidth(getWidth());
+        			}
+        		}
+        	);
+    	}
+    	layout();
+    }
+
     protected void init()
     {
     	super.init();
@@ -76,5 +95,18 @@ public class InstanceFieldPortlet extends PortletContainer
         }
         
         getBody().layout();
+        getBody().addListener(Events.Resize,
+            new Listener<BoxComponentEvent>() {
+                public void handleEvent(BoxComponentEvent evt) {
+                	DeferredCommand.addCommand(
+                		new Command() {
+                			public void execute() {
+                                //getBody().layout();
+                			}
+                		}
+                	);
+                }
+            }
+        );
     }
 }

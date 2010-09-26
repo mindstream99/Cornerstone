@@ -22,7 +22,8 @@ import java.util.List;
 import com.extjs.gxt.ui.client.event.IconButtonEvent;
 import com.extjs.gxt.ui.client.event.SelectionListener;
 import com.extjs.gxt.ui.client.widget.button.ToolButton;
-import com.extjs.gxt.ui.client.widget.layout.FlowData;
+import com.extjs.gxt.ui.client.widget.layout.RowData;
+import com.extjs.gxt.ui.client.widget.layout.RowLayout;
 import com.paxxis.chime.client.InstanceUpdateListener;
 import com.paxxis.chime.client.ServiceManager;
 import com.paxxis.chime.client.InstanceUpdateListener.Type;
@@ -59,7 +60,7 @@ public class FileDetailPortlet extends PortletContainer {
     	        dataInstance = instance;
     	        getBody().removeAll();
     	        filePanel = new FileDetailPanel(instance);
-    	        getBody().add(filePanel, new FlowData(5, 0, 5, 0));
+    	        getBody().add(filePanel, new RowData(1, -1));
     	        getBody().layout();
     	        actionsButton.setVisible(dataInstance.canUpdate(ServiceManager.getActiveUser()));
     		}
@@ -114,6 +115,7 @@ public class FileDetailPortlet extends PortletContainer {
 
     protected void init() {
     	super.init();
+    	getBody().setLayout(new RowLayout());
         fieldListener  = new FileEditorListener() {
             public void onEdit(String fileId, String mimeType, String extension, long size) {
                 sendEdit(fileId, mimeType, extension, size);

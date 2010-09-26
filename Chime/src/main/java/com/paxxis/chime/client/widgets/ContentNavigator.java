@@ -17,6 +17,9 @@
 
 package com.paxxis.chime.client.widgets;
 
+import com.extjs.gxt.ui.client.event.IconButtonEvent;
+import com.extjs.gxt.ui.client.event.SelectionListener;
+import com.extjs.gxt.ui.client.widget.button.ToolButton;
 import com.google.gwt.user.client.Element;
 
 
@@ -26,6 +29,8 @@ import com.google.gwt.user.client.Element;
  */
 public class ContentNavigator extends Navigator {
 
+	private ToolButton refreshButton;
+	
     public ContentNavigator() {
     	super("Navigation", false);
     }
@@ -35,4 +40,17 @@ public class ContentNavigator extends Navigator {
     	init(); 
     }
     
+    protected void init() {
+    	super.init();
+    
+        refreshButton = new ToolButton("x-tool-refresh");
+    	getHeader().addTool(refreshButton);
+        refreshButton.addSelectionListener(
+                new SelectionListener<IconButtonEvent>() {
+            @Override
+             public void componentSelected(IconButtonEvent ce) {
+            	update(null);
+             }
+        });
+    }
 }

@@ -23,12 +23,16 @@ import java.util.List;
 import com.extjs.gxt.ui.client.event.BoxComponentEvent;
 import com.extjs.gxt.ui.client.event.Events;
 import com.extjs.gxt.ui.client.event.Listener;
+import com.extjs.gxt.ui.client.store.ListStore;
 import com.extjs.gxt.ui.client.util.Margins;
-import com.extjs.gxt.ui.client.widget.Component;
-import com.extjs.gxt.ui.client.widget.Html;
 import com.extjs.gxt.ui.client.widget.LayoutContainer;
+import com.extjs.gxt.ui.client.widget.grid.ColumnConfig;
+import com.extjs.gxt.ui.client.widget.grid.ColumnModel;
+import com.extjs.gxt.ui.client.widget.grid.Grid;
 import com.extjs.gxt.ui.client.widget.layout.RowData;
 import com.extjs.gxt.ui.client.widget.layout.RowLayout;
+import com.google.gwt.user.client.Command;
+import com.google.gwt.user.client.DeferredCommand;
 import com.google.gwt.user.client.Element;
 import com.paxxis.chime.client.InstanceUpdateListener;
 import com.paxxis.chime.client.common.DataField;
@@ -42,17 +46,18 @@ import com.paxxis.chime.client.common.Shape;
 public class DataInstanceFields extends LayoutContainer
 {
     private DataInstance _instance = null;
-    private Shape _type = null;
-    private InstanceUpdateListener _saveListener;
+    private InstanceUpdateListener updateListener;
     private boolean pendingData = false;
     private DataInstance pendingInstance; 
-    private Shape pendingType;
+    private Shape pendingShape;
     private boolean pendingRefresh;
     private List<String> pendingExclusions = new ArrayList<String>();
 
-    public DataInstanceFields(InstanceUpdateListener saveListener)
-    {
-        _saveListener = saveListener;
+    private Grid<DataFieldModel> grid = null;
+    private ListStore<DataFieldModel> listStore;
+    
+    public DataInstanceFields(InstanceUpdateListener saveListener) {
+        updateListener = saveListener;
     }
     
     public void onRender(Element parent, int index) {
@@ -60,7 +65,7 @@ public class DataInstanceFields extends LayoutContainer
         init();
         if (pendingData) {
         	pendingData = false;
-        	setDataInstance(pendingInstance, pendingType, pendingExclusions, pendingRefresh);
+        	setDataInstance(pendingInstance, pendingShape, pendingExclusions, pendingRefresh);
         }
     }
     
@@ -78,17 +83,77 @@ public class DataInstanceFields extends LayoutContainer
 
             }
         );
+
+        List<ColumnConfig> configs = new ArrayList<ColumnConfig>();
+        ColumnConfig column = new ColumnConfig();
+        column.setId(DataFieldModel.EDIT);
+        column.setFixed(true);
+        column.setHeader("");
+        column.setWidth(25);
+        column.setSortable(false);
+        column.setMenuDisabled(true);
+        column.setRenderer(new DataEditGridCellRenderer());
+        configs.add(column);
+        
+        column = new ColumnConfig();
+        column.setId(DataFieldModel.NAME);
+        column.setFixed(true);
+        column.setHeader("");
+        column.setWidth(125);
+        column.setSortable(false);
+        column.setMenuDisabled(true);
+        column.setRenderer(new InterceptedHtmlGridCellRenderer());
+        configs.add(column);
+        
+        column = new ColumnConfig();
+        column.setId(DataFieldModel.VALUE);
+        column.setHeader("");
+        column.setWidth(150);
+        column.setSortable(false);
+        column.setMenuDisabled(true);
+        column.setRenderer(new InterceptedHtmlGridCellRenderer());
+        configs.add(column);
+        
+        ColumnModel cm = new ColumnModel(configs);
+        
+        listStore = new ListStore<DataFieldModel>();
+        grid = new Grid<DataFieldModel>(listStore, cm);
+        grid.getView().setAutoFill(true);
+        grid.setSelectionModel(null);
+        grid.getView().setForceFit(true);
+        grid.setHideHeaders(true);
+        grid.setTrackMouseOver(false);
+        grid.setStripeRows(false);
+        grid.setAutoExpandColumn(DataFieldModel.VALUE);
+        grid.setAutoHeight(true);
+        
+        add(grid, new RowData(1, -1, new Margins(0)));
+        addListener(Events.Resize,
+            new Listener<BoxComponentEvent>() {
+                public void handleEvent(BoxComponentEvent evt) {
+                	DeferredCommand.addCommand(
+                		new Command() {
+                			public void execute() {
+                            	layout();
+                                grid.setWidth(getWidth());
+                                grid.getView().refresh(false);
+                			}
+                		}
+                	);
+                }
+            }
+        );
     }
 
-    public void setDataInstance(DataInstance instance, Shape type) {
-        setDataInstance(instance, type, null, true);
+    public void setDataInstance(DataInstance instance, Shape shape) {
+        setDataInstance(instance, shape, null, true);
     }
     
-    public void setDataInstance(DataInstance instance, Shape type, List<String> excludedFields, boolean refresh) {
+    public void setDataInstance(DataInstance instance, Shape shape, List<String> excludedFields, boolean refresh) {
     	if (!isRendered()) {
     		pendingData = true;
     		pendingInstance = instance;
-    		pendingType = type;
+    		pendingShape = shape;
     		pendingRefresh = refresh;
     		if (excludedFields != null) {
     			pendingExclusions.addAll(excludedFields);
@@ -97,15 +162,16 @@ public class DataInstanceFields extends LayoutContainer
     		return;
     	}
 
-    	update(instance, _instance, type, excludedFields, refresh);
+    	update(instance, _instance, shape, excludedFields, refresh);
 
         _instance = instance;
-        _type = type;
     }
 
     private void update(DataInstance newInstance, DataInstance oldInstance, Shape type, 
     		List<String> excludedFields, boolean refresh) {
 
+    	boolean refreshGrid = refresh;
+    	
         // we want to keep the fields that were also in the old instance; remove those
         // that don't exist anymore; and add the new ones.
         
@@ -115,39 +181,39 @@ public class DataInstanceFields extends LayoutContainer
         // then we do remove the fields and start over
         boolean startOver = oldInstance == null || !newInstance.getId().equals(oldInstance.getId());
         if (startOver) {
-            removeAll();
+            listStore.removeAll();
 
-            boolean isFirst = true;
             List<DataField> fields = type.getFields();
-            boolean shade = false;
             for (DataField field : fields) {
             	
                 if (!field.isPrivate() && !excludedFields.contains(field.getName())) {
-                    if (isFirst) {
-                        isFirst = false;
-                    } else {
-                        add(new Html("<hr COLOR=\"#f1f1f1\"/>"), new RowData(1, -1, new Margins(2, 0, 2, 0)));
-                    }
-
-                    DataInstanceField f = new DataInstanceField(newInstance, type, field, _saveListener);
-                    if (shade) {
-                        f.setStyleAttribute("backgroundColor", "#f1f1f1");
-                    }
-
-                    shade = !shade;
-                    add(f, new RowData(1, -1, new Margins(2, 0, 2, 0)));
+                	DataFieldModel model = new DataFieldModel(newInstance, type, field, updateListener);
+                	listStore.add(model);
                 }
             }
+            
+            listStore.commitChanges();
+            refreshGrid = true;
         } else {
-            for (Component comp : getItems()) {
-                if (comp instanceof DataInstanceField) {
-                    DataInstanceField f = (DataInstanceField)comp;
-                    f.updateDataInstance(newInstance, refresh);
-                }
-            }
+        	for (DataFieldModel model : listStore.getModels()) {
+        		model.update(newInstance);
+        	}
+        	listStore.commitChanges();
         }
-        
-        layout();
+
+        if (refreshGrid) {
+            // I don't know why this is necessary, but for some reason the grid is not sizing its
+            // width correctly.
+            DeferredCommand.addCommand(
+            	new Command() {
+            		public void execute() {
+            	    	grid.setWidth(getWidth());
+                    	grid.getView().refresh(false);
+            		}
+            	}
+            );
+        }
     }
     
 }
+

@@ -371,7 +371,7 @@ public class UserMessagesPortlet extends PortletContainer {
     }
     
     protected void deleteAll() {
-        String msg = "Delete all of your messages?";
+        String msg = "Delete all messages?";
         delete(msg, null);
     }
     

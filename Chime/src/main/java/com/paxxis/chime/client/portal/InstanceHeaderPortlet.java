@@ -21,8 +21,10 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import com.extjs.gxt.ui.client.core.Template;
+import com.extjs.gxt.ui.client.event.BoxComponentEvent;
+import com.extjs.gxt.ui.client.event.Events;
 import com.extjs.gxt.ui.client.event.IconButtonEvent;
+import com.extjs.gxt.ui.client.event.Listener;
 import com.extjs.gxt.ui.client.event.MenuEvent;
 import com.extjs.gxt.ui.client.event.SelectionListener;
 import com.extjs.gxt.ui.client.fx.FxConfig;
@@ -77,29 +79,7 @@ import com.paxxis.chime.client.widgets.PasswordWindow.PasswordChangeListener;
  *
  * @author Robert Englander
  */
-public class InstanceHeaderPortlet extends PortletContainer
-{
-    private static final String VOTEPROMPT = "Voting on data instances is an indication that you are familiar with, or have a vested interest in, this " +
-            "kind of data.  Please don't vote only because you like or dislike the data, or because you have no interest in it.<br><br>Would you like to place your vote now?";
-    
-    private static final String TEMPLATE = "<div id='data-header'>"  +
-        "<span id='data-header-msg'>{byline}{backRef}{types}</span></div>";
-
-    private static final String DESCTEMPLATE = "<div id='data-header'>"  +
-        "<span id='data-header-msg'>{desc}</span></div>";
-
-    private static Template _template;
-    private static Template _descTemplate;
-
-    static
-    {
-        _template = new Template(TEMPLATE);
-        _template.compile();
-
-        _descTemplate = new Template(DESCTEMPLATE);
-        _descTemplate.compile();
-    }
-
+public class InstanceHeaderPortlet extends PortletContainer {
     private ToolButton refreshButton;
     private ToolButton actionsButton;
     private DataInstance _instance = null;
@@ -157,30 +137,30 @@ public class InstanceHeaderPortlet extends PortletContainer
 
     	        listStore.removeAll();
     	        if (fullView()) {
-    	        	DataRowModel model = new DataRowModel(DataRowModel.NAME, "Updated By:");
+    	        	DataRowModel model = new DataRowModel(DataRowModel.NAME, "<b>Updated By:</b>");
     	        	model.set(DataRowModel.VALUE, getByLine(_instance));
     	        	listStore.add(model);
 
     	            Date expiration = instance.getExpiration();
     	            if (expiration != null) {
-        	        	model = new DataRowModel(DataRowModel.NAME, "Expires On:");
+        	        	model = new DataRowModel(DataRowModel.NAME, "<b>Expires On:</b>");
         	        	model.set(DataRowModel.VALUE, expiration.toLocaleString());
         	        	listStore.add(model);
     	            }
     	            
-    	        	model = new DataRowModel(DataRowModel.NAME, "Applied Shapes:");
+    	        	model = new DataRowModel(DataRowModel.NAME, "<b>Applied Shapes:</b>");
     	        	model.set(DataRowModel.VALUE, getTypes(_instance));
     	        	listStore.add(model);
         	        
     	        	if (_instance instanceof BackReferencingDataInstance) {
-        	        	model = new DataRowModel(DataRowModel.NAME, "Applied To:");
+        	        	model = new DataRowModel(DataRowModel.NAME, "<b>Applied To:</b>");
         	        	model.set(DataRowModel.VALUE, getBackReference(_instance));
         	        	listStore.add(model);
     	        	}
     	        }
     	        
     	        if (showDescription) {
-    	        	DataRowModel model = new DataRowModel(DataRowModel.NAME, "Description:");
+    	        	DataRowModel model = new DataRowModel(DataRowModel.NAME, "<b>Description:</b>");
     	        	model.set(DataRowModel.VALUE, getDescription(_instance));
     	        	listStore.add(model);
     	        }
@@ -199,6 +179,7 @@ public class InstanceHeaderPortlet extends PortletContainer
     	        	new Command() {
     	        		public void execute() {
     	        	    	grid.setWidth(getWidth());
+    	                	grid.getView().refresh(false);
     	        		}
     	        	}
     	        );
@@ -212,11 +193,6 @@ public class InstanceHeaderPortlet extends PortletContainer
     	}
     }
 
-    public void onResize(int width, int height) {
-    	super.onResize(width, height);
-    	//grid.setWidth(width);
-    }
-    
     private boolean fullView() {
     	boolean isUserInstance = _instance.getShapes().get(0).getName().equals("User");
     	if (isUserInstance) {
@@ -456,6 +432,7 @@ public class InstanceHeaderPortlet extends PortletContainer
         column.setWidth(150);
         column.setSortable(false);
         column.setMenuDisabled(true);
+        column.setRenderer(new InterceptedHtmlGridCellRenderer());
         configs.add(column);
         
         column = new ColumnConfig();
@@ -476,6 +453,8 @@ public class InstanceHeaderPortlet extends PortletContainer
         grid.getView().setForceFit(true);
         grid.setHideHeaders(true);
         grid.setTrackMouseOver(false);
+        grid.setAutoHeight(true);
+        grid.setAutoExpandColumn(DataRowModel.VALUE);
         
         getBody().add(grid, new RowData(1, -1, new Margins(0)));
                 
@@ -490,6 +469,21 @@ public class InstanceHeaderPortlet extends PortletContainer
 
         t.scheduleRepeating(10000);
         PortalUtils.registerTimer(t);
+        getBody().addListener(Events.Resize,
+            new Listener<BoxComponentEvent>() {
+                public void handleEvent(BoxComponentEvent evt) {
+                	DeferredCommand.addCommand(
+                		new Command() {
+                			public void execute() {
+                                getBody().layout();
+                                grid.setWidth(getBody().getWidth());
+                                grid.getView().refresh(false);
+                			}
+                		}
+                	);
+                }
+            }
+        );
     }
 
     public void sendVoteRequest(ApplyVoteRequest request) {

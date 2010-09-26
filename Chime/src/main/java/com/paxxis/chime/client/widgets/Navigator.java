@@ -63,7 +63,9 @@ import com.paxxis.chime.client.common.DataInstanceRequest.Depth;
 public abstract class Navigator extends ContentPanel {
     public class ContentItemModel extends BaseTreeModel implements Serializable {
 
-        private String iconName = "page-icon";
+		private static final long serialVersionUID = 1L;
+
+		private String iconName = "page-icon";
         private boolean isFolder;
         private boolean pending = false;
 
@@ -194,16 +196,12 @@ public abstract class Navigator extends ContentPanel {
 
         private void getChildPages(final ContentItemModel model, final AsyncCallback<List<ContentItemModel>> cb) {
         	final boolean expand = treePanel.isExpanded(model);
-            final AsyncCallback callback = new AsyncCallback() {
-                public void onSuccess(final Object result)
-                {
-                    DataInstanceResponseObject resp = (DataInstanceResponseObject)result;
-                    if (resp.isResponse())
-                    {
+            final AsyncCallback<DataInstanceResponseObject> callback = new AsyncCallback<DataInstanceResponseObject>() {
+                public void onSuccess(DataInstanceResponseObject resp) {
+                    if (resp.isResponse()) {
                         final DataInstanceResponse response = resp.getResponse();
                         List<DataInstance> instances = response.getDataInstances();
-                        if (instances.size() > 0)
-                        {
+                        if (instances.size() > 0) {
                             List<ContentItemModel> children = new ArrayList<ContentItemModel>();
                             final DataInstance dataInstance = instances.get(0);
                             if (dataInstance instanceof Folder) {
@@ -376,7 +374,7 @@ public abstract class Navigator extends ContentPanel {
         loader.load(null);
     }
 
-    private void update(final ContentItemModel model) {
+    protected void update(final ContentItemModel model) {
         treePanel.getSelectionModel().deselectAll();
         DeferredCommand.addCommand(
             new Command() {

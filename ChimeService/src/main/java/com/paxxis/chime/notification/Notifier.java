@@ -49,7 +49,7 @@ public class Notifier {
     private int purgeFreq = 1440; // defaults to 1 day
     private int periodicEventNotificationFreq = 120; // defaults to 2 hours
     private boolean periodicSummarize = false;
-    private int watchNotificationFreq = 24; // defaults to 24 hours
+    private int watchNotificationFreq = 1440; // defaults to 24 hours
 
     public void setConnectionPool(DatabaseConnectionPool pool) {
         dbPool = pool;
@@ -92,7 +92,7 @@ public class Notifier {
     }
 
     void initScheduledWatchNotification() {
-        scheduledExecutor.schedule(new WatchNotificationProcessor(dbPool, config), watchNotificationFreq, TimeUnit.HOURS);
+        scheduledExecutor.schedule(new WatchNotificationProcessor(dbPool, config), watchNotificationFreq, TimeUnit.MINUTES);
     }
 
     public void process(DataInstance inst, User user) {

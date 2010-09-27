@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ * Copyright 2010 Robert Englander
+ * Copyright 2009 Paxxis Technology LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+-->
+
+
+<templates>
+    <specifications>
+        <!-- the detail template for a Cybernode -->
+        <specification name="cybernodeDetail">
+            <column width="1.0">
+                <portlet type="InstanceHeader" headerType="shaded" showHeader="false" />
+                <portlet type="DetailPage" title="Compute Resources" ref="cybernodeData" />
+                <portlet type="InstanceSocialActivity" />
+            </column>
+            <!-- column width="300">
+                <portlet type="ImageGallery" showHeader="true" />
+                <portlet type="FileGallery" showHeader="true" />
+                <portlet type="InstanceReferrers" showHeader="true" />
+            </column-->
+        </specification>
+
+ 		<!-- the field data template for a Cybernode -->
+        <specification name="cybernodeData">
+            <column width="0.2">
+                <portlet type="FieldDataChart" labelY="Percent" height="450" field="CPU (Proc)" chart="area" min="0" max="100" />
+            </column>
+            <column width="0.2">
+                <portlet type="FieldDataChart" labelY="Percent" height="450" field="CPU Usage" chart="area" min="0" max="100" />
+            </column>
+            <column width="0.2">
+            	<portlet type="FieldDataChart" labelY="Percent" height="450" field="System Memory Usage" chart="area" min="0" max="100" />
+            </column>
+            <column width="0.2">
+            	<portlet type="FieldDataChart" labelY="Percent" height="450" field="Memory Usage" chart="area" min="0" max="100" />
+            </column>
+            <column width="0.2">
+            	<portlet type="FieldDataChart" labelY="Percent" height="450" field="Diskspace Usage" chart="area" min="0" max="100" />
+            </column>
+        </specification>
+
+        <!-- the detail template for a Service Instance -->
+        <specification name="serviceInstanceDetail">
+            <column width="1.0">
+                <portlet type="InstanceHeader" headerType="shaded" showHeader="false" />
+                <portlet type="DetailPage" title="Instance Details" ref="serviceInstanceData"/>
+                <portlet type="InstanceSocialActivity" />
+            </column>
+            <!-- column width="300">
+                <portlet type="ImageGallery" showHeader="true" />
+                <portlet type="FileGallery" showHeader="true" />
+                <portlet type="InstanceReferrers" showHeader="true" />
+            </column-->
+        </specification>
+        
+        <specification name="serviceInstanceData">
+        	<column width="0.2">
+            	<portlet type="FieldDataChart" labelY="Percent" height="450" field="Thread Deadlock" chart="area" min="0" max="20" />
+            </column>  
+            <column width="0.2">
+            	<portlet type="FieldDataChart" labelY="Percent" height="450" field="CPU (Proc)" chart="area" min="0" max="100" />
+            </column>  
+            <column width="0.2">
+            	<portlet type="FieldDataChart" labelY="Percent" height="450" field="Memory Limit" chart="area" min="0" max="1000000" />
+            </column>  
+            <column width="0.2">
+            	<portlet type="FieldDataChart" labelY="Percent" height="450" field="Memory Usage" chart="area" min="0" max="100" />
+            </column>  
+            <column width="0.2">
+            	<portlet type="FieldDataChart" labelY="Seconds" height="450" field="Average Enqueue Time" chart="area" min="0" max="20" />
+            </column>  
+        </specification>
+    </specifications>
+
+    <mappings>
+        <!-- The Cybernode shape --> 
+        <mapping shape="75e5ea8550404d6891bd34e1b669693d00" specification="cybernodeDetail" autoUpdate="true"/>
+        
+        <!-- The Service Instance shape --> 
+        <mapping shape="a0f9d454f36d4c7ea2e747233588ada400" specification="serviceInstanceDetail" autoUpdate="true"/>
+        
+    </mappings>
+</templates>
+
+

@@ -1,3 +1,14 @@
 target
-Chime/src/main/webapp/WEB-INF/classes/
-Chime/src/main/webapp/WEB-INF/lib/
+*/src/main/webapp/WEB-INF/classes/
+*/src/main/webapp/WEB-INF/lib/
+*/.classpath
+*/.project
+*/target
+*/.settings
+ChimeService/ChimeDB/*
+Chime/src/main/webapp/chime
+ChimeService/activemq-data
+ChimeService/derby.log
+ChimeService/index
+ChimeService/ChimeDB/**
+ChimeService/webapps/

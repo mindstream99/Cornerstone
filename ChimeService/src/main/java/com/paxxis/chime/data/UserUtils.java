@@ -88,7 +88,7 @@ public class UserUtils {
             }
 
             String sql = "update " + Tools.getTableSet() + " set charVal = '" + newPassword +
-                    "' where id = " + userId;
+                    "' where id = '" + userId.getValue() + "'";
 
             database.executeStatement(sql);
             result = getUserById(userId, user, database);

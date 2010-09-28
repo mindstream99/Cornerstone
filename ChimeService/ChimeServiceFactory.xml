@@ -224,6 +224,8 @@ set the bean's chimeConfiguration property.
                 <entry key="criticalEventTypeId" value="173f4a62fa804c5a952f10969ccbbc2a00"/>
                 <entry key="warningEventTypeId" value="173f4a62fa804c5a952f10969ccbbc2a00"/>
                 <entry key="infoEventTypeId" value="173f4a62fa804c5a952f10969ccbbc2a00"/>
+                <entry key="dataCenterShapeId" value="bd55ebbba3e34bcca1ce0b2e87fe621900"/>
+                <entry key="serviceDefinitionShapeId" value="033c1c1f93684bd2b54bc6c8a1f27ad500"/>
             </map>
         </property>
 

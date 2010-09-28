@@ -132,7 +132,8 @@
           </execution>
         </executions>
         <configuration>
-          	<runTarget>chime/Chime.html</runTarget>
+           <runTarget>chime/Chime.html</runTarget>
+           <inplace>true</inplace>
         </configuration>
       </plugin>
       <plugin>

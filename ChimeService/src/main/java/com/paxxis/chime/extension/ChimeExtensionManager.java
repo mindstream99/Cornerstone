@@ -51,10 +51,9 @@ import com.paxxis.chime.service.ServiceBusMessageProducer;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
 
 /**
  *
@@ -245,13 +244,13 @@ public class ChimeExtensionManager implements ExtensionContext {
                 ext.initialize();
                 extensions.add(ext);
             } catch (ClassNotFoundException ex) {
-                Logger.getLogger(ChimeExtensionManager.class.getName()).log(Level.SEVERE, null, ex);
+                Logger.getLogger(ChimeExtensionManager.class.getName()).log(Level.ERROR, null, ex);
             } catch (InstantiationException ex) {
-                Logger.getLogger(ChimeExtensionManager.class.getName()).log(Level.SEVERE, null, ex);
+                Logger.getLogger(ChimeExtensionManager.class.getName()).log(Level.ERROR, null, ex);
             } catch (IllegalAccessException ex) {
-                Logger.getLogger(ChimeExtensionManager.class.getName()).log(Level.SEVERE, null, ex);
+                Logger.getLogger(ChimeExtensionManager.class.getName()).log(Level.ERROR, null, ex);
             } catch (Exception ex) {
-                Logger.getLogger(ChimeExtensionManager.class.getName()).log(Level.SEVERE, null, ex);
+                Logger.getLogger(ChimeExtensionManager.class.getName()).log(Level.ERROR, null, ex);
             }
         }
 
@@ -264,7 +263,7 @@ public class ChimeExtensionManager implements ExtensionContext {
         try {
             result = DataInstanceUtils.getInstance(id, user, db, true, true);
         } catch (Exception ex) {
-            Logger.getLogger(ChimeExtensionManager.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(ChimeExtensionManager.class.getName()).log(Level.ERROR, null, ex);
         }
 
         dbPool.returnInstance(db, this);
@@ -364,6 +363,27 @@ public class ChimeExtensionManager implements ExtensionContext {
         dbPool.returnInstance(db, this);
         return event;
 
+    }
+
+    @Override
+    public void log(ExtensionContext.LogLevel level, String className, String message) {
+        Level logLevel = Level.INFO;
+        switch (level) {
+            case INFO:
+                logLevel = Level.INFO;
+                break;
+            case WARN:
+                logLevel = Level.WARN;
+                break;
+            case ERROR:
+                logLevel = Level.ERROR;
+                break;
+            case DEBUG:
+                logLevel = Level.DEBUG;
+                break;
+        }
+
+        Logger.getLogger(className).log(logLevel, message);
     }
 }
 

@@ -549,12 +549,12 @@ public class DataInstance implements Serializable {
         if (canUpdate) {
             // there are additional restrictions.
             Shape type = getShapes().get(0);
-            if (type.getName().equals("User") ||
-                type.getName().equals("Review") ||
-                type.getName().equals("Comment") ||
-                type.getName().equals("Tag") ||
-                type.getName().equals("Community") ||
-                type.getName().equals("Discussion"))
+            if (type.getId().equals(Shape.URL_ID) ||
+                type.getId().equals(Shape.REVIEW_ID) ||
+                type.getId().equals(Shape.COMMENT_ID) ||
+                type.getId().equals(Shape.TAG_ID) ||
+                type.getId().equals(Shape.COMMUNITY_ID) ||
+                type.getId().equals(Shape.DISCUSSION_ID))
             {
                 canUpdate = false;
             }
@@ -713,23 +713,113 @@ public class DataInstance implements Serializable {
         return _files;
     }
 
-    public void setFieldValues(Shape type, DataField field, List<DataFieldValue> values)
-    {
-        HashMap<String, List<DataFieldValue>> outer = _fieldValues.get(type.getId());
+    /** 
+     * Gets the last field value for the default(1st) shape field.
+     * @param fieldName the field name
+     * @return the last value, or null if no values exist
+     */
+    public Serializable getLastFieldValue(String fieldName) {
+        Shape shape = getShapes().get(0);
+        DataField field = shape.getField(fieldName);
+        return getLastFieldValue(shape, field);
+    }
+
+    /**
+     * Gets the last value for a given shape field
+     * @param shape the applied shape
+     * @param field the field
+     * @return the last value, or null if there are no values for this field
+     */
+    public Serializable getLastFieldValue(Shape shape, DataField field) {
+        List<DataFieldValue> values = getFieldValues(shape, field);
+        Serializable result = null;
+        int lastIdx = values.size() - 1;
+        if (lastIdx >= 0) {
+            result = values.get(lastIdx).getName();
+        }
+
+        return result;
+    }
+
+    /**
+     * Appends a value to a specified field in the default(1st) shape.
+     * @param fieldName the name of the field
+     * @param value the value to append
+     * @param force if force is true and the field has already reached its max values, the
+     * first value will be dropped to make room for the new value at the end of the list
+     */
+    public void appendFieldValue(String fieldName, Serializable value, boolean force) {
+        Shape shape = getShapes().get(0);
+        DataField field = shape.getField(fieldName);
+        appendFieldValue(shape, field, value, force);
+    }
+
+    /**
+     * Appends a value to a given shape field.  The max value
+     * @param shape the applied shape
+     * @param field the field of the applied shape
+     * @param value the value to append
+     * @param force if force is true and the field has already reached its max values, the
+     * first value will be dropped to make room for the new value at the end of the list
+     */
+    public void appendFieldValue(Shape shape, DataField field, Serializable value, boolean force) {
+        List<DataFieldValue> values = getFieldValues(shape, field);
+        boolean okToAdd = true;
+
+        // remember that a max of 0 means there's no constraint on the number
+        // of values
+        int max = field.getMaxValues();
+        if (max != 0 && values.size() == max) {
+            if (force) {
+                values.remove(0);
+            } else {
+                okToAdd = false;
+            }
+        }
+
+        if (okToAdd) {
+            DataFieldValue newVal = new DataFieldValue(String.valueOf(value), field.getShape().getId(), InstanceId.UNKNOWN, null);
+            values.add(newVal);
+            setFieldValues(shape, field, values);
+        }
+    }
+
+    public void setFieldValues(String fieldName, Serializable ser) {
+        List<DataFieldValue> vals = new ArrayList<DataFieldValue>();
+        Shape shape = getShapes().get(0);
+        DataField field = shape.getField(fieldName);
+        DataFieldValue value = new DataFieldValue(String.valueOf(ser), field.getShape().getId(), InstanceId.UNKNOWN, null);
+        vals.add(value);
+        setFieldValues(shape, field, vals);
+    }
+
+    public void setFieldValues(String fieldName, List<DataFieldValue> values) {
+        Shape shape = getShapes().get(0);
+        DataField field = shape.getField(fieldName);
+        setFieldValues(shape, field, values);
+    }
+
+    public void setFieldValues(Shape shape, DataField field, List<DataFieldValue> values) {
+        HashMap<String, List<DataFieldValue>> outer = _fieldValues.get(shape.getId());
         if (outer == null) {
             outer = new HashMap<String, List<DataFieldValue>>();
-            _fieldValues.put(type.getId(), outer);
+            _fieldValues.put(shape.getId(), outer);
         }
 
         outer.put(field.getId(), values);
     }
-    
-    public List<DataFieldValue> getFieldValues(Shape type, DataField field)
-    {
-        HashMap<String, List<DataFieldValue>> outer = _fieldValues.get(type.getId());
+
+    public List<DataFieldValue> getFieldValues(String fieldName) {
+        Shape shape = getShapes().get(0);
+        DataField field = shape.getField(fieldName);
+        return getFieldValues(shape, field);
+    }
+
+    public List<DataFieldValue> getFieldValues(Shape shape, DataField field) {
+        HashMap<String, List<DataFieldValue>> outer = _fieldValues.get(shape.getId());
         if (outer == null) {
-            setFieldValues(type, field, new ArrayList<DataFieldValue>());
-            outer = _fieldValues.get(type.getId());
+            setFieldValues(shape, field, new ArrayList<DataFieldValue>());
+            outer = _fieldValues.get(shape.getId());
         }
 
         List<DataFieldValue> values = outer.get(field.getId());

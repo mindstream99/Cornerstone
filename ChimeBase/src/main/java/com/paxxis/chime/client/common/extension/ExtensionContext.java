@@ -30,12 +30,80 @@ import java.util.List;
  */
 public interface ExtensionContext {
 
+    public enum LogLevel {
+        INFO,
+        WARN,
+        ERROR,
+        DEBUG
+    }
+
+    /**
+     * Creates an in memory indexer for use by the extension.
+     *
+     */
     public MemoryIndexer createMemoryIndexer();
+
+    /**
+     * Retrieves a shape instance.
+     * @param id the id of the shape to retrieve
+    */
     public Shape getShapeById(InstanceId id);
+
+    /**
+     * Retrieves a data instance.
+     * @param id the id of the instance to retrieve
+     * @param user the user requesting the data
+     */
     public DataInstance getInstanceById(InstanceId id, User user);
+
+    /**
+     * Creates a data instance.  This does not store the instance.  That is up to the caller to
+     * do separately.
+     * 
+     * @param extId the id of the extension making the request.
+     * @param shapeId the id of the shape to apply
+     * @param name the name of the new data
+     * @param desc the description for the new data
+     * @param user the user creating the data
+     * @param community the community that has visibility of the data
+     */
     public DataInstance createDataInstance(String extId, InstanceId shapeId, String name, String desc,
             User user, Community community);
+
+    /**
+     * Publishes and Event instance.  The event instance is created and stored in the Chime primary data
+     * store.
+     * 
+     * @param name the name of the event
+     * @param desc the description for the event
+     * @param eventType the event type
+     * @param related a list of related data instances.
+     * @param summary a summary description of the event
+     * @param user the user creating the event
+     * @param community the community that has visibility
+     */
     public DataInstance publishEvent(String name, String desc, DataInstance eventType, List<DataInstance> related,
             String summary, User user, Community community);
+
+    /**
+     * Publishes an update event indicating that a data instance has been changed
+     * @param instance the changed instance.
+     */
     public void publishUpdate(DataInstance instance);
+
+    /**
+     * Logs a message into the ChimeService log.
+     *
+     * @param level the log level
+     * @param message the message to log
+     */
+    public void log(LogLevel level, String className, String message);
+
 }
+
+
+
+
+
+
+

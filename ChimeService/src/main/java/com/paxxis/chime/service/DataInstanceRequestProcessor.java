@@ -35,7 +35,6 @@ import com.paxxis.chime.database.DatabaseConnectionPool;
 import com.paxxis.chime.client.common.ErrorMessage;
 import com.paxxis.chime.client.common.Message;
 import com.paxxis.chime.common.MessagePayload;
-import com.paxxis.chime.service.MessageProcessor; 
 import com.paxxis.chime.data.SearchUtils;
 import java.util.ArrayList;
 import java.util.List;
@@ -61,14 +60,17 @@ public class DataInstanceRequestProcessor extends MessageProcessor {
         _pool = pool;
     }
     
-    protected Message process(boolean ignorePreviousChanges)
-    {
+    @Override
+    protected Message process(boolean ignorePreviousChanges) {
         Object payload = getPayload();
         DataInstanceRequest requestMessage = (DataInstanceRequest)new DataInstanceRequest().createInstance(payload);
-        
+        return process(requestMessage, _pool);
+    }
+
+    public static Message process(DataInstanceRequest requestMessage, DatabaseConnectionPool pool) {
         // build up a response
         Message response = null;
-        DatabaseConnection database = _pool.borrowInstance(this);
+        DatabaseConnection database = pool.borrowInstance(requestMessage);
         
         boolean tryAgain = true;
         boolean retried = false;
@@ -177,7 +179,7 @@ public class DataInstanceRequestProcessor extends MessageProcessor {
                         retried = true;
                         tryAgain = true;
                         
-                        _pool.connect(database);
+                        pool.connect(database);
                     }
                 }
                 else
@@ -190,7 +192,7 @@ public class DataInstanceRequestProcessor extends MessageProcessor {
             }
         }
 
-        _pool.returnInstance(database, this);
+        pool.returnInstance(database, requestMessage);
         
         return response;
     }

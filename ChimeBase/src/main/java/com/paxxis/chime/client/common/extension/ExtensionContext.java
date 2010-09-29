@@ -19,7 +19,9 @@ package com.paxxis.chime.client.common.extension;
 
 import com.paxxis.chime.client.common.Community;
 import com.paxxis.chime.client.common.DataInstance;
+import com.paxxis.chime.client.common.DataInstanceRequest;
 import com.paxxis.chime.client.common.InstanceId;
+import com.paxxis.chime.client.common.Message;
 import com.paxxis.chime.client.common.Shape;
 import com.paxxis.chime.client.common.User;
 import java.util.List;
@@ -98,6 +100,14 @@ public interface ExtensionContext {
      * @param message the message to log
      */
     public void log(LogLevel level, String className, String message);
+
+    /**
+     * Processes a DataInstanceRequest and returns the resulting message.
+     * 
+     * @param request The request to process
+     * @return Either a DataInstanceResponse, or an ErrorMessage
+     */
+    public Message processRequest(DataInstanceRequest request);
 
 }
 

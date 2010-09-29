@@ -24,11 +24,13 @@ import com.paxxis.chime.client.common.DataFieldValue;
 import com.paxxis.chime.client.common.DataInstance;
 import com.paxxis.chime.client.common.DataInstanceEvent;
 import com.paxxis.chime.client.common.DataInstanceEvent.EventType;
+import com.paxxis.chime.client.common.DataInstanceRequest;
 import com.paxxis.chime.client.common.DataSocialContext;
 import com.paxxis.chime.client.common.Shape;
 import com.paxxis.chime.client.common.DiscussionsBundle;
 import com.paxxis.chime.client.common.FieldData;
 import com.paxxis.chime.client.common.InstanceId;
+import com.paxxis.chime.client.common.Message;
 import com.paxxis.chime.client.common.ReviewsBundle;
 import com.paxxis.chime.client.common.Scope;
 import com.paxxis.chime.client.common.Scope.Permission;
@@ -45,6 +47,7 @@ import com.paxxis.chime.data.DataInstanceUtils;
 import com.paxxis.chime.data.ShapeUtils;
 import com.paxxis.chime.data.PortalTemplateUtils;
 import com.paxxis.chime.data.UserUtils;
+import com.paxxis.chime.service.DataInstanceRequestProcessor;
 import com.paxxis.chime.service.NotificationTopicSender;
 import com.paxxis.chime.service.RequestQueueSender;
 import com.paxxis.chime.service.ServiceBusMessageProducer;
@@ -385,6 +388,12 @@ public class ChimeExtensionManager implements ExtensionContext {
 
         Logger.getLogger(className).log(logLevel, message);
     }
+
+    @Override
+    public Message processRequest(DataInstanceRequest request) {
+        return DataInstanceRequestProcessor.process(request, dbPool);
+    }
+
 }
 
 

@@ -51,6 +51,7 @@ import com.paxxis.chime.service.DataInstanceRequestProcessor;
 import com.paxxis.chime.service.NotificationTopicSender;
 import com.paxxis.chime.service.RequestQueueSender;
 import com.paxxis.chime.service.ServiceBusMessageProducer;
+import com.paxxis.chime.service.Tools;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -226,6 +227,7 @@ public class ChimeExtensionManager implements ExtensionContext {
 
                 DatabaseConnection dbconn = dbPool.borrowInstance(this);
                 User extuser = UserUtils.getUserByName(def.getUserName(), user, dbconn);
+                extuser.setSessionToken(Tools.PERMANENT_SESSIONTOKEN);
                 Community extcomm = null;
                 for (Community c : extuser.getCommunities()) {
                     if (c.getId().equals(InstanceId.create(def.getCommunityId()))) {

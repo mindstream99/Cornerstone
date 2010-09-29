@@ -32,7 +32,6 @@ import com.paxxis.chime.client.common.Review;
 import com.paxxis.chime.client.common.Scope;
 import com.paxxis.chime.client.common.Tag;
 import com.paxxis.chime.client.common.User;
-import com.paxxis.chime.database.DataSet;
 import com.paxxis.chime.database.DatabaseConnection;
 import java.io.File;
 import java.util.List;
@@ -46,6 +45,10 @@ import org.apache.log4j.Logger;
 public class Tools {
     private static final Logger _logger = Logger.getLogger(Tools.class);
 
+    // the permanent session token is used by the extension manager to allow
+    // the extension users to remain "logged in" without having to ping.
+    public static final String PERMANENT_SESSIONTOKEN = "999999999";
+    
     public static final String DEFAULT_EXTID = "00";
     
     private static final String TABLESET = "Chime.DataInstance";
@@ -239,21 +242,20 @@ public class Tools {
         return isVisible;
     }
     
-    public static void validateUser(User user) throws SessionValidationException
-    {
-        if (user != null)
-        {
+    public static void validateUser(User user) throws SessionValidationException {
+        if (user != null) {
             _logger.info("Validating user " + user.getName() + " with token: " + user.getSessionToken());
-            
-            if (null == CacheManager.instance().getUserSession(user))
-            {
-                // has it already moved into the expiring session cache?
-                if (CacheManager.instance().isExpiringUserSession(user)) {
-                    CacheManager.instance().putUserSession(user);
-                    CacheManager.instance().removeExpiringUserSession(user);
-                } else {
-                    // this is a bogus or expired session
-                    throw new SessionValidationException("Invalid or expired user session");
+
+            if (!user.getSessionToken().equals(Tools.PERMANENT_SESSIONTOKEN)) {
+                if (null == CacheManager.instance().getUserSession(user)) {
+                    // has it already moved into the expiring session cache?
+                    if (CacheManager.instance().isExpiringUserSession(user)) {
+                        CacheManager.instance().putUserSession(user);
+                        CacheManager.instance().removeExpiringUserSession(user);
+                    } else {
+                        // this is a bogus or expired session
+                        throw new SessionValidationException("Invalid or expired user session");
+                    }
                 }
             }
         }

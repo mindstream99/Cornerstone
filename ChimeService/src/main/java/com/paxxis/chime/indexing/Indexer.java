@@ -55,6 +55,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import org.apache.log4j.Logger;
@@ -91,6 +92,12 @@ public class Indexer {
         }
     }
 
+    /** this is a thread synchronization latch that users of the index must .await() on
+     * before accessing the index.  This gives the startup indexer a chance to finish
+     * its work before any other threads attempt access to the index
+     */
+    private CountDownLatch readyLatch = new CountDownLatch(1);
+
     public static Indexer instance()
     {
         if (instance == null)
@@ -100,6 +107,17 @@ public class Indexer {
         }
         
         return instance;
+    }
+
+    public void await() {
+        try {
+            readyLatch.await();
+        } catch (InterruptedException e) {
+        }
+    }
+
+    public void setReady() {
+        readyLatch.countDown();
     }
 
     public static String[] getIndexNames() {
@@ -766,7 +784,8 @@ class IndexBuilder extends IndexerBase {
         }
         
         _pool.returnInstance(database, this);
-        
+
+        Indexer.instance().setReady();
     }
     
     private int doIndex(IndexWriter[] writers, DatabaseConnection database) throws Exception

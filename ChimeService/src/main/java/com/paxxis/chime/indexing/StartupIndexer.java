@@ -28,8 +28,13 @@ public class StartupIndexer {
 
     private DatabaseConnectionPool dbPool;
     private boolean optimize = false;
+    private boolean rebuildIndex = true;
 
     public StartupIndexer() {
+    }
+
+    public void setRebuildIndex(boolean val) {
+        rebuildIndex = val;
     }
 
     public void setConnectionPool(DatabaseConnectionPool pool) {
@@ -41,13 +46,17 @@ public class StartupIndexer {
     }
 
     public void initialize() {
-        if (dbPool == null) {
-            throw new RuntimeException("StartupIndexer dbPool can't be null");
-        }
+        if (rebuildIndex) {
+            if (dbPool == null) {
+                throw new RuntimeException("StartupIndexer dbPool can't be null");
+            }
 
-        User admin = new User();
-        admin.setId(User.ADMIN);
-        Indexer.instance().rebuildIndex(optimize, admin, dbPool);
+            User admin = new User();
+            admin.setId(User.ADMIN);
+            Indexer.instance().rebuildIndex(optimize, admin, dbPool);
+        } else {
+            Indexer.instance().setReady();
+        }
     }
 }
 

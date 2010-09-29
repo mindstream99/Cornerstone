@@ -36,6 +36,7 @@ import com.paxxis.chime.client.common.ErrorMessage;
 import com.paxxis.chime.client.common.Message;
 import com.paxxis.chime.common.MessagePayload;
 import com.paxxis.chime.data.SearchUtils;
+import com.paxxis.chime.indexing.Indexer;
 import java.util.ArrayList;
 import java.util.List;
 import org.apache.log4j.Logger;
@@ -68,6 +69,10 @@ public class DataInstanceRequestProcessor extends MessageProcessor {
     }
 
     public static Message process(DataInstanceRequest requestMessage, DatabaseConnectionPool pool) {
+
+        // wait for the indexer
+        Indexer.instance().await();
+
         // build up a response
         Message response = null;
         DatabaseConnection database = pool.borrowInstance(requestMessage);

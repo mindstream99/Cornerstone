@@ -102,21 +102,19 @@ public class TemplateLoader {
                                             spec.setProperty(aname, aval);
                                         }
 
-                                        if (ptype == PortletType.ShapeFields) {
-                                            // excluded fields?
-                                            ArrayList<String> exclusions = new ArrayList<String>();
-                                            NodeList kids = portletNode.getChildNodes();
-                                            int kidCnt = kids.getLength();
-                                            for (int l = 0; l < kidCnt; l++) {
-                                                Node kidNode = kids.item(l);
-                                                if (kidNode.getNodeName().equals("exclusion")) {
-                                                    String field = kidNode.getAttributes().getNamedItem("name").getNodeValue();
-                                                    exclusions.add(field);
-                                                }
+                                        // excluded fields?
+                                        ArrayList<String> exclusions = new ArrayList<String>();
+                                        NodeList kids = portletNode.getChildNodes();
+                                        int kidCnt = kids.getLength();
+                                        for (int l = 0; l < kidCnt; l++) {
+                                            Node kidNode = kids.item(l);
+                                            if (kidNode.getNodeName().equals("exclusion")) {
+                                                String field = kidNode.getAttributes().getNamedItem("name").getNodeValue();
+                                                exclusions.add(field);
                                             }
-
-                                            spec.setProperty("exclusions", exclusions);
                                         }
+
+                                        spec.setProperty("exclusions", exclusions);
                                         
                                         portalColumn.add(spec);
                                         int xx = 1;

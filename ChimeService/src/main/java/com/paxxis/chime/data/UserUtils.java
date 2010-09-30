@@ -28,6 +28,7 @@ import com.paxxis.chime.client.common.UserProfile;
 import com.paxxis.chime.database.DataSet;
 import com.paxxis.chime.database.DatabaseConnection;
 import com.paxxis.chime.database.IDataValue;
+import com.paxxis.chime.database.StringData;
 import com.paxxis.chime.service.Tools;
 import java.util.ArrayList;
 import java.util.List;
@@ -87,8 +88,8 @@ public class UserUtils {
                 }
             }
 
-            String sql = "update " + Tools.getTableSet() + " set charVal = '" + newPassword +
-                    "' where id = '" + userId.getValue() + "'";
+            String sql = "update " + Tools.getTableSet() + " set charVal = " + new StringData(newPassword).asSQLValue() +
+                    " where id = '" + userId.getValue() + "'";
 
             database.executeStatement(sql);
             result = getUserById(userId, user, database);

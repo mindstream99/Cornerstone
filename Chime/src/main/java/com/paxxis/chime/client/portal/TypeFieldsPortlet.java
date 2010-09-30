@@ -116,7 +116,7 @@ public class TypeFieldsPortlet extends PortletContainer {
 
     	        getBody().removeAll();
 
-    	        portlet = new InstanceFieldPortlet(null, HeaderType.Transparent, updateListener);
+    	        portlet = new InstanceFieldPortlet(getSpecification(), HeaderType.Transparent, updateListener);
     	        getBody().add(portlet, new ColumnData(1.0));
 
     	        DeferredCommand.addCommand(

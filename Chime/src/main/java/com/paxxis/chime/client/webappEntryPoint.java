@@ -27,6 +27,8 @@ import com.google.gwt.user.client.DeferredCommand;
 import com.google.gwt.user.client.History;
 import com.google.gwt.visualization.client.VisualizationUtils;
 import com.google.gwt.visualization.client.visualizations.AreaChart;
+import com.google.gwt.visualization.client.visualizations.BarChart;
+import com.google.gwt.visualization.client.visualizations.ColumnChart;
 import com.google.gwt.visualization.client.visualizations.Gauge;
 import com.google.gwt.visualization.client.visualizations.OrgChart;
 import com.paxxis.chime.client.common.DataInstance;
@@ -61,6 +63,9 @@ public class webappEntryPoint implements EntryPoint
 		// Load the visualization api's we use
 		VisualizationUtils.loadVisualizationApi(onLoadCallback, Gauge.PACKAGE);
 		VisualizationUtils.loadVisualizationApi(onLoadCallback, AreaChart.PACKAGE);
+		VisualizationUtils.loadVisualizationApi(onLoadCallback, OrgChart.PACKAGE);
+		VisualizationUtils.loadVisualizationApi(onLoadCallback, BarChart.PACKAGE);
+		VisualizationUtils.loadVisualizationApi(onLoadCallback, ColumnChart.PACKAGE);
 		VisualizationUtils.loadVisualizationApi(onLoadCallback, OrgChart.PACKAGE);
           
         // this will get the activity manager loaded and running

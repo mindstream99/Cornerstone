@@ -50,13 +50,12 @@ public class TypeFieldGroupsPortlet extends PortletContainer {
     public void setDataInstance(final DataInstance instance, final UpdateReason reason) {
     	Runnable r = new Runnable() {
     		public void run() {
-    	        if (reason == UpdateReason.InstanceChange || reason == UpdateReason.AppliedTypeChange 
-    	        		|| reason == UpdateReason.UpdateEvent) {
+    	        if (reason == UpdateReason.InstanceChange || reason == UpdateReason.AppliedTypeChange) {
     	            getBody().removeAll();
 
     	            for (final Shape type : instance.getShapes()) {
     	            	if (!type.isPrimitive()) {
-        	            	final TypeFieldsPortlet portlet = new TypeFieldsPortlet(null, updateListener);
+        	            	final TypeFieldsPortlet portlet = new TypeFieldsPortlet(getSpecification(), updateListener);
         	                getBody().add(portlet, new RowData(1, -1, new Margins(5, 0, 0, 0)));
         	                
         	                DeferredCommand.addCommand(
@@ -72,10 +71,11 @@ public class TypeFieldGroupsPortlet extends PortletContainer {
     	        } else  {
     	            for (Component comp : getBody().getItems()) {
     	                TypeFieldsPortlet portlet = (TypeFieldsPortlet)comp;
-    	                portlet.updateDataInstance(instance, reason == UpdateReason.FieldChange);
+    	                portlet.updateDataInstance(instance, reason == UpdateReason.FieldChange ||
+    	                		reason == UpdateReason.UpdateEvent);
     	            }
     	        }
-    	     		}
+     		}
     	};
     	
     	if (isRendered()) {

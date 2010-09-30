@@ -38,6 +38,7 @@ import com.paxxis.chime.client.InstanceUpdateListener;
 import com.paxxis.chime.client.common.DataField;
 import com.paxxis.chime.client.common.DataInstance;
 import com.paxxis.chime.client.common.Shape;
+import com.paxxis.chime.client.portal.DataRowModel;
 
 /**
  *
@@ -106,7 +107,8 @@ public class DataInstanceFields extends LayoutContainer
         configs.add(column);
         
         column = new ColumnConfig();
-        column.setId(DataFieldModel.VALUE);
+        
+        column.setId(DataRowModel.VALUE);
         column.setHeader("");
         column.setWidth(150);
         column.setSortable(false);
@@ -124,7 +126,7 @@ public class DataInstanceFields extends LayoutContainer
         grid.setHideHeaders(true);
         grid.setTrackMouseOver(false);
         grid.setStripeRows(false);
-        grid.setAutoExpandColumn(DataFieldModel.VALUE);
+        grid.setAutoExpandColumn(DataRowModel.VALUE);
         grid.setAutoHeight(true);
         
         add(grid, new RowData(1, -1, new Margins(0)));
@@ -201,6 +203,7 @@ public class DataInstanceFields extends LayoutContainer
         	listStore.commitChanges();
         }
 
+        
         if (refreshGrid) {
             // I don't know why this is necessary, but for some reason the grid is not sizing its
             // width correctly.
@@ -213,6 +216,7 @@ public class DataInstanceFields extends LayoutContainer
             	}
             );
         }
+        
     }
     
 }

@@ -65,7 +65,7 @@ public class InstanceFieldPortlet extends PortletContainer
     	}
     }
     
-    public void onResizeXXX(int width, int height) {
+    public void onResize(int width, int height) {
     	super.onResize(width, height);
     	if (_fields != null) {
         	DeferredCommand.addCommand(

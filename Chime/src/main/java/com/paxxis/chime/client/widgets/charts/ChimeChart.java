@@ -19,6 +19,8 @@ package com.paxxis.chime.client.widgets.charts;
 
 import com.google.gwt.visualization.client.DataTable;
 import com.google.gwt.visualization.client.AbstractDataTable.ColumnType;
+import com.paxxis.chime.client.common.cal.Table;
+import com.paxxis.chime.client.common.portal.PortletSpecification;
 import com.paxxis.chime.client.widgets.ChimeLayoutContainer;
 
 /**
@@ -31,9 +33,29 @@ import com.paxxis.chime.client.widgets.ChimeLayoutContainer;
  */
 public abstract class ChimeChart extends ChimeLayoutContainer {
 	private DataTable data = null;
+	private PortletSpecification spec;
+        private boolean makeSquare = true;
+	
+	public ChimeChart(PortletSpecification spec) {
+		this.spec = spec;
+                Object obj = spec.getProperty("square");
+                if (obj != null) {
+                   makeSquare = obj.toString().equals("true");
+                }
 
-	public ChimeChart() {
 		resetData();
+	}
+
+	protected void init() {
+		
+	}
+
+        protected boolean makeSquare() {
+            return makeSquare;
+        }
+	
+	protected PortletSpecification getSpecification() {
+		return spec;
 	}
 	
 	/**
@@ -42,13 +64,47 @@ public abstract class ChimeChart extends ChimeLayoutContainer {
 	public abstract void redraw();
 	
 	/**
+	 * Each chart must be able to update itself with the contents of
+	 * a CAL table.  Charts that require different behavior can
+	 * override this method.
+	 */
+	public void update(Table table) {
+		DataTable data = resetData();
+		int rowCount = table.rowCount();
+		int colIdx = getValueColumn();
+		int labelIdx = getAxisColumn();
+		int axisCol = Integer.parseInt(spec.getProperty("axisCol").toString());
+		int valCol = Integer.parseInt(spec.getProperty("valueCol").toString());
+		for (int i = 0; i < rowCount; i++) {
+    		data.addRow();
+    		double value = table.getRow(i).get(valCol).valueAsDouble();
+    		data.setValue(i, colIdx, value);
+    		String label = table.getRow(i).get(axisCol).valueAsString();
+    		data.setValue(i, labelIdx, label);
+		}  
+
+		redraw();
+	}
+	
+	/**
 	 * Gets the column index into the data table that contains the
 	 * actual value.  Other columns are used by the individual chart
+	 * types for their own purpose, and not all charts use column 1 for
+	 * the data.  Those that use something other than 1 should override
+	 * this method.
+	 */
+	public int getValueColumn() {
+		return 1;
+	}
+
+	/**
+	 * Gets the column index into the data table that contains the
+	 * axis label value.  Other columns are used by the individual chart
 	 * types for their own purpose, and not all charts use column 0 for
 	 * the data.  Those that use something other than 0 should override
 	 * this method.
 	 */
-	public int getValueColumn() {
+	public int getAxisColumn() {
 		return 0;
 	}
 
@@ -57,11 +113,17 @@ public abstract class ChimeChart extends ChimeLayoutContainer {
 	 */
 	public DataTable resetData() {
 		data = DataTable.create();
+	    data.addColumn(ColumnType.STRING, "LABEL");
 	    data.addColumn(ColumnType.NUMBER, "VALUE");
 		return getData();
 	}
 
 	public DataTable getData() {
 		return data;
+	}
+
+	public void onResize(int w, int h) {
+		super.onResize(w, h);
+		redraw();
 	}
 }

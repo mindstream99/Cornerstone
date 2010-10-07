@@ -45,11 +45,11 @@ import com.paxxis.chime.client.common.cal.IValue;
 import com.paxxis.chime.client.common.cal.Table;
 import com.paxxis.chime.client.common.portal.PortletSpecification;
 import com.paxxis.chime.client.editor.AnalyticPortletEditorWindow;
-import com.paxxis.chime.client.editor.ChartUtils;
-import com.paxxis.chime.client.editor.ChartUtils.ChartType;
 import com.paxxis.chime.client.widgets.AnalyticDetailPanel;
 import com.paxxis.chime.client.widgets.ChimeMessageBox;
 import com.paxxis.chime.client.widgets.InterceptedHtml;
+import com.paxxis.chime.client.widgets.charts.ChimeChartFactory;
+import com.paxxis.chime.client.widgets.charts.ChimeChartFactory.ChartType;
 
 /**
  *
@@ -75,20 +75,14 @@ public class AnalyticPortlet extends PortletContainer {
 
         private void render() {
             DeferredCommand.addCommand(
-                    new Command()
-                    {
-                        public void execute()
-                        {
-                            final AsyncCallback callback = new AsyncCallback() {
-                                public void onSuccess(final Object result)
-                                {
-                                    DataInstanceResponseObject resp = (DataInstanceResponseObject)result;
-                                    if (resp.isResponse())
-                                    {
+                    new Command() {
+                        public void execute() {
+                            final AsyncCallback<DataInstanceResponseObject> callback = new AsyncCallback<DataInstanceResponseObject>() {
+                                public void onSuccess(final DataInstanceResponseObject resp) {
+                                    if (resp.isResponse()) {
                                         final DataInstanceResponse response = resp.getResponse();
                                         List<DataInstance> instances = response.getDataInstances();
-                                        if (instances.size() > 0)
-                                        {
+                                        if (instances.size() > 0) {
                                             DataInstance instance = instances.get(0);
                                             Object renderChart = getSpecification().getProperty("chartType");
                                             String content;
@@ -305,24 +299,19 @@ public class AnalyticPortlet extends PortletContainer {
     }
 
     private void runScript() {
-        AsyncCallback callback = new AsyncCallback()
-        {
-            public void onFailure(Throwable arg0)
-            {
+        AsyncCallback<ServiceResponseObject<RunCALScriptResponse>> callback = new AsyncCallback<ServiceResponseObject<RunCALScriptResponse>>() {
+            public void onFailure(Throwable arg0) {
                 ChimeMessageBox.alert("System Error", "Please contact the system administrator.", null);
             }
 
-            public void onSuccess(Object obj)
-            {
-                ServiceResponseObject<RunCALScriptResponse> response = (ServiceResponseObject<RunCALScriptResponse>)obj;
-                if (response.isResponse())
-                {
+            public void onSuccess(ServiceResponseObject<RunCALScriptResponse> response) {
+                if (response.isResponse()) {
                     RunCALScriptResponse resp = response.getResponse();
                     IValue result = resp.getResult();
                     if (result instanceof Table) {
                         Object renderChart = getSpecification().getProperty("chartType");
                         if (renderChart != null) {
-                        	ChartType chartType = ChartUtils.getChartType(renderChart.toString());
+                        	ChartType chartType = ChimeChartFactory.getChartType(renderChart.toString());
                         	String title = getSpecification().getProperty("chartTitle").toString();
                         	int axisCol = Integer.valueOf(getSpecification().getProperty("chartAxisColumn").toString());
                         	int valueCol = Integer.valueOf(getSpecification().getProperty("chartValueColumn").toString());
@@ -388,27 +377,22 @@ public class AnalyticPortlet extends PortletContainer {
             {
                 public void execute()
                 {
-                    final AsyncCallback callback = new AsyncCallback() {
-                        public void onSuccess(final Object result)
-                        {
-                            DataInstanceResponseObject resp = (DataInstanceResponseObject)result;
-                            if (resp.isResponse())
-                            {
+                    final AsyncCallback<DataInstanceResponseObject> callback = new AsyncCallback<DataInstanceResponseObject>() {
+                        public void onSuccess(DataInstanceResponseObject resp) {
+                            if (resp.isResponse()) {
                                 final DataInstanceResponse response = resp.getResponse();
                                 List<DataInstance> instances = response.getDataInstances();
-                                if (instances.size() > 0)
-                                {
+                                if (instances.size() > 0) {
                                     DataInstance instance = instances.get(0);
-                                    if (instance.getShapes().get(0).getName().equals("Analytic"))
-                                    {
+                                    if (instance.getShapes().get(0).getName().equals("Analytic")) {
                                         setDataInstance(instance);
                                     }
                                 }
                             }
                         }
 
-                        public void onFailure(Throwable caught)
-                        {
+                        public void onFailure(Throwable caught) {
+                        	
                         }
                     };
 

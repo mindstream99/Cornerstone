@@ -17,9 +17,10 @@
 
 package com.paxxis.chime.client.widgets.charts;
 
-import com.extjs.gxt.ui.client.util.Size;
 import com.extjs.gxt.ui.client.widget.layout.RowData;
 import com.extjs.gxt.ui.client.widget.layout.RowLayout;
+import com.google.gwt.user.client.Command;
+import com.google.gwt.user.client.DeferredCommand;
 import com.google.gwt.visualization.client.DataTable;
 import com.google.gwt.visualization.client.AbstractDataTable.ColumnType;
 import com.google.gwt.visualization.client.visualizations.Gauge;
@@ -35,19 +36,21 @@ public class ChimeGaugeChart extends ChimeChart {
 
 	private Gauge chart;
     private Gauge.Options options = Gauge.Options.create();
-	private PortletSpecification spec;
 	
 	ChimeGaugeChart(PortletSpecification spec) {
-		this.spec = spec;
+		super(spec);
 	}
 	
 	@Override
 	protected void init() {
+		super.init();
         setBorders(false);
         setLayout(new RowLayout());
 
         int min = 0;
         int max = 100;
+        
+        PortletSpecification spec = getSpecification();
         
         Object object = spec.getProperty("max");
         if (object != null) {
@@ -126,45 +129,34 @@ public class ChimeGaugeChart extends ChimeChart {
 	    add(chart, new RowData(1, -1));
 	}
 
-	public int getValueColumn() {
-		return 1;
-	}
-	
-	public DataTable resetData() {
-		DataTable data = super.resetData();
-	    data.removeColumn(0);
-	    data.insertColumn(0, ColumnType.STRING, "LABEL");
-	    data.insertColumn(1, ColumnType.NUMBER, "VALUE");
-	    return data;
-	}
-	
 	public void redraw() {
-		DataTable data = getData();
-		int rows = data.getNumberOfRows();
+		DeferredCommand.addCommand(
+			new Command() {
+				public void execute() {
+			    	int val = getWidth() - 2;
+					options.setWidth(val);
+			    	
+					if (!makeSquare()) {
+						val = getHeight();
+					}
+					
+					options.setHeight(val);
 
-		if (rows > 0) {
-			if (rows > 1) {
-				data.removeRows(0, rows - 1);
+					DataTable data = getData();
+					int rows = data.getNumberOfRows();
+
+					if (rows > 0) {
+						if (rows > 1) {
+							data.removeRows(0, rows - 1);
+						}
+
+						//data.setValue(0, 0, "Percent");
+					    chart.draw(data, options);
+					}
+				}
 			}
-
-			data.setValue(0, 0, "Percent");
-		    chart.draw(data, options);
-		}
+		);
 	}
-	
-    @Override
-    protected void onResize(int width, int height) {
-    	super.onResize(width, height);
-
-    	int aw = width;
-
-    	Size frameWidth = el().getFrameSize();
-    	aw -= (15 + frameWidth.width);
-
-		options.setHeight(aw);
-		options.setWidth(aw);
-		redraw();
-    }
 }
 
 

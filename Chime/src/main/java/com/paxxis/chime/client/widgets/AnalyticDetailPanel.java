@@ -21,7 +21,6 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.extjs.gxt.charts.client.Chart;
 import com.extjs.gxt.charts.client.model.ChartModel;
 import com.extjs.gxt.charts.client.model.Legend;
 import com.extjs.gxt.charts.client.model.Legend.Position;
@@ -46,12 +45,16 @@ import com.extjs.gxt.ui.client.widget.layout.CardLayout;
 import com.extjs.gxt.ui.client.widget.layout.FitLayout;
 import com.extjs.gxt.ui.client.widget.layout.RowData;
 import com.extjs.gxt.ui.client.widget.layout.RowLayout;
+import com.google.gwt.user.client.Command;
+import com.google.gwt.user.client.DeferredCommand;
 import com.paxxis.chime.client.common.DataField;
 import com.paxxis.chime.client.common.DataFieldValue;
 import com.paxxis.chime.client.common.DataInstance;
 import com.paxxis.chime.client.common.cal.IValue;
 import com.paxxis.chime.client.common.cal.Table;
-import com.paxxis.chime.client.editor.ChartUtils.ChartType;
+import com.paxxis.chime.client.widgets.charts.ChimeChart;
+import com.paxxis.chime.client.widgets.charts.ChimeChartFactory;
+import com.paxxis.chime.client.widgets.charts.ChimeChartFactory.ChartType;
 
 
 /**
@@ -85,12 +88,10 @@ public class AnalyticDetailPanel extends LayoutContainer {
     private LayoutContainer tableResultsContainer;
     private LayoutContainer textResultsContainer;
     private InterceptedHtml textResultsHtml;
-    private boolean showScript;
 
     public AnalyticDetailPanel(DataInstance instance, int height, boolean showScript) {
         dataInstance = instance;
         setHeight(height);
-        this.showScript = showScript;
 
         BorderLayout layout = new BorderLayout();
         setLayout(layout);
@@ -158,34 +159,29 @@ public class AnalyticDetailPanel extends LayoutContainer {
         ((CardLayout)resultsContainer.getLayout()).setActiveItem(textResultsContainer);
     }
 
-    public void showChartResult(Table table, ChartType type, String title, int axisCol, int valueCol,
+    public void showChartResult(final Table table, ChartType type, String title, int axisCol, int valueCol,
     		Integer minValue, Integer maxValue) {
         //tableResultsContainer.removeAll();
     	
-        String url = "./resources/chart/open-flash-chart.swf";        
-        Chart chart;
         if (tableResultsContainer.getItemCount() == 0) {
-            chart = new Chart(url);  
+        	final ChimeChart chart = ChimeChartFactory.create(type, title, axisCol - 1, 
+        			valueCol - 1, minValue, maxValue);  
             chart.setBorders(true);  
-            tableResultsContainer.add(chart);
+            tableResultsContainer.add(chart, new RowData(1, 1));
             tableResultsContainer.layout();
+
+            DeferredCommand.addCommand(
+            	new Command() {
+            		public void execute() {
+            	        chart.update(table);
+            		}
+            	}
+            );
         } else {
-        	chart = (Chart)tableResultsContainer.getItem(0);
+        	ChimeChart chart = (ChimeChart)tableResultsContainer.getItem(0);
+            chart.update(table);
         }
 
-        int aCol = axisCol - 1;
-        int vCol = valueCol - 1;
-        switch (type) {
-	        case Pie:
-	            chart.setChartModel(getPieChartData(table, title, aCol, vCol));  
-	            break;
-	        case Bar:
-	            chart.setChartModel(getBarChartData(table, title, aCol, vCol, minValue, maxValue));  
-	            break;
-	        case Bar3D:
-	            chart.setChartModel(getBar3DChartData(table, title, aCol, vCol, minValue, maxValue));  
-	            break;
-        }
         
         ((CardLayout)resultsContainer.getLayout()).setActiveItem(tableResultsContainer);
     }

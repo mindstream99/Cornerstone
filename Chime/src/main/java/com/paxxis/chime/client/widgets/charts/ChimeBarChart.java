@@ -20,6 +20,8 @@ package com.paxxis.chime.client.widgets.charts;
 import com.extjs.gxt.ui.client.util.Size;
 import com.extjs.gxt.ui.client.widget.layout.RowData;
 import com.extjs.gxt.ui.client.widget.layout.RowLayout;
+import com.google.gwt.user.client.Command;
+import com.google.gwt.user.client.DeferredCommand;
 import com.google.gwt.visualization.client.DataTable;
 import com.google.gwt.visualization.client.LegendPosition;
 import com.google.gwt.visualization.client.visualizations.BarChart;
@@ -35,17 +37,19 @@ public class ChimeBarChart extends ChimeChart {
 
 	private BarChart chart;
     private BarChart.Options options = BarChart.Options.create();
-	private PortletSpecification spec;
 	
 	ChimeBarChart(PortletSpecification spec) {
-		this.spec = spec;
+		super(spec);
 	}
 	
 	@Override
 	protected void init() {
+		super.init();
         setBorders(false);
         setLayout(new RowLayout());
 
+        PortletSpecification spec = getSpecification();
+        
         Object object = spec.getProperty("max");
         if (object != null) {
         	try {
@@ -81,29 +85,31 @@ public class ChimeBarChart extends ChimeChart {
 	    
 	    DataTable data = getData();
 	    data.addRow();
-	    data.setValue(0, 0, 0);
+	    data.setValue(0, 0, "");
+	    data.setValue(0, 1, 0);
 	    chart = new BarChart(data, options);
 	    
 	    add(chart, new RowData(1, -1));
 	}
 
 	public void redraw() {
-	    chart.draw(getData(), options);
+		DeferredCommand.addCommand(
+			new Command() {
+				public void execute() {
+			    	int val = getWidth() - 2;
+					options.setWidth(val);
+			    	
+					if (!makeSquare()) {
+						val = getHeight();
+					}
+					
+					options.setHeight(val);
+
+					chart.draw(getData(), options);
+				}
+			}
+		);
 	}
-	
-    @Override
-    protected void onResize(int width, int height) {
-    	super.onResize(width, height);
-
-    	int aw = width;
-
-    	Size frameWidth = el().getFrameSize();
-    	aw -= (15 + frameWidth.width);
-
-		options.setHeight(aw);
-		options.setWidth(aw);
-		redraw();
-    }
 }
 
 

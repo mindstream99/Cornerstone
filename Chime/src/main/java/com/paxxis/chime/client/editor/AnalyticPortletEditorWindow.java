@@ -51,9 +51,10 @@ import com.paxxis.chime.client.common.DataInstanceResponse;
 import com.paxxis.chime.client.common.InstanceId;
 import com.paxxis.chime.client.common.DataInstanceRequest.Depth;
 import com.paxxis.chime.client.common.portal.PortletSpecification;
-import com.paxxis.chime.client.editor.ChartUtils.ChartType;
-import com.paxxis.chime.client.editor.ChartUtils.ChartTypeModel;
 import com.paxxis.chime.client.widgets.ChimeWindow;
+import com.paxxis.chime.client.widgets.charts.ChimeChartFactory;
+import com.paxxis.chime.client.widgets.charts.ChimeChartFactory.ChartType;
+import com.paxxis.chime.client.widgets.charts.ChimeChartFactory.ChartTypeModel;
 
 /**
  * 
@@ -299,7 +300,7 @@ public class AnalyticPortletEditorWindow extends ChimeWindow
         fl.setLabelWidth(100);
         chartFieldSet.setLayout(fl);
         
-        chartStore = ChartUtils.getListStore();
+        chartStore = ChimeChartFactory.getListStore();
         chartBox = new ComboBox<ChartTypeModel>();
         chartBox.setStore(chartStore);
         chartBox.setEditable(false);

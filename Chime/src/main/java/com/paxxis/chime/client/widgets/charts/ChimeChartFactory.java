@@ -17,6 +17,8 @@
 
 package com.paxxis.chime.client.widgets.charts;
 
+import com.extjs.gxt.ui.client.data.BaseModel;
+import com.paxxis.chime.client.ChimeListStore;
 import com.paxxis.chime.client.common.portal.PortletSpecification;
 
 /**
@@ -27,31 +29,89 @@ import com.paxxis.chime.client.common.portal.PortletSpecification;
  */
 public class ChimeChartFactory {
 
-	public static final String CHART = "chart";
-	public static final String AREA = "area";
-	public static final String BAR = "bar";
-	public static final String COLUMN = "column";
-	public static final String GAUGE = "gauge";
+	public static class ChartTypeModel extends BaseModel {
+		private static final long serialVersionUID = 1L;
+
+		private ChartType type;
+		
+		public ChartTypeModel(ChartType t) {
+			type = t;
+			set("type", type);
+			set("name", type.name());
+		}
+		
+		public ChartType getChartType() {
+			return get("type");
+		}
+	}
 	
+	public enum ChartType {
+		Pie,
+		Bar,
+		Column,
+		Area,
+		Gauge
+	}
+
 	/**
 	 * Factory instance can't be created.  All access is via static methods.
 	 */
 	private ChimeChartFactory() {
 	}
 	
+	public static ChimeListStore<ChartTypeModel> getListStore() {
+        ChimeListStore<ChartTypeModel> chartStore = new ChimeListStore<ChartTypeModel>();
+        chartStore.add(new ChartTypeModel(ChartType.Pie));
+        chartStore.add(new ChartTypeModel(ChartType.Bar));
+        chartStore.add(new ChartTypeModel(ChartType.Column));
+        chartStore.add(new ChartTypeModel(ChartType.Area));
+        chartStore.add(new ChartTypeModel(ChartType.Gauge));
+        
+        return chartStore;
+	}
+	
+	public static ChartType getChartType(String name) {
+		ChartType type = ChartType.valueOf(name);
+		return type;
+	}
+	
+	public static ChimeChart create(ChartType type, String title, int axisCol,
+			int valueCol, int minValue, int maxValue) {
+		
+		PortletSpecification spec = new PortletSpecification();
+		spec.setProperty("chart", type.name());
+		spec.setProperty("field", title);
+		spec.setProperty("labelY", "");
+		spec.setProperty("axisCol", axisCol);
+		spec.setProperty("valueCol", valueCol);
+		spec.setProperty("min", minValue);
+		spec.setProperty("max", maxValue);
+                spec.setProperty("square", false);		
+		return create(spec);
+	}
+	
 	public static ChimeChart create(PortletSpecification spec) {
 		ChimeChart chart = null;
 		
-		Object object = spec.getProperty(CHART);
+		Object object = spec.getProperty("chart");
 		if (object != null) {
-			if (AREA.equals(object)) {
-				chart = new ChimeAreaChart(spec);
-			} else if (BAR.equals(object)) {
-				chart = new ChimeBarChart(spec);
-			} else if (COLUMN.equals(object)) {
-				chart = new ChimeColumnChart(spec);
-			} else if (GAUGE.equals(object)) {
-				chart = new ChimeGaugeChart(spec);
+			ChartType chartType = ChartType.valueOf(object.toString());
+			switch (chartType) {
+				case Area:
+					chart = new ChimeAreaChart(spec);
+					break;
+				case Column:
+					chart = new ChimeColumnChart(spec);
+					break;
+				case Bar:
+					chart = new ChimeBarChart(spec);
+					break;
+				case Pie:
+					chart = new ChimePieChart(spec);
+					break;
+				case Gauge:
+					chart = new ChimeGaugeChart(spec);
+					break;
 			}
 		}
 		

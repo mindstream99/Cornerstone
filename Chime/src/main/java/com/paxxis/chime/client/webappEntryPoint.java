@@ -30,7 +30,7 @@ import com.google.gwt.visualization.client.visualizations.AreaChart;
 import com.google.gwt.visualization.client.visualizations.BarChart;
 import com.google.gwt.visualization.client.visualizations.ColumnChart;
 import com.google.gwt.visualization.client.visualizations.Gauge;
-import com.google.gwt.visualization.client.visualizations.OrgChart;
+import com.google.gwt.visualization.client.visualizations.PieChart;
 import com.paxxis.chime.client.common.DataInstance;
 import com.paxxis.chime.client.pages.PageManager;
 
@@ -63,10 +63,9 @@ public class webappEntryPoint implements EntryPoint
 		// Load the visualization api's we use
 		VisualizationUtils.loadVisualizationApi(onLoadCallback, Gauge.PACKAGE);
 		VisualizationUtils.loadVisualizationApi(onLoadCallback, AreaChart.PACKAGE);
-		VisualizationUtils.loadVisualizationApi(onLoadCallback, OrgChart.PACKAGE);
 		VisualizationUtils.loadVisualizationApi(onLoadCallback, BarChart.PACKAGE);
 		VisualizationUtils.loadVisualizationApi(onLoadCallback, ColumnChart.PACKAGE);
-		VisualizationUtils.loadVisualizationApi(onLoadCallback, OrgChart.PACKAGE);
+		VisualizationUtils.loadVisualizationApi(onLoadCallback, PieChart.PACKAGE);
           
         // this will get the activity manager loaded and running
         ActivityMonitor.instance();

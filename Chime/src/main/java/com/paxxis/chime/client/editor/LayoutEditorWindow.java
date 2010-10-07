@@ -51,13 +51,11 @@ import com.google.gwt.user.client.ui.Widget;
 import com.paxxis.chime.client.Constants;
 import com.paxxis.chime.client.common.Dashboard;
 import com.paxxis.chime.client.common.DataInstance;
-import com.paxxis.chime.client.common.InstanceId;
 import com.paxxis.chime.client.common.Shape;
 import com.paxxis.chime.client.common.portal.PortalColumn;
 import com.paxxis.chime.client.common.portal.PortalTemplate;
 import com.paxxis.chime.client.common.portal.PortletSpecification;
 import com.paxxis.chime.client.common.portal.PortletSpecification.PortletType;
-import com.paxxis.chime.client.editor.ChartUtils.ChartType;
 import com.paxxis.chime.client.editor.RichTextEditorWindow.TextEditorListener;
 import com.paxxis.chime.client.portal.LayoutProxyPortlet;
 import com.paxxis.chime.client.portal.PortalContainer;
@@ -65,6 +63,7 @@ import com.paxxis.chime.client.portal.PortalContainerEvent;
 import com.paxxis.chime.client.portal.PortalUtils;
 import com.paxxis.chime.client.portal.LayoutProxyPortlet.LayoutProxyListener;
 import com.paxxis.chime.client.widgets.ChimeWindow;
+import com.paxxis.chime.client.widgets.charts.ChimeChartFactory.ChartType;
 
 /**
  *

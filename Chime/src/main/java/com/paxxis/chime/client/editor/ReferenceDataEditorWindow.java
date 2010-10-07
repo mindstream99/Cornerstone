@@ -156,7 +156,7 @@ public class ReferenceDataEditorWindow extends ChimeWindow
     {
         DataInstance instance = _simpleEditorPanel.getResult();
         
-        _listener.onSave(_field, _value, String.valueOf(instance.getId()));
+        _listener.onSave(_field, _value, instance.getId().getValue());
     }
     
     private boolean validate()

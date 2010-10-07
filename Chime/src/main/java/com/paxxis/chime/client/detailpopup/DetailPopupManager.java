@@ -264,7 +264,7 @@ public class DetailPopupManager {
                 List<DataFieldValue> vals = image.getFieldValues(type, field);
                 if (vals.size() > 0) {
                     String id = vals.get(0).getName();
-                    ImageContainer imageContainer = new ImageContainer(imageLayoutContainer, String.valueOf(id), false, null, false);
+                    ImageContainer imageContainer = new ImageContainer(imageLayoutContainer, id, false, null, false);
                     imageLayoutContainer.add(imageContainer);
                     imageLayoutContainer.layout();
                 }

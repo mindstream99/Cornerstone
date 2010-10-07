@@ -153,7 +153,7 @@ public class ImageRendererPortlet extends PortletContainer {
                                         if (vals.size() == 1) {
                                             String id = vals.get(0).getName();
                                             getBody().removeAll();
-                                            imageContainer = new ImageContainer(getBody(), String.valueOf(id), false, null, false);
+                                            imageContainer = new ImageContainer(getBody(), id, false, null, false);
                                             getBody().add(imageContainer, new FlowData(5, 0, 5, 0));
                                             getBody().layout();
                                         }

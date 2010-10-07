@@ -331,7 +331,7 @@ public class ComplexSearchFilterEditor extends ChimeWindow
         DataInputListener l2 = new DataInputListener() {
             public void onDataInstance(DataInstance instance) {
             	if (instance != null) {
-                    filter.setValue(String.valueOf(instance.getId()), instance.getName());
+                    filter.setValue(instance.getId().getValue(), instance.getName());
             	} else {
                     filter.setValue(null);
             	}

@@ -687,7 +687,7 @@ public class AdvancedSearchPanel extends ChimeLayoutContainer
                     
                     // is this the permanent way to deal with this?
                     SearchFilter filter = new SearchFilter();
-                    filter.setValue(String.valueOf(type.getId()), type.getName());
+                    filter.setValue(type.getId(), type.getName());
                     filter.setEnabled(true);
                     filter.setOperator(Operator.Reference);
                     DataField f = new DataField();

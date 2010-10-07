@@ -242,6 +242,6 @@ public class ReviewPanel extends LayoutContainer
     
     private static String getId(Review rating)
     {
-        return String.valueOf(rating.getId());
+        return rating.getId().getValue();
     }
 }

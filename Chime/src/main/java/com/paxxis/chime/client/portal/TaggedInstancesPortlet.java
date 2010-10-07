@@ -99,7 +99,7 @@ public class TaggedInstancesPortlet extends PortletContainer {
                 req.setCursor(new Cursor(20));
                 req.setDepth(Depth.Shallow);
                 req.setSortOrder(SortOrder.ByName);
-                req.addQueryParameter(null, "Tag", String.valueOf(tag.getId()), Operator.Reference);
+                req.addQueryParameter(null, "Tag", tag.getId().getValue(), Operator.Reference);
 
                 if (globalItemAttached) {
                     globalResultsPanel.query(req);
@@ -110,7 +110,7 @@ public class TaggedInstancesPortlet extends PortletContainer {
                     req.setCursor(new Cursor(20));
                     req.setDepth(Depth.Shallow);
                     req.setSortOrder(SortOrder.ByName);
-                    req.addQueryParameter(null, "TagAppliedUser", String.valueOf(tag.getId()), Operator.Reference);
+                    req.addQueryParameter(null, "TagAppliedUser", tag.getId().getValue(), Operator.Reference);
                     userResultsPanel.query(req);
     	    	} else {
                     userResultsPanel.query(req);

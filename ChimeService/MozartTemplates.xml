@@ -23,32 +23,39 @@
         <specification name="cybernodeDetail">
             <column width="1.0">
                 <portlet type="InstanceHeader" headerType="shaded" showHeader="false" />
+                <portlet type="InstanceField" title="Instance Metadata">
+                	<exclusion name="CPU (Proc)"/>
+                	<exclusion name="CPU Usage"/>
+                	<exclusion name="System Memory Usage"/>
+                	<exclusion name="Memory Usage"/>
+                	<exclusion name="Diskspace Usage"/>
+                </portlet>
                 <portlet type="DetailPage" title="Compute Resources" ref="cybernodeData" />
                 <portlet type="InstanceSocialActivity" />
             </column>
-            <!-- column width="300">
-                <portlet type="ImageGallery" showHeader="true" />
-                <portlet type="FileGallery" showHeader="true" />
+            <column width="300">
+                <!-- portlet type="ImageGallery" showHeader="true" />
+                <portlet type="FileGallery" showHeader="true" /-->
                 <portlet type="InstanceReferrers" showHeader="true" />
-            </column-->
+            </column>
         </specification>
 
  		<!-- the field data template for a Cybernode -->
         <specification name="cybernodeData">
             <column width="0.2">
-                <portlet type="FieldDataChart" labelY="Percent" height="450" field="CPU (Proc)" chart="area" min="0" max="100" />
+                <portlet type="FieldDataChart" labelY="Percent" field="CPU (Proc)" chart="Area" min="0" max="100" />
             </column>
             <column width="0.2">
-                <portlet type="FieldDataChart" labelY="Percent" height="450" field="CPU Usage" chart="area" min="0" max="100" />
+                <portlet type="FieldDataChart" labelY="Percent" field="CPU Usage" chart="Area" min="0" max="100" />
             </column>
             <column width="0.2">
-            	<portlet type="FieldDataChart" labelY="Percent" height="450" field="System Memory Usage" chart="area" min="0" max="100" />
+            	<portlet type="FieldDataChart" labelY="Percent" field="System Memory Usage" chart="Area" min="0" max="100" />
             </column>
             <column width="0.2">
-            	<portlet type="FieldDataChart" labelY="Percent" height="450" field="Memory Usage" chart="area" min="0" max="100" />
+            	<portlet type="FieldDataChart" labelY="Percent" field="Memory Usage" chart="Area" min="0" max="100" />
             </column>
             <column width="0.2">
-            	<portlet type="FieldDataChart" labelY="Percent" height="450" field="Diskspace Usage" chart="area" min="0" max="100" />
+            	<portlet type="FieldDataChart" labelY="Percent" field="Diskspace Usage" chart="Area" min="0" max="100" />
             </column>
         </specification>
 
@@ -56,6 +63,13 @@
         <specification name="serviceInstanceDetail">
             <column width="1.0">
                 <portlet type="InstanceHeader" headerType="shaded" showHeader="false" />
+                <portlet type="InstanceField" title="Instance Metadata">
+                	<exclusion name="Thread Deadlock"/>
+                	<exclusion name="CPU (Proc)"/>
+                	<exclusion name="Memory Limit"/>
+                	<exclusion name="Memory Usage"/>
+                	<exclusion name="Average Enqueue Time"/>
+                </portlet>
                 <portlet type="DetailPage" title="Instance Details" ref="serviceInstanceData"/>
                 <portlet type="InstanceSocialActivity" />
             </column>
@@ -68,19 +82,19 @@
         
         <specification name="serviceInstanceData">
         	<column width="0.2">
-            	<portlet type="FieldDataChart" labelY="Percent" height="450" field="Thread Deadlock" chart="area" min="0" max="20" />
+            	<portlet type="FieldDataChart" labelY="Percent" field="Thread Deadlock" chart="Area" min="0" max="20" />
             </column>  
             <column width="0.2">
-            	<portlet type="FieldDataChart" labelY="Percent" height="450" field="CPU (Proc)" chart="area" min="0" max="100" />
+            	<portlet type="FieldDataChart" labelY="Percent" field="CPU (Proc)" chart="Area" min="0" max="100" />
             </column>  
             <column width="0.2">
-            	<portlet type="FieldDataChart" labelY="Percent" height="450" field="Memory Limit" chart="area" min="0" max="1000000" />
+            	<portlet type="FieldDataChart" labelY="Percent" field="Memory Limit" chart="Area" min="0" max="1000000" />
             </column>  
             <column width="0.2">
-            	<portlet type="FieldDataChart" labelY="Percent" height="450" field="Memory Usage" chart="area" min="0" max="100" />
+            	<portlet type="FieldDataChart" labelY="Percent" field="Memory Usage" chart="Area" min="0" max="100" />
             </column>  
             <column width="0.2">
-            	<portlet type="FieldDataChart" labelY="Seconds" height="450" field="Average Enqueue Time" chart="area" min="0" max="20" />
+            	<portlet type="FieldDataChart" labelY="Seconds" field="Average Enqueue Time" chart="Area" min="0" max="20" />
             </column>  
         </specification>
     </specifications>

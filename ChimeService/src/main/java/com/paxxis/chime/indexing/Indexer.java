@@ -17,55 +17,30 @@
 
 package com.paxxis.chime.indexing;
 
-import org.apache.tika.Tika;
-import com.paxxis.chime.client.common.BackReferencingDataInstance;
-import com.paxxis.chime.client.common.Comment;
-import com.paxxis.chime.client.common.CommentsBundle;
-import com.paxxis.chime.client.common.Community;
-import com.paxxis.chime.client.common.DataField;
-import com.paxxis.chime.client.common.DataFieldValue;
-import com.paxxis.chime.client.common.DataInstance;
-import com.paxxis.chime.client.common.DataInstanceRequest.SortOrder;
-import com.paxxis.chime.client.common.DataSocialContext;
-import com.paxxis.chime.client.common.Shape;
-import com.paxxis.chime.client.common.Discussion;
-import com.paxxis.chime.client.common.Dashboard;
-import com.paxxis.chime.client.common.InstanceId;
-import com.paxxis.chime.client.common.Scope;
-import com.paxxis.chime.client.common.Tag;
-import com.paxxis.chime.client.common.TagContext;
-import com.paxxis.chime.client.common.User;
-import com.paxxis.chime.client.common.portal.PortalColumn;
-import com.paxxis.chime.client.common.portal.PortalTemplate;
-import com.paxxis.chime.client.common.portal.PortletSpecification;
-import com.paxxis.chime.client.common.portal.PortletSpecification.PortletType;
-import com.paxxis.chime.database.DataSet;
-import com.paxxis.chime.database.DatabaseConnection;
-import com.paxxis.chime.database.DatabaseConnectionPool;
-import com.paxxis.chime.database.IDataValue;
-import com.paxxis.chime.data.CacheManager;
-import com.paxxis.chime.data.CommentUtils;
-import com.paxxis.chime.data.DataInstanceUtils;
-import com.paxxis.chime.data.ShapeUtils;
-import com.paxxis.chime.data.TagUtils;
-import com.paxxis.chime.service.Tools;
-import com.paxxis.chime.indexing.IndexUpdater.Type;
 import java.io.File;
-import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+
 import org.apache.log4j.Logger;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.document.Document;
-import org.apache.lucene.document.Field;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.Term;
-import org.htmlparser.Parser;
-import org.htmlparser.visitors.TextExtractingVisitor;
+
+import com.paxxis.chime.client.common.DataInstance;
+import com.paxxis.chime.client.common.InstanceId;
+import com.paxxis.chime.client.common.Shape;
+import com.paxxis.chime.client.common.User;
+import com.paxxis.chime.data.DataInstanceUtils;
+import com.paxxis.chime.database.DataSet;
+import com.paxxis.chime.database.DatabaseConnection;
+import com.paxxis.chime.database.DatabaseConnectionPool;
+import com.paxxis.chime.database.IDataValue;
+import com.paxxis.chime.indexing.IndexUpdater.Type;
+import com.paxxis.chime.service.Tools;
  
 /**
  *
@@ -208,7 +183,6 @@ public class Indexer {
         //_executor.submit(new NameChanger(data, Type.Delete));
     }
 }
-
 
 
 class OptimizerTask implements Runnable {

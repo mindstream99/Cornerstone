@@ -51,135 +51,141 @@ public interface CALRuleParserConstants {
   /** RegularExpression Id. */
   int STREQUALS = 23;
   /** RegularExpression Id. */
-  int STRCAT = 24;
+  int STRCONTAINS = 24;
   /** RegularExpression Id. */
-  int GREATERTHAN = 25;
+  int STRCAT = 25;
   /** RegularExpression Id. */
-  int LESSTHAN = 26;
+  int GREATERTHAN = 26;
   /** RegularExpression Id. */
-  int GREATERTHANEQ = 27;
+  int LESSTHAN = 27;
   /** RegularExpression Id. */
-  int LESSTHANEQ = 28;
+  int GREATERTHANEQ = 28;
   /** RegularExpression Id. */
-  int DO = 29;
+  int LESSTHANEQ = 29;
   /** RegularExpression Id. */
-  int WHEN = 30;
+  int DO = 30;
   /** RegularExpression Id. */
-  int SET = 31;
+  int WHEN = 31;
   /** RegularExpression Id. */
-  int TO = 32;
+  int SET = 32;
   /** RegularExpression Id. */
-  int RULE = 33;
+  int TO = 33;
   /** RegularExpression Id. */
-  int SWITCH = 34;
+  int RULE = 34;
   /** RegularExpression Id. */
-  int CASE = 35;
+  int SWITCH = 35;
   /** RegularExpression Id. */
-  int EVENT = 36;
+  int CASE = 36;
   /** RegularExpression Id. */
-  int TIMER = 37;
+  int EVENT = 37;
   /** RegularExpression Id. */
-  int DEFCASE = 38;
+  int TIMER = 38;
   /** RegularExpression Id. */
-  int CONDITION = 39;
+  int DEFCASE = 39;
   /** RegularExpression Id. */
-  int CHANGES = 40;
+  int CONDITION = 40;
   /** RegularExpression Id. */
-  int RETURNS = 41;
+  int CHANGES = 41;
   /** RegularExpression Id. */
-  int RETURN = 42;
+  int RETURNS = 42;
   /** RegularExpression Id. */
-  int TRUE = 43;
+  int RETURN = 43;
   /** RegularExpression Id. */
-  int FALSE = 44;
+  int TRUE = 44;
   /** RegularExpression Id. */
-  int REFERENCE = 45;
+  int FALSE = 45;
   /** RegularExpression Id. */
-  int VARIABLE = 46;
+  int REFERENCE = 46;
   /** RegularExpression Id. */
-  int START = 47;
+  int VARIABLE = 47;
   /** RegularExpression Id. */
-  int SUBMIT = 48;
+  int START = 48;
   /** RegularExpression Id. */
-  int DURABLE = 49;
+  int SUBMIT = 49;
   /** RegularExpression Id. */
-  int DYNAMIC = 50;
+  int DURABLE = 50;
   /** RegularExpression Id. */
-  int AS = 51;
+  int DYNAMIC = 51;
   /** RegularExpression Id. */
-  int ON = 52;
+  int AS = 52;
   /** RegularExpression Id. */
-  int IF = 53;
+  int ON = 53;
   /** RegularExpression Id. */
-  int ELSE = 54;
+  int BEFORE = 54;
   /** RegularExpression Id. */
-  int ELSEIF = 55;
+  int AFTER = 55;
   /** RegularExpression Id. */
-  int WHILE = 56;
+  int IF = 56;
   /** RegularExpression Id. */
-  int BREAK = 57;
+  int ELSE = 57;
   /** RegularExpression Id. */
-  int ERROR = 58;
+  int ELSEIF = 58;
   /** RegularExpression Id. */
-  int METHODSEP = 59;
+  int WHILE = 59;
   /** RegularExpression Id. */
-  int VALUESEP = 60;
+  int BREAK = 60;
   /** RegularExpression Id. */
-  int IS = 61;
+  int ERROR = 61;
   /** RegularExpression Id. */
-  int AND = 62;
+  int METHODSEP = 62;
   /** RegularExpression Id. */
-  int OR = 63;
+  int VALUESEP = 63;
   /** RegularExpression Id. */
-  int NOT = 64;
+  int IS = 64;
   /** RegularExpression Id. */
-  int WAIT = 65;
+  int AND = 65;
   /** RegularExpression Id. */
-  int UNTIL = 66;
+  int OR = 66;
   /** RegularExpression Id. */
-  int ARRAY = 67;
+  int NOT = 67;
   /** RegularExpression Id. */
-  int TABLE = 68;
+  int WAIT = 68;
   /** RegularExpression Id. */
-  int INTEGER = 69;
+  int UNTIL = 69;
   /** RegularExpression Id. */
-  int DOUBLE = 70;
+  int ARRAY = 70;
   /** RegularExpression Id. */
-  int BOOLEAN = 71;
+  int TABLE = 71;
   /** RegularExpression Id. */
-  int STRING = 72;
+  int INTEGER = 72;
   /** RegularExpression Id. */
-  int DATE = 73;
+  int DOUBLE = 73;
   /** RegularExpression Id. */
-  int STOCKSYMBOL = 74;
+  int BOOLEAN = 74;
   /** RegularExpression Id. */
-  int DATAINSTANCE = 75;
+  int STRING = 75;
   /** RegularExpression Id. */
-  int SHAPE = 76;
+  int DATE = 76;
   /** RegularExpression Id. */
-  int EXTENSION = 77;
+  int STOCKSYMBOL = 77;
   /** RegularExpression Id. */
-  int QUERY = 78;
+  int DATAINSTANCE = 78;
   /** RegularExpression Id. */
-  int NARROW = 79;
+  int SHAPE = 79;
   /** RegularExpression Id. */
-  int WHERE = 80;
+  int EXTENSION = 80;
   /** RegularExpression Id. */
-  int RATING = 81;
+  int QUERY = 81;
   /** RegularExpression Id. */
-  int FIELD = 82;
+  int NARROW = 82;
   /** RegularExpression Id. */
-  int PRINT = 83;
+  int WHERE = 83;
   /** RegularExpression Id. */
-  int NEWLINE = 84;
+  int RATING = 84;
   /** RegularExpression Id. */
-  int name = 85;
+  int FIELD = 85;
   /** RegularExpression Id. */
-  int INTEGERLITERAL = 86;
+  int PRINT = 86;
   /** RegularExpression Id. */
-  int DATELITERAL = 87;
+  int NEWLINE = 87;
   /** RegularExpression Id. */
-  int FLOATLITERAL = 88;
+  int name = 88;
+  /** RegularExpression Id. */
+  int INTEGERLITERAL = 89;
+  /** RegularExpression Id. */
+  int DATELITERAL = 90;
+  /** RegularExpression Id. */
+  int FLOATLITERAL = 91;
 
   /** Lexical state. */
   int DEFAULT = 0;
@@ -214,6 +220,7 @@ public interface CALRuleParserConstants {
     "\"==\"",
     "\"!=\"",
     "<STREQUALS>",
+    "<STRCONTAINS>",
     "\"|\"",
     "\">\"",
     "\"<\"",
@@ -243,6 +250,8 @@ public interface CALRuleParserConstants {
     "<DYNAMIC>",
     "<AS>",
     "<ON>",
+    "<BEFORE>",
+    "<AFTER>",
     "<IF>",
     "<ELSE>",
     "<ELSEIF>",

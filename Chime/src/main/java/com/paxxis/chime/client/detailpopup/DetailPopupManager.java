@@ -263,7 +263,7 @@ public class DetailPopupManager {
                 DataField field = type.getField("File ID");
                 List<DataFieldValue> vals = image.getFieldValues(type, field);
                 if (vals.size() > 0) {
-                    String id = vals.get(0).getName();
+                    String id = vals.get(0).getValue().toString();
                     ImageContainer imageContainer = new ImageContainer(imageLayoutContainer, id, false, null, false);
                     imageLayoutContainer.add(imageContainer);
                     imageLayoutContainer.layout();

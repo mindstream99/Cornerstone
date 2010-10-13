@@ -58,7 +58,7 @@ public class NamedSearchHelper implements DataInstanceHelper
         List<DataFieldValue> values = inst.getFieldValues(type, field);
         if (values.size() > 0) // && typevalues.size() > 0)
         {
-            String jsonText = values.get(0).getName();
+            String jsonText = values.get(0).getValue().toString();
             
             SearchCriteria criteria = convert(jsonText, (DatabaseConnection)obj);
             inst.setSearchCriteria(criteria);
@@ -80,12 +80,12 @@ public class NamedSearchHelper implements DataInstanceHelper
         DataField field = req.getShapes().get(0).getField("Search Criteria");
         if (req.getDataInstance() == null) {
             DataFieldValue value = new DataFieldValue();
-            value.setName(str);
+            value.setValue(str);
             req.addFieldData(req.getShapes().get(0), field, value);
         } else {
             List<DataFieldValue> values = req.getDataInstance().getFieldValues(req.getShapes().get(0), field);
             DataFieldValue value = values.get(0);
-            value.setName(str);
+            value.setValue(str);
             req.addFieldData(req.getShapes().get(0), field, value);
         }
     }

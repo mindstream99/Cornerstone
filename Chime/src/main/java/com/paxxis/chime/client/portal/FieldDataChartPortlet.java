@@ -62,7 +62,7 @@ public class FieldDataChartPortlet extends PortletContainer {
 			    int col = chart.getValueColumn();
 			    for (DataFieldValue value : values) {
 				    data.addRow();
-				    double dval = Double.parseDouble(value.getName());
+				    double dval = Double.parseDouble(value.getValue().toString());
 				    data.setValue(row, col, round(dval, 2));
 				    row++;
 			    }

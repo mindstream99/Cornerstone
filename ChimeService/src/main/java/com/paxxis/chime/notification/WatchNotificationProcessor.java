@@ -62,7 +62,7 @@ class WatchNotificationProcessor extends MessageNotifier {
                     Date lastUpdate = dataSet.getFieldValue("last_update").asDate();
                     if (!userId.equals(currentUserId)) {
                         if (currentUserId != null) {
-                            User user = UserUtils.getUserById(userId, admin, dbconn);
+                            User user = UserUtils.getUserById(currentUserId, admin, dbconn);
                             String email = user.getEmailAddress();
                             Pair p = new Pair();
                             if (email != null && !email.isEmpty()) {
@@ -70,8 +70,8 @@ class WatchNotificationProcessor extends MessageNotifier {
                                 p.email = email;
                             }
 
-                            p.id = userId;
-                            String body = "The following data instances have had recent activity:\n\n" + msg.toString();
+                            p.id = currentUserId;
+                            String body = "The following data instances have had recent activity:<br><br>" + msg.toString();
                             send(p, dbconn, "Chime Watch Notification", body);
                         }
 
@@ -86,7 +86,7 @@ class WatchNotificationProcessor extends MessageNotifier {
                     }
 
                     String entry = "The data named " + link + " was updated on " + lastUpdate.toLocaleString();
-                    msg.append(entry).append("\n");
+                    msg.append(entry).append("<br>");
                 }
                 dataSet.close();
                 sql = "update Chime.RegisteredInterest set last_notification = CURRENT_TIMESTAMP where last_update > last_notification";
@@ -102,7 +102,7 @@ class WatchNotificationProcessor extends MessageNotifier {
                     }
 
                     p.id = currentUserId;
-                    String body = "The following data instances have had recent activity:\n\n" + msg.toString();
+                    String body = "The following data instances have had recent activity:<br><br>" + msg.toString();
                     send(p, dbconn, "Chime Watch Notification", body);
                 }
 

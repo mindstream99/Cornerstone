@@ -22,6 +22,7 @@ import com.paxxis.chime.client.common.InstanceId;
 import com.paxxis.chime.client.common.Shape;
 import com.paxxis.chime.client.editor.FieldEditListener;
 import com.paxxis.chime.client.editor.FieldEditorListener;
+import com.paxxis.chime.client.editor.MultiDateEditorWindow;
 import com.paxxis.chime.client.editor.MultiReferenceEditorWindow;
 import com.paxxis.chime.client.editor.MultiTextEditorWindow;
 import com.paxxis.chime.client.editor.TextFieldEditorWindow;
@@ -53,7 +54,7 @@ public class DataEditGridCellRenderer implements GridCellRenderer<DataFieldModel
         // if the value is null, then this is new data, otherwise this is modified data
         if (value != null) {
             if (field.getShape().isPrimitive()) {
-                value.setName(text);
+                value.setValue(text);
             } else {
                 value.setReferenceId(InstanceId.create(text));
             }
@@ -99,8 +100,8 @@ public class DataEditGridCellRenderer implements GridCellRenderer<DataFieldModel
                         MultiReferenceEditorWindow w = new MultiReferenceEditorWindow(inst, shape, field, fieldEditListener);
                         w.show();
                     } else {
-                        String typeName = field.getShape().getName();
-                        if (typeName.equals("Rich Text")) {
+                    	Shape fieldShape = field.getShape();
+                        if (fieldShape.getId().equals(Shape.RICHTEXT_ID)) {
                             List<DataFieldValue> list = inst.getFieldValues(shape, field);
                             DataFieldValue val = null;
                             if (list.size() == 1) {
@@ -109,12 +110,18 @@ public class DataEditGridCellRenderer implements GridCellRenderer<DataFieldModel
 
                             TextFieldEditorWindow editor = new TextFieldEditorWindow(shape, field, val, textListener);
                             editor.show();
-                        } else { // if (typeName.equals("Text")) {
+                        } else if (fieldShape.getId().equals(Shape.DATE_ID)) {
+                            MultiDateEditorWindow w = new MultiDateEditorWindow(inst, shape, field, fieldEditListener);
+
+                            int x = btn.getAbsoluteLeft();
+                            int y = btn.getAbsoluteTop() + btn.getOffsetHeight() + 1;
+                            w.show();
+                        } else { // TEXT
                             MultiTextEditorWindow w = new MultiTextEditorWindow(inst, shape, field, fieldEditListener);
 
                             int x = btn.getAbsoluteLeft();
                             int y = btn.getAbsoluteTop() + btn.getOffsetHeight() + 1;
-                            w.show(); //At(x, y);
+                            w.show();
                         }
                     }
                  }

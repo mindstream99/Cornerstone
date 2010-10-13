@@ -29,9 +29,9 @@ public class ChimePieChart extends ChimeChart {
 	    options.setWidth(-1);
 	    options.setTitleFontSize(14.0); 
 	    options.setTitle(spec.getProperty("field").toString());
-	    options.setLegend(LegendPosition.NONE);
-	    options.setTitle(spec.getProperty("title").toString());
+	    options.setLegend(LegendPosition.RIGHT);
 	    options.setEnableTooltip(true);
+	    options.set3D(true);
 	    
 	    DataTable data = getData();
 	    data.addRow();

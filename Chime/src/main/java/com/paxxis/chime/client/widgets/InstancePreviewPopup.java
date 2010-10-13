@@ -153,7 +153,7 @@ public class InstancePreviewPopup extends ChimePopup {
         List<DataFieldValue> vals = image.getFieldValues(type, field);
         if (vals.size() == 1) {
             removeAll();
-    		ImageContainer ic = new ImageContainer(this, vals.get(0).getName(), true, "white", false);
+    		ImageContainer ic = new ImageContainer(this, vals.get(0).getValue().toString(), true, "white", false);
     		ic.setImageLoadListener(
     			new ImageContainer.ImageLoadListener() {
     				public void onSuccess() {

@@ -17,6 +17,11 @@
 
 package com.paxxis.chime.data;
 
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
 import com.paxxis.chime.client.common.DataFieldValue;
 import com.paxxis.chime.client.common.DataInstance;
 import com.paxxis.chime.client.common.FieldData;
@@ -25,13 +30,11 @@ import com.paxxis.chime.client.common.Shape;
 import com.paxxis.chime.client.common.User;
 import com.paxxis.chime.database.DataSet;
 import com.paxxis.chime.database.DatabaseConnection;
+import com.paxxis.chime.database.DateValue;
 import com.paxxis.chime.database.IDataValue;
 import com.paxxis.chime.database.StringData;
-import com.paxxis.chime.service.Tools;
 import com.paxxis.chime.extension.ChimeExtensionManager;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import com.paxxis.chime.service.Tools;
 
 /**
  *
@@ -123,7 +126,7 @@ public class FieldDataUtils {
         String tableName = Tools.getTableSet();
         int colid = fieldData.field.getColumn();
         String column;
-        String value;
+        Serializable value;
         Shape fieldShape = fieldData.field.getShape();
 
         if (fieldShape.isPrimitive())
@@ -136,7 +139,17 @@ public class FieldDataUtils {
                 if (fieldData.value instanceof String) {
                     value = fieldData.value.toString();
                 } else {
-                    value = ((DataFieldValue)fieldData.value).getName();
+                    value = ((DataFieldValue)fieldData.value).getValue();
+                }
+            } else if (fieldShape.isDate()) {
+                tableName += "_Timestamp";
+
+                if (fieldData.value instanceof Date) {
+                    value = new DateValue(((Date)fieldData.value)).asSQLValue();
+                } else {
+                    DataFieldValue dfv = (DataFieldValue)fieldData.value;
+                    Date dt = (Date)dfv.getValue();
+                    value = new DateValue(dt).asSQLValue();
                 }
             } else {
                 tableName += "_Text";
@@ -144,7 +157,7 @@ public class FieldDataUtils {
                 if (fieldData.value instanceof String) {
                     value = new StringData(fieldData.value.toString()).asSQLValue();
                 } else {
-                    value = new StringData(((DataFieldValue)fieldData.value).getName()).asSQLValue();
+                    value = new StringData(((DataFieldValue)fieldData.value).getValue().toString()).asSQLValue();
                 }
             }
         }
@@ -163,7 +176,7 @@ public class FieldDataUtils {
                 value = String.valueOf(((DataFieldValue)fieldData.value).getReferenceId());
             }
 
-            value = new StringData(value).asSQLValue();
+            value = new StringData(value.toString()).asSQLValue();
         }
 
         InstanceId id = Tools.getNewId(Tools.DEFAULT_EXTID);
@@ -186,6 +199,10 @@ public class FieldDataUtils {
                 "' and datatype_id = '" + shape.getId() + "'";
         database.executeStatement(sql);
 
+        sql = "delete from DataInstance_Timestamp where instance_id = '" + instance.getId() +
+        		"' and datatype_id = '" + shape.getId() + "'";
+        database.executeStatement(sql);
+
         sql = "delete from DataInstance_Text where instance_id = '" + instance.getId() +
                 "' and datatype_id = '" + shape.getId() + "'";
         database.executeStatement(sql);
@@ -200,6 +217,8 @@ public class FieldDataUtils {
         if (fieldShape.isPrimitive()) {
             if (fieldShape.isNumeric()) {
                 tableName += "_Number";
+            } else if (fieldShape.isDate()) {
+                tableName += "_Timestamp";
             } else {
                 tableName += "_Text";
             }
@@ -226,15 +245,23 @@ public class FieldDataUtils {
 
             if (fieldData.field.getShape().isNumeric()) {
                 tableName += "_Number";
-
                 value = fieldData.value.toString();
+            } else if (fieldData.field.getShape().isDate()) {
+                tableName += "_Timestamp";
+                if (fieldData.value instanceof Date) {
+                    value = new DateValue(((Date)fieldData.value)).asSQLValue();
+                } else {
+                    DataFieldValue dfv = (DataFieldValue)fieldData.value;
+                    Date dt = (Date)dfv.getValue();
+                    value = new DateValue(dt).asSQLValue();
+                }
             } else {
                 tableName += "_Text";
 
                 if (fieldData.value instanceof String) {
                     value = new StringData(fieldData.value.toString()).asSQLValue();
                 } else {
-                    value = new StringData(((DataFieldValue)fieldData.value).getName()).asSQLValue();
+                    value = new StringData(((DataFieldValue)fieldData.value).getValue().toString()).asSQLValue();
                 }
             }
         }
@@ -263,8 +290,10 @@ public class FieldDataUtils {
     public static List<DataFieldValue> getInternalFieldValues(DatabaseConnection database, Shape shape, int col, Shape type2, InstanceId instanceId) throws Exception
     {
         String tableName = Tools.getTableSet();
-        if (type2.getName().equals("Number")) {
+        if (type2.isNumeric()) {
             tableName += "_Number";
+        } else if (type2.isDate()) {
+            tableName += "_Timestamp";
         } else {
             tableName += "_Text";
         }
@@ -281,9 +310,16 @@ public class FieldDataUtils {
             IDataValue instId = dataSet.getFieldValue("theId");
             IDataValue timestamp = dataSet.getFieldValue("timestamp");
 
+            Serializable sval;
+            if (value instanceof DateValue) {
+                sval = value.asDate();
+            } else {
+                sval = value.asString();
+            }
+
             // we should really support the various internal (primitive) data types.  for
             // now we just treat everything like a string
-            values.add(new DataFieldValue(value.asString(), type2.getId(), instId.asInstanceId(), timestamp.asDate()));
+            values.add(new DataFieldValue(sval, type2.getId(), instId.asInstanceId(), timestamp.asDate()));
             found = dataSet.next();
         }
 

@@ -17,43 +17,13 @@
 
 package com.paxxis.chime.extension;
 
-import com.paxxis.chime.client.common.BackReferencingDataInstance;
-import com.paxxis.chime.client.common.Comment;
-import com.paxxis.chime.client.common.CommentsBundle;
-import com.paxxis.chime.client.common.Community;
-import com.paxxis.chime.client.common.Dashboard;
-import com.paxxis.chime.client.common.DataField;
-import com.paxxis.chime.client.common.DataFieldValue;
-import com.paxxis.chime.client.common.DataInstance;
-import com.paxxis.chime.client.common.DataInstanceRequest.SortOrder;
-import com.paxxis.chime.client.common.DataSocialContext;
-import com.paxxis.chime.client.common.Shape;
-import com.paxxis.chime.client.common.Discussion;
-import com.paxxis.chime.client.common.InstanceId;
-import com.paxxis.chime.client.common.Scope;
-import com.paxxis.chime.client.common.Tag;
-import com.paxxis.chime.client.common.TagContext;
-import com.paxxis.chime.client.common.User;
-import com.paxxis.chime.client.common.extension.MemoryIndexer;
-import com.paxxis.chime.client.common.portal.PortalColumn;
-import com.paxxis.chime.client.common.portal.PortalTemplate;
-import com.paxxis.chime.client.common.portal.PortletSpecification;
-import com.paxxis.chime.client.common.portal.PortletSpecification.PortletType;
-import com.paxxis.chime.database.DatabaseConnection;
-import com.paxxis.chime.database.DatabaseConnectionPool;
-import com.paxxis.chime.data.CacheManager;
-import com.paxxis.chime.data.CommentUtils;
-import com.paxxis.chime.data.DataInstanceUtils;
-import com.paxxis.chime.data.ShapeUtils;
-import com.paxxis.chime.data.TagUtils;
-import com.paxxis.chime.service.Tools;
-import com.paxxis.chime.indexing.ChimeAnalyzer;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.index.CorruptIndexException;
@@ -63,6 +33,38 @@ import org.apache.lucene.store.LockObtainFailedException;
 import org.apache.lucene.store.RAMDirectory;
 import org.htmlparser.Parser;
 import org.htmlparser.visitors.TextExtractingVisitor;
+
+import com.paxxis.chime.client.common.BackReferencingDataInstance;
+import com.paxxis.chime.client.common.Comment;
+import com.paxxis.chime.client.common.CommentsBundle;
+import com.paxxis.chime.client.common.Community;
+import com.paxxis.chime.client.common.Dashboard;
+import com.paxxis.chime.client.common.DataField;
+import com.paxxis.chime.client.common.DataFieldValue;
+import com.paxxis.chime.client.common.DataInstance;
+import com.paxxis.chime.client.common.DataSocialContext;
+import com.paxxis.chime.client.common.Discussion;
+import com.paxxis.chime.client.common.InstanceId;
+import com.paxxis.chime.client.common.Scope;
+import com.paxxis.chime.client.common.Shape;
+import com.paxxis.chime.client.common.Tag;
+import com.paxxis.chime.client.common.TagContext;
+import com.paxxis.chime.client.common.User;
+import com.paxxis.chime.client.common.DataInstanceRequest.SortOrder;
+import com.paxxis.chime.client.common.extension.MemoryIndexer;
+import com.paxxis.chime.client.common.portal.PortalColumn;
+import com.paxxis.chime.client.common.portal.PortalTemplate;
+import com.paxxis.chime.client.common.portal.PortletSpecification;
+import com.paxxis.chime.client.common.portal.PortletSpecification.PortletType;
+import com.paxxis.chime.data.CacheManager;
+import com.paxxis.chime.data.CommentUtils;
+import com.paxxis.chime.data.DataInstanceUtils;
+import com.paxxis.chime.data.ShapeUtils;
+import com.paxxis.chime.data.TagUtils;
+import com.paxxis.chime.database.DatabaseConnection;
+import com.paxxis.chime.database.DatabaseConnectionPool;
+import com.paxxis.chime.indexing.ChimeAnalyzer;
+import com.paxxis.chime.service.Tools;
 
 /**
  *
@@ -405,12 +407,12 @@ public class ChimeMemoryIndexer implements MemoryIndexer {
                     {
                         if (field.getShape().isNumeric())
                         {
-                            data = Tools.floatToNumeric(Float.parseFloat(value.getName()));
+                            data = Tools.floatToNumeric(Float.parseFloat(value.getValue().toString()));
                             doc.add(new Field(fieldName, data, Field.Store.NO, Field.Index.UN_TOKENIZED));
                         }
                         else
                         {
-                            data = value.getName();
+                            data = value.getValue().toString();
 
                             if (field.getShape().getId().equals(Shape.RICHTEXT_ID) ||
                                     (shape.getId().equals(Shape.DASHBOARD_ID) && field.getShape().getId().equals(Shape.TEXT_ID))) {
@@ -422,7 +424,7 @@ public class ChimeMemoryIndexer implements MemoryIndexer {
 
                                 // look for references within the content
                                 int idx;
-                                String html = value.getName();
+                                String html = value.getValue().toString();
                                 while (-1 != (idx = html.indexOf("<a href=\"chime://#detail:"))) {
                                     // find the instance id
                                     int idx2 = idx + 25;

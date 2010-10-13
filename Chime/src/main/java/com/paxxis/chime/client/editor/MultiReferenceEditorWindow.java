@@ -352,7 +352,7 @@ public class MultiReferenceEditorWindow extends ChimeWindow {
                 new InstanceCreatorWindow.InstanceCreationListener() {
                     public void onInstanceCreated(DataInstance instance) {
                         DataFieldValue val = new DataFieldValue();
-                        val.setName(instance.getName());
+                        val.setValue(instance.getName());
                         val.setShapeId(dataField.getShape().getId());
                         val.setReferenceId(instance.getId());
                         addValue(val);
@@ -435,13 +435,13 @@ public class MultiReferenceEditorWindow extends ChimeWindow {
                 TextDataPanel otherPanel = (TextDataPanel)listPanel.getItem(otherIdx);
 
                 if (val != null) {
-                    name = val.getName();
+                    name = val.getValue().toString();
                 }
                 otherPanel.setValue(name);
 
                 name = "";
                 if (otherVal != null) {
-                    name = otherVal.getName();
+                    name = otherVal.getValue().toString();
                 }
                 panel.setValue(name);
 
@@ -488,7 +488,7 @@ public class MultiReferenceEditorWindow extends ChimeWindow {
             fileValues.set(idx, inst);
         } else {
             DataFieldValue val = new DataFieldValue();
-            val.setName(inst.getName());
+            val.setValue(inst.getName());
             val.setReferenceId(inst.getId());
             fieldValues.set(idx, val);
         }
@@ -777,9 +777,9 @@ public class MultiReferenceEditorWindow extends ChimeWindow {
                 for (int j = (i + 1); j < cnt; j++) {
                     DataFieldValue f1 = fieldValues.get(i);
                     DataFieldValue f2 = fieldValues.get(j);
-                    if (f1.getReferenceId() == f2.getReferenceId()) {
+                    if (f1.getReferenceId().equals(f2.getReferenceId())) {
                         hasDuplicates = true;
-                        duplicateName = f1.getName();
+                        duplicateName = f1.getValue().toString();
                         break;
                     }
                 }
@@ -795,7 +795,7 @@ public class MultiReferenceEditorWindow extends ChimeWindow {
                 for (int i = 0; i < list.size(); i++) {
                     DataFieldValue f1 = list.get(i);
                     DataFieldValue f2 = fieldValues.get(i);
-                    if (f1.getReferenceId() != f2.getReferenceId()) {
+                    if (!f1.getReferenceId().equals(f2.getReferenceId())) {
                         changes = true;
                         break;
                     }
@@ -853,7 +853,7 @@ class TextDataPanel extends LayoutContainer {
         listener = l;
         String name = null;
         if (value != null) {
-            name = value.getName();
+            name = value.getValue().toString();
         }
 
         editorType = MultiReferenceEditorWindow.EditorType.FieldData;

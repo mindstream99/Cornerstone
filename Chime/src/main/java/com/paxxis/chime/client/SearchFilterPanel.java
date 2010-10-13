@@ -17,6 +17,8 @@
 
 package com.paxxis.chime.client;
 
+import java.util.Date;
+
 import com.extjs.gxt.ui.client.Style.HorizontalAlignment;
 import com.extjs.gxt.ui.client.event.BoxComponentEvent;
 import com.extjs.gxt.ui.client.event.Events;
@@ -33,6 +35,7 @@ import com.extjs.gxt.ui.client.widget.layout.HBoxLayoutData;
 import com.extjs.gxt.ui.client.widget.layout.RowData;
 import com.extjs.gxt.ui.client.widget.layout.RowLayout;
 import com.extjs.gxt.ui.client.widget.layout.HBoxLayout.HBoxLayoutAlign;
+import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.user.client.Element;
 import com.paxxis.chime.client.common.InstanceId;
 import com.paxxis.chime.client.common.SearchFilter;
@@ -299,6 +302,46 @@ public class SearchFilterPanel extends LayoutContainer
             case Past30Days:
                 text += " within the past 30 days";
                 break;
+            case BeforeDate:
+	        	{
+	                Date dval = (Date)_filter.getValue();
+	                DateTimeFormat dtf = DateTimeFormat.getFormat("MMM d, yyyy");
+	                String formatted = dtf.format(dval);
+	        		text += " is before " + formatted;
+	        	}
+	            break;
+            case OnOrBeforeDate:
+	        	{
+	                Date dval = (Date)_filter.getValue();
+	                DateTimeFormat dtf = DateTimeFormat.getFormat("MMM d, yyyy");
+	                String formatted = dtf.format(dval);
+	        		text += " is on or before " + formatted;
+	        	}
+	            break;
+            case OnDate:
+	        	{
+	                Date dval = (Date)_filter.getValue();
+	                DateTimeFormat dtf = DateTimeFormat.getFormat("MMM d, yyyy");
+	                String formatted = dtf.format(dval);
+	        		text += " is " + formatted;
+	        	}
+                break;
+            case AfterDate:
+	        	{
+	                Date dval = (Date)_filter.getValue();
+	                DateTimeFormat dtf = DateTimeFormat.getFormat("MMM d, yyyy");
+	                String formatted = dtf.format(dval);
+	        		text += " is after " + formatted;
+	        	}
+	            break;
+            case OnOrAfterDate:
+	        	{
+	                Date dval = (Date)_filter.getValue();
+	                DateTimeFormat dtf = DateTimeFormat.getFormat("MMM d, yyyy");
+	                String formatted = dtf.format(dval);
+	        		text += " is on or after " + formatted;
+	        	}
+	            break;
         }
 
         htmlTitle.setHtml(text + "<br>&nbsp;");

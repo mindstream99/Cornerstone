@@ -17,6 +17,7 @@
 
 package com.paxxis.chime.client.common;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -58,6 +59,11 @@ public class DataInstanceRequest extends RequestMessage {
         Past3Days,
         Past7Days,
         Past30Days,
+        BeforeDate,
+        OnOrBeforeDate,
+        OnDate,
+        AfterDate,
+        OnOrAfterDate
     }
     
     public enum Depth
@@ -194,17 +200,17 @@ public class DataInstanceRequest extends RequestMessage {
         return _instanceId;
     }
     
-    public void addQueryParameter(Shape type, String fieldName, String fieldValue)
+    public void addQueryParameter(Shape type, String fieldName, Serializable fieldValue)
     {
         addQueryParameter(type, fieldName, fieldValue, Operator.Contains);
     }
 
-    public void addQueryParameter(Shape type, String fieldName, String fieldValue, Operator operator)
+    public void addQueryParameter(Shape type, String fieldName, Serializable fieldValue, Operator operator)
     {
         addQueryParam(type, fieldName, fieldValue, operator, ClauseOperator.MatchAll);
     }
     
-    private void addQueryParam(Shape type, String fieldName, String fieldValue, Operator operator, ClauseOperator clauseOperator)
+    private void addQueryParam(Shape type, String fieldName, Serializable fieldValue, Operator operator, ClauseOperator clauseOperator)
     {
         Parameter param = new Parameter();
         param.dataShape = type;

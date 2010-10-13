@@ -20,6 +20,8 @@ import javax.mail.Transport;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 import org.apache.log4j.Logger;
+import org.htmlparser.Parser;
+import org.htmlparser.visitors.TextExtractingVisitor;
 
 /**
  * This is the base class for all types of message notifiers.
@@ -92,9 +94,16 @@ public abstract class MessageNotifier implements Runnable {
             MimeMessage message = new MimeMessage(session);
             message.setFrom(new InternetAddress(config.getStringValue("chime.notification.email.replyto", "")));
             message.setSubject(subject);
-            message.setText(body);
+            String emailBody = body;
+            emailBody = emailBody.replaceAll("<br>", "\n");
 
-            body = body.replaceAll("\n", "<br>");
+            Parser htmlparser = Parser.createParser(emailBody, null);
+            TextExtractingVisitor visitor = new TextExtractingVisitor();
+            htmlparser.visitAllNodesWith(visitor);
+            emailBody = visitor.getExtractedText();
+
+            message.setText(emailBody);
+
             String bodyText = new StringData(body).asSQLValue();
             boolean sendEmail = false;
             for (Pair pair : pairs) {

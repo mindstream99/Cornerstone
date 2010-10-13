@@ -63,7 +63,7 @@ public class ImageDetailPortlet extends PortletContainer {
     	        DataField field = type.getField("File ID");
     	        List<DataFieldValue> vals = dataInstance.getFieldValues(type, field);
     	        if (vals.size() == 1) {
-    	            imageContainer = new ImageContainer(getBody(), vals.get(0).getName(), false, null, true);
+    	            imageContainer = new ImageContainer(getBody(), vals.get(0).getValue().toString(), false, null, true);
     	            getBody().add(imageContainer, new FlowData(5, 0, 5, 0));
     	        }
 

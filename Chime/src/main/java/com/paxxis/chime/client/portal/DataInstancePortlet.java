@@ -226,7 +226,7 @@ public class DataInstancePortlet extends PortletContainer
         if (values.size() > 0)
         {
             DataFieldValue value = values.get(0);
-            String text = value.getName();
+            String text = value.getValue().toString();
             
             Params params = new Params();
             params.set("content", text);

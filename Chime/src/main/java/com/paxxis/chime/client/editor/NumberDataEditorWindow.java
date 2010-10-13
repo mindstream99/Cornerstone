@@ -78,7 +78,7 @@ public class NumberDataEditorWindow extends ChimeWindow
             _simpleEditorPanel = new NumberEditorPanel(null);
         } else {
             setHeading("Edit '" + _field.getName() + "' Data" + suffix);
-            _simpleEditorPanel = new NumberEditorPanel(_value.getName());
+            _simpleEditorPanel = new NumberEditorPanel(_value.getValue().toString());
         }
         
         _simpleEditorPanel.setChangeListener(

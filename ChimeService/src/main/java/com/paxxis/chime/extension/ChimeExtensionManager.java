@@ -326,7 +326,7 @@ public class ChimeExtensionManager implements ExtensionContext {
             Date expiration = null;
 
             if (!noSave) {
-                double retention = Double.parseDouble(retValues.get(0).getName());
+                double retention = Double.parseDouble(retValues.get(0).getValue().toString());
                 noSave = retention < 0.0;
 
                 if (retention > 0.0) {

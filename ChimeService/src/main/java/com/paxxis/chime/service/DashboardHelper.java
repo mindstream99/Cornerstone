@@ -31,7 +31,7 @@ public class DashboardHelper implements DataInstanceHelper {
         List<DataFieldValue> values = instance.getFieldValues(type, field);
         if (values.size() == 1)
         {
-            String jsonText = values.get(0).getName();
+            String jsonText = values.get(0).getValue().toString();
 
             PortalTemplateHelper helper = new PortalTemplateHelper();
             PortalTemplate template = helper.convert(jsonText);
@@ -50,12 +50,12 @@ public class DashboardHelper implements DataInstanceHelper {
             List<DataFieldValue> values = req.getDataInstance().getFieldValues(req.getShapes().get(0), field);
             if (values.size() == 0) {
                 DataFieldValue value = new DataFieldValue();
-                value.setName(str);
+                value.setValue(str);
                 req.addFieldData(req.getShapes().get(0), field, value);
                 req.setOperation(Operation.AddFieldData);
             } else {
                 DataFieldValue value = values.get(0);
-                value.setName(str);
+                value.setValue(str);
                 req.addFieldData(req.getShapes().get(0), field, value);
                 req.setOperation(Operation.ModifyFieldData);
             }

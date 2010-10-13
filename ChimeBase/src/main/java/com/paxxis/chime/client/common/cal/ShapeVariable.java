@@ -194,7 +194,7 @@ public class ShapeVariable extends RuleVariable implements IRuleObject {
     public String valueAsString() {
         String name = "";
         if (shape != null) {
-            name = shape.getName();
+            name = shape.getId().getValue();
         }
 
         return name;

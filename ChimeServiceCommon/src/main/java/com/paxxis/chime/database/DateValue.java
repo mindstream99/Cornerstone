@@ -29,9 +29,8 @@ import javax.swing.text.DateFormatter;
  *
  * @author Robert Englander
  */
-public class DateValue implements IDataValue
-{
-    Date _data;
+public class DateValue implements IDataValue {
+    private Date _data;
 
     public DateValue(Date data)
     {
@@ -40,7 +39,7 @@ public class DateValue implements IDataValue
     
     public String asSQLValue()
     {
-        return asString();
+        return "'" + asString() + "'";
     }
     
     public String asString() 

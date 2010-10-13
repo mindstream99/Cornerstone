@@ -30,10 +30,11 @@ import java.util.List;
  * @author Robert Englander
  */
 public interface QueryProvider {
+    public List<String> getInstances(List<QueryParameter> params);
+    public List<DataInstance> getDataInstances(List<QueryParameter> params);
     
-    public int getCountByShape(String shapeName, List<QueryParameter> params);
-    public double getFieldDataAverage(String typeName, String fieldName, List<QueryParameter> params);
     public double getStockPrice(String symbol);
+
     public DataInstance getDataInstanceById(InstanceId id);
     public Shape getShapeById(InstanceId id);
     public ChimeExtension getExtension(String id);

@@ -1,29 +1,16 @@
-/*
- * Copyright 2010 the original author or authors.
- * Copyright 2009 Paxxis Technology LLC
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 package com.paxxis.chime.client.editor;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import com.extjs.gxt.ui.client.Style.HorizontalAlignment;
 import com.extjs.gxt.ui.client.Style.Scroll;
 import com.extjs.gxt.ui.client.event.ButtonEvent;
+import com.extjs.gxt.ui.client.event.Events;
+import com.extjs.gxt.ui.client.event.FieldEvent;
 import com.extjs.gxt.ui.client.event.IconButtonEvent;
+import com.extjs.gxt.ui.client.event.Listener;
 import com.extjs.gxt.ui.client.event.SelectionListener;
 import com.extjs.gxt.ui.client.widget.Component;
 import com.extjs.gxt.ui.client.widget.Html;
@@ -31,6 +18,7 @@ import com.extjs.gxt.ui.client.widget.LayoutContainer;
 import com.extjs.gxt.ui.client.widget.button.Button;
 import com.extjs.gxt.ui.client.widget.button.ButtonBar;
 import com.extjs.gxt.ui.client.widget.button.ToolButton;
+import com.extjs.gxt.ui.client.widget.form.DateField;
 import com.extjs.gxt.ui.client.widget.form.FormPanel;
 import com.extjs.gxt.ui.client.widget.layout.FlowData;
 import com.extjs.gxt.ui.client.widget.layout.FlowLayout;
@@ -40,7 +28,6 @@ import com.extjs.gxt.ui.client.widget.layout.TableRowLayout;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.DeferredCommand;
 import com.google.gwt.user.client.Element;
-import com.google.gwt.user.client.ui.RichTextArea;
 import com.paxxis.chime.client.LoginResponseObject;
 import com.paxxis.chime.client.ServiceManager;
 import com.paxxis.chime.client.ServiceManagerAdapter;
@@ -51,13 +38,8 @@ import com.paxxis.chime.client.common.DataInstance;
 import com.paxxis.chime.client.common.InstanceId;
 import com.paxxis.chime.client.common.Shape;
 import com.paxxis.chime.client.widgets.ChimeWindow;
-import com.paxxis.chime.client.widgets.ExpandableTextField;
 
-/**
- *
- * @author Robert Englander
- */
-public class MultiTextEditorWindow extends ChimeWindow {
+public class MultiDateEditorWindow extends ChimeWindow {
     private Html errorLabel;
 
     private ButtonBar saveCancelButtonBar;
@@ -71,7 +53,7 @@ public class MultiTextEditorWindow extends ChimeWindow {
     private LayoutContainer listPanel;
     private FormPanel _form = new FormPanel();
     private ServiceManagerListener _serviceManagerListener = null;
-    private DataPanel.DataPanelListener dataPanelListener;
+    private DatePanel.DatePanelListener dataPanelListener;
 
     private DataInstance dataInstance;
     private Shape dataType;
@@ -80,7 +62,7 @@ public class MultiTextEditorWindow extends ChimeWindow {
 
     private FieldEditListener editListener;
 
-    public MultiTextEditorWindow(DataInstance instance, Shape type,
+    public MultiDateEditorWindow(DataInstance instance, Shape type,
                                 DataField field, FieldEditListener listener) {
         super();
 
@@ -88,12 +70,6 @@ public class MultiTextEditorWindow extends ChimeWindow {
         dataInstance = instance;
         dataType = type;
         dataField = field;
-    }
-
-    @Override
-    protected void onRender(Element parent, int index) {
-    	super.onRender(parent, index);
-        setup();
     }
 
     private void setup() {
@@ -146,21 +122,21 @@ public class MultiTextEditorWindow extends ChimeWindow {
         listPanel.setScrollMode(Scroll.AUTO);
         listPanel.setBorders(true);
 
-        dataPanelListener = new DataPanel.DataPanelListener() {
+        dataPanelListener = new DatePanel.DatePanelListener() {
 
-            public void onDelete(DataPanel panel) {
+            public void onDelete(DatePanel panel) {
                 deleteOne(panel);
             }
 
-            public void onDataUpdate(DataPanel panel) {
+            public void onDataUpdate(DatePanel panel) {
                 updateValue(panel);
             }
 
-            public void onMoveUp(DataPanel panel) {
+            public void onMoveUp(DatePanel panel) {
                 move(panel, true);
             }
 
-            public void onMoveDown(DataPanel panel) {
+            public void onMoveDown(DatePanel panel) {
                 move(panel, false);
             }
         };
@@ -243,9 +219,10 @@ public class MultiTextEditorWindow extends ChimeWindow {
         };
 
         ServiceManager.addListener(_serviceManagerListener);
+        setup();
     }
 
-    private void deleteOne(DataPanel panel) {
+    private void deleteOne(DatePanel panel) {
 
         int idx = -1;
         Component comp = null;
@@ -262,13 +239,13 @@ public class MultiTextEditorWindow extends ChimeWindow {
 
         //listPanel.layout();
         for (Component p : listPanel.getItems()) {
-            ((DataPanel)p).updateLayout();
+            ((DatePanel)p).updateLayout();
         }
 
         validate();
     }
 
-    private void move(DataPanel panel, boolean up) {
+    private void move(DatePanel panel, boolean up) {
         int idx = -1;
         for (int i = 0; i < listPanel.getItems().size(); i++) {
             if (panel == listPanel.getItem(i)) {
@@ -291,19 +268,19 @@ public class MultiTextEditorWindow extends ChimeWindow {
             fieldValues.set(idx, otherVal);
             fieldValues.set(otherIdx, val);
 
-            DataPanel otherPanel = (DataPanel)listPanel.getItem(otherIdx);
+            DatePanel otherPanel = (DatePanel)listPanel.getItem(otherIdx);
 
-            String name = "";
+            Date dt = new Date();
             if (val != null) {
-                name = val.getValue().toString();
+                dt = (Date)val.getValue();
             }
-            otherPanel.setValue(name);
+            otherPanel.setValue(dt);
 
-            name = "";
+            dt = new Date();
             if (otherVal != null) {
-                name = otherVal.getValue().toString();
+                dt = (Date)otherVal.getValue();
             }
-            panel.setValue(name);
+            panel.setValue(dt);
 
             listPanel.scrollIntoView(otherPanel);
 
@@ -312,7 +289,7 @@ public class MultiTextEditorWindow extends ChimeWindow {
         }
     }
 
-    private void updateValue(DataPanel panel) {
+    private void updateValue(DatePanel panel) {
 
         int idx = -1;
         for (int i = 0; i < listPanel.getItems().size(); i++) {
@@ -322,7 +299,7 @@ public class MultiTextEditorWindow extends ChimeWindow {
             }
         }
 
-        String value = panel.getValue();
+        Date value = panel.getValue();
         DataFieldValue val = new DataFieldValue();
         val.setValue(value);
 
@@ -332,12 +309,12 @@ public class MultiTextEditorWindow extends ChimeWindow {
     }
 
     private void addValue(DataFieldValue value) {
-        DataPanel panel = new DataPanel(dataPanelListener, dataField, value);
+        DatePanel panel = new DatePanel(dataPanelListener, dataField, value);
         listPanel.add(panel, new FlowData(0, 0, 5, 0));
         listPanel.layout();
 
         for (Component p : listPanel.getItems()) {
-            ((DataPanel)p).updateLayout();
+            ((DatePanel)p).updateLayout();
         }
 
         listPanel.scrollIntoView(panel);
@@ -375,17 +352,8 @@ public class MultiTextEditorWindow extends ChimeWindow {
         values.addAll(fieldValues);
 
         // we clear the id of each value so that the service will treat it all as new.
-        RichTextArea rta = new RichTextArea();
         for (DataFieldValue val : values) {
             val.setId(InstanceId.create("-1"));
-
-            // the only HTML we keep is <br>
-            String txt = val.getValue().toString();
-            String modified = txt.replaceAll("<br>", "CHIME:BR");
-            rta.setHTML(modified);
-            txt = rta.getText();
-            modified = txt.replaceAll("CHIME:BR", "<br>");
-            val.setValue(modified);
         }
 
         editListener.onEdit(dataInstance, dataType, dataField);
@@ -412,41 +380,32 @@ public class MultiTextEditorWindow extends ChimeWindow {
     private void validate() {
         boolean hasNulls = false;
         for (DataFieldValue fv : fieldValues) {
-            if (fv == null || fv.getValue().toString().trim().length() == 0) {
+            if (fv == null) {
                 hasNulls = true;
                 break;
             }
         }
 
-        boolean overSized = false;
-        if (!hasNulls) {
-            // check if any are more than 500 characters
-            for (DataFieldValue fv : fieldValues) {
-                if (fv.getValue().toString().trim().length() > 500) {
-                    overSized = true;
-                    break;
-                }
-            }
-        }
+        boolean hasDuplicates = false;
+        String duplicateName = null;
 
-        boolean badData = false; 
-        if (!hasNulls && !overSized) {
-            for (DataFieldValue fv : fieldValues) {
-                String data = fv.getValue().toString().trim();
-                if (dataField.getShape().getName().equals("Number")) {
-                    try {
-                        Double.parseDouble(data);
-                    } catch (NumberFormatException e) {
-                        badData = true;
+        if (!hasNulls) {
+            int cnt = fieldValues.size();
+            for (int i = 0; i < (cnt - 1); i++) {
+                for (int j = (i + 1); j < cnt; j++) {
+                    DataFieldValue f1 = fieldValues.get(i);
+                    DataFieldValue f2 = fieldValues.get(j);
+                    if (f1.getValue().equals(f2.getValue())) {
+                        hasDuplicates = true;
+                        duplicateName = f1.getValue().toString();
                         break;
                     }
-                } else if (dataField.getShape().getName().equals("URL")) {
                 }
             }
         }
 
         boolean changes = false;
-        if (!hasNulls && !overSized && !badData) {
+        if (!hasNulls && !hasDuplicates) {
             if (fieldValues.size() != dataInstance.getFieldValues(dataType, dataField).size()) {
                 changes = true;
             } else {
@@ -469,50 +428,47 @@ public class MultiTextEditorWindow extends ChimeWindow {
         String errorText = "&nbsp;";
         if (hasNulls) {
             errorText = "Please fill in empty items";
-        } else if (overSized) {
-            errorText = "Can't use more than 500 characters";
-        } else if (badData) {
-            errorText = "Data must be a valid " + dataField.getShape().getName();
+        }
+        else if (hasDuplicates) {
+            errorText = "Duplicate item: " + duplicateName;
         }
 
         errorLabel.setHtml("<div id='endslice-error-label'>" + errorText + "</div>");
-        _okButton.setEnabled(!hasNulls && changes);
+        _okButton.setEnabled(!hasDuplicates && !hasNulls && changes);
         addButton.setEnabled(!maxedOut);
     }
-
 }
 
 /**
  *
  * @author Robert Englander
  */
-class DataPanel extends LayoutContainer {
+class DatePanel extends LayoutContainer {
 
-    interface DataPanelListener {
-        public void onDelete(DataPanel panel);
-        public void onDataUpdate(DataPanel panel);
-        public void onMoveUp(DataPanel panel);
-        public void onMoveDown(DataPanel panel);
+    interface DatePanelListener {
+        public void onDelete(DatePanel panel);
+        public void onDataUpdate(DatePanel panel);
+        public void onMoveUp(DatePanel panel);
+        public void onMoveDown(DatePanel panel);
     }
 
-    private DataPanelListener listener;
+    private DatePanelListener listener;
     private ToolButton upButton;
     private ToolButton downButton;
     private ToolButton deleteButton;
-    private ExpandableTextField textField;
+    private DateField dateField;
     private TableRowLayout theLayout;
 
-    public DataPanel(DataPanelListener l, DataField field, DataFieldValue value) {
+    public DatePanel(DatePanelListener l, DataField field, DataFieldValue value) {
         listener = l;
         init(field, value);
     }
 
     public void setFocus() {
-        textField.setFocus();
+        //dateField.setFocus();
     }
 
     public void init(DataField field, final DataFieldValue value) {
-        //setLayout(new FilledColumnLayout(HorizontalAlignment.LEFT));
         theLayout = new TableRowLayout();
         setLayout(theLayout);
 
@@ -521,13 +477,12 @@ class DataPanel extends LayoutContainer {
             new SelectionListener<IconButtonEvent>() {
                 @Override
                 public void componentSelected(IconButtonEvent evt) {
-                    listener.onMoveUp(DataPanel.this);
+                    listener.onMoveUp(DatePanel.this);
                 }
             }
         );
 
         TableData data = new TableData("auto", "auto");
-        //add(deleteButton, new FilledColumnLayoutData());
         add(upButton, data);
 
         downButton = new ToolButton("x-tool-down");
@@ -535,7 +490,7 @@ class DataPanel extends LayoutContainer {
             new SelectionListener<IconButtonEvent>() {
                 @Override
                 public void componentSelected(IconButtonEvent evt) {
-                    listener.onMoveDown(DataPanel.this);
+                    listener.onMoveDown(DatePanel.this);
                 }
             }
         );
@@ -548,7 +503,7 @@ class DataPanel extends LayoutContainer {
             new SelectionListener<IconButtonEvent>() {
                 @Override
                 public void componentSelected(IconButtonEvent evt) {
-                    listener.onDelete(DataPanel.this);
+                    listener.onDelete(DatePanel.this);
                 }
             }
         );
@@ -556,27 +511,31 @@ class DataPanel extends LayoutContainer {
         data = new TableData("auto", "auto");
         add(deleteButton, data);
 
-        textField = new ExpandableTextField(
-            new ExpandableTextField.ExpandableTextListener() {
-                public void onChange(String val) {
-                    listener.onDataUpdate(DataPanel.this);
-                }
-            }
-        );
+        dateField = new DateField();
+        Listener<FieldEvent> l = new Listener<FieldEvent>() {
+	        public void handleEvent(FieldEvent evt) {
+	            listener.onDataUpdate(DatePanel.this);
+	        }
+	    };
 
+        dateField.addListener(Events.KeyPress, l);
+        dateField.addListener(Events.Valid, l);
+        dateField.addListener(Events.Invalid, l);
+        dateField.addListener(Events.Change, l);
+        
         if (value != null) {
-            setValue(value.getValue().toString());
+            setValue((Date)value.getValue());
         }
 
         data = new TableData("auto", "auto");
-        add(textField, data);
+        add(dateField, data);
     }
 
-    public void setValue(final String value) {
+    public void setValue(final Date value) {
         DeferredCommand.addCommand(
             new Command() {
                 public void execute() {
-                    textField.setValue(value);
+                    dateField.setValue(value);
                 }
             }
         );
@@ -584,12 +543,12 @@ class DataPanel extends LayoutContainer {
 
     public void updateLayout() {
         int w = getWidth() - 3 * deleteButton.getWidth() - 18;
-        textField.setWidth(w);
+        dateField.setWidth(w);
         layout();
     }
 
-    public String getValue() {
-        return textField.getValue();
+    public Date getValue() {
+        return dateField.getValue();
     }
 }
 

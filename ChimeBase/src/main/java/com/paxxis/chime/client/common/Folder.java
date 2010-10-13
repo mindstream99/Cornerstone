@@ -47,7 +47,7 @@ public class Folder extends DataInstance {
             DataInstance favorite = new DataInstance();
             favorite.setId(value.getReferenceId());
             favorite.addShape(field.getShape());
-            favorite.setName(value.getName());
+            favorite.setName(value.getValue().toString());
 
             result.add(favorite);
         }

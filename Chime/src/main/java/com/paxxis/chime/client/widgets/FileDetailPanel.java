@@ -150,7 +150,7 @@ public class FileDetailPanel extends LayoutContainer {
 
         String result = "Unknown";
         if (values.size() > 0) {
-            result = values.get(0).getName();
+            result = values.get(0).getValue().toString();
         }
 
         return result;
@@ -163,7 +163,7 @@ public class FileDetailPanel extends LayoutContainer {
 
         String result = "Unknown";
         if (values.size() > 0) {
-            result = values.get(0).getName();
+            result = values.get(0).getValue().toString();
 
             try {
                 double sz = Double.valueOf(result);
@@ -187,11 +187,11 @@ public class FileDetailPanel extends LayoutContainer {
             if (-1 == fileName.indexOf(".")) {
                 List<DataFieldValue> vals = dataInstance.getFieldValues(type, type.getField("Extension"));
                 if (vals.size() > 0) {
-                    fileName += ("." + vals.get(0).getName());
+                    fileName += ("." + vals.get(0).getValue());
                 }
             }
 
-            String id = values.get(0).getName();
+            String id = values.get(0).getValue().toString();
             String link = GWT.getHostPageBaseURL().trim();
             if (link.endsWith("/")) {
                 link = link.substring(0, link.length() - 1);

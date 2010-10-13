@@ -17,33 +17,10 @@
 
 package com.paxxis.chime.data;
 
-import com.paxxis.chime.client.common.Community;
-import com.paxxis.chime.client.common.Cursor;
-import com.paxxis.chime.client.common.DataField;
-import com.paxxis.chime.client.common.DataInstance;
-import com.paxxis.chime.client.common.DataInstance.ReviewAction;
-import com.paxxis.chime.client.common.DataInstance.TagAction;
-import com.paxxis.chime.client.common.DataInstanceRequest.ClauseOperator;
-import com.paxxis.chime.client.common.DataInstanceRequest.Operator;
-import com.paxxis.chime.client.common.DataInstanceRequest.SortOrder;
-import com.paxxis.chime.client.common.InstanceId;
-import com.paxxis.chime.client.common.Parameter;
-import com.paxxis.chime.client.common.Shape;
-import com.paxxis.chime.client.common.User;
-import com.paxxis.chime.client.common.extension.ChimeExtension;
-import com.paxxis.chime.client.common.extension.MemoryIndexer;
-import com.paxxis.chime.database.DataSet;
-import com.paxxis.chime.database.DatabaseConnection;
-import com.paxxis.chime.database.StringData;
-import com.paxxis.chime.service.InstancesResponse;
-import com.paxxis.chime.service.Tools;
-import com.paxxis.chime.extension.ChimeExtensionManager;
-import com.paxxis.chime.extension.ChimeMemoryIndexer;
-import com.paxxis.chime.indexing.ChimeAnalyzer;
-import com.paxxis.chime.indexing.Indexer;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+
 import org.apache.log4j.Logger;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.index.IndexReader;
@@ -59,6 +36,31 @@ import org.apache.lucene.search.SortField;
 import org.apache.lucene.search.TopFieldDocs;
 import org.apache.lucene.store.RAMDirectory;
 
+import com.paxxis.chime.client.common.Community;
+import com.paxxis.chime.client.common.Cursor;
+import com.paxxis.chime.client.common.DataField;
+import com.paxxis.chime.client.common.DataInstance;
+import com.paxxis.chime.client.common.InstanceId;
+import com.paxxis.chime.client.common.Parameter;
+import com.paxxis.chime.client.common.Shape;
+import com.paxxis.chime.client.common.User;
+import com.paxxis.chime.client.common.DataInstance.ReviewAction;
+import com.paxxis.chime.client.common.DataInstance.TagAction;
+import com.paxxis.chime.client.common.DataInstanceRequest.ClauseOperator;
+import com.paxxis.chime.client.common.DataInstanceRequest.Operator;
+import com.paxxis.chime.client.common.DataInstanceRequest.SortOrder;
+import com.paxxis.chime.client.common.extension.ChimeExtension;
+import com.paxxis.chime.client.common.extension.MemoryIndexer;
+import com.paxxis.chime.database.DataSet;
+import com.paxxis.chime.database.DatabaseConnection;
+import com.paxxis.chime.database.StringData;
+import com.paxxis.chime.extension.ChimeExtensionManager;
+import com.paxxis.chime.extension.ChimeMemoryIndexer;
+import com.paxxis.chime.indexing.ChimeAnalyzer;
+import com.paxxis.chime.indexing.Indexer;
+import com.paxxis.chime.service.InstancesResponse;
+import com.paxxis.chime.service.Tools;
+
 /**
  *
  * @author Robert Englander
@@ -71,6 +73,7 @@ public class SearchUtils {
     private static final long MSEC_3DAYS = (3L * 24L * 60L * 60L * 1000L);
     private static final long MSEC_7DAYS = (7L * 24L * 60L * 60L * 1000L);
     private static final long MSEC_30DAYS = (30L * 24L * 60L * 60L * 1000L);
+    private static final long MAXDATE = Date.UTC(2999, 1, 1, 0, 0, 0);
 
     private SearchUtils() {
     }
@@ -443,6 +446,7 @@ public class SearchUtils {
             else if (param.fieldName.equalsIgnoreCase("editor (user)"))
             {
                 String term = "";
+                String sval = param.fieldValue.toString();
                 switch (param.operator)
                 {
                     case Reference:
@@ -453,7 +457,7 @@ public class SearchUtils {
                         break;
                     case ContainedIn:
                         term = "(";
-                        String[] list = param.fieldValue.split(",");
+                        String[] list = sval.split(",");
                         String op = "";
                         for (String id : list) {
                             term += op + "updatedById:" + id;
@@ -463,7 +467,7 @@ public class SearchUtils {
                         break;
                     case NotContainedIn:
                         term = "(marker:marker AND (";
-                        list = param.fieldValue.split(",");
+                        list = sval.split(",");
                         op = "";
                         for (String id : list) {
                             term += op + "!updatedById:" + id;
@@ -499,6 +503,7 @@ public class SearchUtils {
                 String term = "latestActivity:";
                 long end = new Date().getTime();
                 long start = end;
+                Date value = (Date)param.fieldValue;
 
                 switch (param.operator)
                 {
@@ -514,6 +519,50 @@ public class SearchUtils {
                     case Past30Days:
                         start = end - MSEC_30DAYS;
                         break;
+                    case BeforeDate:
+                        value.setHours(23);
+                        value.setMinutes(59);
+                        value.setSeconds(59);
+                    	start = 0;
+                    	end = value.getTime() - MSEC_24HOURS;
+                    	break;
+                    case OnOrBeforeDate:
+                        value.setHours(23);
+                        value.setMinutes(59);
+                        value.setSeconds(59);
+                    	start = 0;
+                    	end = value.getTime();
+                    	break;
+                    case OnDate:
+                        {
+                            Date dt = new Date();
+                            dt.setTime(value.getTime());
+                            dt.setHours(0);
+                            dt.setMinutes(0);
+                            dt.setSeconds(0);
+                            start = dt.getTime();
+                            dt = new Date();
+                            dt.setTime(value.getTime());
+                            dt.setHours(23);
+                            dt.setMinutes(59);
+                            dt.setSeconds(59);
+                            end = dt.getTime();
+                        }
+                    	break;
+                    case AfterDate:
+                        value.setHours(0);
+                        value.setMinutes(0);
+                        value.setSeconds(0);
+                    	start = value.getTime() + MSEC_24HOURS;
+                    	end = MAXDATE;
+                    	break;
+                    case OnOrAfterDate:
+                        value.setHours(0);
+                        value.setMinutes(0);
+                        value.setSeconds(0);
+                    	start = value.getTime();
+                    	end = MAXDATE;
+                    	break;
                 }
 
                 term += "[" + Tools.longToNumeric(start) + " TO " + Tools.longToNumeric(end) + "]";
@@ -524,6 +573,7 @@ public class SearchUtils {
                 String term = "updated:";
                 long end = new Date().getTime();
                 long start = end;
+                Date value = (Date)param.fieldValue;
 
                 switch (param.operator)
                 {
@@ -539,6 +589,50 @@ public class SearchUtils {
                     case Past30Days:
                         start = end - MSEC_30DAYS;
                         break;
+                    case BeforeDate:
+                        value.setHours(23);
+                        value.setMinutes(59);
+                        value.setSeconds(59);
+                    	start = 0;
+                    	end = value.getTime() - MSEC_24HOURS;
+                    	break;
+                    case OnOrBeforeDate:
+                        value.setHours(23);
+                        value.setMinutes(59);
+                        value.setSeconds(59);
+                    	start = 0;
+                    	end = value.getTime();
+                    	break;
+                    case OnDate:
+                        {
+                            Date dt = new Date();
+                            dt.setTime(value.getTime());
+                            dt.setHours(0);
+                            dt.setMinutes(0);
+                            dt.setSeconds(0);
+                            start = dt.getTime();
+                            dt = new Date();
+                            dt.setTime(value.getTime());
+                            dt.setHours(23);
+                            dt.setMinutes(59);
+                            dt.setSeconds(59);
+                            end = dt.getTime();
+                        }
+                    	break;
+                    case AfterDate:
+                        value.setHours(0);
+                        value.setMinutes(0);
+                        value.setSeconds(0);
+                    	start = value.getTime() + MSEC_24HOURS;
+                    	end = MAXDATE;
+                    	break;
+                    case OnOrAfterDate:
+                        value.setHours(0);
+                        value.setMinutes(0);
+                        value.setSeconds(0);
+                    	start = value.getTime();
+                    	end = MAXDATE;
+                    	break;
                 }
 
                 term += "[" + Tools.longToNumeric(start) + " TO " + Tools.longToNumeric(end) + "]";
@@ -593,14 +687,115 @@ public class SearchUtils {
 
                 if (field.getShape().isPrimitive())
                 {
-                    String value = param.fieldValue.toString().trim().toLowerCase();
-                    if (value.length() > 0)
-                    {
-                        term = fieldName + ":";
+                    term = fieldName + ":";
 
-                        String name = field.getShape().getName();
-                        if (name.equals("Text") || name.equals("Rich Text"))
+                    Shape fieldShape = field.getShape();
+                    if (fieldShape.isDate()) {
+                        Date value = (Date)param.fieldValue;
+                        
+                        // start and end begin their life as the current date
+                        Date dt = new Date();
+                        dt.setHours(0);
+                        dt.setMinutes(0);
+                        dt.setSeconds(0);
+                        long end = dt.getTime();
+                        long start = end;
+
+                        switch (param.operator)
                         {
+                            case Past24Hours:
+                                start = end - MSEC_24HOURS;
+                                break;
+                            case Past3Days:
+                                start = end - MSEC_3DAYS;
+                                break;
+                            case Past7Days:
+                                start = end - MSEC_7DAYS;
+                                break;
+                            case Past30Days:
+                                start = end - MSEC_30DAYS;
+                                break;
+                            case BeforeDate:
+                                value.setHours(23);
+                                value.setMinutes(59);
+                                value.setSeconds(59);
+                                start = 0;
+                                end = value.getTime() - MSEC_24HOURS;
+                                break;
+                            case OnOrBeforeDate:
+                                value.setHours(23);
+                                value.setMinutes(59);
+                                value.setSeconds(59);
+                                start = 0;
+                                end = value.getTime();
+                                break;
+                            case OnDate:
+                                {
+                                    Date startDate = new Date();
+                                    startDate.setTime(value.getTime());
+                                    startDate.setHours(0);
+                                    startDate.setMinutes(0);
+                                    startDate.setSeconds(0);
+                                    start = startDate.getTime();
+                                    Date endDate = new Date();
+                                    endDate.setTime(value.getTime());
+                                    endDate.setHours(23);
+                                    endDate.setMinutes(59);
+                                    endDate.setSeconds(59);
+                                    end = endDate.getTime();
+                                }
+                                break;
+                            case AfterDate:
+                                value.setHours(0);
+                                value.setMinutes(0);
+                                value.setSeconds(0);
+                                start = value.getTime() + MSEC_24HOURS;
+                                end = MAXDATE;
+                                break;
+                            case OnOrAfterDate:
+                                value.setHours(0);
+                                value.setMinutes(0);
+                                value.setSeconds(0);
+                                start = value.getTime();
+                                end = MAXDATE;
+                                break;
+                        }
+
+                        term += "[" + Tools.longToNumeric(start) + " TO " + Tools.longToNumeric(end) + "]";
+                        terms.add("(" + term + typeTerm + ")");
+                    }
+                    else if (fieldShape.isNumeric())
+                    {
+                        String value = param.fieldValue.toString().trim().toLowerCase();
+                        String valString = Tools.floatToNumeric(Float.parseFloat(value));
+                        String minString = Tools.minNumeric();
+                        String maxString = Tools.maxNumeric();
+                        switch (param.operator)
+                        {
+                            case Equals:
+                                term += "\"" + valString + "\"";
+                                break;
+                            case LessThan:
+                                term += "{" + minString + " TO " + valString + "}";
+                                break;
+                            case LessThanOrEquals:
+                                term += "[" + minString + " TO " + valString + "]";
+                                break;
+                            case GreaterThan:
+                                term += "{" + valString + " TO " + maxString + "}";
+                                break;
+                            case NotEquals:
+                                term = "(marker:marker AND !" + term + "\"" + valString + "\")";
+                                break;
+                            case GreaterThanOrEquals:
+                                term += "[" + valString + " TO " + maxString + "]";
+                                break;
+                        }
+                    }
+                    else if (fieldShape.getId().equals(Shape.TEXT_ID) || fieldShape.getId().equals(Shape.RICHTEXT_ID))
+                    {
+                        String value = param.fieldValue.toString().trim().toLowerCase();
+                        if (value.length() > 0) {
                             switch (param.operator)
                             {
                                 case Contains:
@@ -616,33 +811,6 @@ public class SearchUtils {
                                     break;
                             }
                         }
-                        else if (field.getShape().isNumeric())
-                        {
-                            String valString = Tools.floatToNumeric(Float.parseFloat(value));
-                            String minString = Tools.minNumeric();
-                            String maxString = Tools.maxNumeric();
-                            switch (param.operator)
-                            {
-                                case Equals:
-                                    term += "\"" + valString + "\"";
-                                    break;
-                                case LessThan:
-                                    term += "{" + minString + " TO " + valString + "}";
-                                    break;
-                                case LessThanOrEquals:
-                                    term += "[" + minString + " TO " + valString + "]";
-                                    break;
-                                case GreaterThan:
-                                    term += "{" + valString + " TO " + maxString + "}";
-                                    break;
-                                case NotEquals:
-                                    term = "(marker:marker AND !" + term + "\"" + valString + "\")";
-                                    break;
-                                case GreaterThanOrEquals:
-                                    term += "[" + valString + " TO " + maxString + "]";
-                                    break;
-                            }
-                        }
                     }
                 }
                 else
@@ -654,7 +822,7 @@ public class SearchUtils {
                             term = fieldName + "Id:\"" + param.fieldValue.toString() + "\"";
                             break;
                         case NotReference:
-                            term = "(marker:marker AND !" + fieldName + ":\"" + param.fieldValue.toString() + "\")";
+                            term = "(marker:marker AND !" + fieldName + "Id:\"" + param.fieldValue.toString() + "\")";
                             break;
                     }
                 }

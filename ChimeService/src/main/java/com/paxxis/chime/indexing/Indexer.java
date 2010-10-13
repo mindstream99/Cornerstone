@@ -227,7 +227,7 @@ abstract class IndexerBase implements Runnable {
             List<DataFieldValue> values = instance.getFieldValues(fileType, field);
             if (values.size() > 0) {
                 _logger.info("Indexing file contents");
-                String fileName = "./filestore/" + values.get(0).getName();
+                String fileName = "./filestore/" + values.get(0).getValue();
                 
                 Tika tika = new Tika();
                 File file = new File(fileName);
@@ -510,14 +510,15 @@ abstract class IndexerBase implements Runnable {
                     String data;
                     if (value.isInternal())
                     {
-                        if (field.getShape().isNumeric())
-                        { 
-                            data = Tools.floatToNumeric(Float.parseFloat(value.getName()));
+                        if (field.getShape().isNumeric()) {
+                            data = Tools.floatToNumeric(Float.parseFloat(value.getValue().toString()));
                             doc.add(new Field(fieldName, data, Field.Store.NO, Field.Index.UN_TOKENIZED));
-                        }
-                        else
-                        {
-                            data = value.getName();
+                        } else if (field.getShape().isDate()) {
+                        	Date dt = (Date)value.getValue();
+                        	data = dt.toLocaleString();
+                            doc.add(new Field(fieldName, Tools.longToNumeric(dt.getTime()), Field.Store.NO, Field.Index.UN_TOKENIZED));
+                        } else {
+                            data = value.getValue().toString();
 
                             if (field.getShape().getId().equals(Shape.RICHTEXT_ID) ||
                                     (shape.getId().equals(Shape.DASHBOARD_ID) && field.getShape().getId().equals(Shape.TEXT_ID))) {
@@ -529,7 +530,7 @@ abstract class IndexerBase implements Runnable {
 
                                 // look for references within the content
                                 int idx;
-                                String html = value.getName();
+                                String html = value.getValue().toString();
                                 while (-1 != (idx = html.indexOf("<a href=\"chime://#detail:"))) {
                                     // find the instance id
                                     int idx2 = idx + 25;

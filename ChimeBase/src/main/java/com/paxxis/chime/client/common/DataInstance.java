@@ -735,7 +735,7 @@ public class DataInstance implements Serializable {
         Serializable result = null;
         int lastIdx = values.size() - 1;
         if (lastIdx >= 0) {
-            result = values.get(lastIdx).getName();
+            result = values.get(lastIdx).getValue();
         }
 
         return result;

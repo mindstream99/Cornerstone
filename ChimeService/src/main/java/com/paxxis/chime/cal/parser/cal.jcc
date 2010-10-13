@@ -140,6 +140,7 @@ TOKEN :
 |  < EQUALS: ("==") >
 |  < NOTEQUALS: ("!=") >
 |  < STREQUALS: ("equals" | "EQUALS") >
+|  < STRCONTAINS: ("contains" | "CONTAINS") >
 |  < STRCAT: ("|") >
 |  < GREATERTHAN: (">") >
 |  < LESSTHAN: ("<") >
@@ -169,6 +170,8 @@ TOKEN :
 |  < DYNAMIC: ("dynamic" | "DYNAMIC") >
 |  < AS: ("as" | "AS") >
 |  < ON: ("on" | "ON") >
+|  < BEFORE: ("before" | "BEFORE") >
+|  < AFTER: ("after" | "AFTER") >
 |  < IF: ("if" | "IF") >
 |  < ELSE: ("else" | "ELSE") >
 |  < ELSEIF: ("elseif" | "ELSEIF") >
@@ -420,58 +423,33 @@ void queryClause(InstructionQueue queue) :
     <NARROW> t = variablename() <WHERE>
     (
         narrowByFieldValueClause(queue, t)
-        |
-        narrowByRatingClause(queue, t)
     )
 }
 
 void narrowByFieldValueClause(InstructionQueue queue, Token t) :
 {
     ValueExpression.Operator operator;
-    IValue exp;
-    IValue exp2;
+    IValue shapeExp = null;
+    IValue fieldExp;
+    IValue valueExp;
 }
 {
-    <LBRACE> exp = valueExpression(queue) <RBRACE>
-    <IS>
-    {
-        operator = ValueExpression.Operator.VALEQUALS;
-    }
     (
-        LOOKAHEAD(2) <NOT>
-        {
-            operator = ValueExpression.Operator.NOTEQUALS;
-        }
+        LOOKAHEAD(2)
+        shapeExp = valueOperand(queue)
     )?
-    exp2 = valueExpression(queue)
-    {
-        RuleVariable rv = queue.getVariable(t.image);
-        if (rv == null)
-        {
-            throw new ParseException("Reference to undefined variable: " + t.image
-              + " at Line " + t.beginLine + " Column " + t.beginColumn);
-        }
-
-        if (!(rv instanceof Query))
-        {
-            throw new ParseException("Attempt to narrow non Query variable: " + t.image
-              + " at Line " + t.beginLine + " Column " + t.beginColumn);
-        }
-
-        Query query = (Query)rv;
-        query.addParameter(new QueryParameter(QueryParameter.Narrow.ReferenceField, operator, exp, exp2));
-    }
-}
-
-void narrowByRatingClause(InstructionQueue queue, Token t) :
-{
-    ValueExpression.Operator operator;
-    IValue exp;
-}
-{
-    <RATING>
+    <METHODSEP>
+    fieldExp = valueOperand(queue)
     (
         <EQUALS> { operator = ValueExpression.Operator.VALEQUALS; }
+        |
+        <STRCONTAINS> { operator = ValueExpression.Operator.STREQUALS; }
+        |
+        <ON> { operator = ValueExpression.Operator.ON; }
+        |
+        <BEFORE> { operator = ValueExpression.Operator.BEFORE; }
+        |
+        <AFTER> { operator = ValueExpression.Operator.AFTER; }
         |
         <GREATERTHAN> { operator = ValueExpression.Operator.GREATERTHAN; }
         |
@@ -482,8 +460,13 @@ void narrowByRatingClause(InstructionQueue queue, Token t) :
         <LESSTHANEQ> { operator = ValueExpression.Operator.LESSTHANEQ; }
         |
         <NOTEQUALS> { operator = ValueExpression.Operator.NOTEQUALS; }
+        |
+        (
+           <IS> { operator = ValueExpression.Operator.IS; }
+           ( LOOKAHEAD(2) <NOT> { operator = ValueExpression.Operator.ISNOT; } )?
+        )
     )
-    exp = valueExpression(queue)
+    valueExp = valueOperand(queue)
     {
         RuleVariable rv = queue.getVariable(t.image);
         if (rv == null)
@@ -499,7 +482,7 @@ void narrowByRatingClause(InstructionQueue queue, Token t) :
         }
 
         Query query = (Query)rv;
-        query.addParameter(new QueryParameter(QueryParameter.Narrow.Rating, operator, exp));
+        query.addParameter(new QueryParameter(shapeExp, fieldExp, operator, valueExp));
     }
 }
 

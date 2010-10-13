@@ -17,13 +17,14 @@
 
 package com.paxxis.chime.client.common.cal;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import com.paxxis.chime.client.common.DataField;
 import com.paxxis.chime.client.common.DataFieldValue;
 import com.paxxis.chime.client.common.DataInstance;
 import com.paxxis.chime.client.common.InstanceId;
 import com.paxxis.chime.client.common.Shape;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * A CAL wrapper around a DataInstance
@@ -46,6 +47,10 @@ public class InstanceVariable extends RuleVariable implements IRuleObject {
 
     }
 
+    public InstanceVariable(DataInstance inst) {
+        dataInstance = inst;
+    }
+    
     public InstanceVariable(String name) {
         super(name);
     }
@@ -139,10 +144,11 @@ public class InstanceVariable extends RuleVariable implements IRuleObject {
         List<IValue> results = new ArrayList<IValue>();
         for (DataFieldValue val : vals) {
             if (val.isInternal()) {
-                StringVariable s = new StringVariable(null, val.getName());
+                StringVariable s = new StringVariable(null, val.getValue().toString());
                 results.add(s);
             } else {
                 InstanceVariable inst = new InstanceVariable();
+                inst.setMonitor(_monitor);
                 inst.setValue(new StringVariable(null, val.getReferenceId().getValue()), true);
                 results.add(inst);
             }
@@ -219,14 +225,18 @@ public class InstanceVariable extends RuleVariable implements IRuleObject {
             value = (IValue)indexer.valueAsObject();
         }
 
-        InstanceId id = InstanceId.create(value.valueAsString());
+        if (value instanceof InstanceVariable) {
+            dataInstance = ((InstanceVariable)value).dataInstance;
+        } else {
+            InstanceId id = InstanceId.create(value.valueAsString());
 
-        QueryProvider provider = _monitor.getQueryProvider();
-        if (provider == null) {
-            throw new RuntimeException("No Query Provider available");
+            QueryProvider provider = _monitor.getQueryProvider();
+            if (provider == null) {
+                throw new RuntimeException("No Query Provider available");
+            }
+
+            dataInstance = provider.getDataInstanceById(id);
         }
-
-        dataInstance = provider.getDataInstanceById(id);
 
         if (_monitor != null)
         {

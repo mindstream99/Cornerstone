@@ -17,6 +17,7 @@
 
 package com.paxxis.chime.client.common.cal;
 
+import com.paxxis.chime.client.common.DataInstance;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -26,13 +27,12 @@ import java.util.List;
  */
 public class Query extends RuleVariable implements IRuleObject
 {
-    private static enum Methods
-    {
-        count,
-        average
+    private static enum Methods {
+        fetch,
+        addFilter,
+        addShapeFilter
     }
 
-    private IValue shapeName = new StringVariable(null, "");
     private List<QueryParameter> queryParameters = new ArrayList<QueryParameter>();
 
     public Query() {
@@ -61,9 +61,7 @@ public class Query extends RuleVariable implements IRuleObject
     {
         switch (Methods.valueOf(name))
         {
-            case count:
-                return true;
-            case average:
+            case fetch:
                 return true;
         }
 
@@ -79,10 +77,12 @@ public class Query extends RuleVariable implements IRuleObject
     {
         switch (Methods.valueOf(name))
         {
-            case count:
+            case fetch:
                 return 0;
-            case average:
-                return 1;
+            case addFilter:
+                return 2;
+            case addShapeFilter:
+                return 3;
         }
 
         return 0;
@@ -92,29 +92,31 @@ public class Query extends RuleVariable implements IRuleObject
     {
         switch (Methods.valueOf(name))
         {
-            case count:
-                return executeCount(params);
-            case average:
-                return executeAverage(params);
+            case fetch:
+                return executeFetch(params);
+            case addFilter:
+                return executeAddFilter(params);
+            case addShapeFilter:
+                return executeAddShapeFilter(params);
         }
 
         return null;
     }
 
-    private IValue executeAverage(List<IValue> params) {
-        // the 1st parameter is the field name to get the data from
-        // the field is a field of the data type
-        String fieldName = params.get(0).valueAsString();
+    private IValue executeAddFilter(List<IValue> params) {
 
-        QueryProvider provider = _monitor.getQueryProvider();
-        if (provider == null) {
-            throw new RuntimeException("No Query Provider available");
-        }
 
-        return new DoubleVariable(null, provider.getFieldDataAverage(shapeName.valueAsString(), fieldName, queryParameters));
+        return new BooleanVariable(null, true);
     }
 
-    private IValue executeCount(List<IValue> params)
+    private IValue executeAddShapeFilter(List<IValue> params) {
+
+
+        return new BooleanVariable(null, true);
+
+    }
+
+    private IValue executeFetch(List<IValue> params)
     {
         // we don't use any parameters
 
@@ -123,7 +125,14 @@ public class Query extends RuleVariable implements IRuleObject
             throw new RuntimeException("No Query Provider available");
         }
 
-        return new IntegerVariable(null, provider.getCountByShape(shapeName.valueAsString(), queryParameters));
+        Array result = new Array();
+        List<DataInstance> instances = provider.getDataInstances(queryParameters);
+        List<IValue> ivals = new ArrayList<IValue>();
+        for (DataInstance instance : instances) {
+            ivals.add(new InstanceVariable(instance));
+        }
+        result.initialize(ivals);
+        return result;
     }
 
     /**
@@ -132,31 +141,6 @@ public class Query extends RuleVariable implements IRuleObject
      */
     public void setValue(IValue val, boolean trigger)
     {
-        // if the value being assigned is an object expression,
-        // then we need to evaluate it
-        IValue value = val;
-        if (val instanceof ObjectMethodExpression)
-        {
-            ObjectMethodExpression m = (ObjectMethodExpression)val;
-            value = m.execute();
-        }
-        else if (val instanceof ArrayIndexer)
-        {
-            // we need to evaluate the indexed value
-            ArrayIndexer indexer = (ArrayIndexer)val;
-            value = (IValue)indexer.valueAsObject();
-        }
-        else if (val instanceof TableIndexer)
-        {
-            // we need to evaluate the indexed value
-            TableIndexer indexer = (TableIndexer)val;
-            value = (IValue)indexer.valueAsObject();
-        }
-
-        shapeName = value;
-
-        // tell the monitor about this change
-        _monitor.variableChange(this);
     }
 
     public Object valueAsObject()
@@ -166,7 +150,7 @@ public class Query extends RuleVariable implements IRuleObject
 
     public String valueAsString()
     {
-        return shapeName.valueAsString();
+        return "";
     }
 
     public double valueAsDouble()

@@ -90,9 +90,9 @@ public class TextFieldEditorWindow extends ChimeWindow
             }
         } else {
             if (simpleText) {
-                _simpleEditorPanel = new SimpleTextEditorPanel(_value.getName());
+                _simpleEditorPanel = new SimpleTextEditorPanel(_value.getValue().toString());
             } else {
-                _editorPanel = new ChimeRichTextEditor(_value.getName(), true);
+                _editorPanel = new ChimeRichTextEditor(_value.getValue().toString(), true);
             }
         }
         

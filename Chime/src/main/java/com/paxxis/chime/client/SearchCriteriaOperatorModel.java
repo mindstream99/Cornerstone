@@ -85,6 +85,21 @@ public class SearchCriteriaOperatorModel extends BaseTreeModel implements Serial
             case Past30Days:
                 setDescription("In Past 30 Days");
                 break;
+            case BeforeDate:
+                setDescription("Before Date");
+                break;
+            case OnOrBeforeDate:
+                setDescription("On Or Before Date");
+                break;
+            case OnDate:
+                setDescription("On Date");
+                break;
+            case AfterDate:
+                setDescription("After Date");
+                break;
+            case OnOrAfterDate:
+                setDescription("On Or After Date");
+                break;
         }
     }
 

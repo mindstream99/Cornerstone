@@ -404,10 +404,10 @@ public class DataInstanceModel extends BaseTreeModel implements Serializable
             if (-1 == fileName.indexOf(".")) {
                 List<DataFieldValue> vals = _instance.getFieldValues(type, type.getField("Extension"));
                 if (vals.size() > 0) {
-                    fileName += ("." + vals.get(0).getName());
+                    fileName += ("." + vals.get(0).getValue());
                 }
             }
-            String id = _instance.getFieldValues(type, type.getField("File ID")).get(0).getName();
+            String id = _instance.getFieldValues(type, type.getField("File ID")).get(0).getValue().toString();
 
             String link = GWT.getHostPageBaseURL().trim();
             if (link.endsWith("/")) {

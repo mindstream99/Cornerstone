@@ -18,11 +18,15 @@
 package com.paxxis.chime.client.editor;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import com.extjs.gxt.ui.client.Style.HorizontalAlignment;
 import com.extjs.gxt.ui.client.event.ButtonEvent;
 import com.extjs.gxt.ui.client.event.ComponentEvent;
+import com.extjs.gxt.ui.client.event.Events;
+import com.extjs.gxt.ui.client.event.FieldEvent;
+import com.extjs.gxt.ui.client.event.Listener;
 import com.extjs.gxt.ui.client.event.SelectionChangedEvent;
 import com.extjs.gxt.ui.client.event.SelectionChangedListener;
 import com.extjs.gxt.ui.client.event.SelectionListener;
@@ -31,6 +35,7 @@ import com.extjs.gxt.ui.client.widget.Component;
 import com.extjs.gxt.ui.client.widget.Html;
 import com.extjs.gxt.ui.client.widget.button.Button;
 import com.extjs.gxt.ui.client.widget.form.ComboBox;
+import com.extjs.gxt.ui.client.widget.form.DateField;
 import com.extjs.gxt.ui.client.widget.form.FormPanel;
 import com.extjs.gxt.ui.client.widget.form.TextField;
 import com.google.gwt.user.client.Command;
@@ -76,6 +81,7 @@ public class SearchFilterEditor extends ChimeWindow {
     private FormPanel _form;
     private TextField<String> textValueField = null;
     private TextField<Number> numberValueField = null;
+    private DateField dateField = null;
     private Button _okButton;
     private Button _cancelButton;
     private Html _errorLabel;
@@ -159,6 +165,12 @@ public class SearchFilterEditor extends ChimeWindow {
                     {
                         Operator operator = model.getOperator();
                         filter.setOperator(operator);
+                        boolean showDateField = operator == Operator.AfterDate ||
+	                        operator == Operator.OnOrAfterDate ||
+	                        operator == Operator.OnDate ||
+	                        operator == Operator.OnOrBeforeDate ||
+	                        operator == Operator.BeforeDate;
+                        dateField.setVisible(showDateField);
                     }
                 }
             }
@@ -218,7 +230,27 @@ public class SearchFilterEditor extends ChimeWindow {
             
             _form.add(_instanceBox);
         } else {  // Activity
-        	// there is no value field for activity.  the operator says it all.
+            dateField = new DateField();
+            dateField.setVisible(false);
+            _form.add(dateField);
+            dateField.setHideLabel(true);
+            Listener<FieldEvent> l = new Listener<FieldEvent>() {
+    	        public void handleEvent(FieldEvent evt) {
+    	        	Date dt = dateField.getValue();
+    	        	if (dt != null) {
+                        filter.setValue(dt);
+                	} else {
+                        filter.setValue(null);
+                	}
+
+                	validate();
+    	        }
+    	    };
+
+            dateField.addListener(Events.KeyPress, l);
+            dateField.addListener(Events.Valid, l);
+            dateField.addListener(Events.Invalid, l);
+            dateField.addListener(Events.Change, l);
         }
 
         _errorLabel = new Html("<div id='endslice-error-label'>&nbsp;</div>");
@@ -341,6 +373,11 @@ public class SearchFilterEditor extends ChimeWindow {
         _referenceOperatorList.add(new SearchCriteriaOperatorModel(Operator.Reference));
         _referenceOperatorList.add(new SearchCriteriaOperatorModel(Operator.NotReference));
         
+        _activityOperatorList.add(new SearchCriteriaOperatorModel(Operator.BeforeDate));
+        _activityOperatorList.add(new SearchCriteriaOperatorModel(Operator.OnOrBeforeDate));
+        _activityOperatorList.add(new SearchCriteriaOperatorModel(Operator.OnDate));
+        _activityOperatorList.add(new SearchCriteriaOperatorModel(Operator.AfterDate));
+        _activityOperatorList.add(new SearchCriteriaOperatorModel(Operator.OnOrAfterDate));
         _activityOperatorList.add(new SearchCriteriaOperatorModel(Operator.Past24Hours));
         _activityOperatorList.add(new SearchCriteriaOperatorModel(Operator.Past3Days));
         _activityOperatorList.add(new SearchCriteriaOperatorModel(Operator.Past7Days));

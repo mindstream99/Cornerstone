@@ -24,90 +24,77 @@ import java.util.Date;
  *
  * @author Robert Englander
  */
-public class DataFieldValue implements Serializable
-{
-    private InstanceId id = InstanceId.create("-1");
+public class DataFieldValue implements Serializable {
+	private static final long serialVersionUID = 1L;
+
+	private InstanceId id = InstanceId.create("-1");
     private InstanceId shapeId = InstanceId.create("-1");
     private InstanceId referenceId = InstanceId.create("-1");
-    private String value;
+    private Serializable value;
     private boolean isInternal;
     private Date timestamp = null;
 
-    public DataFieldValue()
-    {
-        
+    public DataFieldValue() {
     }
     
-    public DataFieldValue(InstanceId refId, String name, InstanceId sId, InstanceId id, Date ts)
-    {
+    public DataFieldValue(InstanceId refId, Serializable nameVal, InstanceId sId, InstanceId id, Date ts) {
         referenceId = refId;
-        value = name;
+        value = nameVal;
         shapeId = sId;
         this.id = id;
         timestamp = ts;
         isInternal = false;
     }
     
-    public DataFieldValue(String name, InstanceId sId, InstanceId id, Date ts)
-    {
-        value = name;
+    public DataFieldValue(Serializable val, InstanceId sId, InstanceId id, Date ts) {
+        value = val;
         shapeId = sId;
         this.id = id;
         timestamp = ts;
         isInternal = true;
     }
     
-    public DataFieldValue(DataFieldValue source)
-    {
+    public DataFieldValue(DataFieldValue source) {
         isInternal = source.isInternal();
         id = source.getId();
         shapeId = source.getShapeId();
         referenceId = source.getReferenceId();
-        value = source.getName();
+        value = source.getValue();
     }
     
-    public boolean isInternal()
-    {
+    public boolean isInternal() {
         return isInternal;
     }
     
-    public void setReferenceId(InstanceId id)
-    {
+    public void setReferenceId(InstanceId id) {
         referenceId = id;
     }
     
-    public void setName(String name)
-    {
-        value = name;
+    public void setValue(Serializable val) {
+        value = val;
     }
     
-    public String getName()
-    {
+    public Serializable getValue() {
         return value;
     }
     
-    public InstanceId getReferenceId()
-    {
+    public InstanceId getReferenceId() {
         return referenceId;
     }
     
-    public void setShapeId(InstanceId id)
-    {
+    public void setShapeId(InstanceId id) {
         shapeId = id;
     }
     
-    public InstanceId getShapeId()
-    {
+    public InstanceId getShapeId() {
         return shapeId;
     }
     
-    public void setId(InstanceId id)
-    {
+    public void setId(InstanceId id) {
         this.id = id;
     }
     
-    public InstanceId getId()
-    {
+    public InstanceId getId() {
         return id;
     }
 

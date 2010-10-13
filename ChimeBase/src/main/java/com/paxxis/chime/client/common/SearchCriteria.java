@@ -148,15 +148,9 @@ public class SearchCriteria implements Serializable
                 }
 
                 Operator op = filter.getOperator();
-                Object value = filter.getValue();
-                
-                String val = null;
-                if (value != null)
-                {
-                    val = value.toString();
-                }
-                
-                req.addQueryParameter(filter.getDataShape(), fieldName, val, op);
+                Serializable value = filter.getValue();
+                 
+                req.addQueryParameter(filter.getDataShape(), fieldName, value, op);
             }
         }
         

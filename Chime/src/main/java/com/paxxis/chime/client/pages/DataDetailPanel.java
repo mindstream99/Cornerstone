@@ -972,12 +972,12 @@ public class DataDetailPanel extends ChimeLayoutContainer implements InstanceUpd
             boolean found = false;
             if (sourceValue.isInternal())
             {
-                String sourceVal = sourceValue.getName();
+                String sourceVal = sourceValue.getValue().toString();
                 InstanceId sourceId = sourceValue.getId();
 
                 for (DataFieldValue baseValue : base)
                 {
-                    String baseVal = baseValue.getName();
+                    String baseVal = baseValue.getValue().toString();
                     InstanceId baseId = baseValue.getId();
                     if (!baseId.equals(InstanceId.create("-1")))
                     {

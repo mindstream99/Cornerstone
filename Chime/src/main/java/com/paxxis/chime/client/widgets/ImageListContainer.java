@@ -212,7 +212,7 @@ public class ImageListContainer extends LayoutContainer implements ImageContaine
         DataField field = imageType.getField("File ID");
         List<DataFieldValue> vals = img.getFieldValues(imageType, field);
         if (vals.size() == 1) {
-            String id = vals.get(0).getName();
+            String id = vals.get(0).getValue().toString();
             ImageContainer image = new ImageContainer(ImageListContainer.this, id, true, "#e1e1e1", false,
                     ImageListContainer.this, idx);
             imageIndexMap.put(idx, image);

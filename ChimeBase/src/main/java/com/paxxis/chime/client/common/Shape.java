@@ -45,6 +45,7 @@ public class Shape extends DataInstance {
     public static final InstanceId ANALYTIC_ID = InstanceId.create("1900");
     public static final InstanceId REFERENCE_ID = InstanceId.create("2000");
     public static final InstanceId FOLDER_ID = InstanceId.create("2100");
+    public static final InstanceId DATE_ID = InstanceId.create("2200");
 
     private boolean _primitive = false;
     private boolean _viewable = false;
@@ -185,17 +186,12 @@ public class Shape extends DataInstance {
         throw new RuntimeException("something something");
     }
         
-    public boolean isNumeric()
-    {
-        boolean isNumeric = false;
-        
-        if (isPrimitive())
-        {
-            String name = getName();
-            isNumeric = (name.equals("Number"));
-        }
-        
-        return isNumeric;
+    public boolean isNumeric() {
+        return getId().equals(Shape.NUMBER_ID);
+    }
+
+    public boolean isDate() {
+        return getId().equals(Shape.DATE_ID);
     }
 
     public boolean canMultiType() {

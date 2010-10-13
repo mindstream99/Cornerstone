@@ -75,7 +75,17 @@ public class DataInstanceUtils {
     private static final int DISCUSSIONLIMIT = 20;
     
     public static final int USRMSGLIMIT = 20;
-    
+
+    public enum FetchType {
+        /** fetches only the instance header */
+        Shallow,
+
+        /** fetches the header and field data */
+        Deep,
+
+        /** fetches everything */
+        Full
+    }
     
     private DataInstanceUtils()
     {}
@@ -139,6 +149,9 @@ public class DataInstanceUtils {
             database.executeStatement(sql);
 
             sql = "delete from " + tableName + "_Number where instance_id = " + quotedInstanceId;
+            database.executeStatement(sql);
+
+            sql = "delete from " + tableName + "_Timestamp where instance_id = " + quotedInstanceId;
             database.executeStatement(sql);
 
             sql = "delete from " + tableName + "_Reference where instance_id = " + quotedInstanceId;
@@ -357,8 +370,19 @@ public class DataInstanceUtils {
         return result;
     }
  
-    public static DataInstance getInstance(InstanceId id, User user, DatabaseConnection database, boolean deep, boolean useCache) throws Exception
-    {
+    public static DataInstance getInstance(InstanceId id, User user, DatabaseConnection database, 
+            boolean deep, boolean useCache) throws Exception {
+        FetchType ftype = FetchType.Shallow;
+        if (deep) {
+            ftype = FetchType.Full;
+        }
+        
+        return getInstance(id, user, database, ftype, useCache);
+    }
+
+    public static DataInstance getInstance(InstanceId id, User user, DatabaseConnection database,
+            FetchType fetchType, boolean useCache) throws Exception {
+
         if (!id.getValue().endsWith(Tools.DEFAULT_EXTID)) {
             // the data must be sourced by an extension
             return ChimeExtensionManager.instance().getDataInstance(id);
@@ -369,7 +393,7 @@ public class DataInstanceUtils {
         if (useCache) {
             DataInstance cachedInstance = CacheManager.instance().get(id);
             if (cachedInstance != null) {
-                if (deep) {
+                if (fetchType == FetchType.Full) {
 
                     DataSocialContext social = cachedInstance.getSocialContext();
                     if (social != null) {
@@ -449,7 +473,7 @@ public class DataInstanceUtils {
                 + Tools.getTableSet() + " where id = '" + id + "'";
 
         long start = System.currentTimeMillis();
-        List<? extends DataInstance> results = getInstances(sql, null, user, database, deep).getInstances();
+        List<? extends DataInstance> results = getInstances(sql, null, user, database, fetchType).getInstances();
         long elapsed = System.currentTimeMillis() - start;
 
         if (results.isEmpty()) {
@@ -460,6 +484,15 @@ public class DataInstanceUtils {
     }
 
     public static InstancesBundle getInstances(String sql, Cursor cursor, User user, DatabaseConnection database, boolean deep) throws Exception {
+        FetchType ftype = FetchType.Shallow;
+        if (deep) {
+            ftype = FetchType.Full;
+        }
+
+        return getInstances(sql, cursor, user, database, ftype);
+    }
+
+    public static InstancesBundle getInstances(String sql, Cursor cursor, User user, DatabaseConnection database, FetchType fetchType) throws Exception {
 
         List<Tag> userTags = null;
         List<DataInstance> results = new ArrayList<DataInstance>();
@@ -641,76 +674,7 @@ public class DataInstanceUtils {
                 type.setCanMultiType(mask[11] == 'Y');
             }
 
-            if (deep)
-            {
-                DataSocialContext context = instance.createNewSocialContext();
-                context.setUser(user);
-                context.setAverageRating(averageRating.asFloat());
-                context.setRatingCount(ratingCount.asInteger());
-
-                InstanceId instId = InstanceId.create(id.asString());
-
-                if (true) { //user == null || !user.isIndexing()) {
-                    ReviewsBundle ratings = ReviewUtils.getReviews(instId, null, new Cursor(REVIEWLIMIT), SortOrder.ByMostRecentEdit, database);
-                    context.setReviewsBundle(ratings);
-                }
-
-                context.setHasUserVote(false);
-
-                if (user != null)
-                {
-                    Review userReview = ReviewUtils.getReview(instId, user, database);
-                    context.setUserReview(userReview);
-
-                    UserVote userVote = VoteUtils.getVote(instId, user, database);
-                    if (userVote.hasVote) {
-                        context.setUserVote(userVote.vote);
-                    }
-                }
-
-                List<DataInstance> images = AttachmentUtils.getImages(instId, database);
-                instance.setImages(images);
-
-                List<DataInstance> files = AttachmentUtils.getFiles(instId, database);
-                instance.setFiles(files);
-
-                if (true) { //user == null || !user.isIndexing()) {
-                    CommentsBundle comments = CommentUtils.getComments(instId, null, new Cursor(REVIEWLIMIT), SortOrder.ByMostRecentEdit, database);
-                    context.setCommentsBundle(comments);
-                }
-
-                if (true) { //user == null || !user.isIndexing()) {
-                    DiscussionsBundle discussions = DiscussionUtils.getDiscussions(instId, new Cursor(DISCUSSIONLIMIT), database);
-                    context.setDiscussionsBundle(discussions);
-                }
-
-                List<TagContext> tagList = TagUtils.getTagContexts(instId, user, database);
-                HashMap<InstanceId, TagContext> tagMap = new HashMap<InstanceId, TagContext>();
-                for (TagContext tagContext : tagList)
-                {
-                    context.addTagContext(tagContext);
-                    tagMap.put(tagContext.getTag().getId(), tagContext);
-                }
-
-                if (user != null && !user.isIndexing())
-                {
-                    userTags = TagUtils.getUserTags(instId, user, database, false);
-                }
-
-                List<Scope> scopeList = ScopeUtils.getScopes(instId, database);
-                for (Scope scope : scopeList)
-                {
-                    context.addScope(scope);
-                }
-
-                if (user != null && !user.isIndexing()) {
-                    boolean regInterest = RegisteredInterestUtils.isRegisteredInterest(instance, user, database);
-                    context.setRegisteredInterest(regInterest);
-                }
-
-                instance.setSocialContext(context);
-
-                // the column data comes next
+            if (fetchType != FetchType.Shallow) {
                 for (Shape shape : instance.getShapes()) {
                     List<DataField> fields = shape.getFields();
                     for (DataField field : fields)
@@ -734,88 +698,157 @@ public class DataInstanceUtils {
                     }
                 }
 
-                if (instance instanceof User) {
-                    // grab the favorites
-                    User userData = (User)instance;
-                    List<DataInstance> refs = userData.getFavoriteReferences();
-                    List<DataInstance> favorites = new ArrayList<DataInstance>();
-                    for (DataInstance ref : refs) {
-                        DataInstance fav = DataInstanceUtils.getInstance(ref.getId(), user, database, false, true);
-                        favorites.add(fav);
+                if (fetchType == FetchType.Full) {
+                    DataSocialContext context = instance.createNewSocialContext();
+                    context.setUser(user);
+                    context.setAverageRating(averageRating.asFloat());
+                    context.setRatingCount(ratingCount.asInteger());
+
+                    InstanceId instId = InstanceId.create(id.asString());
+
+                    if (true) { //user == null || !user.isIndexing()) {
+                        ReviewsBundle ratings = ReviewUtils.getReviews(instId, null, new Cursor(REVIEWLIMIT), SortOrder.ByMostRecentEdit, database);
+                        context.setReviewsBundle(ratings);
                     }
 
-                    userData.setFavorites(favorites);
-
-                    UserMessagesBundle msgsBundle = UserMessageUtils.getMessages(userData, new Cursor(USRMSGLIMIT), database);
-                    userData.setUserMessagesBundle(msgsBundle);
-                }
-
-                if (instance instanceof Community) {
-                    // grab the favorites
-                }
-
-                if (instance instanceof Folder) {
-                    // grab the favorites
-                    Folder userData = (Folder)instance;
-                    List<DataInstance> refs = userData.getChildrenReferences();
-                    List<DataInstance> kids = new ArrayList<DataInstance>();
-                    for (DataInstance ref : refs) {
-                        DataInstance fav = DataInstanceUtils.getInstance(ref.getId(), user, database, false, true);
-                        kids.add(fav);
-                    }
-
-                    userData.setChildren(kids);
-                }
-
-                if (instance instanceof Tag)
-                {
-                    Tag tag = (Tag)instance;
-
-                    ShapeUtils.getCommunityShapeContexts(tag, user, database);
+                    context.setHasUserVote(false);
 
                     if (user != null)
                     {
-                        ShapeUtils.getUserShapeContexts(user, tag, database);
-                    }
+                        Review userReview = ReviewUtils.getReview(instId, user, database);
+                        context.setUserReview(userReview);
 
-                    boolean isPrivate = true;
-                    for (Scope scope : context.getScopes()) {
-                        if (scope.isGlobalCommunity()) {
-                            isPrivate = false;
-                            break;
+                        UserVote userVote = VoteUtils.getVote(instId, user, database);
+                        if (userVote.hasVote) {
+                            context.setUserVote(userVote.vote);
                         }
                     }
-                    tag.setPrivate(isPrivate);
-                } else if (instance instanceof Shape) {
-                    ShapeUtils.getFields((Shape)instance, database, true);
-                } else if (instance instanceof User) {
-                    UserUtils.updateUserProfile((User)instance, database);
-                    UserSocialContext ctx = (UserSocialContext)context;
-                    //ctx.setUserTagContexts(TagUtils.getTagContexts((User)instance, database));
-                }
-            }
 
-            instance.finishLoading(DataInstanceHelperFactory.getHelper(instanceClass), database);
+                    List<DataInstance> images = AttachmentUtils.getImages(instId, database);
+                    instance.setImages(images);
 
-            PortalTemplate template = PortalTemplateUtils.getTemplate(instance, database);
-            instance.setPortalTemplate(template);
+                    List<DataInstance> files = AttachmentUtils.getFiles(instId, database);
+                    instance.setFiles(files);
 
-            CacheManager.instance().put(instance);
-            CacheManager.instance().putSocialContext(instance);
+                    if (true) { //user == null || !user.isIndexing()) {
+                        CommentsBundle comments = CommentUtils.getComments(instId, null, new Cursor(REVIEWLIMIT), SortOrder.ByMostRecentEdit, database);
+                        context.setCommentsBundle(comments);
+                    }
 
-            // update the tag contexts for the given user
-            if (userTags != null)
-            {
-                DataSocialContext social = instance.getSocialContext();
-                List<TagContext> tagContexts = social.getTagContexts();
-                for (TagContext tagContext : tagContexts)
-                {
-                    Tag tag = tagContext.getTag();
-                    for (Tag t : userTags)
+                    if (true) { //user == null || !user.isIndexing()) {
+                        DiscussionsBundle discussions = DiscussionUtils.getDiscussions(instId, new Cursor(DISCUSSIONLIMIT), database);
+                        context.setDiscussionsBundle(discussions);
+                    }
+
+                    List<TagContext> tagList = TagUtils.getTagContexts(instId, user, database);
+                    HashMap<InstanceId, TagContext> tagMap = new HashMap<InstanceId, TagContext>();
+                    for (TagContext tagContext : tagList)
                     {
-                        if (t.getId().equals(tag.getId()))
+                        context.addTagContext(tagContext);
+                        tagMap.put(tagContext.getTag().getId(), tagContext);
+                    }
+
+                    if (user != null && !user.isIndexing())
+                    {
+                        userTags = TagUtils.getUserTags(instId, user, database, false);
+                    }
+
+                    List<Scope> scopeList = ScopeUtils.getScopes(instId, database);
+                    for (Scope scope : scopeList)
+                    {
+                        context.addScope(scope);
+                    }
+
+                    if (user != null && !user.isIndexing()) {
+                        boolean regInterest = RegisteredInterestUtils.isRegisteredInterest(instance, user, database);
+                        context.setRegisteredInterest(regInterest);
+                    }
+
+                    instance.setSocialContext(context);
+
+                    if (instance instanceof User) {
+                        // grab the favorites
+                        User userData = (User)instance;
+                        List<DataInstance> refs = userData.getFavoriteReferences();
+                        List<DataInstance> favorites = new ArrayList<DataInstance>();
+                        for (DataInstance ref : refs) {
+                            DataInstance fav = DataInstanceUtils.getInstance(ref.getId(), user, database, false, true);
+                            favorites.add(fav);
+                        }
+
+                        userData.setFavorites(favorites);
+
+                        UserMessagesBundle msgsBundle = UserMessageUtils.getMessages(userData, new Cursor(USRMSGLIMIT), database);
+                        userData.setUserMessagesBundle(msgsBundle);
+                    }
+
+                    if (instance instanceof Community) {
+                        // grab the favorites
+                    }
+
+                    if (instance instanceof Folder) {
+                        // grab the favorites
+                        Folder userData = (Folder)instance;
+                        List<DataInstance> refs = userData.getChildrenReferences();
+                        List<DataInstance> kids = new ArrayList<DataInstance>();
+                        for (DataInstance ref : refs) {
+                            DataInstance fav = DataInstanceUtils.getInstance(ref.getId(), user, database, false, true);
+                            kids.add(fav);
+                        }
+
+                        userData.setChildren(kids);
+                    }
+
+                    if (instance instanceof Tag)
+                    {
+                        Tag tag = (Tag)instance;
+
+                        ShapeUtils.getCommunityShapeContexts(tag, user, database);
+
+                        if (user != null)
                         {
-                            tagContext.setUserTagged(true);
+                            ShapeUtils.getUserShapeContexts(user, tag, database);
+                        }
+
+                        boolean isPrivate = true;
+                        for (Scope scope : context.getScopes()) {
+                            if (scope.isGlobalCommunity()) {
+                                isPrivate = false;
+                                break;
+                            }
+                        }
+                        tag.setPrivate(isPrivate);
+                    } else if (instance instanceof Shape) {
+                        ShapeUtils.getFields((Shape)instance, database, true);
+                    } else if (instance instanceof User) {
+                        UserUtils.updateUserProfile((User)instance, database);
+                        UserSocialContext ctx = (UserSocialContext)context;
+                        //ctx.setUserTagContexts(TagUtils.getTagContexts((User)instance, database));
+                    }
+
+                    instance.finishLoading(DataInstanceHelperFactory.getHelper(instanceClass), database);
+
+                    PortalTemplate template = PortalTemplateUtils.getTemplate(instance, database);
+                    instance.setPortalTemplate(template);
+
+                    CacheManager.instance().put(instance);
+                    CacheManager.instance().putSocialContext(instance);
+
+                    // update the tag contexts for the given user
+                    if (userTags != null)
+                    {
+                        DataSocialContext social = instance.getSocialContext();
+                        List<TagContext> tagContexts = social.getTagContexts();
+                        for (TagContext tagContext : tagContexts)
+                        {
+                            Tag tag = tagContext.getTag();
+                            for (Tag t : userTags)
+                            {
+                                if (t.getId().equals(tag.getId()))
+                                {
+                                    tagContext.setUserTagged(true);
+                                }
+                            }
                         }
                     }
                 }

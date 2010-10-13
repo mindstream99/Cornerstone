@@ -43,7 +43,12 @@ public class ValueExpression extends IValue implements IBinaryExpression
         MINUS,
         MULT,
         DIV,
-        NOT
+        NOT,
+        IS,
+        ISNOT,
+        ON,
+        BEFORE,
+        AFTER
     }
     
     IValue _leftOperand = null;

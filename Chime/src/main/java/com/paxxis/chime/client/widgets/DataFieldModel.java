@@ -1,7 +1,9 @@
 package com.paxxis.chime.client.widgets;
 
+import java.util.Date;
 import java.util.List;
 
+import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.i18n.client.NumberFormat;
 import com.paxxis.chime.client.InstanceUpdateListener;
 import com.paxxis.chime.client.ServiceManager;
@@ -66,7 +68,7 @@ public class DataFieldModel extends DataRowModel {
         String stringContent = "";
         String sep = "";
         for (DataFieldValue value : values) {
-            String valueName = value.getName().trim();
+            String valueName = value.getValue().toString().trim();
             boolean isInternal = dataField.getShape().isPrimitive();
 
             boolean isImageReference = false;
@@ -75,7 +77,7 @@ public class DataFieldModel extends DataRowModel {
                 if (shape.getId().equals(Shape.IMAGE_ID) &&
                         dataField.getId().equals(Shape.FILE_ID)) {
                     isImageReference = true;
-                    stringContent = sep + value.getName();
+                    stringContent = sep + value.getValue();
                 }
                 else if (dataField.getShape().getId().equals(Shape.URL_ID))
                 {
@@ -88,16 +90,24 @@ public class DataFieldModel extends DataRowModel {
                 {
                     // TODO when formatting is added to the field definition, we'll
                     // apply whatever is specified
-                    Double dval = Double.valueOf(value.getName());
+                    Double dval = Double.valueOf(value.getValue().toString());
                     NumberFormat fmt = NumberFormat.getDecimalFormat();
                     String formatted = fmt.format(dval);
 
                     buffer.append(sep + formatted);
                     sep = "   ";
                 }
+                else if (dataField.getShape().isDate())
+                {
+                    Date dval = (Date)value.getValue();
+                    DateTimeFormat dtf = DateTimeFormat.getFormat("MMM d, yyyy");
+                    String formatted = dtf.format(dval);
+                    buffer.append(sep + formatted);
+                    sep = "   ";
+                }
                 else
                 {
-                    buffer.append(sep + value.getName());
+                    buffer.append(sep + value.getValue());
                     sep = "<br>";
                 }
 

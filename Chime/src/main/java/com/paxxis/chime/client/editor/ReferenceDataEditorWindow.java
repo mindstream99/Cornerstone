@@ -79,7 +79,7 @@ public class ReferenceDataEditorWindow extends ChimeWindow
             _simpleEditorPanel = new ReferenceEditorPanel(_field.getShape());
         } else {
             setHeading("Edit '" + _field.getName() + "' Data" + suffix);
-            _simpleEditorPanel = new ReferenceEditorPanel(_field.getShape(), _value.getName());
+            _simpleEditorPanel = new ReferenceEditorPanel(_field.getShape(), _value.getValue().toString());
         }
         
         _simpleEditorPanel.setChangeListener(

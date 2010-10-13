@@ -145,7 +145,7 @@ public class AnalyticDetailPanel extends LayoutContainer {
             DataField field = dataInstance.getShapes().get(0).getField("Script");
             List<DataFieldValue> vals = dataInstance.getFieldValues(dataInstance.getShapes().get(0), field);
             if (vals.size() > 0) {
-                String script = vals.get(0).getName();
+                String script = vals.get(0).getValue().toString();
                 scriptHtml.setHtml(script);
             } else {
                 scriptHtml.setHtml("No Script Available");

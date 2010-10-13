@@ -78,7 +78,7 @@ public class AnalyticDetailPortlet extends PortletContainer {
     	            DataField field = dataInstance.getShapes().get(0).getField("Script");
     	            List<DataFieldValue> vals = dataInstance.getFieldValues(dataInstance.getShapes().get(0), field);
     	            if (vals.size() > 0) {
-    	                script = vals.get(0).getName();
+    	                script = vals.get(0).getValue().toString();
     	                newScript = false;
     	            }
     	        }
@@ -223,13 +223,13 @@ public class AnalyticDetailPortlet extends PortletContainer {
         if (newScript) {
             // add this one
             DataFieldValue val = new DataFieldValue();
-            val.setName(scriptText);
+            val.setValue(scriptText);
             val.setShapeId(field.getShape().getId());
             vals.add(val);
         } else {
             // modify the existing one
             DataFieldValue val = vals.get(0);
-            val.setName(scriptText);
+            val.setValue(scriptText);
         }
 
         updateListener.onUpdate(dataInstance, InstanceUpdateListener.Type.FieldData);

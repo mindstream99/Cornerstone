@@ -25,7 +25,9 @@ import java.util.List;
  * @author Robert Englander
  */
 public class Community extends DataInstance {
-    public static final String FAVORITES_FIELD = "Favorites";
+	private static final long serialVersionUID = 1L;
+
+	public static final String FAVORITES_FIELD = "Favorites";
 
     public static final Community Global = new Community(InstanceId.create("100"));
     public static final Community ChimeAdministrators = new Community(InstanceId.create("10200"));
@@ -65,7 +67,7 @@ public class Community extends DataInstance {
             DataInstance instance = new DataInstance();
             instance.setId(value.getReferenceId());
             instance.addShape(field.getShape());
-            instance.setName(value.getName());
+            instance.setName(value.getValue().toString());
 
             results.add(instance);
         }

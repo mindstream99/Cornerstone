@@ -278,6 +278,8 @@ public class ShapeUtils
             if (fieldType.isPrimitive()) {
                 if (fieldType.isNumeric()) {
                     ext = "_Number";
+                } else if (fieldType.isDate()) {
+                	ext = "_Timestamp";
                 } else {
                     ext = "_Text";
                 }

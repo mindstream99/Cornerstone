@@ -25,11 +25,12 @@ import java.io.Serializable;
  *
  * @author Robert Englander
  */
-public class Parameter implements Serializable
-{
-    public Shape dataShape;
+public class Parameter implements Serializable {
+	private static final long serialVersionUID = 1L;
+
+	public Shape dataShape;
     public String fieldName;
-    public String fieldValue;    
+    public Serializable fieldValue;    
     public Operator operator;
     public ClauseOperator clauseOperator;
 }

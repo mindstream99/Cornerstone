@@ -126,7 +126,7 @@ class ImmediateNotificationProcessor extends MessageNotifier {
         field = eventShape.getField("Summary");
         values = instance.getFieldValues(eventShape, field);
         if (values.size() > 0) {
-            buffer.append("\n\nSummary: ").append(values.get(0).getName()).append("\n\n");
+            buffer.append("\n\nSummary: ").append(values.get(0).getValue()).append("\n\n");
         }
 
         return buffer.toString();

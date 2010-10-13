@@ -24,46 +24,41 @@ import java.io.Serializable;
  * @author Robert Englander
  */
 public class QueryParameter implements Serializable {
-    public enum Narrow {
-        Rating,
-        ReferenceField
-    }
 
-    private QueryParameter.Narrow narrowType;
     private ValueExpression.Operator operator;
-    private IValue expression;
-    private IValue expression2;
+    private IValue shapeExpression = null;
+    private IValue fieldExpression = null;
+    private IValue valueExpression = null;
 
     public QueryParameter() {
     }
 
-    public QueryParameter(QueryParameter.Narrow narrowType, ValueExpression.Operator operator, IValue expression) {
-        this.narrowType = narrowType;
+    public QueryParameter(IValue shapeExpression, IValue fieldExpression, ValueExpression.Operator operator, IValue valueExpression) {
         this.operator = operator;
-        this.expression = expression;
+        this.shapeExpression = shapeExpression;
+        this.fieldExpression = fieldExpression;
+        this.valueExpression = valueExpression;
     }
 
-    public QueryParameter(QueryParameter.Narrow narrowType,
-            ValueExpression.Operator operator, IValue expression, IValue expression2) {
-        this.narrowType = narrowType;
+    public QueryParameter(IValue fieldExpression, ValueExpression.Operator operator, IValue valueExpression) {
         this.operator = operator;
-        this.expression = expression;
-        this.expression2 = expression2;
-    }
-
-    public QueryParameter.Narrow getNarrowType() {
-        return narrowType;
+        this.fieldExpression = fieldExpression;
+        this.valueExpression = valueExpression;
     }
 
     public ValueExpression.Operator getOperator() {
         return operator;
     }
 
-    public IValue getExpression() {
-        return expression;
+    public IValue getShapeExpression() {
+        return shapeExpression;
     }
 
-    public IValue getExpression2() {
-        return expression2;
+    public IValue getFieldExpression() {
+        return fieldExpression;
+    }
+
+    public IValue getValueExpression() {
+        return valueExpression;
     }
 }

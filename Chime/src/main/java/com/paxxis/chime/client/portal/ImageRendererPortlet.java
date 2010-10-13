@@ -151,7 +151,7 @@ public class ImageRendererPortlet extends PortletContainer {
                                         DataField field = type.getField("File ID");
                                         List<DataFieldValue> vals = instance.getFieldValues(type, field);
                                         if (vals.size() == 1) {
-                                            String id = vals.get(0).getName();
+                                            String id = vals.get(0).getValue().toString();
                                             getBody().removeAll();
                                             imageContainer = new ImageContainer(getBody(), id, false, null, false);
                                             getBody().add(imageContainer, new FlowData(5, 0, 5, 0));

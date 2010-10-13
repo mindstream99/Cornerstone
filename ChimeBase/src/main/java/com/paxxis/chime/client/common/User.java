@@ -17,7 +17,6 @@
 
 package com.paxxis.chime.client.common;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -209,7 +208,7 @@ public class User extends DataInstance {
             Community community = new Community();
             community.setId(value.getReferenceId());
             community.addShape(field.getShape());
-            community.setName(value.getName());
+            community.setName(value.getValue().toString());
 
             map.put(community.getId(), community);
         }
@@ -238,7 +237,7 @@ public class User extends DataInstance {
             Community community = new Community();
             community.setId(value.getReferenceId());
             community.addShape(field.getShape());
-            community.setName(value.getName());
+            community.setName(value.getValue().toString());
 
             results.add(community);
         }
@@ -252,7 +251,7 @@ public class User extends DataInstance {
         List<DataFieldValue> values = getFieldValues(type, field);
         String email = "";
         if (values.size() > 0) {
-            email = values.get(0).getName();
+            email = values.get(0).getValue().toString();
         }
 
         return email;
@@ -269,7 +268,7 @@ public class User extends DataInstance {
             home = new DataInstance();
             home.setId(value.getReferenceId());
             home.addShape(field.getShape());
-            home.setName(value.getName());
+            home.setName(value.getValue().toString());
         }
 
         return home;
@@ -299,7 +298,7 @@ public class User extends DataInstance {
             DataInstance favorite = new DataInstance();
             favorite.setId(value.getReferenceId());
             favorite.addShape(field.getShape());
-            favorite.setName(value.getName());
+            favorite.setName(value.getValue().toString());
 
             result.add(favorite);
         }

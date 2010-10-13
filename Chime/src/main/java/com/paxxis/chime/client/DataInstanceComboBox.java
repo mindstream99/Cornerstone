@@ -1331,7 +1331,7 @@ protected void onSelect(DataInstanceModel model)
                     List<DataInstance> instances = response.getDataInstances();
 
                     // multiple hits, let's see if there's any exact matches in there
-                    String name = response.getRequest().getQueryParameters().get(0).fieldValue;
+                    String name = response.getRequest().getQueryParameters().get(0).fieldValue.toString();
 
                     List<DataInstance> exactMatches = new ArrayList<DataInstance>();
                     if (dataIsId) {

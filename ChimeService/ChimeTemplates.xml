@@ -27,7 +27,9 @@
 <!--
                 <portlet type="UserDetail" title="User Details" />
 -->
-                <portlet type="InstanceField" title="User" />
+                <portlet type="InstanceField" title="User">
+                </portlet>
+
                 <portlet type="InstanceSocialActivity" />
             </column>
             <column width="300">
@@ -61,5 +63,6 @@
         <mapping instance="1000" specification="shapeless"/>
         <mapping instance="1100" specification="shapeless"/>
         <mapping instance="2000" specification="shapeless"/>
+        <mapping instance="2200" specification="shapeless"/>
     </mappings>
 </templates>

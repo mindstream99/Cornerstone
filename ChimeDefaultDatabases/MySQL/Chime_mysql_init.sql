@@ -148,6 +148,7 @@ INSERT INTO `Chime`.`DataInstance` VALUES  ('100','Shape','A Chime Shape definit
  ('200','Text','Raw Text','2010-02-23 15:45:02','19900','system','2010-02-23 15:45:02','19900','system',0,0,0,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,0,0,0,0,0,'YYNNNNNNNNNN','NONE',NULL,NULL,NULL,NULL,NULL),
  ('2000','Reference','A reference to any chime data instance','2010-02-23 15:45:02','19900','system','2010-02-23 15:45:02','19900','system',0,0,0,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,0,0,0,0,0,'NYNNNNNNNNNN','NONE',NULL,NULL,NULL,NULL,NULL),
  ('2100','Folder','A folder is a collection of Chime data instance references.','2010-08-07 17:37:04','19900','system','2010-08-07 17:40:07','19900','system',0,0,0,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,0,0,0,0,0,'NYYYYYYYYYYY','NONE',NULL,NULL,NULL,NULL,NULL),
+ ('2200','Date','A date value.','2010-08-07 17:37:04','19900','system','2010-08-07 17:40:07','19900','system',0,0,0,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,0,0,0,0,0,'YYNNNNNNNNNN','NONE',NULL,NULL,NULL,NULL,NULL),
  ('300','Number','Numeric Data','2010-02-23 15:46:29','19900','system','2010-02-23 15:46:29','19900','system',0,0,0,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,0,0,0,0,0,'YYNNNNNNNNNN','NONE',NULL,NULL,NULL,NULL,NULL),
  ('400','URL','A single URL','2010-02-23 15:47:22','19900','system','2010-02-23 15:47:22','19900','system',0,0,0,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,0,0,0,0,0,'YYNNNNNNNNNN','NONE',NULL,NULL,NULL,NULL,NULL),
  ('500','Review','A user\'s review of a Shape instance','2010-02-23 15:49:04','19900','system','2010-02-23 15:49:04','19900','system',0,0,0,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,0,0,0,0,0,'NYNYNYYNNNNN','NONE',NULL,NULL,NULL,NULL,NULL),
@@ -249,6 +250,35 @@ CREATE TABLE  `Chime`.`DataInstance_Number` (
 LOCK TABLES `DataInstance_Number` WRITE;
 UNLOCK TABLES;
 /*!40000 ALTER TABLE `DataInstance_Number` ENABLE KEYS */;
+
+
+--
+-- Definition of table `Chime`.`DataInstance_Timestamp`
+--
+
+DROP TABLE IF EXISTS `Chime`.`DataInstance_Timestamp`;
+CREATE TABLE  `Chime`.`DataInstance_Timestamp` (
+  `ID` varchar(40) NOT NULL,
+  `INSTANCE_ID` varchar(40) DEFAULT NULL,
+  `DATATYPE_ID` varchar(40) DEFAULT NULL,
+  `DATATYPE_COLUMN` int(11) DEFAULT NULL,
+  `VALUE` timestamp NULL,
+  `TIMESTAMP` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `POSITION` int(11) DEFAULT NULL,
+  PRIMARY KEY (`ID`),
+  KEY `IDX98` (`INSTANCE_ID`,`DATATYPE_ID`),
+  KEY `IDX97` (`DATATYPE_ID`),
+  KEY `IDX96` (`INSTANCE_ID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+--
+-- Dumping data for table `Chime`.`DataInstance_Timestamp`
+--
+
+/*!40000 ALTER TABLE `DataInstance_Timestamp` DISABLE KEYS */;
+LOCK TABLES `DataInstance_Timestamp` WRITE;
+UNLOCK TABLES;
+/*!40000 ALTER TABLE `DataInstance_Timestamp` ENABLE KEYS */;
 
 
 --

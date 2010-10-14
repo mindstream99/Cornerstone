@@ -42,4 +42,10 @@ public class NotificationUtils {
         return url;
     }
 
+    public static String toChimeUrl(InstanceId instanceId, String text) {
+        String url = "<a href=\"chime://#detail:" + instanceId + "\">" + text + "</a>";
+
+        return url;
+    }
+
 }

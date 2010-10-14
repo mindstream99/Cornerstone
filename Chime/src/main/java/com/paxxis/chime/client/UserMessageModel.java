@@ -20,6 +20,7 @@ package com.paxxis.chime.client;
 import java.io.Serializable;
 
 import com.extjs.gxt.ui.client.data.BaseTreeModel;
+import com.paxxis.chime.client.common.InstanceId;
 import com.paxxis.chime.client.common.UserMessage;
 
 /**
@@ -45,8 +46,34 @@ public class UserMessageModel extends BaseTreeModel implements Serializable {
         userMessage = msg;
         set(ID, userMessage.getId().getValue());
         set(SUBJECT, userMessage.getSubject());
-        set(BODY, userMessage.getBody().replaceAll("\n", "<br>"));
         set(TIMESTAMP, userMessage.getTimestamp().toLocaleString());
+
+        // convert chime: protocol urls
+
+        // TODO find out if the replacement of "\n" is needed.  I don't think so.
+        // I think they don't exist.
+        String html = userMessage.getBody().replaceAll("\n", "<br>");
+    	int idx;
+    	while (-1 != (idx = html.indexOf("<a href=\"chime://#detail:"))) {
+    		// find the instance id
+    		int idx2 = idx + 25;
+    		int idx3 = idx2 - 1;
+    		while (html.charAt(idx3) != '"') {
+    			idx3++;
+    		}
+    		String instStr = html.substring(idx2, idx3);
+    		InstanceId instId = InstanceId.create(instStr);
+    		idx2 = html.indexOf("</a>",idx3 + 1) + 4;
+    		
+			String text = html.substring(idx3 + 2, idx2 - 4);
+    		
+    		String part1 = html.substring(0, idx);
+    		String part2 = Utils.toHoverUrl(instId, text);
+    		String part3 = html.substring(idx2);
+    		html = part1 + part2 + part3;
+    	}
+
+        set(BODY, html);
     }
 
     public UserMessage getuserMessage() {

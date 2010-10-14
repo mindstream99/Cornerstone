@@ -79,12 +79,7 @@ class WatchNotificationProcessor extends MessageNotifier {
                         msg = new StringBuilder();
                     }
 
-                    String link = "";
-                    String urlHost = config.getStringValue("chime.notification.urlHost", "");
-                    if (!urlHost.isEmpty()) {
-                        link = NotificationUtils.toHoverUrl(urlHost, InstanceId.create(instanceId), instanceName);
-                    }
-
+                    String link = NotificationUtils.toChimeUrl(InstanceId.create(instanceId), instanceName);
                     String entry = "The data named " + link + " was updated on " + lastUpdate.toLocaleString();
                     msg.append(entry).append("<br>");
                 }

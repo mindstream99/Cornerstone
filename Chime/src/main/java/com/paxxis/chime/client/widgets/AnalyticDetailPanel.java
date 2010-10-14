@@ -21,15 +21,6 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.extjs.gxt.charts.client.model.ChartModel;
-import com.extjs.gxt.charts.client.model.Legend;
-import com.extjs.gxt.charts.client.model.Legend.Position;
-import com.extjs.gxt.charts.client.model.axis.XAxis;
-import com.extjs.gxt.charts.client.model.axis.YAxis;
-import com.extjs.gxt.charts.client.model.charts.BarChart;
-import com.extjs.gxt.charts.client.model.charts.FilledBarChart;
-import com.extjs.gxt.charts.client.model.charts.PieChart;
-import com.extjs.gxt.charts.client.model.charts.BarChart.BarStyle;
 import com.extjs.gxt.ui.client.Style.LayoutRegion;
 import com.extjs.gxt.ui.client.Style.Scroll;
 import com.extjs.gxt.ui.client.data.BaseTreeModel;
@@ -161,7 +152,6 @@ public class AnalyticDetailPanel extends LayoutContainer {
 
     public void showChartResult(final Table table, ChartType type, String title, int axisCol, int valueCol,
     		Integer minValue, Integer maxValue) {
-        //tableResultsContainer.removeAll();
     	
         if (tableResultsContainer.getItemCount() == 0) {
         	final ChimeChart chart = ChimeChartFactory.create(type, title, axisCol - 1, 
@@ -186,143 +176,6 @@ public class AnalyticDetailPanel extends LayoutContainer {
         ((CardLayout)resultsContainer.getLayout()).setActiveItem(tableResultsContainer);
     }
     
-    private ChartModel getBar3DChartData(Table table, String title, int axisCol, int valueCol, Integer minVal, Integer maxVal) {  
-    	ChartModel cm = new ChartModel(title,  
-			"font-size: 14px; font-family: Verdana; color:#ffff00;");  
-		cm.setBackgroundColour("#000077");  
-    	int rowCount = table.rowCount();
-		XAxis xa = new XAxis();  
-		YAxis ya = new YAxis();
-		double maxValue = 0.0;
-		if (maxVal != null) {
-			maxValue = maxVal;
-		}
-
-		double minValue = 0.0;
-		if (minVal != null) {
-			minValue = minVal;
-		}
-		
-		List<Number> values = new ArrayList<Number>();
-		for (int i = 0; i < rowCount; i++) {
-    		String text = table.getRow(i).get(axisCol).valueAsString();
-    		xa.addLabels(text);  
-
-    		double value = table.getRow(i).get(valueCol).valueAsDouble();
-    		values.add(value);
-    		
-    		if (maxVal == null && value > maxValue) {
-    			maxValue = value;
-    		}
-    		
-    		if (minVal == null && value < minValue) {
-    			minValue = value;
-    		}
-		}  
-		
-		xa.getLabels().setColour("#ffff00");  
-		xa.setGridColour("-1");  
-		xa.setColour("#aa5500");  
-		xa.setZDepth3D(5);  
-		cm.setXAxis(xa);
-		
-		ya.setMax(maxValue);
-		ya.setMin(minValue);
-		ya.setGridColour("-1");  
-		ya.setColour("#ffff00");  
-		cm.setYAxis(ya);  
-		
-		BarChart bchart = new BarChart(BarStyle.THREED);  
-		bchart.setColour("#CC6600");  
-		bchart.setTooltip("#val#");
-		
-		bchart.addValues(values);
-
-		cm.addChartConfig(bchart);  
-    	return cm;  
-    }      
-    
-    private ChartModel getBarChartData(Table table, String title, int axisCol, int valueCol, Integer minVal, Integer maxVal) {  
-    	ChartModel cm = new ChartModel(title,  
-		"font-size: 14px; font-family: Verdana; color:#ffff00;");  
-		cm.setBackgroundColour("#000077");  
-		int rowCount = table.rowCount();
-		XAxis xa = new XAxis();  
-		YAxis ya = new YAxis();
-		double maxValue = 0.0;
-		if (maxVal != null) {
-			maxValue = maxVal;
-		}
-		
-		double minValue = 0.0;
-		if (minVal != null) {
-			minValue = minVal;
-		}
-	
-		List<Number> values = new ArrayList<Number>();
-		for (int i = 0; i < rowCount; i++) {
-			String text = table.getRow(i).get(axisCol).valueAsString();
-			xa.addLabels(text);  
-	
-			double value = table.getRow(i).get(valueCol).valueAsDouble();
-			values.add(value);
-    		
-    		if (maxVal == null && value > maxValue) {
-    			maxValue = value;
-    		}
-    		
-    		if (minVal == null && value < minValue) {
-    			minValue = value;
-    		}
-		}  
-		
-		xa.getLabels().setColour("#ffff00");  
-		xa.setGridColour("-1");  
-		xa.setColour("#aa5500");  
-		cm.setXAxis(xa);  
-
-		ya.setMax(maxValue);
-		ya.setMin(minValue);
-		ya.setGridColour("-1");  
-		ya.setColour("#ffff00");  
-		cm.setYAxis(ya);  
-		
-		FilledBarChart bchart = new FilledBarChart();  
-		bchart.setColour("#CC6600");  
-		bchart.setTooltip("#val#");
-		
-		bchart.addValues(values);
-	
-		cm.addChartConfig(bchart);  
-		return cm;  
-    }      
-    
-    private ChartModel getPieChartData(Table table, String title, int axisCol, int valueCol) {  
-    	ChartModel cm = new ChartModel(title,  
-    		"font-size: 14px; font-family: Verdana; text-align: center;");  
-    	cm.setBackgroundColour("#fffff5");  
-    	Legend lg = new Legend(Position.RIGHT, true);  
-    	lg.setPadding(10);  
-    	//cm.setLegend(lg);  
-    	       
-    	PieChart pie = new PieChart();  
-    	pie.setAlpha(0.5f);  
-    	pie.setNoLabels(false);  
-    	//pie.setTooltip("#label# $#val#K<br>#percent#");  
-    	pie.setTooltip("#label# #val#");  
-    	pie.setColours("#ff0000", "#00aa00", "#0000ff", "#ff9900", "#ff00ff");  
-    	
-    	int rowCount = table.rowCount();
-    	for (int i = 0; i < rowCount; i++) {
-    		String text = table.getRow(i).get(axisCol).valueAsString();
-    		double value = table.getRow(i).get(valueCol).valueAsDouble();
-        	pie.addSlices(new PieChart.Slice(value, text, text));  
-    	}
-    	  
-    	cm.addChartConfig(pie);  
-    	return cm;  
-    }      
-    
     public void showResult(Table table) {
         tableResultsContainer.removeAll();
 
@@ -341,6 +194,8 @@ public class AnalyticDetailPanel extends LayoutContainer {
             column.setId(String.valueOf(i));
             column.setHeader(colNames.get(i).valueAsString());
             column.setWidth(150);
+            column.setSortable(false);
+            column.setMenuDisabled(true);
             configs.add(column);
         }
 
@@ -348,9 +203,10 @@ public class AnalyticDetailPanel extends LayoutContainer {
         Grid<TableRowModel> grid = new Grid<TableRowModel>(store, cm);
         grid.setStyleAttribute("borderTop", "none");
         grid.setAutoExpandColumn(String.valueOf(colNames.size() - 1));
+        grid.getView().setAutoFill(true);
         grid.setBorders(true);
 
-        tableResultsContainer.add(grid);
+        tableResultsContainer.add(grid, new RowData(1, 1));
         tableResultsContainer.layout();
         ((CardLayout)resultsContainer.getLayout()).setActiveItem(tableResultsContainer);
     }

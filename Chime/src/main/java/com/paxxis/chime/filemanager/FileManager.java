@@ -17,8 +17,6 @@
 
 package com.paxxis.chime.filemanager;
 
-import com.paxxis.chime.json.JSONObject;
-import eu.medsea.mimeutil.MimeUtil;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -26,23 +24,31 @@ import java.io.OutputStream;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
+
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.FileItemFactory;
 import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 
+import com.paxxis.chime.json.JSONObject;
+
+import eu.medsea.mimeutil.MimeUtil;
+
 /**
  *
  * @author Robert Englander
  */
 public class FileManager extends HttpServlet {
-    private static class FileItemResponse {
+	private static final long serialVersionUID = 1L;
+
+	private static class FileItemResponse {
         FileItem item;
         boolean isImage;
 
@@ -56,7 +62,7 @@ public class FileManager extends HttpServlet {
     public void init(ServletConfig config) throws ServletException {
         super.init(config);
 
-        // grab the attributes from the context
+        MimeUtil.registerMimeDetector("eu.medsea.mimeutil.detector.MagicMimeMimeDetector");
     }
    
     /** 
@@ -80,7 +86,7 @@ public class FileManager extends HttpServlet {
                 out.write(buffer, 0, cnt);
             }
 
-            MimeUtil.registerMimeDetector("eu.medsea.mimeutil.detector.MagicMimeMimeDetector");
+            @SuppressWarnings("unchecked")
             Collection mimeTypes = MimeUtil.getMimeTypes("./filestore/" + fileId);
             String mimeType = mimeTypes.toArray()[0].toString();
 
@@ -91,7 +97,6 @@ public class FileManager extends HttpServlet {
         }
     } 
 
-    // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
     /** 
      * Handles the HTTP <code>GET</code> method.
      * @param request servlet request
@@ -112,13 +117,12 @@ public class FileManager extends HttpServlet {
      * @throws ServletException if a servlet-specific error occurs
      * @throws IOException if an I/O error occurs
      */
-    @Override
+	@Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
     throws ServletException, IOException {
         response.setContentType("text/html");
 
         // get the json payload that has the message content
-        //
         FileItemResponse uploadItem = getFileItem(request);
         if(uploadItem == null) {
             response.getWriter().write("NO-DATA");
@@ -150,7 +154,7 @@ public class FileManager extends HttpServlet {
         }
 
         try {
-            MimeUtil.registerMimeDetector("eu.medsea.mimeutil.detector.MagicMimeMimeDetector");
+            @SuppressWarnings("unchecked")
             Collection mimeTypes = MimeUtil.getMimeTypes("./filestore/" + token.toUpperCase());
             if (mimeTypes.size() > 0) {
                 String mimeType = mimeTypes.toArray()[0].toString();
@@ -170,7 +174,10 @@ public class FileManager extends HttpServlet {
         ServletFileUpload upload = new ServletFileUpload(factory);
 
         try {
+            @SuppressWarnings("unchecked")
             List items = upload.parseRequest(req);
+
+            @SuppressWarnings("unchecked")
             Iterator it = items.iterator();
 
             while(it.hasNext()) {
@@ -199,6 +206,6 @@ public class FileManager extends HttpServlet {
     @Override
     public String getServletInfo() {
         return "The Chime file upload manager";
-    }// </editor-fold>
+    }
 
 }

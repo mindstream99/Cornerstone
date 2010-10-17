@@ -19,6 +19,7 @@ package com.paxxis.chime.client.widgets;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import com.extjs.gxt.ui.client.Style.LayoutRegion;
@@ -36,11 +37,13 @@ import com.extjs.gxt.ui.client.widget.layout.CardLayout;
 import com.extjs.gxt.ui.client.widget.layout.FitLayout;
 import com.extjs.gxt.ui.client.widget.layout.RowData;
 import com.extjs.gxt.ui.client.widget.layout.RowLayout;
+import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.DeferredCommand;
 import com.paxxis.chime.client.common.DataField;
 import com.paxxis.chime.client.common.DataFieldValue;
 import com.paxxis.chime.client.common.DataInstance;
+import com.paxxis.chime.client.common.cal.DateVariable;
 import com.paxxis.chime.client.common.cal.IValue;
 import com.paxxis.chime.client.common.cal.Table;
 import com.paxxis.chime.client.widgets.charts.ChimeChart;
@@ -61,7 +64,15 @@ class TableRowModel extends BaseTreeModel implements Serializable {
         // the column header index defines the property names
         int cnt = table.columnCount();
         for (int i = 0; i < cnt; i++) {
-            set(String.valueOf(i), row.get(i).valueAsString());
+        	IValue iVal = row.get(i);
+        	String displayText;
+        	if (iVal instanceof DateVariable) {
+                DateTimeFormat dtf = DateTimeFormat.getFormat("MMM d, yyyy");
+                displayText = dtf.format((Date)iVal.valueAsObject());
+        	} else {
+        		displayText = iVal.valueAsString();        	}
+
+        	set(String.valueOf(i), displayText);
         }
     }
 }

@@ -17,7 +17,6 @@
 
 package com.paxxis.chime.client;
 
-import com.extjs.gxt.ui.client.GXT;
 import com.extjs.gxt.ui.client.Style.HorizontalAlignment;
 import com.extjs.gxt.ui.client.event.ButtonEvent;
 import com.extjs.gxt.ui.client.event.MenuEvent;
@@ -220,28 +219,10 @@ public class HeaderPanel extends LayoutContainer
         bar.add(create);
         bar.add(login);
 
-        if (GXT.isIE)
-        {
-            LayoutContainer cont = new LayoutContainer();
-            cont.setLayout(new FilledColumnLayout(HorizontalAlignment.RIGHT));
-
-            LayoutContainer filler = new LayoutContainer();
-            filler.setStyleAttribute("backgroundColor", "transparent");
-
-            cont.add(filler, new FilledColumnLayoutData(-1));
-            cont.add(bar, new FilledColumnLayoutData(-1));
-            cont.setWidth(250);
-
-            //add(cont, "#endslice-header-toolbar");
-        }
-        else
-        {
-            //add(bar, "#endslice-header-toolbar");
-        	LayoutContainer lc = new LayoutContainer();
-        	lc.setLayout(new RowLayout());
-        	lc.add(bar, new RowData(1, -1, new Margins(5)));
-            add(lc, new ColumnData(0.7)); 
-        }
+    	LayoutContainer lc = new LayoutContainer();
+    	lc.setLayout(new RowLayout());
+    	lc.add(bar, new RowData(1, -1, new Margins(5)));
+        add(lc, new ColumnData(0.7)); 
 
         updateActionMenu();
         updateButtonState();

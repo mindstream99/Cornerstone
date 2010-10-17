@@ -59,6 +59,14 @@ public class FieldDataUtils {
             }
 
             result = DataInstanceUtils.getInstance(instance.getId(), user, database, true, false);
+
+            if (fieldData.size() > 0) {
+                FieldData fd = fieldData.get(0);
+                StringBuilder builder = new StringBuilder();
+                builder.append("Added ").append(fd.shape.getName()).append(" : ").append(fd.field.getName()).append(" data");
+                HistoryUtils.writeEvent(HistoryUtils.HistoryEventType.Modify, builder.toString(), instance, user, database);
+            }
+
             database.commitTransaction();
         }
         catch (Exception e)
@@ -84,6 +92,12 @@ public class FieldDataUtils {
             }
 
             result = DataInstanceUtils.getInstance(instance.getId(), user, database, true, false);
+            if (fieldData.size() > 0) {
+                FieldData fd = fieldData.get(0);
+                StringBuilder builder = new StringBuilder();
+                builder.append("Removed ").append(fd.shape.getName()).append(" : ").append(fd.field.getName()).append(" data");
+                HistoryUtils.writeEvent(HistoryUtils.HistoryEventType.Modify, builder.toString(), instance, user, database);
+            }
             database.commitTransaction();
         }
         catch (Exception e)
@@ -109,6 +123,12 @@ public class FieldDataUtils {
             }
 
             result = DataInstanceUtils.getInstance(instance.getId(), user, database, true, false);
+            if (fieldData.size() > 0) {
+                FieldData fd = fieldData.get(0);
+                StringBuilder builder = new StringBuilder();
+                builder.append("Modified ").append(fd.shape.getName()).append(" : ").append(fd.field.getName()).append(" data");
+                HistoryUtils.writeEvent(HistoryUtils.HistoryEventType.Modify, builder.toString(), instance, user, database);
+            }
             database.commitTransaction();
 
         }
@@ -187,6 +207,8 @@ public class FieldDataUtils {
                 ", " + colid +
                 ", " + value + 
                 ", " + position + ")";
+
+
         database.executeStatement(sql);
     }
 

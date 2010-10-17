@@ -85,7 +85,7 @@ public class CommentUtils
 
             DataInstanceUtils.modifyInstance(instance, sqlInserts, user, false, database);
 
-            HistoryUtils.writeEvent(HistoryUtils.HistoryEventType.Comment, instance, user, database);
+            HistoryUtils.writeEvent(HistoryUtils.HistoryEventType.Comment, "", instance, user, database);
 
             // the user is automatically subscribed when a comment is added
             //DataInstanceUtils.registerInterest(instance, user, true, database);

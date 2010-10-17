@@ -333,8 +333,6 @@ public class DataInstanceUtils {
             
             database.executeStatement(sql);
 
-            //String id = Tools.getPreviousId(database, Tools.getTableSet());
-
             // set the initial data types for the new instance
             int position = 1;
             for (Shape type : types) {
@@ -357,7 +355,7 @@ public class DataInstanceUtils {
                 ScopeUtils.applyScope(id, scope, database);
             }
             
-            HistoryUtils.writeEvent(HistoryUtils.HistoryEventType.Create, instance, user, database);
+            HistoryUtils.writeEvent(HistoryUtils.HistoryEventType.Create, "", instance, user, database);
             result = getInstance(id, user, database, true, false);
             database.commitTransaction();
         }

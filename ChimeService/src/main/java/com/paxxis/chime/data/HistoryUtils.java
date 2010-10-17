@@ -21,6 +21,7 @@ import com.paxxis.chime.client.common.DataInstance;
 import com.paxxis.chime.client.common.InstanceId;
 import com.paxxis.chime.client.common.User;
 import com.paxxis.chime.database.DatabaseConnection;
+import com.paxxis.chime.database.StringData;
 import com.paxxis.chime.service.Tools;
 
 /**
@@ -34,19 +35,22 @@ public class HistoryUtils {
         Modify,
         Review,
         Comment,
+        Discussion,
         Tag
     }
 
     private HistoryUtils() {}
 
-    public static void writeEvent(HistoryEventType type, DataInstance instance, User user, DatabaseConnection database) throws Exception {
+    public static void writeEvent(HistoryEventType type, String comment, DataInstance instance,
+            User user, DatabaseConnection database) throws Exception {
 
         InstanceId id = Tools.getNewId(Tools.DEFAULT_EXTID);
+        String cmt = new StringData(comment).asSQLValue();
         String sql = "insert into " + Tools.getTableSet() + "_History " +
-                "(id, instance_id, user_id, user_name, timestamp, eventType) values ('" +
+                "(id, instance_id, user_id, user_name, timestamp, eventType, comment) values ('" +
                 id + "', '" + instance.getId() +
                 "', '" + user.getId() + "', '" + user.getName() + "', CURRENT_TIMESTAMP" +
-                ", '" + type.toString() + "')";
+                ", '" + type.toString() + "'," + cmt + ")";
         database.executeStatement(sql);
     }
 }

@@ -80,6 +80,8 @@ public class DiscussionUtils
             DataInstanceUtils.modifyInstance(instance, sqlInserts, user, false, database);
 
             DataInstance data = DataInstanceUtils.getInstance(instance.getId(), user, database, true, false);
+            HistoryUtils.writeEvent(HistoryUtils.HistoryEventType.Discussion, "", instance, user, database);
+
             database.commitTransaction();
             return data;
         } catch (Exception e) {

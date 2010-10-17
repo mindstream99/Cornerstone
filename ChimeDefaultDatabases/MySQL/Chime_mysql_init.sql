@@ -200,6 +200,7 @@ CREATE TABLE  `Chime`.`DataInstance_History` (
   `USER_NAME` varchar(254) DEFAULT NULL,
   `EVENTTYPE` varchar(10) DEFAULT NULL,
   `TIMESTAMP` timestamp NULL DEFAULT NULL,
+  `COMMENT` mediumtext,
   PRIMARY KEY (`ID`),
   KEY `IDX5` (`TIMESTAMP`),
   KEY `IDX4` (`INSTANCE_ID`)
@@ -212,13 +213,13 @@ CREATE TABLE  `Chime`.`DataInstance_History` (
 /*!40000 ALTER TABLE `DataInstance_History` DISABLE KEYS */;
 LOCK TABLES `DataInstance_History` WRITE;
 INSERT INTO `Chime`.`DataInstance_History` VALUES  ('100000200','100000200','19900','system','Create','2010-02-26 10:33:11'),
- ('100000300','100000300','19800','admin','Create','2010-02-26 14:19:42'),
- ('100000400','100000400','19800','admin','Create','2010-05-15 12:08:59'),
- ('100000500','100000500','19800','admin','Create','2010-05-15 12:09:46'),
- ('100000600','100000600','19800','admin','Create','2010-05-15 12:10:37'),
- ('a8b23fcdd74a4fd0af7e7c89998601c100','a97381dce3d44e139823679460d2a5f100','19900','system','Create','2010-08-08 11:58:52'),
- ('be40a4e9e61b4f76a937db51ac4a8c9500','0a221845f6c9466f978def67cf999b8400','19900','system','Create','2010-08-07 17:37:05'),
- ('be9194d7079742a9bcf3320a41fb148500','f574d270d05146ba9fe55bbbeacec8e300','19900','system','Create','2010-08-08 11:53:37');
+ ('100000300','100000300','19800','admin','Create','2010-02-26 14:19:42',''),
+ ('100000400','100000400','19800','admin','Create','2010-05-15 12:08:59',''),
+ ('100000500','100000500','19800','admin','Create','2010-05-15 12:09:46',''),
+ ('100000600','100000600','19800','admin','Create','2010-05-15 12:10:37',''),
+ ('a8b23fcdd74a4fd0af7e7c89998601c100','a97381dce3d44e139823679460d2a5f100','19900','system','Create','2010-08-08 11:58:52',''),
+ ('be40a4e9e61b4f76a937db51ac4a8c9500','0a221845f6c9466f978def67cf999b8400','19900','system','Create','2010-08-07 17:37:05',''),
+ ('be9194d7079742a9bcf3320a41fb148500','f574d270d05146ba9fe55bbbeacec8e300','19900','system','Create','2010-08-08 11:53:37','');
 UNLOCK TABLES;
 /*!40000 ALTER TABLE `DataInstance_History` ENABLE KEYS */;
 

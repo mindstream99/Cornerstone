@@ -134,6 +134,7 @@ public class ReviewUtils
                         ", reviewedByAction = '" + reviewedAction + "'";
 
                 DataInstanceUtils.modifyInstance(instance, sqlInserts, false, user, database);
+                HistoryUtils.writeEvent(HistoryUtils.HistoryEventType.Review, "", instance, user, database);
                 dataSet.close();
             }
             

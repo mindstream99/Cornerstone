@@ -93,7 +93,7 @@ public class UserUtils {
 
             database.executeStatement(sql);
             result = getUserById(userId, user, database);
-            HistoryUtils.writeEvent(HistoryUtils.HistoryEventType.Modify, result, user, database);
+            HistoryUtils.writeEvent(HistoryUtils.HistoryEventType.Modify, "Password Changed", result, user, database);
             database.commitTransaction();
         } catch (Exception e) {
             database.rollbackTransaction();

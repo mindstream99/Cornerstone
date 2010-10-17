@@ -17,7 +17,6 @@
 
 package com.paxxis.chime.client.common.cal;
 
-import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -46,13 +45,6 @@ public class DateVariable extends RuleVariable implements IRuleObject
     private static enum Methods
     {
         after,
-        getDay,
-        getMonth,
-        getMonthName,
-        getYear,
-        getHour,
-        getMinutes,
-        getSeconds,
         setNow
     }
 
@@ -106,13 +98,6 @@ public class DateVariable extends RuleVariable implements IRuleObject
         switch (Methods.valueOf(name))
         {
             case after:
-            case getDay:
-            case getMonth:
-            case getMonthName:
-            case getYear:
-            case getHour:
-            case getMinutes:
-            case getSeconds:
                 return true;
         }
 
@@ -126,20 +111,6 @@ public class DateVariable extends RuleVariable implements IRuleObject
         {
             case after:
                 return 1;
-            case getMonth:
-                return 0;
-            case getMonthName:
-                return 0;
-            case getYear:
-                return 0;
-            case getDay:
-                return 0;
-            case getHour:
-                return 0;
-            case getMinutes:
-                return 0;
-            case getSeconds:
-                return 0;
             case setNow:
                 return 0;
         }
@@ -160,20 +131,6 @@ public class DateVariable extends RuleVariable implements IRuleObject
         {
             case after:
                 return isAfter(params);
-            case getMonth:
-                return getDateValue(params, Calendar.MONTH);
-            case getMonthName:
-                return getMonthName(params);
-            case getYear:
-                return getDateValue(params, Calendar.YEAR);
-            case getDay:
-                return getDateValue(params, Calendar.DAY_OF_MONTH);
-            case getHour:
-                return getDateValue(params, Calendar.HOUR);
-            case getMinutes:
-                return getDateValue(params, Calendar.MINUTE);
-            case getSeconds:
-                return getDateValue(params, Calendar.SECOND);
             case setNow:
                 setNow(params);
                 return new BooleanVariable(null, true);
@@ -182,20 +139,6 @@ public class DateVariable extends RuleVariable implements IRuleObject
         // maybe we ought to be throwing an exception here, since
         // this should never happen.
         return null;
-    }
-
-    public IValue getDateValue(List<IValue> params, int field)
-    {
-        Calendar cal = Calendar.getInstance();
-        cal.setTime(_value);
-        return new IntegerVariable(null, cal.get(field));
-    }
-
-    public IValue getMonthName(List<IValue> params)
-    {
-        Calendar cal = Calendar.getInstance();
-        cal.setTime(_value);
-        return new StringVariable(null, monthNames[cal.get(Calendar.MONTH)]);
     }
 
     public void setNow(List<IValue> params)

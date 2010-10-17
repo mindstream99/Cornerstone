@@ -17,7 +17,9 @@
 
 package com.paxxis.chime.client.common.cal;
 
+import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import com.paxxis.chime.client.common.DataField;
@@ -144,7 +146,13 @@ public class InstanceVariable extends RuleVariable implements IRuleObject {
         List<IValue> results = new ArrayList<IValue>();
         for (DataFieldValue val : vals) {
             if (val.isInternal()) {
-                StringVariable s = new StringVariable(null, val.getValue().toString());
+            	Serializable ser = val.getValue();
+            	IValue s;
+            	if (ser instanceof Date) {
+            		s = new DateVariable(null, (Date)ser);
+            	} else {
+                    s = new StringVariable(null, val.getValue().toString());
+            	}
                 results.add(s);
             } else {
                 InstanceVariable inst = new InstanceVariable();

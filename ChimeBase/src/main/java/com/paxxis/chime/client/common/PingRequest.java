@@ -22,7 +22,8 @@ package com.paxxis.chime.client.common;
  * @author Robert Englander
  */
 public class PingRequest extends RequestMessage {
-    private final static int VERSION = 1;
+	private static final long serialVersionUID = 1L;
+	private final static int VERSION = 1;
 
     @Override
     public MessageConstants.MessageType getMessageType() {
@@ -42,32 +43,22 @@ public class PingRequest extends RequestMessage {
         return VERSION;
     }
 
-    User _user = null;
-    InstanceId activeDetailId = InstanceId.create("-1");
-    InstanceId activePortalId = InstanceId.create("-1");
-    boolean sessionPing = true;
-    boolean userActivity = false;
+    private User _user = null;
+    private InstanceId activeId = InstanceId.create("-1");
+    private boolean sessionPing = true;
+    private boolean userActivity = false;
 
     public boolean isSessionPing() {
         return sessionPing;
     }
     
-    public void setActiveDetailInstanceId(InstanceId id) {
-        activeDetailId = id;
+    public void setActiveInstanceId(InstanceId id) {
+        activeId = id;
         sessionPing = false;
     }
 
-    public InstanceId getActiveDetailInstanceId() {
-        return activeDetailId;
-    }
-
-    public void setActivePortalInstanceId(InstanceId id) {
-        activePortalId = id;
-        sessionPing = false;
-    }
-
-    public InstanceId getActivePortalInstanceId() {
-        return activePortalId;
+    public InstanceId getActiveInstanceId() {
+        return activeId;
     }
 
     public void setUserActivity(boolean activity) {
@@ -78,13 +69,11 @@ public class PingRequest extends RequestMessage {
         return userActivity;
     }
 
-    public void setUser(User user)
-    {
+    public void setUser(User user) {
         _user = user;
     }
     
-    public User getUser()
-    {
+    public User getUser() {
         return _user;
     }
 }

@@ -29,7 +29,9 @@ import java.util.List;
  * @author Robert Englander
  */
 public class DataInstance implements Serializable {
-    public enum TagAction
+	private static final long serialVersionUID = 1L;
+
+	public enum TagAction
     {
         A, // Applied
         R  // Removed
@@ -47,8 +49,12 @@ public class DataInstance implements Serializable {
         FLOW
     }
 
-    private boolean isTransient = false;
+    // this property is set to true if the instance no longer exists.  this is used, for instance, during
+    // the ping process where a user might be looking at the detail of a data instance that has been
+    // deleted.  
+    private boolean isGone = false;
 
+    private boolean isTransient = false;
     private InstanceId _id = InstanceId.create("0");
     private String _name = null;
     private String _description = "";
@@ -107,6 +113,14 @@ public class DataInstance implements Serializable {
 
     public boolean isTransient() {
         return isTransient;
+    }
+    
+    public void setGone(boolean val) {
+    	isGone = val;
+    }
+    
+    public boolean isGone() {
+    	return isGone;
     }
     
     public void finishLoading(DataInstanceHelper helper, Object database)

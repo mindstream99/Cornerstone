@@ -17,9 +17,9 @@
 
 package com.paxxis.chime.service;
 
+import org.apache.log4j.Logger;
+
 import com.paxxis.chime.client.common.Cursor;
-import com.paxxis.chime.data.CacheManager;
-import com.paxxis.chime.data.DataInstanceUtils;
 import com.paxxis.chime.client.common.DataInstance;
 import com.paxxis.chime.client.common.ErrorMessage;
 import com.paxxis.chime.client.common.InstanceId;
@@ -29,11 +29,11 @@ import com.paxxis.chime.client.common.PingResponse;
 import com.paxxis.chime.client.common.User;
 import com.paxxis.chime.client.common.UserMessagesBundle;
 import com.paxxis.chime.common.MessagePayload;
+import com.paxxis.chime.data.CacheManager;
+import com.paxxis.chime.data.DataInstanceUtils;
 import com.paxxis.chime.data.UserMessageUtils;
-import com.paxxis.chime.data.UserUtils;
 import com.paxxis.chime.database.DatabaseConnection;
 import com.paxxis.chime.database.DatabaseConnectionPool;
-import org.apache.log4j.Logger;
 
 /**
  *
@@ -64,74 +64,64 @@ public class PingRequestProcessor extends MessageProcessor {
         // build up a response
         Message response = null;
         
-        boolean tryAgain = true;
+        PingResponse pingResponse = new PingResponse();
+        pingResponse.setRequest(requestMessage);
+        response = pingResponse;
         
-        while (tryAgain)
+        try
         {
-            tryAgain = false;
-            PingResponse lr = new PingResponse();
-            lr.setRequest(requestMessage);
-            response = lr;
-            
-            try
-            {
-                User user = requestMessage.getUser();
-                if (requestMessage.isSessionPing()) {
-                    if (user != null) {
-                        if (requestMessage.getUserActivity()) {
-                            if (CacheManager.instance().isExpiringUserSession(user)) {
-                                // saved :)
-                                CacheManager.instance().putUserSession(user);
-                                CacheManager.instance().removeExpiringUserSession(user);
-                                _logger.info("Ping received for user " + user.getName() + ". Session valid: " + true);
-                            } else {
-                                boolean result = null != CacheManager.instance().getUserSession(user);
-                                _logger.info("Ping received for user " + user.getName() + ". Session valid: " + result);
-                                if (result == false) {
-                                    lr.setExpired();
-                                }
-                            }
+            User user = requestMessage.getUser();
+            if (requestMessage.isSessionPing()) {
+                
+            	// TBD can user ever be null?
+            	if (user != null) {
+                    if (requestMessage.getUserActivity()) {
+                        if (CacheManager.instance().isExpiringUserSession(user)) {
+                            // saved :)
+                            CacheManager.instance().putUserSession(user);
+                            CacheManager.instance().removeExpiringUserSession(user);
+                            _logger.info("Ping received for user " + user.getName() + ". Session valid: " + true);
                         } else {
-                            if (CacheManager.instance().isExpiringUserSession(user)) {
-                                lr.setPendingTimeout(true);
-                                _logger.info("Ping received for user " + user.getName() + ". Session Expiring");
+                            boolean result = null != CacheManager.instance().getUserSession(user);
+                            _logger.info("Ping received for user " + user.getName() + ". Session valid: " + result);
+                            if (result == false) {
+                                pingResponse.setExpired();
                             }
                         }
-
-                    UserMessagesBundle bundle = UserMessageUtils.getMessages(user, new Cursor(DataInstanceUtils.USRMSGLIMIT), database);
-                    user.setUserMessagesBundle(bundle);
-                    //user = UserUtils.getUserById(user.getId(), user, database);
-                    lr.setUser(user);
-
-                    }
-                } else {
-                    // if the message includes an active detail id, fetch the instance and return it in the response
-                    InstanceId id = requestMessage.getActiveDetailInstanceId();
-                    if (!id.equals(InstanceId.create("-1"))) {
-                        DataInstance inst = DataInstanceUtils.getInstance(id, user, database, true, true);
-                        lr.setActiveDetailInstance(inst);
+                    } else {
+                        if (CacheManager.instance().isExpiringUserSession(user)) {
+                            pingResponse.setPendingTimeout(true);
+                            _logger.info("Ping received for user " + user.getName() + ". Session Expiring");
+                        }
                     }
 
-                    id = requestMessage.getActivePortalInstanceId();
-                    if (!id.equals(InstanceId.create("-1"))) {
-                        DataInstance inst = DataInstanceUtils.getInstance(id, user, database, true, true);
-                        lr.setActivePortalInstance(inst);
+                }
+            } else {
+                // if the message includes an active id, fetch the instance and return it in the response
+                InstanceId id = requestMessage.getActiveInstanceId();
+                if (!id.equals(InstanceId.create("-1"))) {
+                    DataInstance inst = DataInstanceUtils.getInstance(id, user, database, true, true);
+                    if (inst == null) {
+                        // this indicates that the data is gone
+                        inst = new DataInstance();
+                        inst.setId(id);
+                        inst.setGone(true);
                     }
-
-                    UserMessagesBundle bundle = UserMessageUtils.getMessages(user, new Cursor(DataInstanceUtils.USRMSGLIMIT), database);
-                    user.setUserMessagesBundle(bundle);
-                    //user = UserUtils.getUserById(user.getId(), user, database);
-                    lr.setUser(user);
                     
+                    pingResponse.setActiveInstance(inst);
                 }
             }
-            catch (Exception e)
-            {
-                _logger.error(e);
-                ErrorMessage em = new ErrorMessage();
-                em.setMessage(e.getMessage());
-                response = em;
-            }
+
+            // grab the latest user messages while we're here
+            UserMessagesBundle bundle = UserMessageUtils.getMessages(user, new Cursor(DataInstanceUtils.USRMSGLIMIT), database);
+            user.setUserMessagesBundle(bundle);
+            pingResponse.setUser(user);
+
+        } catch (Exception e) {
+            _logger.error(e);
+            ErrorMessage em = new ErrorMessage();
+            em.setMessage(e.getMessage());
+            response = em;
         }
 
         _pool.returnInstance(database, this);

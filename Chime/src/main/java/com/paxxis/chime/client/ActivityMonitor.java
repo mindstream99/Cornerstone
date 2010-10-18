@@ -190,9 +190,9 @@ public class ActivityMonitor {
                 {
                     PingResponse resp = response.getResponse();
 
-                    DataInstance inst = resp.getActivePortalInstance();
+                    DataInstance inst = resp.getActiveInstance();
                     if (inst != null) {
-                        // tell the portal page about this instance
+                        // tell the navigator about this instance
                         PageManager.instance().getActiveNavigatorPage().compareForRefresh(inst);
                     }
                     
@@ -212,7 +212,7 @@ public class ActivityMonitor {
 
         DataInstance inst = PageManager.instance().getActiveNavigatorInstance();
         if (inst != null) {
-            request.setActivePortalInstanceId(inst.getId());
+            request.setActiveInstanceId(inst.getId());
         }
 
         ServiceManager.getService().sendPingRequest(request, callback);

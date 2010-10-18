@@ -22,7 +22,8 @@ package com.paxxis.chime.client.common;
  * @author Robert Englander
  */
 public class PingResponse extends ResponseMessage<PingRequest> {
-    private final static int VERSION = 1;
+	private static final long serialVersionUID = 1L;
+	private final static int VERSION = 1;
 
     @Override
     public MessageConstants.MessageType getMessageType() {
@@ -42,11 +43,10 @@ public class PingResponse extends ResponseMessage<PingRequest> {
         return VERSION;
     }
 
-    DataInstance activeDetailInstance = null;
-    DataInstance activePortalInstance = null;
-    boolean pendingTimeout = false;
-    boolean expired = false;
-    User user;
+    private DataInstance activeInstance = null;
+    private boolean pendingTimeout = false;
+    private boolean expired = false;
+    private User user;
 
     public void setUser(User u) {
         user = u;
@@ -72,20 +72,12 @@ public class PingResponse extends ResponseMessage<PingRequest> {
         return pendingTimeout;
     }
     
-    public void setActiveDetailInstance(DataInstance inst) {
-        activeDetailInstance = inst;
+    public void setActiveInstance(DataInstance inst) {
+        activeInstance = inst;
     }
 
-    public DataInstance getActiveDetailInstance() {
-        return activeDetailInstance;
-    }
-
-    public void setActivePortalInstance(DataInstance inst) {
-        activePortalInstance = inst;
-    }
-
-    public DataInstance getActivePortalInstance() {
-        return activePortalInstance;
+    public DataInstance getActiveInstance() {
+        return activeInstance;
     }
 }
 

@@ -23,10 +23,9 @@ import java.util.Date;
 import java.util.List;
 
 import com.extjs.gxt.ui.client.Style.LayoutRegion;
+import com.extjs.gxt.ui.client.event.Listener;
 import com.extjs.gxt.ui.client.util.Margins;
 import com.extjs.gxt.ui.client.widget.ContentPanel;
-import com.extjs.gxt.ui.client.widget.Info;
-import com.extjs.gxt.ui.client.widget.InfoConfig;
 import com.extjs.gxt.ui.client.widget.layout.BorderLayout;
 import com.extjs.gxt.ui.client.widget.layout.BorderLayoutData;
 import com.extjs.gxt.ui.client.widget.layout.FitLayout;
@@ -66,6 +65,7 @@ import com.paxxis.chime.client.common.User;
 import com.paxxis.chime.client.common.DataInstanceRequest.Depth;
 import com.paxxis.chime.client.common.EditDataInstanceRequest.Operation;
 import com.paxxis.chime.client.common.portal.PortalTemplate;
+import com.paxxis.chime.client.pages.PageManager.StaticPageType;
 import com.paxxis.chime.client.portal.InstanceHeaderPortlet;
 import com.paxxis.chime.client.portal.PagePortlet;
 import com.paxxis.chime.client.portal.PortalContainer;
@@ -74,6 +74,7 @@ import com.paxxis.chime.client.portal.UpdateReason;
 import com.paxxis.chime.client.portal.UserMessagesPortlet;
 import com.paxxis.chime.client.widgets.ChimeLayoutContainer;
 import com.paxxis.chime.client.widgets.ChimeMessageBox;
+import com.paxxis.chime.client.widgets.ChimeMessageBoxEvent;
 
 /**
  *
@@ -241,28 +242,48 @@ public class DataDetailPanel extends ChimeLayoutContainer implements InstanceUpd
     public void compareForRefresh(DataInstance instance) {
     	try {
             if (_dataInstance.getId().equals(instance.getId())) {
-            	if (userMessagesUpdated(instance)) {
-                	if (isVisible()) {
-                        UserMessagesPortlet portlet = _portal.getUserMessagesPortlet();
-                        if (portlet != null) {
-                            portlet.setStale();
-                        }
+            	if (instance.isGone()) {
+            		informGone();
+            	} else {
+                	if (userMessagesUpdated(instance)) {
+                    	if (isVisible()) {
+                            UserMessagesPortlet portlet = _portal.getUserMessagesPortlet();
+                            if (portlet != null) {
+                                portlet.setStale();
+                            }
+                    	}
                 	}
+                	
+                    if (instance.getUpdated().after(_dataInstance.getUpdated())) {
+                    	if (isVisible()) {
+                    		doRefresh(instance);
+                    	} else {
+                    		refreshInstance = instance;
+                    	}
+                    }
             	}
-            	
-                if (instance.getUpdated().after(_dataInstance.getUpdated())) {
-                	if (isVisible()) {
-                		doRefresh(instance);
-                	} else {
-                		refreshInstance = instance;
-                	}
-                }
             }
     	} catch (Exception e) {
     		
     	}
     }
 
+    /**
+     * Informs the user that the current data instance is gone, and takes the user to his/her
+     * home after the user acknowledges the message.
+     */
+    private void informGone() {
+    	Listener<ChimeMessageBoxEvent> listener = new Listener<ChimeMessageBoxEvent>() {
+			@Override
+			public void handleEvent(ChimeMessageBoxEvent evt) {
+                PageManager.instance().open(StaticPageType.Navigator, true);
+			}
+    	};
+
+    	String msg = "The data you are viewing has been removed.";
+    	ChimeMessageBox.alert("Chime", msg, listener);
+    }
+    
     private boolean userMessagesUpdated(DataInstance newInstance) {
     	boolean result = false;
     	

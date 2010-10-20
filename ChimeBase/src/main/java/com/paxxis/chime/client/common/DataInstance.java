@@ -29,7 +29,7 @@ import java.util.List;
  * @author Robert Englander
  */
 public class DataInstance implements Serializable {
-	private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 2L;
 
 	public enum TagAction
     {
@@ -733,9 +733,14 @@ public class DataInstance implements Serializable {
      * @return the last value, or null if no values exist
      */
     public Serializable getLastFieldValue(String fieldName) {
-        Shape shape = getShapes().get(0);
+    	Serializable result = null;
+    	Shape shape = getShapes().get(0);
         DataField field = shape.getField(fieldName);
-        return getLastFieldValue(shape, field);
+        if (field != null) {
+           result = getLastFieldValue(shape, field);
+        }
+        
+        return result;
     }
 
     /**
@@ -762,10 +767,15 @@ public class DataInstance implements Serializable {
      * @param force if force is true and the field has already reached its max values, the
      * first value will be dropped to make room for the new value at the end of the list
      */
-    public void appendFieldValue(String fieldName, Serializable value, boolean force) {
+    public boolean appendFieldValue(String fieldName, Serializable value, boolean force) {
+    	boolean appended = false;
         Shape shape = getShapes().get(0);
         DataField field = shape.getField(fieldName);
-        appendFieldValue(shape, field, value, force);
+        if (field != null) {
+            appended = appendFieldValue(shape, field, value, force);
+        }
+        
+        return appended;
     }
 
     /**
@@ -776,8 +786,9 @@ public class DataInstance implements Serializable {
      * @param force if force is true and the field has already reached its max values, the
      * first value will be dropped to make room for the new value at the end of the list
      */
-    public void appendFieldValue(Shape shape, DataField field, Serializable value, boolean force) {
-        List<DataFieldValue> values = getFieldValues(shape, field);
+    public boolean appendFieldValue(Shape shape, DataField field, Serializable value, boolean force) {
+        boolean appended = false;
+    	List<DataFieldValue> values = getFieldValues(shape, field);
         boolean okToAdd = true;
 
         // remember that a max of 0 means there's no constraint on the number
@@ -792,28 +803,54 @@ public class DataInstance implements Serializable {
         }
 
         if (okToAdd) {
-            DataFieldValue newVal = new DataFieldValue(String.valueOf(value), field.getShape().getId(), InstanceId.UNKNOWN, null);
-            values.add(newVal);
-            setFieldValues(shape, field, values);
+            DataFieldValue val;
+            if (value instanceof DataInstance) {
+            	DataInstance inst = (DataInstance)value;
+                val = new DataFieldValue(inst.getId(), inst.getName(), field.getShape().getId(), InstanceId.UNKNOWN, null);
+            } else {
+                val = new DataFieldValue(value, field.getShape().getId(), InstanceId.UNKNOWN, null);
+            }
+            
+            values.add(val);
+            appended = setFieldValues(shape, field, values);
         }
+        
+        return appended;
     }
 
-    public void setFieldValues(String fieldName, Serializable ser) {
-        List<DataFieldValue> vals = new ArrayList<DataFieldValue>();
+    public boolean setFieldValues(String fieldName, Serializable ser) {
+        boolean result = false;
+    	List<DataFieldValue> vals = new ArrayList<DataFieldValue>();
         Shape shape = getShapes().get(0);
         DataField field = shape.getField(fieldName);
-        DataFieldValue value = new DataFieldValue(String.valueOf(ser), field.getShape().getId(), InstanceId.UNKNOWN, null);
-        vals.add(value);
-        setFieldValues(shape, field, vals);
+        if (field != null) {
+            DataFieldValue value;
+            if (ser instanceof DataInstance) {
+            	DataInstance inst = (DataInstance)ser;
+                value = new DataFieldValue(inst.getId(), inst.getName(), field.getShape().getId(), InstanceId.UNKNOWN, null);
+            } else {
+                value = new DataFieldValue(ser, field.getShape().getId(), InstanceId.UNKNOWN, null);
+            }
+            
+            vals.add(value);
+            result = setFieldValues(shape, field, vals);
+        }
+        
+        return result;
     }
 
-    public void setFieldValues(String fieldName, List<DataFieldValue> values) {
-        Shape shape = getShapes().get(0);
+    public boolean setFieldValues(String fieldName, List<DataFieldValue> values) {
+        boolean result = false;
+    	Shape shape = getShapes().get(0);
         DataField field = shape.getField(fieldName);
-        setFieldValues(shape, field, values);
+        if (field != null) {
+            result = setFieldValues(shape, field, values);
+        }
+        
+        return result;
     }
 
-    public void setFieldValues(Shape shape, DataField field, List<DataFieldValue> values) {
+    public boolean setFieldValues(Shape shape, DataField field, List<DataFieldValue> values) {
         HashMap<String, List<DataFieldValue>> outer = _fieldValues.get(shape.getId());
         if (outer == null) {
             outer = new HashMap<String, List<DataFieldValue>>();
@@ -821,6 +858,7 @@ public class DataInstance implements Serializable {
         }
 
         outer.put(field.getId(), values);
+        return true;
     }
 
     public List<DataFieldValue> getFieldValues(String fieldName) {

@@ -73,7 +73,6 @@ public class PingRequestProcessor extends MessageProcessor {
             User user = requestMessage.getUser();
             if (requestMessage.isSessionPing()) {
                 
-            	// TBD can user ever be null?
             	if (user != null) {
                     if (requestMessage.getUserActivity()) {
                         if (CacheManager.instance().isExpiringUserSession(user)) {
@@ -112,10 +111,12 @@ public class PingRequestProcessor extends MessageProcessor {
                 }
             }
 
-            // grab the latest user messages while we're here
-            UserMessagesBundle bundle = UserMessageUtils.getMessages(user, new Cursor(DataInstanceUtils.USRMSGLIMIT), database);
-            user.setUserMessagesBundle(bundle);
-            pingResponse.setUser(user);
+            if (user != null) {
+                // grab the latest user messages while we're here
+                UserMessagesBundle bundle = UserMessageUtils.getMessages(user, new Cursor(DataInstanceUtils.USRMSGLIMIT), database);
+                user.setUserMessagesBundle(bundle);
+                pingResponse.setUser(user);
+            }
 
         } catch (Exception e) {
             _logger.error(e);

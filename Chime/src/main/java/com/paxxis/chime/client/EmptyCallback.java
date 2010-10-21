@@ -17,15 +17,13 @@
 
 package com.paxxis.chime.client;
 
-import com.google.gwt.user.client.rpc.AsyncCallback;
 
 /**
  * 
  * @author Robert Englander
  *
  */
-@SuppressWarnings("unchecked")
-public class EmptyCallback implements AsyncCallback<Object> {
+public class EmptyCallback extends ChimeAsyncCallback<Object> {
 
 	private static final EmptyCallback INSTANCE = new EmptyCallback();
 	
@@ -34,10 +32,6 @@ public class EmptyCallback implements AsyncCallback<Object> {
 	}
 	
 	private EmptyCallback() {
-	}
-
-	@Override  
-	public void onFailure(Throwable caught) {
 	}
 
 	@Override

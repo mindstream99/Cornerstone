@@ -889,27 +889,16 @@ public class DataInstanceComboBox extends TwinTriggerField<DataInstanceModel> im
         _searchable = searchable;
         lastStartsWith = null;
 
-        AsyncCallback callback = new AsyncCallback() {
-            public void onFailure(Throwable result) {
-            }
-
-            public void onSuccess(final Object result) {
-                ShapeResponseObject resp = (ShapeResponseObject)result;
+        ChimeAsyncCallback<ShapeResponseObject> callback = 
+        		new ChimeAsyncCallback<ShapeResponseObject>() {
+            public void onSuccess(ShapeResponseObject resp) {
                 if (resp.isResponse()) {
                 	dataShape = resp.getResponse().getShape();
                     if (getValue() != null)
                     {
                         setValue((DataInstanceModel)null);
-                    }
-                    else
-                    {
-                        setRawValue("");
-                    }
-                    
-                    if (_searchable) {
-                        //addTrigger();
                     } else {
-                        //removeTrigger();
+                        setRawValue("");
                     }
                 }
             }
@@ -1134,17 +1123,13 @@ public class DataInstanceComboBox extends TwinTriggerField<DataInstanceModel> im
       setRawValue(getPropertyEditor().getStringValue(value));
     }
 
-    AsyncCallback callback = new AsyncCallback() {
-        public void onFailure(Throwable result) {
-        }
-
-        public void onSuccess(final Object result) {
-            ShapeResponseObject resp = (ShapeResponseObject)result;
+    ChimeAsyncCallback<ShapeResponseObject> callback = 
+    		new ChimeAsyncCallback<ShapeResponseObject>() {
+        public void onSuccess(ShapeResponseObject resp) {
             if (resp.isResponse()) {
             	dataShape = resp.getResponse().getShape();
                 eventPreview.getIgnoreList().add(getElement());
                 eventPreview.getIgnoreList().add(view.getElement());
-
             }
         }
     };
@@ -1193,12 +1178,9 @@ protected void onSelect(DataInstanceModel model)
    }
 
     protected void notifyFullInstance(DataInstance instance) {
-        AsyncCallback callback = new AsyncCallback() {
-            public void onFailure(Throwable result) {
-            }
-
-            public void onSuccess(final Object result) {
-                DataInstanceResponseObject resp = (DataInstanceResponseObject)result;
+        ChimeAsyncCallback<DataInstanceResponseObject> callback = 
+        		new ChimeAsyncCallback<DataInstanceResponseObject>() {
+            public void onSuccess(DataInstanceResponseObject resp) {
                 final DataInstanceResponse response = resp.getResponse();
                 List<DataInstance> instances = response.getDataInstances();
                 _dataInstanceListener.onDataInstance(instances.get(0));
@@ -1316,92 +1298,81 @@ protected void onSelect(DataInstanceModel model)
     {
         // it's very possible that the user has made a selection that is not the currently
         // selected item in the view.  so go query the server for user's selection.
-        AsyncCallback callback = new AsyncCallback()
-        {
-            public void onFailure(Throwable result) 
-            {
-            }
+        ChimeAsyncCallback<DataInstanceResponseObject> callback = 
+        		new ChimeAsyncCallback<DataInstanceResponseObject>() {
+            public void onSuccess(DataInstanceResponseObject resp) {
+                final DataInstanceResponse response = resp.getResponse();
+                List<DataInstance> instances = response.getDataInstances();
 
-            public void onSuccess(final Object result) 
-            {
-                if (true) //result instanceof DataInstanceResponseObject)
+                // multiple hits, let's see if there's any exact matches in there
+                String name = response.getRequest().getQueryParameters().get(0).fieldValue.toString();
+
+                List<DataInstance> exactMatches = new ArrayList<DataInstance>();
+                if (dataIsId) {
+                	exactMatches.add(instances.get(0));
+                } else {
+                    for (DataInstance instance : instances)
+                    {
+                        if (name.equalsIgnoreCase(instance.getName()))
+                        {
+                            exactMatches.add(instance);
+                        }
+                    }
+                }
+
+                int ct = exactMatches.size();
+                if (ct == 1) 
                 {
-                    DataInstanceResponseObject resp = (DataInstanceResponseObject)result;
-                    final DataInstanceResponse response = resp.getResponse();
-                    List<DataInstance> instances = response.getDataInstances();
-
-                    // multiple hits, let's see if there's any exact matches in there
-                    String name = response.getRequest().getQueryParameters().get(0).fieldValue.toString();
-
-                    List<DataInstance> exactMatches = new ArrayList<DataInstance>();
-                    if (dataIsId) {
-                    	exactMatches.add(instances.get(0));
+                    // got it!
+                	DataInstance inst = exactMatches.get(0);
+                    notifyQueryProvider(inst);
+                    
+                    // it's possible that the store is empty, which can happen if the applyInput method was called
+                    // without the find instances being needed.  if this is the case, we add a new model to the store
+                    // so that it can be the selected one in the view
+                    DataInstanceModel model;
+                    List<DataInstanceModel> models = store.getModels();
+                    if (models.size() == 0) {
+                    	model = new DataInstanceModel(inst, false, 1, false);
+                    	store.add(model);
                     } else {
-                        for (DataInstance instance : instances)
-                        {
-                            if (name.equalsIgnoreCase(instance.getName()))
-                            {
-                                exactMatches.add(instance);
-                            }
-                        }
+                        model = store.findModel("id", exactMatches.get(0).getId().getValue());
                     }
-
-                    int ct = exactMatches.size();
-                    if (ct == 1) 
-                    {
-                        // got it!
-                    	DataInstance inst = exactMatches.get(0);
-                        notifyQueryProvider(inst);
-                        
-                        // it's possible that the store is empty, which can happen if the applyInput method was called
-                        // without the find instances being needed.  if this is the case, we add a new model to the store
-                        // so that it can be the selected one in the view
-                        DataInstanceModel model;
-                        List<DataInstanceModel> models = store.getModels();
-                        if (models.size() == 0) {
-                        	model = new DataInstanceModel(inst, false, 1, false);
-                        	store.add(model);
-                        } else {
-                            model = store.findModel("id", exactMatches.get(0).getId().getValue());
-                        }
-                        
-                        onSelect(model);
-                        clearValidation();
-                    }
-                    else if (ct == 0)
-                    {
-                        if (_useValidation)
-                        {
-                            setValidator(new DataInstanceValidator(""));
-                            _dataInstanceListener.onDataInstance(null);
-                            validate();
-                            //setValidator(null);
-
-                            if (keepFocus)
-                            {
-                                focus();
-                            }
-                        }
-                        else
-                        {
-                            if (isExpanded()) 
-                            {
-                                collapse();
-                            } 
-                
-                            _dataInstanceListener.onStringData(rawData);
-                        }
-                        
-                    }
-                    else
+                    
+                    onSelect(model);
+                    clearValidation();
+                }
+                else if (ct == 0)
+                {
+                    if (_useValidation)
                     {
                         setValidator(new DataInstanceValidator(""));
+                        _dataInstanceListener.onDataInstance(null);
                         validate();
                         //setValidator(null);
+
                         if (keepFocus)
                         {
                             focus();
                         }
+                    }
+                    else
+                    {
+                        if (isExpanded()) 
+                        {
+                            collapse();
+                        } 
+            
+                        _dataInstanceListener.onStringData(rawData);
+                    }
+                    
+                }
+                else
+                {
+                    setValidator(new DataInstanceValidator(""));
+                    validate();
+                    if (keepFocus) {
+                        focus();
                     }
                 }
             }
@@ -1409,7 +1380,6 @@ protected void onSelect(DataInstanceModel model)
 
         DataInstanceRequest req = new DataInstanceRequest();
         req.setCursor(new Cursor(100));
-        //req.setDataShape(dataShape);
         req.setClauseOperator(ClauseOperator.MatchAll);
         req.setDepth(Depth.Shallow);
         req.setUser(ServiceManager.getActiveUser());
@@ -1420,8 +1390,7 @@ protected void onSelect(DataInstanceModel model)
         }
         ServiceManager.getService().sendDataInstanceRequest(req, callback);
                 
-        if (keepFocus)
-        {
+        if (keepFocus) {
             focus();
         }
         

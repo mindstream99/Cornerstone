@@ -34,7 +34,7 @@ import com.extjs.gxt.ui.client.widget.layout.FlowData;
 import com.extjs.gxt.ui.client.widget.layout.FlowLayout;
 import com.extjs.gxt.ui.client.widget.layout.RowData;
 import com.extjs.gxt.ui.client.widget.layout.RowLayout;
-import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.paxxis.chime.client.ChimeAsyncCallback;
 import com.paxxis.chime.client.FilledColumnLayout;
 import com.paxxis.chime.client.FilledColumnLayoutData;
 import com.paxxis.chime.client.InstanceUpdateListener;
@@ -126,22 +126,12 @@ public class TagsPanel extends ChimeLayoutContainer
 
     private void applyTag(Tag tag, boolean apply)
     {
-        final AsyncCallback callback = new AsyncCallback()
-        {
-            public void onFailure(Throwable arg0)
-            {
-                ChimeMessageBox.alert("System Error", "Please contact the system administrator.", null);
-            }
-
-            public void onSuccess(Object obj)
-            {
-                ServiceResponseObject<ApplyTagResponse> response = (ServiceResponseObject<ApplyTagResponse>)obj;
-                if (response.isResponse())
-                {
+        final ChimeAsyncCallback<ServiceResponseObject<ApplyTagResponse>> callback = 
+        		new ChimeAsyncCallback<ServiceResponseObject<ApplyTagResponse>>() {
+            public void onSuccess(ServiceResponseObject<ApplyTagResponse> response) {
+                if (response.isResponse()) {
                     _tagsChangedListener.onTagsChanged(response.getResponse().getDataInstance());
-                }
-                else
-                {
+                } else {
                     ChimeMessageBox.alert("Error", response.getError().getMessage(), null);
                 }
             }

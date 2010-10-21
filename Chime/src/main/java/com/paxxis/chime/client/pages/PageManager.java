@@ -30,15 +30,14 @@ import com.extjs.gxt.ui.client.widget.TabPanel;
 import com.extjs.gxt.ui.client.widget.layout.FitLayout;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.DeferredCommand;
-import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.paxxis.chime.client.ActivityMonitor;
+import com.paxxis.chime.client.ChimeAsyncCallback;
 import com.paxxis.chime.client.DataInstanceResponseObject;
 import com.paxxis.chime.client.LoginResponseObject;
 import com.paxxis.chime.client.SearchPanel;
 import com.paxxis.chime.client.ServiceManager;
 import com.paxxis.chime.client.ServiceManagerAdapter;
 import com.paxxis.chime.client.StateManager;
-import com.paxxis.chime.client.UserProfilePanel;
 import com.paxxis.chime.client.common.DataInstance;
 import com.paxxis.chime.client.common.DataInstanceRequest;
 import com.paxxis.chime.client.common.ErrorMessage;
@@ -148,18 +147,10 @@ public class PageManager extends TabPanel
     
     private void getInstance(final String typeId, final InstanceId instanceId, final boolean promptUser)
     {
-        final AsyncCallback callback = new AsyncCallback()
-        {
-            public void onFailure(Throwable arg0) 
-            {
-                StateManager.instance().backInactive();
-            }
-
-            public void onSuccess(Object obj) 
-            {
-                DataInstanceResponseObject response = (DataInstanceResponseObject)obj;
-                if (response.isResponse())
-                {
+        final ChimeAsyncCallback<DataInstanceResponseObject> callback = 
+        		new ChimeAsyncCallback<DataInstanceResponseObject>() {
+            public void onSuccess(DataInstanceResponseObject response) { 
+                if (response.isResponse()) {
                     List<DataInstance> list = response.getResponse().getDataInstances();
                     if (list.size() == 1)
                     {

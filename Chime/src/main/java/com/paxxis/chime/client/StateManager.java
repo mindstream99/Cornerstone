@@ -104,6 +104,7 @@ public class StateManager implements HistoryListener
     public void onHistoryChanged(String token) 
     {
     	ChimeDialogManager.instance().clear();
+    	ServiceManager.clearServiceAlertFlag();
         
         if (ServiceManager.isLoggedIn()) {
         	if (!_silent)

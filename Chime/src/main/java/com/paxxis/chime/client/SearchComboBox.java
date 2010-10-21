@@ -53,7 +53,6 @@ import com.google.gwt.user.client.DeferredCommand;
 import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.Event;
 import com.google.gwt.user.client.Timer;
-import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.KeyboardListener;
 import com.google.gwt.user.client.ui.RootPanel;
 import com.paxxis.chime.client.common.Cursor;
@@ -1072,12 +1071,9 @@ protected void onSelect(DataInstanceModel model)
    }
 
     protected void notifyFullInstance(DataInstance instance) {
-        AsyncCallback callback = new AsyncCallback() {
-            public void onFailure(Throwable result) {
-            }
-
-            public void onSuccess(final Object result) {
-                DataInstanceResponseObject resp = (DataInstanceResponseObject)result;
+        ChimeAsyncCallback<DataInstanceResponseObject> callback = 
+        		new ChimeAsyncCallback<DataInstanceResponseObject>() {
+            public void onSuccess(DataInstanceResponseObject resp) {
                 final DataInstanceResponse response = resp.getResponse();
                 List<DataInstance> instances = response.getDataInstances();
                 _dataInstanceListener.onDataInstance(instances.get(0));
@@ -1172,58 +1168,39 @@ protected void onSelect(DataInstanceModel model)
     {
         // it's very possible that the user has made a selection that is not the currently
         // selected item in the view.  so go query the server for user's selection.
-        AsyncCallback callback = new AsyncCallback()
-        {
-            public void onFailure(Throwable result)
-            {
-            }
+        ChimeAsyncCallback<DataInstanceResponseObject> callback = 
+        		new ChimeAsyncCallback<DataInstanceResponseObject>() {
+            public void onSuccess(DataInstanceResponseObject resp) {
+                final DataInstanceResponse response = resp.getResponse();
+                List<DataInstance> instances = response.getDataInstances();
 
-            public void onSuccess(final Object result)
-            {
-                if (true) //result instanceof DataInstanceResponseObject)
-                {
-                    DataInstanceResponseObject resp = (DataInstanceResponseObject)result;
-                    final DataInstanceResponse response = resp.getResponse();
-                    List<DataInstance> instances = response.getDataInstances();
+                // multiple hits, let's see if there's any exact matches in there
+                String name = response.getRequest().getQueryParameters().get(0).fieldValue.toString();
 
-                    // multiple hits, let's see if there's any exact matches in there
-                    String name = response.getRequest().getQueryParameters().get(0).fieldValue.toString();
+                List<DataInstance> exactMatches = new ArrayList<DataInstance>();
+                for (DataInstance instance : instances) {
+                    if (name.equalsIgnoreCase(instance.getName())) {
+                        exactMatches.add(instance);
+                    }
+                }
 
-                    List<DataInstance> exactMatches = new ArrayList<DataInstance>();
-                    for (DataInstance instance : instances)
-                    {
-                        if (name.equalsIgnoreCase(instance.getName()))
-                        {
-                            exactMatches.add(instance);
-                        }
+                int ct = exactMatches.size();
+                if (ct == 1) {
+                    // got it!
+                    final DataInstanceModel model = new DataInstanceModel(exactMatches.get(0), false, 100, false);
+                    notifyQueryProvider(model.getDataInstance());
+                    onSelect(model);
+                } else if (ct == 0) {
+                    if (isExpanded()) {
+                        collapse();
                     }
 
-                    int ct = exactMatches.size();
-                    if (ct == 1)
-                    {
-                        // got it!
-                        final DataInstanceModel model = new DataInstanceModel(exactMatches.get(0), false, 100, false);
-                        notifyQueryProvider(model.getDataInstance());
-                        onSelect(model);
-                    }
-                    else if (ct == 0)
-                    {
-                        if (isExpanded())
-                        {
-                            collapse();
-                        }
-
-                        _dataInstanceListener.onStringData(rawData);
-                    }
-                    else
-                    {
-                        setValidator(new DataInstanceValidator("Ambiguous Data Instance"));
-                        validate();
-                        //setValidator(null);
-                        if (keepFocus)
-                        {
-                            focus();
-                        }
+                    _dataInstanceListener.onStringData(rawData);
+                } else {
+                    setValidator(new DataInstanceValidator("Ambiguous Data Instance"));
+                    validate();
+                    if (keepFocus) {
+                        focus();
                     }
                 }
             }
@@ -1238,11 +1215,9 @@ protected void onSelect(DataInstanceModel model)
             ServiceManager.getService().sendDataInstanceRequest(request, callback);
         }
 
-        if (keepFocus)
-        {
+        if (keepFocus) {
             focus();
         }
-
     }
 
     private void bindStore(DataInstanceStore store, boolean initial)

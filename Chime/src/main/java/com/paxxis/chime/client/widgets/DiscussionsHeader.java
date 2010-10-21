@@ -27,7 +27,7 @@ import com.extjs.gxt.ui.client.widget.button.Button;
 import com.extjs.gxt.ui.client.widget.layout.RowData;
 import com.extjs.gxt.ui.client.widget.layout.RowLayout;
 import com.extjs.gxt.ui.client.widget.toolbar.ToolBar;
-import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.paxxis.chime.client.ChimeAsyncCallback;
 import com.paxxis.chime.client.ServiceManager;
 import com.paxxis.chime.client.ServiceResponseObject;
 import com.paxxis.chime.client.common.CreateDiscussionRequest;
@@ -102,12 +102,8 @@ public class DiscussionsHeader extends LayoutContainer {
 
     private void processRequest(String title, String initialComment) {
 
-        final AsyncCallback<ServiceResponseObject<CreateDiscussionResponse>> callback = 
-        		new AsyncCallback<ServiceResponseObject<CreateDiscussionResponse>>() {
-            public void onFailure(Throwable arg0) {
-                ChimeMessageBox.alert("System Error", "Please contact the system administrator.", null);
-            }
-
+        final ChimeAsyncCallback<ServiceResponseObject<CreateDiscussionResponse>> callback = 
+        		new ChimeAsyncCallback<ServiceResponseObject<CreateDiscussionResponse>>() {
             public void onSuccess(ServiceResponseObject<CreateDiscussionResponse> response) {
                 if (response.isResponse()) {
                     _discussionsChangedListener.onDiscussionsChanged(response.getResponse().getDataInstance());

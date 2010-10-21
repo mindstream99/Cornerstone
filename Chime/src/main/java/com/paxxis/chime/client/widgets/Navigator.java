@@ -36,6 +36,7 @@ import com.extjs.gxt.ui.client.widget.layout.RowLayout;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.DeferredCommand;
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.paxxis.chime.client.ChimeAsyncCallback;
 import com.paxxis.chime.client.DataInstanceResponseObject;
 import com.paxxis.chime.client.FilledColumnLayout;
 import com.paxxis.chime.client.LoginResponseObject;
@@ -196,7 +197,8 @@ public abstract class Navigator extends ContentPanel {
 
         private void getChildPages(final ContentItemModel model, final AsyncCallback<List<ContentItemModel>> cb) {
         	final boolean expand = treePanel.isExpanded(model);
-            final AsyncCallback<DataInstanceResponseObject> callback = new AsyncCallback<DataInstanceResponseObject>() {
+            final ChimeAsyncCallback<DataInstanceResponseObject> callback = 
+            		new ChimeAsyncCallback<DataInstanceResponseObject>() {
                 public void onSuccess(DataInstanceResponseObject resp) {
                     if (resp.isResponse()) {
                         final DataInstanceResponse response = resp.getResponse();
@@ -261,10 +263,6 @@ public abstract class Navigator extends ContentPanel {
                     {
                         cb.onFailure(new Exception(resp.getError().getMessage()));
                     }
-                }
-
-                public void onFailure(Throwable caught)
-                {
                 }
             };
 

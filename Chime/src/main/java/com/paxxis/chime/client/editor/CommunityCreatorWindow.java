@@ -31,7 +31,7 @@ import com.extjs.gxt.ui.client.widget.form.TextArea;
 import com.extjs.gxt.ui.client.widget.form.TextField;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.DeferredCommand;
-import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.paxxis.chime.client.ChimeAsyncCallback;
 import com.paxxis.chime.client.DataInstanceResponseObject;
 import com.paxxis.chime.client.LoginResponseObject;
 import com.paxxis.chime.client.ServiceManager;
@@ -91,12 +91,8 @@ public class CommunityCreatorWindow extends ChimeWindow
 
     protected void init() {
     	postInit();
-        AsyncCallback callback = new AsyncCallback() {
-            public void onFailure(Throwable result) {
-            }
-
-            public void onSuccess(final Object result) {
-                ShapeResponseObject resp = (ShapeResponseObject)result;
+        ChimeAsyncCallback<ShapeResponseObject> callback = new ChimeAsyncCallback<ShapeResponseObject>() {
+            public void onSuccess(ShapeResponseObject resp) {
                 if (resp.isResponse()) {
                 	communityShape = resp.getResponse().getShape();
                 	validate();
@@ -198,12 +194,8 @@ public class CommunityCreatorWindow extends ChimeWindow
     }
 
     protected void createInstance(final EditCommunityRequest req) {
-        AsyncCallback callback = new AsyncCallback() {
-            public void onFailure(Throwable result) {
-            }
-
-            public void onSuccess(final Object result) {
-                DataInstanceResponseObject resp = (DataInstanceResponseObject)result;
+        ChimeAsyncCallback<DataInstanceResponseObject> callback = new ChimeAsyncCallback<DataInstanceResponseObject>() {
+            public void onSuccess(DataInstanceResponseObject resp) {
                 if (resp.isResponse()) {
                     DataInstanceResponse response = resp.getResponse();
                     List<DataInstance> instances = response.getDataInstances();
@@ -231,12 +223,9 @@ public class CommunityCreatorWindow extends ChimeWindow
     }
 
     protected void doCreate(EditCommunityRequest req) {
-        AsyncCallback callback = new AsyncCallback() {
-            public void onFailure(Throwable result) {
-            }
-
-            public void onSuccess(final Object result) {
-                ServiceResponseObject<EditCommunityResponse> resp = (ServiceResponseObject<EditCommunityResponse>)result;
+        ChimeAsyncCallback<ServiceResponseObject<EditCommunityResponse>> callback = 
+        			new ChimeAsyncCallback<ServiceResponseObject<EditCommunityResponse>>() {
+            public void onSuccess(ServiceResponseObject<EditCommunityResponse> resp) {
                 if (resp.isResponse()) {
                     EditCommunityResponse response = resp.getResponse();
                     Community inst = response.getCommunity();

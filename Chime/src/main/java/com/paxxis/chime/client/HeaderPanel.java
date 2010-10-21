@@ -34,7 +34,6 @@ import com.extjs.gxt.ui.client.widget.menu.MenuItem;
 import com.extjs.gxt.ui.client.widget.toolbar.LabelToolItem;
 import com.extjs.gxt.ui.client.widget.toolbar.ToolBar;
 import com.google.gwt.user.client.Element;
-import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.paxxis.chime.client.common.DataInstance;
 import com.paxxis.chime.client.common.User;
 import com.paxxis.chime.client.editor.CommunityCreatorWindow;
@@ -74,16 +73,11 @@ public class HeaderPanel extends LayoutContainer
         setLayout(layout);
 
         ServiceManager.getService().getBrandingData(
-        	new AsyncCallback() {
+        	new ChimeAsyncCallback<BrandingData>() {
 
 				@Override
-				public void onFailure(Throwable caught) {
-					finishRendering(new BrandingData());
-				}
-
-				@Override
-				public void onSuccess(Object result) {
-					finishRendering((BrandingData)result);
+				public void onSuccess(BrandingData result) {
+					finishRendering(result);
 				}
         	}
         );

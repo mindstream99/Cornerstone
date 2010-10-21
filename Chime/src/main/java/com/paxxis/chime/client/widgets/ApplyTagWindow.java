@@ -35,7 +35,7 @@ import com.extjs.gxt.ui.client.widget.layout.RowData;
 import com.extjs.gxt.ui.client.widget.layout.RowLayout;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.DeferredCommand;
-import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.paxxis.chime.client.ChimeAsyncCallback;
 import com.paxxis.chime.client.DataInputListener;
 import com.paxxis.chime.client.DataInstanceComboBox;
 import com.paxxis.chime.client.ServiceManager;
@@ -199,23 +199,12 @@ public class ApplyTagWindow extends ChimeWindow
         ShapeRequest req = new ShapeRequest();
         req.setId(Shape.TAG_ID);
         
-        final AsyncCallback callback = new AsyncCallback()
-        {
-            public void onFailure(Throwable arg0) 
-            {
-                ChimeMessageBox.alert("System Error", "Please contact the system administrator.", null);
-            }
-
-            public void onSuccess(Object obj) 
-            {
-                ShapeResponseObject response = (ShapeResponseObject)obj;
-                if (response.isResponse())
-                {
+        final ChimeAsyncCallback<ShapeResponseObject> callback = new ChimeAsyncCallback<ShapeResponseObject>() {
+            public void onSuccess(ShapeResponseObject response) { 
+                if (response.isResponse()) {
                     Shape dataType = response.getResponse().getShape();
                     applyNewTag(dataType, name, desc, isPrivate);
-                }
-                else
-                {
+                } else {
                     ChimeMessageBox.alert("System Error", response.getError().getMessage(), null);
                 }
             }
@@ -246,24 +235,14 @@ public class ApplyTagWindow extends ChimeWindow
 
         req.setDescription(desc);
         
-        final AsyncCallback callback = new AsyncCallback()
-        {
-            public void onFailure(Throwable arg0) 
-            {
-                ChimeMessageBox.alert("System Error", "Please contact the system administrator.", null);
-            }
-
-            public void onSuccess(Object obj) 
-            {
-                ServiceResponseObject<EditDataInstanceResponse> response = (ServiceResponseObject<EditDataInstanceResponse>)obj;
-                if (response.isResponse())
-                {
+        final ChimeAsyncCallback<ServiceResponseObject<EditDataInstanceResponse>> callback = 
+        		new ChimeAsyncCallback<ServiceResponseObject<EditDataInstanceResponse>>() {
+            public void onSuccess(ServiceResponseObject<EditDataInstanceResponse> response) { 
+                if (response.isResponse()) {
                     Tag tag = (Tag)response.getResponse().getDataInstance();
                     _listener.onApply(tag);
                     hide();
-                }
-                else
-                {
+                } else {
                     ChimeMessageBox.alert("System Error", response.getError().getMessage(), null);
                 }
             }

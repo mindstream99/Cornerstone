@@ -39,7 +39,7 @@ import com.extjs.gxt.ui.client.widget.form.TextField;
 import com.extjs.gxt.ui.client.widget.layout.FormLayout;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.DeferredCommand;
-import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.paxxis.chime.client.ChimeAsyncCallback;
 import com.paxxis.chime.client.ChimeListStore;
 import com.paxxis.chime.client.DataInputListener;
 import com.paxxis.chime.client.DataInstanceComboBox;
@@ -49,6 +49,7 @@ import com.paxxis.chime.client.common.DataInstance;
 import com.paxxis.chime.client.common.DataInstanceRequest;
 import com.paxxis.chime.client.common.DataInstanceResponse;
 import com.paxxis.chime.client.common.InstanceId;
+import com.paxxis.chime.client.common.Shape;
 import com.paxxis.chime.client.common.DataInstanceRequest.Depth;
 import com.paxxis.chime.client.common.portal.PortletSpecification;
 import com.paxxis.chime.client.widgets.ChimeWindow;
@@ -121,27 +122,19 @@ public class AnalyticPortletEditorWindow extends ChimeWindow
             {
                 public void execute()
                 {
-                    final AsyncCallback callback = new AsyncCallback() {
-                        public void onSuccess(final Object result)
-                        {
-                            DataInstanceResponseObject resp = (DataInstanceResponseObject)result;
-                            if (resp.isResponse())
-                            {
+                    final ChimeAsyncCallback<DataInstanceResponseObject> callback = 
+                    	         new ChimeAsyncCallback<DataInstanceResponseObject>() {
+                        public void onSuccess(DataInstanceResponseObject resp) {
+                            if (resp.isResponse()) {
                                 final DataInstanceResponse response = resp.getResponse();
                                 List<DataInstance> instances = response.getDataInstances();
-                                if (instances.size() > 0)
-                                {
+                                if (instances.size() > 0) {
                                     DataInstance instance = instances.get(0);
-                                    if (instance.getShapes().get(0).getName().equals("Analytic"))
-                                    {
+                                    if (instance.getShapes().get(0).getId().equals(Shape.ANALYTIC_ID)) {
                                     	setDefaults(instance, spec);
                                     }
                                 }
                             }
-                        }
-
-                        public void onFailure(Throwable caught)
-                        {
                         }
                     };
 

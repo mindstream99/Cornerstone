@@ -34,7 +34,7 @@ import com.extjs.gxt.ui.client.widget.form.FormPanel;
 import com.extjs.gxt.ui.client.widget.layout.FormLayout;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.DeferredCommand;
-import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.paxxis.chime.client.ChimeAsyncCallback;
 import com.paxxis.chime.client.ChimeListStore;
 import com.paxxis.chime.client.LoginResponseObject;
 import com.paxxis.chime.client.ServiceManager;
@@ -265,12 +265,9 @@ public class InstancePermissionWindow extends ChimeWindow
     }
 
     protected void update() {
-        AsyncCallback callback = new AsyncCallback() {
-            public void onFailure(Throwable result) {
-            }
-
-            public void onSuccess(final Object result) {
-                ServiceResponseObject<EditDataInstanceResponse> resp = (ServiceResponseObject<EditDataInstanceResponse>)result;
+        ChimeAsyncCallback<ServiceResponseObject<EditDataInstanceResponse>> callback = 
+        	            new ChimeAsyncCallback<ServiceResponseObject<EditDataInstanceResponse>>() {
+            public void onSuccess(ServiceResponseObject<EditDataInstanceResponse> resp) {
                 if (resp.isResponse()) {
                     EditDataInstanceResponse response = resp.getResponse();
                     DataInstance inst = response.getDataInstance();

@@ -34,7 +34,7 @@ import com.extjs.gxt.ui.client.widget.menu.CheckMenuItem;
 import com.extjs.gxt.ui.client.widget.menu.Menu;
 import com.extjs.gxt.ui.client.widget.toolbar.FillToolItem;
 import com.extjs.gxt.ui.client.widget.toolbar.ToolBar;
-import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.paxxis.chime.client.ChimeAsyncCallback;
 import com.paxxis.chime.client.SearchFilterModifyListener;
 import com.paxxis.chime.client.SearchFilterPanel;
 import com.paxxis.chime.client.ServiceManager;
@@ -97,14 +97,8 @@ public class ReviewsHeader extends LayoutContainer
     
     public void sendRequest(ApplyReviewRequest request)
     {
-        final AsyncCallback<ServiceResponseObject<ApplyReviewResponse>> callback = 
-        					new AsyncCallback<ServiceResponseObject<ApplyReviewResponse>>()
-        {
-            public void onFailure(Throwable arg0)
-            {
-                ChimeMessageBox.alert("System Error", "Please contact the system administrator.", null);
-            }
-
+        final ChimeAsyncCallback<ServiceResponseObject<ApplyReviewResponse>> callback = 
+        					new ChimeAsyncCallback<ServiceResponseObject<ApplyReviewResponse>>() {
             public void onSuccess(ServiceResponseObject<ApplyReviewResponse> response) {
                 if (response.isResponse()) {
                     _reviewsChangedListener.onReviewsChanged(response.getResponse().getDataInstance());

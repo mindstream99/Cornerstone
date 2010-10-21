@@ -32,6 +32,7 @@ import com.extjs.gxt.ui.client.widget.layout.FitLayout;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.DeferredCommand;
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.paxxis.chime.client.ChimeAsyncCallback;
 import com.paxxis.chime.client.DataInstanceResponseObject;
 import com.paxxis.chime.client.InstanceUpdateListener;
 import com.paxxis.chime.client.ServiceManager;
@@ -151,15 +152,9 @@ public class DataDetailPanel extends ChimeLayoutContainer implements InstanceUpd
     {
         if (_dataInstance != null)
         {
-            final AsyncCallback callback = new AsyncCallback()
-            {
-                public void onFailure(Throwable arg0) 
-                {
-                }
-
-                public void onSuccess(Object obj) 
-                {
-                    DataInstanceResponseObject response = (DataInstanceResponseObject)obj;
+            final ChimeAsyncCallback<DataInstanceResponseObject> callback = 
+            			new ChimeAsyncCallback<DataInstanceResponseObject>() {
+                public void onSuccess(DataInstanceResponseObject response) { 
                     DataInstance instance = null;
                     if (response.isResponse())
                     {
@@ -320,18 +315,10 @@ public class DataDetailPanel extends ChimeLayoutContainer implements InstanceUpd
     
     public void onUpdateFavorite(DataInstance instance, boolean favorite) {
 
-        AsyncCallback callback = new AsyncCallback()
-        {
-            public void onFailure(Throwable arg0)
-            {
-                ChimeMessageBox.alert("System Error", "Please contact the system administrator.", null);
-            }
-
-            public void onSuccess(Object obj)
-            {
-                ServiceResponseObject<EditDataInstanceResponse> response = (ServiceResponseObject<EditDataInstanceResponse>)obj;
-                if (response.isResponse())
-                {
+        ChimeAsyncCallback<ServiceResponseObject<EditDataInstanceResponse>> callback = 
+        			new ChimeAsyncCallback<ServiceResponseObject<EditDataInstanceResponse>>() {
+            public void onSuccess(ServiceResponseObject<EditDataInstanceResponse> response) {
+                if (response.isResponse()) {
                     EditDataInstanceResponse resp = response.getResponse();
 
                     User userInst = (User)resp.getDataInstance();
@@ -339,15 +326,7 @@ public class DataDetailPanel extends ChimeLayoutContainer implements InstanceUpd
 
                     setDataInstance(_dataInstance, UpdateReason.PrimaryChange);
                     UserContext.notifyPortalPageChange(null);
-                    
-                    // if the user page occupies the open detail page, push the new data
-                    //DataInstance activeInstance = PageManager.instance().getActiveDetailInstance();
-                    //if (activeInstance != null && activeInstance.getId().equals(userInst.getId())) {
-                   //	PageManager.instance().openDetail(false, userInst);
-                    //}
-                }
-                else
-                {
+                } else {
                     ErrorMessage msg = response.getError();
                     processErrorMessage(msg);
                 }
@@ -380,26 +359,16 @@ public class DataDetailPanel extends ChimeLayoutContainer implements InstanceUpd
     }
 
     public void onUpdateLock(DataInstance instance, DataInstance.LockType lockType) {
-        final AsyncCallback callback = new AsyncCallback()
-        {
-            public void onFailure(Throwable arg0)
-            {
-                ChimeMessageBox.alert("System Error", "Please contact the system administrator.", null);
-            }
-
-            public void onSuccess(Object obj)
-            {
-                ServiceResponseObject<LockResponse> response = (ServiceResponseObject<LockResponse>)obj;
-                if (response.isResponse())
-                {
+        final ChimeAsyncCallback<ServiceResponseObject<LockResponse>> callback = 
+        			new ChimeAsyncCallback<ServiceResponseObject<LockResponse>>() {
+            public void onSuccess(ServiceResponseObject<LockResponse> response) {
+                if (response.isResponse()) {
                     LockResponse resp = response.getResponse();
 
                     DataInstance inst = resp.getDataInstance();
                     _origDataInstance = inst.copy();
                     setDataInstance(inst, UpdateReason.PrimaryChange);
-                }
-                else
-                {
+                } else {
                 	ErrorMessage error = response.getError();
                 	processErrorMessage(error);
                 }
@@ -415,26 +384,16 @@ public class DataDetailPanel extends ChimeLayoutContainer implements InstanceUpd
     }
 
     public void onUpdateSubscription(DataInstance instance, boolean subscribe) {
-        final AsyncCallback callback = new AsyncCallback()
-        {
-            public void onFailure(Throwable arg0)
-            {
-                ChimeMessageBox.alert("System Error", "Please contact the system administrator.", null);
-            }
-
-            public void onSuccess(Object obj)
-            {
-                ServiceResponseObject<SubscribeResponse> response = (ServiceResponseObject<SubscribeResponse>)obj;
-                if (response.isResponse())
-                {
+        final ChimeAsyncCallback<ServiceResponseObject<SubscribeResponse>> callback = 
+        			new ChimeAsyncCallback<ServiceResponseObject<SubscribeResponse>>() {
+            public void onSuccess(ServiceResponseObject<SubscribeResponse> response) {
+                if (response.isResponse()) {
                     SubscribeResponse resp = response.getResponse();
 
                     DataInstance inst = resp.getDataInstance();
                     _origDataInstance = inst.copy();
                     setDataInstance(inst, UpdateReason.PrimaryChange);
-                }
-                else
-                {
+                } else {
                 	ErrorMessage error = response.getError();
                 	processErrorMessage(error);
                 }
@@ -458,26 +417,16 @@ public class DataDetailPanel extends ChimeLayoutContainer implements InstanceUpd
     }
 
     private void addFieldDefinition(Shape dataType, DataField field) {
-        final AsyncCallback callback = new AsyncCallback()
-        {
-            public void onFailure(Throwable arg0)
-            {
-                ChimeMessageBox.alert("System Error", "Please contact the system administrator.", null);
-            }
-
-            public void onSuccess(Object obj)
-            {
-                ServiceResponseObject<EditShapeResponse> response = (ServiceResponseObject<EditShapeResponse>)obj;
-                if (response.isResponse())
-                {
+        final ChimeAsyncCallback<ServiceResponseObject<EditShapeResponse>> callback = 
+        			new ChimeAsyncCallback<ServiceResponseObject<EditShapeResponse>>() {
+            public void onSuccess(ServiceResponseObject<EditShapeResponse> response) {
+                if (response.isResponse()) {
                     EditShapeResponse resp = response.getResponse();
 
                     Shape inst = resp.getShape();
                     _origDataInstance = inst.copy();
                     setDataInstance(inst, UpdateReason.FieldChange);
-                }
-                else
-                {
+                } else {
                 	ErrorMessage error = response.getError();
                 	processErrorMessage(error);
                 }
@@ -534,7 +483,6 @@ public class DataDetailPanel extends ChimeLayoutContainer implements InstanceUpd
                 break;
             case Name:
                 onUpdatePrimaryData(instance, UpdateReason.PrimaryChange);
-                //PageManager.instance().updateDetailName(instance);
                 break;
             case Description:
                 onUpdatePrimaryData(instance, UpdateReason.PrimaryChange);
@@ -564,24 +512,14 @@ public class DataDetailPanel extends ChimeLayoutContainer implements InstanceUpd
     }
 
     private void onUpdateNamedSearch(NamedSearch instance, SearchCriteria criteria) {
-        final AsyncCallback callback = new AsyncCallback()
-        {
-            public void onFailure(Throwable arg0)
-            {
-                ChimeMessageBox.alert("System Error", "Please contact the system administrator.", null);
-            }
-
-            public void onSuccess(Object obj)
-            {
-                ServiceResponseObject<EditDataInstanceResponse> response = (ServiceResponseObject<EditDataInstanceResponse>)obj;
-                if (response.isResponse())
-                {
+        final ChimeAsyncCallback<ServiceResponseObject<EditDataInstanceResponse>> callback = 
+        		new ChimeAsyncCallback<ServiceResponseObject<EditDataInstanceResponse>>() {
+            public void onSuccess(ServiceResponseObject<EditDataInstanceResponse> response) {
+                if (response.isResponse()) {
                     EditDataInstanceResponse resp = response.getResponse();
-                    DataInstance inst = resp.getDataInstance();
+                    DataInstance inst = resp.getDataInstance(); 
                     resetInstance(inst, UpdateReason.FieldChange);
-                }
-                else
-                {
+                } else {
                 	ErrorMessage error = response.getError();
                 	processErrorMessage(error);
                 }
@@ -599,26 +537,16 @@ public class DataDetailPanel extends ChimeLayoutContainer implements InstanceUpd
     }
 
     private void onUpdateTypeData(DataInstance instance) {
-        final AsyncCallback callback = new AsyncCallback()
-        {
-            public void onFailure(Throwable arg0)
-            {
-                ChimeMessageBox.alert("System Error", "Please contact the system administrator.", null);
-            }
-
-            public void onSuccess(Object obj)
-            {
-                ServiceResponseObject<EditDataInstanceResponse> response = (ServiceResponseObject<EditDataInstanceResponse>)obj;
-                if (response.isResponse())
-                {
+        final ChimeAsyncCallback<ServiceResponseObject<EditDataInstanceResponse>> callback = 
+        			new ChimeAsyncCallback<ServiceResponseObject<EditDataInstanceResponse>>() {
+            public void onSuccess(ServiceResponseObject<EditDataInstanceResponse> response) {
+                if (response.isResponse()) {
                     EditDataInstanceResponse resp = response.getResponse();
 
                     DataInstance inst = resp.getDataInstance();
                     _origDataInstance = inst.copy();
                     setDataInstance(inst, UpdateReason.AppliedTypeChange);
-                }
-                else
-                {
+                } else {
                     ErrorMessage msg = response.getError();
                     processErrorMessage(msg);
                 }
@@ -635,26 +563,16 @@ public class DataDetailPanel extends ChimeLayoutContainer implements InstanceUpd
     }
 
     private void onUpdatePageLayout(DataInstance instance, PortalTemplate template) {
-        final AsyncCallback callback = new AsyncCallback()
-        {
-            public void onFailure(Throwable arg0)
-            {
-                ChimeMessageBox.alert("System Error", "Please contact the system administrator.", null);
-            }
-
-            public void onSuccess(Object obj)
-            {
-                ServiceResponseObject<EditDataInstanceResponse> response = (ServiceResponseObject<EditDataInstanceResponse>)obj;
-                if (response.isResponse())
-                {
+        final ChimeAsyncCallback<ServiceResponseObject<EditDataInstanceResponse>> callback = 
+        			new ChimeAsyncCallback<ServiceResponseObject<EditDataInstanceResponse>>() {
+            public void onSuccess(ServiceResponseObject<EditDataInstanceResponse> response) {
+                if (response.isResponse()) {
                     EditDataInstanceResponse resp = response.getResponse();
 
                     DataInstance inst = resp.getDataInstance();
                     _origDataInstance = inst.copy();
                     setDataInstance(inst, UpdateReason.InstanceChange);
-                }
-                else
-                {
+                } else {
                 	ErrorMessage error = response.getError();
                 	processErrorMessage(error);
                 }
@@ -680,26 +598,16 @@ public class DataDetailPanel extends ChimeLayoutContainer implements InstanceUpd
     }
 
     private void onUpdatePrimaryData(DataInstance instance, final UpdateReason reason) {
-        final AsyncCallback callback = new AsyncCallback()
-        {
-            public void onFailure(Throwable arg0)
-            {
-                ChimeMessageBox.alert("System Error", "Please contact the system administrator.", null);
-            }
-
-            public void onSuccess(Object obj)
-            {
-                ServiceResponseObject<EditDataInstanceResponse> response = (ServiceResponseObject<EditDataInstanceResponse>)obj;
-                if (response.isResponse())
-                {
+        final ChimeAsyncCallback<ServiceResponseObject<EditDataInstanceResponse>> callback = 
+        			new ChimeAsyncCallback<ServiceResponseObject<EditDataInstanceResponse>>() {
+            public void onSuccess(ServiceResponseObject<EditDataInstanceResponse> response) {
+                if (response.isResponse()) {
                     EditDataInstanceResponse resp = response.getResponse();
 
                     DataInstance inst = resp.getDataInstance();
                     _origDataInstance = inst.copy();
                     setDataInstance(inst, reason);
-                }
-                else
-                {
+                } else {
                     ErrorMessage msg = response.getError();
                     processErrorMessage(msg);
                 }
@@ -784,18 +692,10 @@ public class DataDetailPanel extends ChimeLayoutContainer implements InstanceUpd
         //        JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE))
         {
 
-            final AsyncCallback callback = new AsyncCallback()
-            {
-                public void onFailure(Throwable arg0) 
-                {
-                    ChimeMessageBox.alert("System Error", "Please contact the system administrator.", null);
-                }
-
-                public void onSuccess(Object obj) 
-                {
-                    ServiceResponseObject<MultiResponse> response = (ServiceResponseObject<MultiResponse>)obj;
-                    if (response.isResponse())
-                    {
+            final ChimeAsyncCallback<ServiceResponseObject<MultiResponse>> callback = 
+            			new ChimeAsyncCallback<ServiceResponseObject<MultiResponse>>() {
+                public void onSuccess(ServiceResponseObject<MultiResponse> response) { 
+                    if (response.isResponse()) {
                         MultiResponse resp = response.getResponse();
 
                         // we want the last response
@@ -810,9 +710,7 @@ public class DataDetailPanel extends ChimeLayoutContainer implements InstanceUpd
                             _origDataInstance = inst.copy();
                             setDataInstance(inst, UpdateReason.FieldChange);
                         }
-                    }
-                    else
-                    {
+                    } else {
                         _dataInstance = _origDataInstance.copy();
                         ErrorMessage msg = response.getError();
                         processErrorMessage(msg);

@@ -17,13 +17,8 @@
 
 package com.paxxis.chime.client.pages;
 
-import com.paxxis.chime.client.DataInstanceResponseObject;
-import com.paxxis.chime.client.LoginResponseObject;
-import com.paxxis.chime.client.ServiceManager;
-import com.paxxis.chime.client.ServiceManagerAdapter;
-import com.paxxis.chime.client.StateManager;
-import com.paxxis.chime.client.portal.UpdateReason;
-import com.paxxis.chime.client.widgets.ContentNavigator;
+import java.util.List;
+
 import com.extjs.gxt.ui.client.Style.LayoutRegion;
 import com.extjs.gxt.ui.client.util.Margins;
 import com.extjs.gxt.ui.client.widget.LayoutContainer;
@@ -31,13 +26,19 @@ import com.extjs.gxt.ui.client.widget.layout.BorderLayout;
 import com.extjs.gxt.ui.client.widget.layout.BorderLayoutData;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.DeferredCommand;
-import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.paxxis.chime.client.ChimeAsyncCallback;
+import com.paxxis.chime.client.DataInstanceResponseObject;
+import com.paxxis.chime.client.LoginResponseObject;
+import com.paxxis.chime.client.ServiceManager;
+import com.paxxis.chime.client.ServiceManagerAdapter;
+import com.paxxis.chime.client.StateManager;
 import com.paxxis.chime.client.common.DataInstance;
 import com.paxxis.chime.client.common.DataInstanceRequest;
-import com.paxxis.chime.client.common.DataInstanceRequest.Depth;
 import com.paxxis.chime.client.common.DataInstanceResponse;
 import com.paxxis.chime.client.common.User;
-import java.util.List;
+import com.paxxis.chime.client.common.DataInstanceRequest.Depth;
+import com.paxxis.chime.client.portal.UpdateReason;
+import com.paxxis.chime.client.widgets.ContentNavigator;
 
 /**
  *
@@ -114,12 +115,10 @@ public class PortalViewPage extends LayoutContainer
     
     public void goHome(final String followToken) {
 
-        final AsyncCallback callback = new AsyncCallback() {
-            public void onSuccess(final Object result)
-            {
-                DataInstanceResponseObject resp = (DataInstanceResponseObject)result;
-                if (resp.isResponse())
-                {
+        final ChimeAsyncCallback<DataInstanceResponseObject> callback = 
+        			new ChimeAsyncCallback<DataInstanceResponseObject>() {
+            public void onSuccess(DataInstanceResponseObject resp) {
+                if (resp.isResponse()) {
                     final DataInstanceResponse response = resp.getResponse();
                     List<DataInstance> instances = response.getDataInstances();
                     if (instances.size() > 0)
@@ -145,10 +144,6 @@ public class PortalViewPage extends LayoutContainer
                         );
                     }
                 }
-            }
-
-            public void onFailure(Throwable caught)
-            {
             }
         };
 

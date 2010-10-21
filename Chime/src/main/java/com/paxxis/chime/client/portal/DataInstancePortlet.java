@@ -30,6 +30,7 @@ import com.extjs.gxt.ui.client.widget.layout.RowLayout;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.DeferredCommand;
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.paxxis.chime.client.ChimeAsyncCallback;
 import com.paxxis.chime.client.DataInstanceResponseObject;
 import com.paxxis.chime.client.LoginResponseObject;
 import com.paxxis.chime.client.ServiceManager;
@@ -67,12 +68,10 @@ public class DataInstancePortlet extends PortletContainer
                 {
                     public void execute()
                     {
-                        final AsyncCallback callback = new AsyncCallback() {
-                            public void onSuccess(final Object result)
-                            {
-                                DataInstanceResponseObject resp = (DataInstanceResponseObject)result;
-                                if (resp.isResponse())
-                                {
+                        final ChimeAsyncCallback<DataInstanceResponseObject> callback = 
+                        			new ChimeAsyncCallback<DataInstanceResponseObject>() {
+                            public void onSuccess(DataInstanceResponseObject resp) {
+                                if (resp.isResponse()) {
                                     final DataInstanceResponse response = resp.getResponse();
                                     List<DataInstance> instances = response.getDataInstances();
                                     if (instances.size() > 0)
@@ -90,10 +89,6 @@ public class DataInstancePortlet extends PortletContainer
                                         getPropertiesContainer().layout();
                                     }
                                 }
-                            }
-
-                            public void onFailure(Throwable caught)
-                            {
                             }
                         };
 
@@ -250,14 +245,12 @@ public class DataInstancePortlet extends PortletContainer
     
     private void runQuery()
     {
-        final AsyncCallback callback = new AsyncCallback() {
-            public void onSuccess(final Object result) 
-            {
+        final ChimeAsyncCallback<DataInstanceResponseObject> callback = 
+        			new ChimeAsyncCallback<DataInstanceResponseObject>() {
+            public void onSuccess(DataInstanceResponseObject resp) { 
                 boolean isEmpty = true;
                 
-                DataInstanceResponseObject resp = (DataInstanceResponseObject)result;
-                if (resp.isResponse())
-                {
+                if (resp.isResponse()) {
                     final DataInstanceResponse response = resp.getResponse();
                     List<DataInstance> instances = response.getDataInstances();
                     if (instances.size() > 0)
@@ -270,22 +263,6 @@ public class DataInstancePortlet extends PortletContainer
         
                 setVisible(!isEmpty);
                 layout();
-                /*
-                if (isEmpty)
-                {
-                    _html.setHtml("");
-                    if (_showHeader)
-                    {
-                        setHeading("---");
-                    }
-                }
-                
-                layout();
-                */
-            }
-            
-            public void onFailure(Throwable caught) 
-            {
             }
         };
         

@@ -21,7 +21,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.extjs.gxt.ui.client.store.ListStore;
-import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.paxxis.chime.client.common.DataInstance;
 import com.paxxis.chime.client.common.DataInstanceRequest;
 import com.paxxis.chime.client.common.DataInstanceResponse;
@@ -37,8 +36,8 @@ import com.paxxis.chime.client.widgets.ChimeMessageBox;
  */
 public class DataInstanceStore extends ListStore<DataInstanceModel> implements QueryProvider
 {
-    private AsyncCallback dataInstanceCallBack;
-    private AsyncCallback findInstancesCallBack;
+    private ChimeAsyncCallback<DataInstanceResponseObject> dataInstanceCallBack;
+    private ChimeAsyncCallback<FindInstancesResponseObject> findInstancesCallBack;
     private DataStoreUpdateListener listener;
     private boolean _includeLinks;
     private int truncateDescriptions;
@@ -50,80 +49,55 @@ public class DataInstanceStore extends ListStore<DataInstanceModel> implements Q
         _includeLinks = includeLinks;
         truncateDescriptions = truncDescriptions;
         listener = l;
-        dataInstanceCallBack = new AsyncCallback() {
-            public void onSuccess(final Object result) 
-            {
+        dataInstanceCallBack = new ChimeAsyncCallback<DataInstanceResponseObject>() {
+            public void onSuccess(DataInstanceResponseObject resp) { 
                 if (isActive) {
                     removeAll();
-                    //commitChanges();
 
-                    DataInstanceResponseObject resp = (DataInstanceResponseObject)result;
-                    if (resp.isResponse())
-                    {
+                    if (resp.isResponse()) {
                         final DataInstanceResponse response = resp.getResponse();
                         List<DataInstance> instances = response.getDataInstances();
 
                         boolean topRule = false;
                         final List<DataInstanceModel> models = new ArrayList<DataInstanceModel>();
-                        for (DataInstance instance : instances)
-                        {
+                        for (DataInstance instance : instances) {
                            DataInstanceModel m = new DataInstanceModel(instance, _includeLinks, truncateDescriptions, topRule);
                            models.add(m);
                            topRule = true;
                         }
 
                         add(models);
-                        //commitChanges();
                         notifyListener(response);
-                    }
-                    else
-                    {
+                    } else {
                         final ErrorMessage error = resp.getError();
-                        if (error.getType() == ErrorMessage.Type.SessionExpiration)
-                        {
+                        if (error.getType() == ErrorMessage.Type.SessionExpiration) {
                             ServiceManager.reLogin(
-                                new Runnable()
-                                {
-                                    public void run()
-                                    {
+                                new Runnable() {
+                                    public void run() {
                                         RequestMessage rm = error.getRequest();
-                                        if (rm != null && rm instanceof DataInstanceRequest)
-                                        {
+                                        if (rm != null && rm instanceof DataInstanceRequest) {
                                             query((DataInstanceRequest)rm);
                                         }
                                     }
                                 },
-                                new Runnable()
-                                {
-                                    public void run()
-                                    {
+                                new Runnable() {
+                                    public void run() {
                                     }
                                 }
                             );
-                        }
-                        else
-                        {
+                        } else {
                             String errorMsg = resp.getError().getMessage();
                             ChimeMessageBox.alert("Error", errorMsg, null);
                         }
                     }
                 }
             }
-            
-            public void onFailure(Throwable caught) 
-            {
-                if (isActive) {
-                    removeAll();
-                }
-            }
         };
 
-        findInstancesCallBack = new AsyncCallback() {
-            public void onSuccess(final Object result) 
-            {
+        findInstancesCallBack = new ChimeAsyncCallback<FindInstancesResponseObject>() {
+            public void onSuccess(FindInstancesResponseObject resp) { 
                 if (isActive) {
                     removeAll();
-                    FindInstancesResponseObject resp = (FindInstancesResponseObject)result;
                     final FindInstancesResponse response = resp.getResponse();
                     List<DataInstance> instances = response.getDataInstances();
 
@@ -140,13 +114,6 @@ public class DataInstanceStore extends ListStore<DataInstanceModel> implements Q
                     commitChanges();
 
                     notifyListener(response);
-                }
-            }
-            
-            public void onFailure(Throwable caught) 
-            {
-                if (isActive) {
-                    removeAll();
                 }
             }
         };

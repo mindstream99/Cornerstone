@@ -42,7 +42,7 @@ import com.extjs.gxt.ui.client.widget.menu.MenuItem;
 import com.extjs.gxt.ui.client.widget.toolbar.FillToolItem;
 import com.extjs.gxt.ui.client.widget.toolbar.SeparatorToolItem;
 import com.extjs.gxt.ui.client.widget.toolbar.ToolBar;
-import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.paxxis.chime.client.ChimeAsyncCallback;
 import com.paxxis.chime.client.ChimeListStore;
 import com.paxxis.chime.client.SearchCriteriaSortOrderModel;
 import com.paxxis.chime.client.SearchFilterModifyListener;
@@ -665,29 +665,17 @@ public class AdvancedSearchPanel extends ChimeLayoutContainer
     
     protected void initCriteria(final DataInstance shape)
     {
-        final AsyncCallback callback = new AsyncCallback()
-        {
-            public void onFailure(Throwable arg0) 
-            {
-                // let the user know...
-            }
-
-            public void onSuccess(final Object result) 
-            {
-                Shape type = ((ShapeResponseObject)result).getResponse().getShape();
+        final ChimeAsyncCallback<ShapeResponseObject> callback = new ChimeAsyncCallback<ShapeResponseObject>() {
+            public void onSuccess(ShapeResponseObject resp) {
+                Shape shape = resp.getResponse().getShape();
 
                 // we don't want Internals
-                if (type.isPrimitive())
-                {
-                    //_dataTypeComboBox.invalidate(type.getName() + " is not searchable");
-                }
-                else
-                {
+                if (!shape.isPrimitive()) {
                     _criteria = new SearchCriteria();
                     
                     // is this the permanent way to deal with this?
                     SearchFilter filter = new SearchFilter();
-                    filter.setValue(type.getId(), type.getName());
+                    filter.setValue(shape.getId(), shape.getName());
                     filter.setEnabled(true);
                     filter.setOperator(Operator.Reference);
                     DataField f = new DataField();
@@ -695,7 +683,7 @@ public class AdvancedSearchPanel extends ChimeLayoutContainer
                     filter.setDataField(f);
                     //_activeFilter = filter;
 
-                    setupCriteria(type, true, true, true);
+                    setupCriteria(shape, true, true, true);
                 }
             }
         };

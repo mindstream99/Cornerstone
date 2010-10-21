@@ -41,7 +41,7 @@ import com.extjs.gxt.ui.client.widget.form.FormPanel;
 import com.extjs.gxt.ui.client.widget.form.TextField;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.DeferredCommand;
-import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.paxxis.chime.client.ChimeAsyncCallback;
 import com.paxxis.chime.client.ChimeListStore;
 import com.paxxis.chime.client.DataFieldModel;
 import com.paxxis.chime.client.DataInputListener;
@@ -565,26 +565,15 @@ public class ComplexSearchFilterEditor extends ChimeWindow
     
     protected void initCriteria(final DataInstance shape)
     {
-        final AsyncCallback callback = new AsyncCallback()
-        {
-            public void onFailure(Throwable arg0) 
-            {
-                // let the user know...
-            }
-
-            public void onSuccess(final Object result) 
-            {
-                Shape type = ((ShapeResponseObject)result).getResponse().getShape();
+        final ChimeAsyncCallback<ShapeResponseObject> callback = new ChimeAsyncCallback<ShapeResponseObject>() {
+            public void onSuccess(ShapeResponseObject resp) { 
+                Shape shape = resp.getResponse().getShape();
 
                 // we don't want Internals
-                if (type.isPrimitive())
-                {
-                    _dataTypeComboBox.invalidate(type.getName() + " is not searchable");
-                }
-                else
-                {
-                    //searchCriteria = new SearchCriteria();
-                    setupFields(type);
+                if (shape.isPrimitive()) {
+                    _dataTypeComboBox.invalidate(shape.getName() + " is not searchable");
+                } else {
+                    setupFields(shape);
                 }
             }
         };

@@ -26,7 +26,7 @@ import com.extjs.gxt.ui.client.widget.LayoutContainer;
 import com.extjs.gxt.ui.client.widget.layout.FlowData;
 import com.extjs.gxt.ui.client.widget.layout.RowData;
 import com.extjs.gxt.ui.client.widget.layout.RowLayout;
-import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.paxxis.chime.client.ChimeAsyncCallback;
 import com.paxxis.chime.client.DiscussionsResponseObject;
 import com.paxxis.chime.client.InstanceUpdateListener;
 import com.paxxis.chime.client.Paginator;
@@ -52,7 +52,7 @@ public class DiscussionsPanel extends ChimeLayoutContainer implements PagingList
     private Paginator _paginator;
     private DiscussionsHeader _header;
     private LayoutContainer _resultsList;
-    private AsyncCallback callback;
+    private ChimeAsyncCallback<DiscussionsResponseObject> callback;
     private InstanceUpdateListener updateListener;
 
     public DiscussionsPanel(InstanceUpdateListener listener) {
@@ -95,21 +95,10 @@ public class DiscussionsPanel extends ChimeLayoutContainer implements PagingList
         PaginatorContainer south = new PaginatorContainer(_paginator);
         add(south, new RowData(1, -1));
 
-        callback = new AsyncCallback()
-        {
-            public void onFailure(Throwable arg0)
-            {
-            }
-
-            public void onSuccess(Object obj)
-            {
-                DiscussionsResponseObject response = (DiscussionsResponseObject)obj;
-                if (response.isResponse())
-                {
+        callback = new ChimeAsyncCallback<DiscussionsResponseObject>() {
+            public void onSuccess(DiscussionsResponseObject response) {
+                if (response.isResponse()) {
                     update(response.getResponse().getDiscussions(), response.getResponse().getCursor());
-                }
-                else
-                {
                 }
             }
         };

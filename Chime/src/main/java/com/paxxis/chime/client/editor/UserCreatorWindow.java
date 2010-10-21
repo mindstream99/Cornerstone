@@ -32,6 +32,7 @@ import com.extjs.gxt.ui.client.widget.form.TextField;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.DeferredCommand;
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.paxxis.chime.client.ChimeAsyncCallback;
 import com.paxxis.chime.client.DataInstanceResponseObject;
 import com.paxxis.chime.client.LoginResponseObject;
 import com.paxxis.chime.client.ServiceManager;
@@ -100,12 +101,8 @@ public class UserCreatorWindow extends ChimeWindow
 
     protected void init() {
     	postInit();
-        AsyncCallback callback = new AsyncCallback() {
-            public void onFailure(Throwable result) {
-            }
-
-            public void onSuccess(final Object result) {
-                ShapeResponseObject resp = (ShapeResponseObject)result;
+        ChimeAsyncCallback<ShapeResponseObject> callback = new ChimeAsyncCallback<ShapeResponseObject>() {
+            public void onSuccess(ShapeResponseObject resp) {
                 if (resp.isResponse()) {
                 	userShape = resp.getResponse().getShape();
                 	validate();
@@ -226,12 +223,8 @@ public class UserCreatorWindow extends ChimeWindow
     }
 
     protected void createInstance(final EditUserRequest req) {
-        AsyncCallback callback = new AsyncCallback() {
-            public void onFailure(Throwable result) {
-            }
-
-            public void onSuccess(final Object result) {
-                DataInstanceResponseObject resp = (DataInstanceResponseObject)result;
+        ChimeAsyncCallback<DataInstanceResponseObject> callback = new ChimeAsyncCallback<DataInstanceResponseObject>() {
+            public void onSuccess(DataInstanceResponseObject resp) {
                 if (resp.isResponse()) {
                     DataInstanceResponse response = resp.getResponse();
                     List<DataInstance> instances = response.getDataInstances();
@@ -259,12 +252,9 @@ public class UserCreatorWindow extends ChimeWindow
     }
 
     protected void doCreate(EditUserRequest req) {
-        AsyncCallback callback = new AsyncCallback() {
-            public void onFailure(Throwable result) {
-            }
-
-            public void onSuccess(final Object result) {
-                ServiceResponseObject<EditUserResponse> resp = (ServiceResponseObject<EditUserResponse>)result;
+        ChimeAsyncCallback<ServiceResponseObject<EditUserResponse>> callback = 
+        			new ChimeAsyncCallback<ServiceResponseObject<EditUserResponse>>() {
+            public void onSuccess(ServiceResponseObject<EditUserResponse> resp) {
                 if (resp.isResponse()) {
                     EditUserResponse response = resp.getResponse();
                     User inst = response.getUser();

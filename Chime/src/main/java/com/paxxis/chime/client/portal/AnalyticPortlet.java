@@ -27,6 +27,7 @@ import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.DeferredCommand;
 import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.paxxis.chime.client.ChimeAsyncCallback;
 import com.paxxis.chime.client.DataInstanceResponseObject;
 import com.paxxis.chime.client.ServiceManager;
 import com.paxxis.chime.client.ServiceManagerListener;
@@ -77,7 +78,7 @@ public class AnalyticPortlet extends PortletContainer {
             DeferredCommand.addCommand(
                     new Command() {
                         public void execute() {
-                            final AsyncCallback<DataInstanceResponseObject> callback = new AsyncCallback<DataInstanceResponseObject>() {
+                            final ChimeAsyncCallback<DataInstanceResponseObject> callback = new ChimeAsyncCallback<DataInstanceResponseObject>() {
                                 public void onSuccess(final DataInstanceResponseObject resp) {
                                     if (resp.isResponse()) {
                                         final DataInstanceResponse response = resp.getResponse();
@@ -115,10 +116,6 @@ public class AnalyticPortlet extends PortletContainer {
                                             getPropertiesContainer().layout();
                                         }
                                     }
-                                }
-
-                                public void onFailure(Throwable caught)
-                                {
                                 }
                             };
 
@@ -299,11 +296,8 @@ public class AnalyticPortlet extends PortletContainer {
     }
 
     private void runScript() {
-        AsyncCallback<ServiceResponseObject<RunCALScriptResponse>> callback = new AsyncCallback<ServiceResponseObject<RunCALScriptResponse>>() {
-            public void onFailure(Throwable arg0) {
-                ChimeMessageBox.alert("System Error", "Please contact the system administrator.", null);
-            }
-
+        ChimeAsyncCallback<ServiceResponseObject<RunCALScriptResponse>> callback = 
+        			new ChimeAsyncCallback<ServiceResponseObject<RunCALScriptResponse>>() {
             public void onSuccess(ServiceResponseObject<RunCALScriptResponse> response) {
                 if (response.isResponse()) {
                     RunCALScriptResponse resp = response.getResponse();
@@ -377,7 +371,8 @@ public class AnalyticPortlet extends PortletContainer {
             {
                 public void execute()
                 {
-                    final AsyncCallback<DataInstanceResponseObject> callback = new AsyncCallback<DataInstanceResponseObject>() {
+                    final ChimeAsyncCallback<DataInstanceResponseObject> callback =  
+                    		new ChimeAsyncCallback<DataInstanceResponseObject>() {
                         public void onSuccess(DataInstanceResponseObject resp) {
                             if (resp.isResponse()) {
                                 final DataInstanceResponse response = resp.getResponse();
@@ -389,10 +384,6 @@ public class AnalyticPortlet extends PortletContainer {
                                     }
                                 }
                             }
-                        }
-
-                        public void onFailure(Throwable caught) {
-                        	
                         }
                     };
 

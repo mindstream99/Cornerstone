@@ -28,7 +28,7 @@ import com.extjs.gxt.ui.client.widget.button.Button;
 import com.extjs.gxt.ui.client.widget.layout.FlowData;
 import com.extjs.gxt.ui.client.widget.layout.RowData;
 import com.extjs.gxt.ui.client.widget.layout.RowLayout;
-import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.paxxis.chime.client.ChimeAsyncCallback;
 import com.paxxis.chime.client.InstanceUpdateListener;
 import com.paxxis.chime.client.Paginator;
 import com.paxxis.chime.client.PaginatorContainer;
@@ -57,7 +57,7 @@ public class ReviewsPanel extends ChimeLayoutContainer implements PagingListener
     private Paginator _paginator;
     private ReviewsHeader _header;
     private LayoutContainer _resultsList;
-    private AsyncCallback callback;
+    private ChimeAsyncCallback<RatingsResponseObject> callback;
     private SearchFilter _filter = null;
     private SortOrder sortOrder = SortOrder.ByMostRecentEdit;
     private InstanceUpdateListener updateListener;
@@ -119,21 +119,10 @@ public class ReviewsPanel extends ChimeLayoutContainer implements PagingListener
 
         add(south, new RowData(1, -1));
         
-        callback = new AsyncCallback()
-        {
-            public void onFailure(Throwable arg0) 
-            {
-            }
-
-            public void onSuccess(Object obj) 
-            {
-                RatingsResponseObject response = (RatingsResponseObject)obj;
-                if (response.isResponse())
-                {
+        callback = new ChimeAsyncCallback<RatingsResponseObject>() {
+            public void onSuccess(RatingsResponseObject response) { 
+                if (response.isResponse()) {
                     update(response.getResponse().getRatings(), response.getResponse().getCursor());
-                }
-                else
-                { 
                 }
             }
         };

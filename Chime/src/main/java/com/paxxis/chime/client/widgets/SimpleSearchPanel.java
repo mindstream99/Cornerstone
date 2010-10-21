@@ -18,7 +18,7 @@
 package com.paxxis.chime.client.widgets;
 
 import java.util.List;
-import com.extjs.gxt.ui.client.Style.Scroll;
+
 import com.extjs.gxt.ui.client.event.IconButtonEvent;
 import com.extjs.gxt.ui.client.event.SelectionListener;
 import com.extjs.gxt.ui.client.widget.LayoutContainer;
@@ -29,7 +29,7 @@ import com.extjs.gxt.ui.client.widget.toolbar.ToolBar;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.DeferredCommand;
 import com.google.gwt.user.client.Element;
-import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.paxxis.chime.client.ChimeAsyncCallback;
 import com.paxxis.chime.client.DataInstanceResponseObject;
 import com.paxxis.chime.client.FilledColumnLayoutData;
 import com.paxxis.chime.client.SearchProvider;
@@ -127,23 +127,18 @@ public class SimpleSearchPanel extends Navigator {
     
     private void openSearch(InstanceId id) {
 
-        final AsyncCallback callback = new AsyncCallback() {
-            public void onSuccess(final Object result)
-            {
-                DataInstanceResponseObject resp = (DataInstanceResponseObject)result;
-                if (resp.isResponse())
-                {
+        final ChimeAsyncCallback<DataInstanceResponseObject> callback = 
+        		new ChimeAsyncCallback<DataInstanceResponseObject>() {
+            public void onSuccess(DataInstanceResponseObject resp) {
+                if (resp.isResponse()) {
                     final DataInstanceResponse response = resp.getResponse();
                     List<DataInstance> instances = response.getDataInstances();
-                    if (instances.size() > 0)
-                    {
+                    if (instances.size() > 0) {
                         recentNamedSearch = (NamedSearch)instances.get(0);
                         recentKeywords = "";
                         DeferredCommand.addCommand(
-                            new Command()
-                            {
-                                public void execute()
-                                {
+                            new Command() {
+                                public void execute() {
                                     PageManager.instance().openSearch(recentNamedSearch.getSearchCriteria(), false);
                                 	String txt = "Active Named Search: " + Utils.toHoverUrl(recentNamedSearch);
                                 	setActiveHtml(txt);
@@ -152,10 +147,6 @@ public class SimpleSearchPanel extends Navigator {
                         );
                     }
                 }
-            }
-
-            public void onFailure(Throwable caught)
-            {
             }
         };
 

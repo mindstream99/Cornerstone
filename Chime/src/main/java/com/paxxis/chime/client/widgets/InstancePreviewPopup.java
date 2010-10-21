@@ -24,7 +24,7 @@ import com.extjs.gxt.ui.client.util.Point;
 import com.extjs.gxt.ui.client.widget.Component;
 import com.extjs.gxt.ui.client.widget.layout.FitData;
 import com.extjs.gxt.ui.client.widget.layout.FitLayout;
-import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.paxxis.chime.client.ChimeAsyncCallback;
 import com.paxxis.chime.client.DataInstanceResponseObject;
 import com.paxxis.chime.client.ServiceManager;
 import com.paxxis.chime.client.common.DataField;
@@ -105,14 +105,9 @@ public class InstancePreviewPopup extends ChimePopup {
 			return;
 		}
 		
-        final AsyncCallback callback = new AsyncCallback()
-        {
-            public void onFailure(Throwable arg0) {
-            }
-
-            public void onSuccess(Object obj)
-            {
-                DataInstanceResponseObject response = (DataInstanceResponseObject)obj;
+        final ChimeAsyncCallback<DataInstanceResponseObject> callback = 
+        		new ChimeAsyncCallback<DataInstanceResponseObject>() {
+            public void onSuccess(DataInstanceResponseObject response) {
                 if (response.isResponse()) {
                     List<DataInstance> list = response.getResponse().getDataInstances();
                     if (list.size() == 1) {

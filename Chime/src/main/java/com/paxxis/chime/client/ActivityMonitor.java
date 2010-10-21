@@ -20,12 +20,12 @@ package com.paxxis.chime.client;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.DeferredCommand;
 import com.google.gwt.user.client.Timer;
-import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.paxxis.chime.client.common.DataInstance;
 import com.paxxis.chime.client.common.DataInstanceEvent;
 import com.paxxis.chime.client.common.Message;
 import com.paxxis.chime.client.common.PingRequest;
 import com.paxxis.chime.client.common.PingResponse;
+import com.paxxis.chime.client.common.User;
 import com.paxxis.chime.client.pages.PageManager;
 import com.paxxis.chime.client.pages.PortalViewPage;
 import com.paxxis.chime.client.widgets.SessionTimeoutPendingWindow;
@@ -96,8 +96,8 @@ public class ActivityMonitor {
     	eventListener = new RemoteEventListener() {
 			public void apply(Event eventWrapper) {
 				try {
-					if (eventWrapper instanceof EventWrapper) {
-		            	final Message event = ((EventWrapper)eventWrapper).getMessage();
+					if (eventWrapper instanceof EventWrapper<?>) {
+		            	final Message event = ((EventWrapper<?>)eventWrapper).getMessage();
 		            	DeferredCommand.addCommand(
 		            		new Command() {
 		            			public void execute() {
@@ -132,15 +132,9 @@ public class ActivityMonitor {
     }
     
     private void processSession() {
-        final AsyncCallback<ServiceResponseObject<PingResponse>> callback = new AsyncCallback<ServiceResponseObject<PingResponse>>()
-        {
-            public void onFailure(Throwable arg0)
-            {
-            }
-
-            @SuppressWarnings("unchecked")
-			public void onSuccess(ServiceResponseObject<PingResponse> response)
-            {
+        final ChimeAsyncCallback<ServiceResponseObject<PingResponse>> callback = 
+        		new ChimeAsyncCallback<ServiceResponseObject<PingResponse>>() {
+			public void onSuccess(ServiceResponseObject<PingResponse> response) {
                 if (response.isResponse()) {
                     PingResponse resp = response.getResponse();
                     if (resp.isPendingTimeout()) {
@@ -157,11 +151,14 @@ public class ActivityMonitor {
         boolean active = _isActive;
         _isActive = false;
         
-        // send a ping to the service
-        PingRequest request = new PingRequest();
-        request.setUser(ServiceManager.getActiveUser());
-        request.setUserActivity(active);
-        ServiceManager.getService().sendPingRequest(request, callback);
+        User activeUser = ServiceManager.getActiveUser();
+        if (activeUser != null) {
+            // send a ping to the service
+            PingRequest request = new PingRequest();
+            request.setUser(activeUser);
+            request.setUserActivity(active);
+            ServiceManager.getService().sendPingRequest(request, callback);
+        }
     }
 
     private void sessionTimeoutPending() {
@@ -177,17 +174,10 @@ public class ActivityMonitor {
     }
     
     private void processStale() {
-        final AsyncCallback<ServiceResponseObject<PingResponse>> callback = new AsyncCallback<ServiceResponseObject<PingResponse>>()
-        {
-            public void onFailure(Throwable arg0)
-            {
-                //ChimeMessageBox.alert("System Error", "Please contact the system administrator.", null);
-            }
-
-            public void onSuccess(ServiceResponseObject<PingResponse> response)
-            {
-                if (response.isResponse())
-                {
+        final ChimeAsyncCallback<ServiceResponseObject<PingResponse>> callback = 
+        		new ChimeAsyncCallback<ServiceResponseObject<PingResponse>>() {
+            public void onSuccess(ServiceResponseObject<PingResponse> response) {
+                if (response.isResponse()) {
                     PingResponse resp = response.getResponse();
 
                     DataInstance inst = resp.getActiveInstance();
@@ -199,23 +189,23 @@ public class ActivityMonitor {
                     // update the user
                     ServiceManager.updateActiveUser(resp.getUser());
                 }
-                else 
-                {
-                }
             }
  
         };
 
-        // send a stale data ping to the service
-        PingRequest request = new PingRequest();
-        request.setUser(ServiceManager.getActiveUser());
+        User activeUser = ServiceManager.getActiveUser();
+        if (activeUser != null) {
+            // send a stale data ping to the service
+            PingRequest request = new PingRequest();
+            request.setUser(activeUser);
 
-        DataInstance inst = PageManager.instance().getActiveNavigatorInstance();
-        if (inst != null) {
-            request.setActiveInstanceId(inst.getId());
+            DataInstance inst = PageManager.instance().getActiveNavigatorInstance();
+            if (inst != null) {
+                request.setActiveInstanceId(inst.getId());
+            }
+
+            ServiceManager.getService().sendPingRequest(request, callback);
         }
-
-        ServiceManager.getService().sendPingRequest(request, callback);
     }
 }
 

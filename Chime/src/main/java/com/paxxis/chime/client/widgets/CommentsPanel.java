@@ -27,6 +27,7 @@ import com.extjs.gxt.ui.client.widget.button.Button;
 import com.extjs.gxt.ui.client.widget.layout.RowData;
 import com.extjs.gxt.ui.client.widget.layout.RowLayout;
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.paxxis.chime.client.ChimeAsyncCallback;
 import com.paxxis.chime.client.CommentsResponseObject;
 import com.paxxis.chime.client.InstanceUpdateListener;
 import com.paxxis.chime.client.Paginator;
@@ -60,7 +61,7 @@ public class CommentsPanel extends ChimeLayoutContainer implements PagingListene
     private LayoutContainer _resultsList;
     private CommentsHeader _header;
     private PaginatorContainer _south;
-    private AsyncCallback pagedCallback;
+    private ChimeAsyncCallback<CommentsResponseObject> pagedCallback;
     private SearchFilter _filter = null;
     private Type type;
     private SortOrder sortOrder = SortOrder.ByMostRecentEdit;
@@ -129,21 +130,10 @@ public class CommentsPanel extends ChimeLayoutContainer implements PagingListene
 
         add(_south, new RowData(1, -1));
         
-        pagedCallback = new AsyncCallback()
-        {
-            public void onFailure(Throwable arg0) 
-            {
-            }
-
-            public void onSuccess(Object obj) 
-            {
-                CommentsResponseObject response = (CommentsResponseObject)obj;
-                if (response.isResponse())
-                {
+        pagedCallback = new ChimeAsyncCallback<CommentsResponseObject>() {
+            public void onSuccess(CommentsResponseObject response) { 
+                if (response.isResponse()) {
                     update(response.getResponse().getComments(), response.getResponse().getCursor());
-                }
-                else
-                {
                 }
             }
         };

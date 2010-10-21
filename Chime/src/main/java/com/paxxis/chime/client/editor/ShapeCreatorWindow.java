@@ -38,6 +38,7 @@ import com.extjs.gxt.ui.client.widget.layout.FormLayout;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.DeferredCommand;
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.paxxis.chime.client.ChimeAsyncCallback;
 import com.paxxis.chime.client.ChimeListStore;
 import com.paxxis.chime.client.LoginResponseObject;
 import com.paxxis.chime.client.ServiceManager;
@@ -215,13 +216,8 @@ public class ShapeCreatorWindow extends ChimeWindow
     }
 
     protected void createInstance(final EditShapeRequest req) {
-        AsyncCallback callback = new AsyncCallback() {
-            public void onFailure(Throwable result) {
-                //ChimeMessageBox.alert("Error", resp.getError().getMessage(), null);
-            }
-
-            public void onSuccess(final Object result) {
-                ShapeResponseObject resp = (ShapeResponseObject)result;
+        ChimeAsyncCallback<ShapeResponseObject> callback = new ChimeAsyncCallback<ShapeResponseObject>() {
+            public void onSuccess(ShapeResponseObject resp) {
                 if (resp.isResponse()) {
                     String msg = "There is already a shape called '" + nameField.getValue().trim() +
                             "'.  Please choose another name";
@@ -240,12 +236,9 @@ public class ShapeCreatorWindow extends ChimeWindow
     }
 
     protected void doCreate(EditShapeRequest req) {
-        AsyncCallback callback = new AsyncCallback() {
-            public void onFailure(Throwable result) {
-            }
-
-            public void onSuccess(final Object result) {
-                ServiceResponseObject<EditShapeResponse> resp = (ServiceResponseObject<EditShapeResponse>)result;
+        ChimeAsyncCallback<ServiceResponseObject<EditShapeResponse>> callback = 
+        				new ChimeAsyncCallback<ServiceResponseObject<EditShapeResponse>>() {
+            public void onSuccess(ServiceResponseObject<EditShapeResponse> resp) {
                 if (resp.isResponse()) {
                     EditShapeResponse response = resp.getResponse();
                     DataInstance inst = response.getShape();

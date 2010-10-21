@@ -22,7 +22,7 @@ import com.extjs.gxt.ui.client.util.Margins;
 import com.extjs.gxt.ui.client.util.Params;
 import com.extjs.gxt.ui.client.widget.LayoutContainer;
 import com.extjs.gxt.ui.client.widget.layout.FlowData;
-import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.paxxis.chime.client.ChimeAsyncCallback;
 import com.paxxis.chime.client.ServiceManager;
 import com.paxxis.chime.client.ServiceResponseObject;
 import com.paxxis.chime.client.Utils;
@@ -99,18 +99,10 @@ public class CommentPanel extends LayoutContainer
     
     public void sendVoteRequest(ApplyVoteRequest request)
     {
-        final AsyncCallback callback = new AsyncCallback()
-        {
-            public void onFailure(Throwable arg0)
-            {
-                ChimeMessageBox.alert("System Error", "Please contact the system administrator.", null);
-            }
-
-            public void onSuccess(Object obj)
-            {
-                ServiceResponseObject<ApplyVoteResponse> response = (ServiceResponseObject<ApplyVoteResponse>)obj;
-                if (response.isResponse())
-                {
+        final ChimeAsyncCallback<ServiceResponseObject<ApplyVoteResponse>> callback = 
+        		new ChimeAsyncCallback<ServiceResponseObject<ApplyVoteResponse>>() {
+            public void onSuccess(ServiceResponseObject<ApplyVoteResponse> response) {
+                if (response.isResponse()) {
                     _comment = (Comment)response.getResponse().getDataInstance();
                     update();
 
@@ -122,9 +114,7 @@ public class CommentPanel extends LayoutContainer
                     if (voteListener != null) {
                         voteListener.onVoteChange();
                     }
-                }
-                else
-                {
+                } else {
                     ChimeMessageBox.alert("Error", response.getError().getMessage(), null);
                 }
             }

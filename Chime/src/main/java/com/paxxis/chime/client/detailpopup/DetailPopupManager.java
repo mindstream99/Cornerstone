@@ -38,7 +38,7 @@ import com.extjs.gxt.ui.client.widget.layout.RowLayout;
 import com.google.gwt.dom.client.Element;
 import com.google.gwt.user.client.Event;
 import com.google.gwt.user.client.Timer;
-import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.paxxis.chime.client.ChimeAsyncCallback;
 import com.paxxis.chime.client.DataInstanceModel;
 import com.paxxis.chime.client.DataInstanceResponseObject;
 import com.paxxis.chime.client.FilledColumnLayout;
@@ -347,15 +347,9 @@ public class DetailPopupManager {
     
     private void getInstance(final InstanceId instanceId)
     {
-        final AsyncCallback callback = new AsyncCallback()
-        {
-            public void onFailure(Throwable arg0) {
-                popup = null;
-            }
-
-            public void onSuccess(Object obj)
-            {
-                DataInstanceResponseObject response = (DataInstanceResponseObject)obj;
+        final ChimeAsyncCallback<DataInstanceResponseObject> callback = 
+        	        new ChimeAsyncCallback<DataInstanceResponseObject>() {
+            public void onSuccess(DataInstanceResponseObject response) {
                 if (response.isResponse()) {
                     List<DataInstance> list = response.getResponse().getDataInstances();
                     if (list.size() == 1) {

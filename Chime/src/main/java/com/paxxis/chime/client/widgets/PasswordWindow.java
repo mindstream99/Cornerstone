@@ -28,7 +28,7 @@ import com.extjs.gxt.ui.client.widget.form.FormPanel;
 import com.extjs.gxt.ui.client.widget.form.TextField;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.DeferredCommand;
-import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.paxxis.chime.client.ChimeAsyncCallback;
 import com.paxxis.chime.client.ServiceManager;
 import com.paxxis.chime.client.ServiceResponseObject;
 import com.paxxis.chime.client.common.EditUserRequest;
@@ -215,18 +215,10 @@ public class PasswordWindow extends ChimeWindow {
 	}
 	
 	protected void updatePassword() {
-        final AsyncCallback callback = new AsyncCallback()
-        {
-            public void onFailure(Throwable arg0)
-            {
-                ChimeMessageBox.alert("System Error", "Please contact the system administrator.", null);
-            }
-
-            public void onSuccess(Object obj)
-            {
-                ServiceResponseObject<EditUserResponse> response = (ServiceResponseObject<EditUserResponse>)obj;
-                if (response.isResponse())
-                {
+        final ChimeAsyncCallback<ServiceResponseObject<EditUserResponse>> callback = 
+        		new ChimeAsyncCallback<ServiceResponseObject<EditUserResponse>>() {
+            public void onSuccess(ServiceResponseObject<EditUserResponse> response) {
+                if (response.isResponse()) {
                 	User newUser = response.getResponse().getUser();
                 	if (listener != null) {
                 		listener.onChange(newUser);
@@ -234,9 +226,7 @@ public class PasswordWindow extends ChimeWindow {
                 	
                 	hide();
                     ChimeMessageBox.info("Chime", "Password has been changed.", null);
-                }
-                else
-                {
+                } else {
                     ChimeMessageBox.alert("Error", response.getError().getMessage(), null);
                 }
             }

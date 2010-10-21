@@ -35,7 +35,7 @@ import com.extjs.gxt.ui.client.widget.menu.Menu;
 import com.extjs.gxt.ui.client.widget.toolbar.ToolBar;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.DeferredCommand;
-import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.paxxis.chime.client.ChimeAsyncCallback;
 import com.paxxis.chime.client.SearchFilterModifyListener;
 import com.paxxis.chime.client.SearchFilterPanel;
 import com.paxxis.chime.client.ServiceManager;
@@ -118,13 +118,8 @@ public class CommentsHeader extends LayoutContainer {
     
     public void sendRequest(AddCommentRequest request)
     {
-        final AsyncCallback<ServiceResponseObject<AddCommentResponse>> callback = 
-        		new AsyncCallback<ServiceResponseObject<AddCommentResponse>>()
-        {
-            public void onFailure(Throwable arg0) {
-                ChimeMessageBox.alert("System Error", "Please contact the system administrator.", null);
-            }
-
+        final ChimeAsyncCallback<ServiceResponseObject<AddCommentResponse>> callback = 
+        		new ChimeAsyncCallback<ServiceResponseObject<AddCommentResponse>>() {
             public void onSuccess(ServiceResponseObject<AddCommentResponse> response) {
                 if (response.isResponse()) {
                     _commentsChangedListener.onCommentsChanged(response.getResponse().getDataInstance());

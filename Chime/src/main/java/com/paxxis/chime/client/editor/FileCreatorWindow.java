@@ -46,6 +46,7 @@ import com.google.gwt.json.client.JSONValue;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.DeferredCommand;
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.paxxis.chime.client.ChimeAsyncCallback;
 import com.paxxis.chime.client.DataInstanceResponseObject;
 import com.paxxis.chime.client.LoginResponseObject;
 import com.paxxis.chime.client.ServiceManager;
@@ -113,10 +114,7 @@ public class FileCreatorWindow extends ChimeWindow
 
      protected void init() {
       	postInit();
-         AsyncCallback<ShapeResponseObject> callback = new AsyncCallback<ShapeResponseObject>() {
-             public void onFailure(Throwable result) {
-             }
-
+      	ChimeAsyncCallback<ShapeResponseObject> callback = new ChimeAsyncCallback<ShapeResponseObject>() {
              public void onSuccess(final ShapeResponseObject resp) {
                  if (resp.isResponse()) {
                  	fileShape = resp.getResponse().getShape();
@@ -274,11 +272,7 @@ public class FileCreatorWindow extends ChimeWindow
     }
 
     protected void createInstance(final EditDataInstanceRequest req, final String fileId, final String mimeType, final String extension, final long size) {
-        AsyncCallback<DataInstanceResponseObject> callback = new AsyncCallback<DataInstanceResponseObject>() {
-            public void onFailure(Throwable result) {
-                ChimeMessageBox.alert("Error", result.getMessage(), null);
-            }
-
+        ChimeAsyncCallback<DataInstanceResponseObject> callback = new ChimeAsyncCallback<DataInstanceResponseObject>() {
             public void onSuccess(final DataInstanceResponseObject resp) {
                 if (resp.isResponse()) {
                     DataInstanceResponse response = resp.getResponse();
@@ -322,11 +316,8 @@ public class FileCreatorWindow extends ChimeWindow
     }
 
     protected void doCreate(EditDataInstanceRequest req, String fileId, String mimeType, String extension, long size) {
-        AsyncCallback<ServiceResponseObject<EditDataInstanceResponse>> callback = 
-        	              new AsyncCallback<ServiceResponseObject<EditDataInstanceResponse>>() {
-            public void onFailure(Throwable result) {
-            }
-
+        ChimeAsyncCallback<ServiceResponseObject<EditDataInstanceResponse>> callback = 
+        	              new ChimeAsyncCallback<ServiceResponseObject<EditDataInstanceResponse>>() {
             public void onSuccess(final ServiceResponseObject<EditDataInstanceResponse> resp) {
                 if (resp.isResponse()) {
                     EditDataInstanceResponse response = resp.getResponse();

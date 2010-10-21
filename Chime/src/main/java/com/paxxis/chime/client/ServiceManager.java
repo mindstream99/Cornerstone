@@ -20,9 +20,11 @@ package com.paxxis.chime.client;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.extjs.gxt.ui.client.event.Listener;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.Cookies;
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.user.client.rpc.IncompatibleRemoteServiceException;
 import com.google.gwt.user.client.rpc.ServiceDefTarget;
 import com.paxxis.chime.client.common.AddCommentRequest;
 import com.paxxis.chime.client.common.AddCommentResponse;
@@ -36,6 +38,7 @@ import com.paxxis.chime.client.common.EditDataInstanceResponse;
 import com.paxxis.chime.client.common.InstanceId;
 import com.paxxis.chime.client.common.User;
 import com.paxxis.chime.client.widgets.ChimeMessageBox;
+import com.paxxis.chime.client.widgets.ChimeMessageBoxEvent;
 import com.paxxis.chime.client.widgets.LoginWindow;
 
 /**
@@ -45,6 +48,8 @@ import com.paxxis.chime.client.widgets.LoginWindow;
 public class ServiceManager 
 {
     private static final String LOGINCOOKIENAME = "ChimeCookie";
+    
+    private static boolean showingServiceAlert = false;
     
     private static User _user = null;
     private static ArrayList<ServiceManagerListener> _listeners = new ArrayList<ServiceManagerListener>();
@@ -142,36 +147,76 @@ public class ServiceManager
         }
     }
     
-    public static void logout()
-    {
-        final AsyncCallback callback = new AsyncCallback()
-        {
-            public void onFailure(Throwable arg0) 
-            {
-                ChimeMessageBox.alert("System Error", "Please contact the system administrator.", null);
+    public static void handleServiceError(Throwable t) {
+    	if (t instanceof IncompatibleRemoteServiceException) {
+    		ServiceManager.handleIncompatibleService();
+    	} else {
+    		String msg = "The Chime service may be down, or the version of Chime you are using may not be up to date." +
+    					 "<br><br>Please refresh your browser or clear the browser cache and try again." +
+    					 "  If this problem persists, please contact your system administrator.";
+    		showServiceAlert(msg);
+    	}
+    }
+    
+    private static void handleIncompatibleService() {
+    	showServiceAlert("The version of Chime you are using is not up to date.<br><br>Please refresh your browser or clear the browser cache and try again.");
+    }
+    
+    public static void clearServiceAlertFlag() {
+    	showingServiceAlert = false;
+    }
+    
+    private static void showServiceAlert(String msg) {
+    	// the showingServiceAlert flag prevents the alert dialogs
+    	// from piling up
+    	if (!showingServiceAlert) {
+        	showingServiceAlert = true;
+        	Listener<ChimeMessageBoxEvent> listener = new Listener<ChimeMessageBoxEvent>() {
+    			@Override
+    			public void handleEvent(ChimeMessageBoxEvent evt) {
+    				logout(true);
+    				showingServiceAlert = false;
+    			}
+        	};
+        	
+        	ChimeMessageBox.alert("Chime", msg, listener);
+    	}
+    }
+    
+    public static void logout() {
+    	logout(false);
+    }
+    
+    public static void logout(boolean abandon) {
+        final ChimeAsyncCallback<LogoutResponseObject> callback = new ChimeAsyncCallback<LogoutResponseObject>() {
+            public void onFailure(Throwable t) {
+            	if (t instanceof IncompatibleRemoteServiceException) {
+            		// let's not bother the user at this point.  who knows, maybe the browser will be refreshed
+            		// before the next attempt to log in.
+            	} else {
+                    ServiceManager.handleServiceError(t);
+            	}
             }
 
-            public void onSuccess(Object obj) 
-            {
-                LogoutResponseObject response = (LogoutResponseObject)obj;
-                if (response.isResponse())
-                {
-                    _user = null;
-                }
-                else
-                {
-                    _user = null;
-                }
-
-                updateLoginCookie();
-                ServiceManager.notifyLogout();
+            public void onSuccess(LogoutResponseObject response) {
+            	abandonSession();
             }
 
         };
 
-        ServiceManager.getService().logout(_user, callback);
+        if (abandon) {
+        	abandonSession();
+        } else {
+            ServiceManager.getService().logout(_user, callback);
+        }
     }
 
+    private static void abandonSession() {
+        _user = null;
+        updateLoginCookie();
+        ServiceManager.notifyLogout();
+    }
+    
     public static boolean hasLoginCookie() {
         return null != Cookies.getCookie(LOGINCOOKIENAME);
     }
@@ -186,25 +231,14 @@ public class ServiceManager
             user.setId(InstanceId.create(parts[0]));
             user.setSessionToken(parts[1]);
 
-            final AsyncCallback callback = new AsyncCallback()
-            {
-                public void onFailure(Throwable arg0) 
-                {
-                    ChimeMessageBox.alert("System Error", "Please contact the system administrator.", null);
-                }
-
-                public void onSuccess(Object obj) 
-                {
-                    LoginResponseObject response = (LoginResponseObject)obj;
-                    if (response.isResponse())
-                    {
+            final ChimeAsyncCallback<LoginResponseObject> callback = new ChimeAsyncCallback<LoginResponseObject>() {
+                public void onSuccess(LoginResponseObject response) {
+                    if (response.isResponse()) {
                         _user = response.getResponse().getUser();
-                    }
-                    else
-                    {
+                    } else {
                         _user = null;
                     }
-                    //PageManager.instance().openHome(true);
+
                     ServiceManager.notifyLoginResponse(response);
                 }
 
@@ -240,27 +274,13 @@ public class ServiceManager
         w.show();
     }
     
-    public static void login(String name, String pw)
-    {
-        final AsyncCallback callback = new AsyncCallback()
-        {
-            public void onFailure(Throwable arg0) 
-            {
-                ChimeMessageBox.alert("System Error", "Please contact the system administrator.", null);
-            }
-
-            public void onSuccess(Object obj) 
-            {
-                LoginResponseObject response = (LoginResponseObject)obj;
-                if (response.isResponse())
-                {
+    public static void login(String name, String pw) {
+        final ChimeAsyncCallback<LoginResponseObject> callback = new ChimeAsyncCallback<LoginResponseObject>() {
+            public void onSuccess(LoginResponseObject response) { 
+                if (response.isResponse()) {
                     _user = response.getResponse().getUser();
-                }
-                else
-                {
+                } else {
                     _user = null;
-
-                    //ChimeMessageBox.alert("Login Failed", "Please check your username and password.", null);
                 }
 
                 updateLoginCookie();
@@ -274,22 +294,12 @@ public class ServiceManager
 
     public static void sendRequest(ApplyTagRequest request)
     {
-        final AsyncCallback callback = new AsyncCallback()
-        {
-            public void onFailure(Throwable arg0) 
-            {
-                ChimeMessageBox.alert("System Error", "Please contact the system administrator.", null);
-            }
-
-            public void onSuccess(Object obj) 
-            {
-                ServiceResponseObject<ApplyTagResponse> response = (ServiceResponseObject<ApplyTagResponse>)obj;
-                if (response.isResponse())
-                {
+        final ChimeAsyncCallback<ServiceResponseObject<ApplyTagResponse>> callback = 
+        		new ChimeAsyncCallback<ServiceResponseObject<ApplyTagResponse>>() {
+            public void onSuccess(ServiceResponseObject<ApplyTagResponse> response) { 
+                if (response.isResponse()) {
                     ServiceManager.notifyDataInstanceUpdate(response.getResponse().getDataInstance());
-                }
-                else
-                {
+                } else {
                     ChimeMessageBox.alert("Error", response.getError().getMessage(), null);
                 }
             }
@@ -301,22 +311,12 @@ public class ServiceManager
     
     public static void sendRequest(ApplyReviewRequest request)
     {
-        final AsyncCallback callback = new AsyncCallback()
-        {
-            public void onFailure(Throwable arg0) 
-            {
-                ChimeMessageBox.alert("System Error", "Please contact the system administrator.", null);
-            }
-
-            public void onSuccess(Object obj) 
-            {
-                ServiceResponseObject<ApplyReviewResponse> response = (ServiceResponseObject<ApplyReviewResponse>)obj;
-                if (response.isResponse())
-                {
+        final ChimeAsyncCallback<ServiceResponseObject<ApplyReviewResponse>> callback = 
+        		new ChimeAsyncCallback<ServiceResponseObject<ApplyReviewResponse>>() {
+            public void onSuccess(ServiceResponseObject<ApplyReviewResponse> response) { 
+                if (response.isResponse()) {
                     ServiceManager.notifyDataInstanceUpdate(response.getResponse().getDataInstance());
-                }
-                else
-                {
+                } else {
                     ChimeMessageBox.alert("Error", response.getError().getMessage(), null);
                 }
             }
@@ -327,22 +327,12 @@ public class ServiceManager
     }
     
     public static void sendRequest(EditDataInstanceRequest request) {
-        final AsyncCallback callback = new AsyncCallback()
-        {
-            public void onFailure(Throwable arg0) 
-            {
-                ChimeMessageBox.alert("System Error", "Please contact the system administrator.", null);
-            }
-
-            public void onSuccess(Object obj) 
-            {
-                ServiceResponseObject<EditDataInstanceResponse> response = (ServiceResponseObject<EditDataInstanceResponse>)obj;
-                if (response.isResponse())
-                {
+        final ChimeAsyncCallback<ServiceResponseObject<EditDataInstanceResponse>> callback = 
+        		new ChimeAsyncCallback<ServiceResponseObject<EditDataInstanceResponse>>() {
+            public void onSuccess(ServiceResponseObject<EditDataInstanceResponse> response) { 
+                if (response.isResponse()) {
                     ServiceManager.notifyDataInstanceUpdate(response.getResponse().getDataInstance());
-                }
-                else
-                {
+                } else {
                     ChimeMessageBox.alert("Error", response.getError().getMessage(), null);
                 }
             }
@@ -353,22 +343,12 @@ public class ServiceManager
     
     public static void sendRequest(AddCommentRequest request)
     {
-        final AsyncCallback callback = new AsyncCallback()
-        {
-            public void onFailure(Throwable arg0) 
-            {
-                ChimeMessageBox.alert("System Error", "Please contact the system administrator.", null);
-            }
-
-            public void onSuccess(Object obj) 
-            {
-                ServiceResponseObject<AddCommentResponse> response = (ServiceResponseObject<AddCommentResponse>)obj;
-                if (response.isResponse())
-                {
+        final ChimeAsyncCallback<ServiceResponseObject<AddCommentResponse>> callback = 
+        		new ChimeAsyncCallback<ServiceResponseObject<AddCommentResponse>>() {
+            public void onSuccess(ServiceResponseObject<AddCommentResponse> response) { 
+                if (response.isResponse()) {
                     ServiceManager.notifyDataInstanceUpdate(response.getResponse().getDataInstance());
-                }
-                else
-                {
+                } else {
                     ChimeMessageBox.alert("Error", response.getError().getMessage(), null);
                 }
             }

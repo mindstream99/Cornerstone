@@ -30,7 +30,7 @@ import com.extjs.gxt.ui.client.widget.layout.RowLayout;
 import com.extjs.gxt.ui.client.widget.menu.CheckMenuItem;
 import com.extjs.gxt.ui.client.widget.menu.Menu;
 import com.extjs.gxt.ui.client.widget.toolbar.ToolBar;
-import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.paxxis.chime.client.ChimeAsyncCallback;
 import com.paxxis.chime.client.ServiceManager;
 import com.paxxis.chime.client.ServiceResponseObject;
 import com.paxxis.chime.client.common.ApplyTagRequest;
@@ -76,12 +76,8 @@ public class TagsHeader extends LayoutContainer {
     
     public void sendRequest(ApplyTagRequest request)
     {
-        final AsyncCallback<ServiceResponseObject<ApplyTagResponse>> callback = 
-        		new AsyncCallback<ServiceResponseObject<ApplyTagResponse>>() {
-            public void onFailure(Throwable arg0) {
-                ChimeMessageBox.alert("System Error", "Please contact the system administrator.", null);
-            }
-
+        final ChimeAsyncCallback<ServiceResponseObject<ApplyTagResponse>> callback = 
+        		new ChimeAsyncCallback<ServiceResponseObject<ApplyTagResponse>>() {
             public void onSuccess(ServiceResponseObject<ApplyTagResponse> response) {
                 if (response.isResponse()) {
                     _tagsChangedListener.onTagsChanged(response.getResponse().getDataInstance());

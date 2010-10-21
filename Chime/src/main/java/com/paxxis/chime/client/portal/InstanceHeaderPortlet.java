@@ -42,7 +42,7 @@ import com.extjs.gxt.ui.client.widget.menu.SeparatorMenuItem;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.DeferredCommand;
 import com.google.gwt.user.client.Timer;
-import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.paxxis.chime.client.ChimeAsyncCallback;
 import com.paxxis.chime.client.InstanceUpdateListener;
 import com.paxxis.chime.client.ServiceManager;
 import com.paxxis.chime.client.ServiceResponseObject;
@@ -487,11 +487,8 @@ public class InstanceHeaderPortlet extends PortletContainer {
     }
 
     public void sendVoteRequest(ApplyVoteRequest request) {
-        final AsyncCallback<ServiceResponseObject<ApplyVoteResponse>> callback = new AsyncCallback<ServiceResponseObject<ApplyVoteResponse>>() {
-            public void onFailure(Throwable arg0) {
-                ChimeMessageBox.alert("System Error", "Please contact the system administrator.", null);
-            }
-
+        final ChimeAsyncCallback<ServiceResponseObject<ApplyVoteResponse>> callback = 
+        		new ChimeAsyncCallback<ServiceResponseObject<ApplyVoteResponse>>() {
             public void onSuccess(ServiceResponseObject<ApplyVoteResponse> response) {
                 if (response.isResponse()) {
                     setDataInstance(response.getResponse().getDataInstance(), UpdateReason.InstanceChange);

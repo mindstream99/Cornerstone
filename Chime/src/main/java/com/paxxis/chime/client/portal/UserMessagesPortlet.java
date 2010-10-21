@@ -43,7 +43,7 @@ import com.extjs.gxt.ui.client.widget.layout.RowLayout;
 import com.extjs.gxt.ui.client.widget.toolbar.SeparatorToolItem;
 import com.extjs.gxt.ui.client.widget.toolbar.ToolBar;
 import com.google.gwt.user.client.Timer;
-import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.paxxis.chime.client.ChimeAsyncCallback;
 import com.paxxis.chime.client.InstanceUpdateListener;
 import com.paxxis.chime.client.Paginator;
 import com.paxxis.chime.client.PaginatorContainer;
@@ -339,11 +339,8 @@ public class UserMessagesPortlet extends PortletContainer {
     
     protected void query(Cursor cursor) {
     
-    	AsyncCallback<ServiceResponseObject<UserMessagesResponse>> cb = new AsyncCallback<ServiceResponseObject<UserMessagesResponse>>() {
-			@Override
-			public void onFailure(Throwable arg0) {
-			}
-
+    	ChimeAsyncCallback<ServiceResponseObject<UserMessagesResponse>> cb = 
+    			new ChimeAsyncCallback<ServiceResponseObject<UserMessagesResponse>>() {
 			@Override
 			public void onSuccess(ServiceResponseObject<UserMessagesResponse> response) {
 				if (response.isResponse()) {
@@ -407,11 +404,8 @@ public class UserMessagesPortlet extends PortletContainer {
     }
 
     private void executeDelete(List<UserMessage> list) {
-        AsyncCallback<ServiceResponseObject<UserMessagesResponse>> cb = new AsyncCallback<ServiceResponseObject<UserMessagesResponse>>() {
-			@Override
-			public void onFailure(Throwable arg0) {
-			}
-
+        ChimeAsyncCallback<ServiceResponseObject<UserMessagesResponse>> cb = 
+        		new ChimeAsyncCallback<ServiceResponseObject<UserMessagesResponse>>() {
 			@Override
 			public void onSuccess(ServiceResponseObject<UserMessagesResponse> response) {
 				if (response.isResponse()) {

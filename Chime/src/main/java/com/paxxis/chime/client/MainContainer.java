@@ -31,7 +31,6 @@ import com.extjs.gxt.ui.client.widget.layout.CenterLayout;
 import com.extjs.gxt.ui.client.widget.layout.FitLayout;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.DeferredCommand;
-import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.RootPanel;
 import com.paxxis.chime.client.common.DataInstance;
 import com.paxxis.chime.client.common.DataInstanceRequest;
@@ -219,21 +218,12 @@ public class MainContainer extends LayoutContainer implements StateChangeListene
     
     private void getInstance(final String instanceId, final boolean promptUser, final boolean doSearch)
     {
-        final AsyncCallback callback = new AsyncCallback()
-        {
-            public void onFailure(Throwable arg0) 
-            {
-                StateManager.instance().backInactive();
-            }
-
-            public void onSuccess(Object obj) 
-            {
-                DataInstanceResponseObject response = (DataInstanceResponseObject)obj;
-                if (response.isResponse())
-                {
+        final ChimeAsyncCallback<DataInstanceResponseObject> callback = 
+        		new ChimeAsyncCallback<DataInstanceResponseObject>() {
+            public void onSuccess(DataInstanceResponseObject response) { 
+                if (response.isResponse()) {
                     List<DataInstance> list = response.getResponse().getDataInstances();
-                    if (list.size() == 1)
-                    {
+                    if (list.size() == 1) {
                         DataInstance instance = list.get(0);
                         if (doSearch) {
                         	NamedSearch named = (NamedSearch)instance;
@@ -241,9 +231,7 @@ public class MainContainer extends LayoutContainer implements StateChangeListene
                         } else {
                             PageManager.instance().openNavigator(true, instance);
                         }
-                    }
-                    else
-                    {
+                    } else {
                         if (promptUser) {
                             String msg;
                             if (response.getResponse().getReason() == Reason.NoSuchData) {
@@ -274,26 +262,19 @@ public class MainContainer extends LayoutContainer implements StateChangeListene
                             StateManager.instance().backInactive();
                         }
                     }
-                }
-                else
-                {
+                } else {
                     StateManager.instance().backInactive();
                     ErrorMessage error = response.getError();
-                    if (error.getType() == ErrorMessage.Type.SessionExpiration)
-                    {
+                    if (error.getType() == ErrorMessage.Type.SessionExpiration) {
                         StateManager.instance().backInactive();
                         ServiceManager.reLogin(
-                            new Runnable()
-                            {
-                                public void run()
-                                {
+                            new Runnable() {
+                                public void run() {
                                     getInstance(instanceId, false, doSearch);
                                 }
                             },
-                            new Runnable()
-                            {
-                                public void run()
-                                {
+                            new Runnable() {
+                                public void run() {
                                 }
                             }
                         );

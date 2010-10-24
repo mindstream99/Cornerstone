@@ -29,6 +29,7 @@ import com.extjs.gxt.ui.client.event.SelectionListener;
 import com.extjs.gxt.ui.client.util.KeyNav;
 import com.extjs.gxt.ui.client.widget.button.Button;
 import com.extjs.gxt.ui.client.widget.button.ButtonBar;
+import com.extjs.gxt.ui.client.widget.form.CheckBox;
 import com.extjs.gxt.ui.client.widget.form.ComboBox;
 import com.extjs.gxt.ui.client.widget.form.FieldSet;
 import com.extjs.gxt.ui.client.widget.form.FormPanel;
@@ -37,7 +38,6 @@ import com.extjs.gxt.ui.client.widget.form.TextField;
 import com.extjs.gxt.ui.client.widget.layout.FormLayout;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.DeferredCommand;
-import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.paxxis.chime.client.ChimeAsyncCallback;
 import com.paxxis.chime.client.ChimeListStore;
 import com.paxxis.chime.client.LoginResponseObject;
@@ -77,6 +77,7 @@ public class ShapeCreatorWindow extends ChimeWindow
     private FieldSet permissionSet;
     private ServiceManagerListener _serviceManagerListener = null;
     private TextField<String> nameField;
+    private CheckBox tabularField;
 
     public ShapeCreatorWindow()
     {
@@ -139,6 +140,11 @@ public class ShapeCreatorWindow extends ChimeWindow
 
         _form.add(descriptionField);
 
+        tabularField = new CheckBox();
+        tabularField.setHideLabel(true);
+        tabularField.setBoxLabel("Tabular");
+        _form.add(tabularField);
+        
         permissionSet = new FieldSet();
         permissionSet.setLayout(new FormLayout());
         permissionSet.setHeading("Permissions");
@@ -266,6 +272,7 @@ public class ShapeCreatorWindow extends ChimeWindow
         req.setName(nameField.getValue().trim());
         req.setDescription(descriptionField.getValue().trim());
         req.setOperation(EditShapeRequest.Operation.Create);
+        req.setTabular(tabularField.getValue());
 
         ServiceManager.getService().sendEditDataTypeRequest(req, callback);
     }

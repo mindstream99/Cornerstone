@@ -25,8 +25,9 @@ import java.util.List;
  * @author Robert Englander
  */
 public class Shape extends DataInstance {
+	private static final long serialVersionUID = 2L;
 
-    public static final InstanceId EVENT_ID = InstanceId.create("a97381dce3d44e139823679460d2a5f100");
+	public static final InstanceId EVENT_ID = InstanceId.create("a97381dce3d44e139823679460d2a5f100");
     public static final InstanceId SHAPE_ID = InstanceId.create("100");
     public static final InstanceId TEXT_ID = InstanceId.create("200");
     public static final InstanceId NUMBER_ID = InstanceId.create("300");
@@ -60,6 +61,7 @@ public class Shape extends DataInstance {
     private boolean hasImageGallery = false;
     private boolean canMultiType = false;
     private boolean isDirectCreatable = false;
+    private boolean isTabular = false;
 
     private List<DataField> _fields = new ArrayList<DataField>();
 
@@ -78,6 +80,7 @@ public class Shape extends DataInstance {
         result.canMultiType = canMultiType;
         result.hasImageGallery = hasImageGallery;
         result.isDirectCreatable = isDirectCreatable;
+        result.isTabular = isTabular;
         for (DataField field : _fields) {
             result._fields.add(field.copy());
         }
@@ -168,6 +171,10 @@ public class Shape extends DataInstance {
             return false;
         }
 
+        if (isTabular != inst.isTabular) {
+            return false;
+        }
+
         return true;
     }
 
@@ -186,6 +193,21 @@ public class Shape extends DataInstance {
         throw new RuntimeException("something something");
     }
         
+    /**
+     * Although a shape is itself a data instance, the meaning of the
+     * answer to isBackReferencing is different than regular instances.
+     * For shapes, it's not a reflection of whether or not this instance is
+     * referencing a parent, rather it's a reflection of whether or not instances
+     * of this shape DO reference parents.
+     */
+    public boolean isBackReferencing() {
+    	InstanceId id = getId();
+    	return (id.equals(Shape.COMMENT_ID) ||
+    			id.equals(Shape.DISCUSSION_ID) ||
+    			id.equals(Shape.REVIEW_ID) ||
+    			isTabular());
+    }
+    
     public boolean isNumeric() {
         return getId().equals(Shape.NUMBER_ID);
     }
@@ -208,6 +230,14 @@ public class Shape extends DataInstance {
 
     public void setDirectCreatable(boolean val) {
         isDirectCreatable = val;
+    }
+
+    public boolean isTabular() {
+        return isTabular;
+    }
+
+    public void setTabular(boolean val) {
+        isTabular = val;
     }
 
     public boolean canAttachFiles() {

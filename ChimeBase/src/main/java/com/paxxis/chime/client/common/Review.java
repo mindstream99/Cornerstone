@@ -21,8 +21,9 @@ package com.paxxis.chime.client.common;
  *
  * @author Robert Englander
  */
-public class Review extends BackReferencingDataInstance {
-    private int _rating = 0;
+public class Review extends DataInstance {
+	private static final long serialVersionUID = 1L;
+	private int _rating = 0;
 
     public void setRating(int rating) {
         _rating = rating;

@@ -54,8 +54,12 @@ public class DataInstance implements Serializable {
     // deleted.  
     private boolean isGone = false;
 
+    // back reference data.  
+    private InstanceId brId = InstanceId.UNKNOWN;
+    private String brName = "";
+    
     private boolean isTransient = false;
-    private InstanceId _id = InstanceId.create("0");
+    private InstanceId _id = InstanceId.UNKNOWN;
     private String _name = null;
     private String _description = "";
 
@@ -159,6 +163,26 @@ public class DataInstance implements Serializable {
 
         if (hashCode() != inst.hashCode()) {
             return false;
+        }
+
+        if (brId == null) {
+            if (inst.brId != null) {
+                return false;
+            }
+        } else {
+            if (!brId.equals(inst.brId)) {
+                return false;
+            }
+        }
+
+        if (brName == null) {
+            if (inst.brName != null) {
+                return false;
+            }
+        } else {
+            if (!brName.equals(inst.brName)) {
+                return false;
+            }
         }
 
         // we need to do a field by field comparison
@@ -456,6 +480,8 @@ public class DataInstance implements Serializable {
         target.setName(getName());
         target.setDescription(getDescription());
         target.setId(getId());
+        target.setBackRefId(getBackRefId());
+        target.setBackRefName(getBackRefName());
         target.setCommentCount(getCommentCount());
         target.setRatingCount(getRatingCount());
         target.setTagCount(getTagCount());
@@ -891,6 +917,26 @@ public class DataInstance implements Serializable {
         _id = id;
     }
 
+    public void setBackRefId(InstanceId id) {
+        brId = id;
+    }
+
+    public InstanceId getBackRefId() {
+        return brId;
+    }
+
+    public void setBackRefName(String name) {
+        brName = name;
+    }
+
+    public String getBackRefName() {
+        return brName;
+    }
+
+    public boolean isBackReferencing() {
+    	return !brId.equals(InstanceId.UNKNOWN);
+    }
+    
     public String getName() {
         return _name;
     }

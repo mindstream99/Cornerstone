@@ -40,6 +40,7 @@ import com.paxxis.chime.client.common.DataField;
 import com.paxxis.chime.client.common.DataInstance;
 import com.paxxis.chime.client.common.EditDataInstanceRequest;
 import com.paxxis.chime.client.common.Shape;
+import com.paxxis.chime.client.widgets.ChimeMessageBox;
 import com.paxxis.chime.client.widgets.ChimeWindow;
 
 /**
@@ -60,13 +61,15 @@ public class TypeFieldEditorWindow extends ChimeWindow
     private NumberField maxValuesField;
     private DataField dataField;
     private FieldDefinitionEditListener editListener;
-
-    public TypeFieldEditorWindow(FieldDefinitionEditListener listener) {
-        this(null, listener);
+    private Shape shape;
+    
+    public TypeFieldEditorWindow(Shape shape, FieldDefinitionEditListener listener) {
+        this(shape, null, listener);
     }
 
-    public TypeFieldEditorWindow(DataField field, FieldDefinitionEditListener listener) {
+    public TypeFieldEditorWindow(Shape shape, DataField field, FieldDefinitionEditListener listener) {
         super();
+        this.shape = shape;
         dataField = field;
         this.editListener = listener;
     }
@@ -248,10 +251,31 @@ public class TypeFieldEditorWindow extends ChimeWindow
 
         boolean validType = (dataType != null);
 
+        // tabular shapes can't have tabular fields
+        String msg = null;
+        if (validType) {
+        	if (shape.isTabular() && dataType.isTabular()) {
+        		validType = false;
+        		msg = "Can not add a tabular field to a tabular shape.";
+        	}
+        }
+        
+        // rich text fields can only have 1 value
+        if (validType && dataType.getId().equals(Shape.RICHTEXT_ID)) {
+        	maxValuesField.setValue(1);
+        	maxValuesField.setEnabled(false);
+        } else {
+        	maxValuesField.setEnabled(true);
+        }
+        
         Number number = maxValuesField.getValue();
         boolean validNumber = (number != null && number.doubleValue() >= 0);
 
         _okButton.setEnabled(validName && validDesc && validType && validNumber);
+
+        if (msg != null) {
+        	ChimeMessageBox.alert("Chime", msg, null);
+        }
     }
 
 

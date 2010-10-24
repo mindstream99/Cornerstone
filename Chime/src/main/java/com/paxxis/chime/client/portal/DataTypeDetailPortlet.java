@@ -112,7 +112,7 @@ public class DataTypeDetailPortlet extends PortletContainer {
             new SelectionListener<MenuEvent>() {
                 @Override
                 public void componentSelected(MenuEvent ce) {
-                    TypeFieldEditorWindow w = new TypeFieldEditorWindow(
+                    TypeFieldEditorWindow w = new TypeFieldEditorWindow(dataType,
                         new FieldDefinitionEditListener() {
                             public void onEdit(DataField field, Type type) {
                                 updateListener.onUpdate(dataType, field, InstanceUpdateListener.Type.AddFieldDefinition);

@@ -29,7 +29,6 @@ import org.apache.tika.Tika;
 import org.htmlparser.Parser;
 import org.htmlparser.visitors.TextExtractingVisitor;
 
-import com.paxxis.chime.client.common.BackReferencingDataInstance;
 import com.paxxis.chime.client.common.Comment;
 import com.paxxis.chime.client.common.CommentsBundle;
 import com.paxxis.chime.client.common.Community;
@@ -276,10 +275,9 @@ abstract public class IndexerBase implements Runnable {
             }
         }
 
-        if (instance instanceof BackReferencingDataInstance) {
-            BackReferencingDataInstance br = (BackReferencingDataInstance)instance;
-            InstanceId refId = br.getBackRefId();
-            doc.add(new Field("backrefId", refId.getValue(), Field.Store.NO, Field.Index.UN_TOKENIZED));
+        if (instance.isBackReferencing() && !(instance instanceof Shape)) {
+            InstanceId refId = instance.getBackRefId();
+            doc.add(new Field("parentId", refId.getValue(), Field.Store.NO, Field.Index.UN_TOKENIZED));
             doc.add(new Field("refId", refId.getValue(), Field.Store.NO, Field.Index.UN_TOKENIZED));
 
             DataInstance brInst = DataInstanceUtils.getInstance(refId, indexingUser, database, true, true);

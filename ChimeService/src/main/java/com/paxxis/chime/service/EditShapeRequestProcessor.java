@@ -85,10 +85,10 @@ public class EditShapeRequestProcessor extends MessageProcessor {
                 
                 if (requestMessage.getOperation() == EditShapeRequest.Operation.Create)
                 {
-                    long start = System.currentTimeMillis();
+                    long start = System.currentTimeMillis(); 
                     Shape shape = ShapeUtils.createInstance(requestMessage.getName(), requestMessage.getDescription(),
                                             requestMessage.getUser(), requestMessage.getFieldDefinitions(),
-                                            requestMessage.getScopes(), database);
+                                            requestMessage.isTabular(), requestMessage.getScopes(), database);
 
                     DataInstance inst = DataInstanceUtils.getInstance(shape.getId(), null, database, true, false);
 

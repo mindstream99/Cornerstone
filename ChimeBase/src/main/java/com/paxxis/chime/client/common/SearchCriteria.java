@@ -29,9 +29,10 @@ import java.util.List;
  *
  * @author Robert Englander
  */
-public class SearchCriteria implements Serializable
-{
-    private SortOrder _sortOrder = SortOrder.ByName;
+public class SearchCriteria implements Serializable {
+	private static final long serialVersionUID = 1L;
+
+	private SortOrder _sortOrder = SortOrder.ByName;
     private ClauseOperator _operator = ClauseOperator.MatchAll;
     
     private List<SearchFilter> _filters = new ArrayList<SearchFilter>();

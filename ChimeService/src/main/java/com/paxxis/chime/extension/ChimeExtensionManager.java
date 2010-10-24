@@ -47,6 +47,7 @@ import com.paxxis.chime.data.DataInstanceUtils;
 import com.paxxis.chime.data.ShapeUtils;
 import com.paxxis.chime.data.PortalTemplateUtils;
 import com.paxxis.chime.data.UserUtils;
+import com.paxxis.chime.license.LicenseProcessor;
 import com.paxxis.chime.service.DataInstanceRequestProcessor;
 import com.paxxis.chime.service.NotificationTopicSender;
 import com.paxxis.chime.service.RequestQueueSender;
@@ -247,6 +248,7 @@ public class ChimeExtensionManager implements ExtensionContext {
                 }
 
                 ext.initialize();
+                LicenseProcessor.instance().validate(ext);
                 extensions.add(ext);
             } catch (ClassNotFoundException ex) {
                 Logger.getLogger(ChimeExtensionManager.class.getName()).log(Level.ERROR, null, ex);

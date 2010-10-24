@@ -23,7 +23,6 @@ import java.util.List;
 
 import com.extjs.gxt.ui.client.data.BaseTreeModel;
 import com.google.gwt.core.client.GWT;
-import com.paxxis.chime.client.common.BackReferencingDataInstance;
 import com.paxxis.chime.client.common.DataFieldValue;
 import com.paxxis.chime.client.common.DataInstance;
 import com.paxxis.chime.client.common.Shape;
@@ -34,9 +33,9 @@ import com.paxxis.chime.client.common.DataInstance.TagAction;
  *
  * @author Robert Englander
  */
-public class DataInstanceModel extends BaseTreeModel implements Serializable
-{
-    private static final String STARS = "<img src='resources/images/chime/stars";
+public class DataInstanceModel extends BaseTreeModel implements Serializable {
+	private static final long serialVersionUID = 1L;
+	private static final String STARS = "<img src='resources/images/chime/stars";
     private static final String STARSEND = ".gif' width='55' height='13'/>";
     
     DataInstance _instance;
@@ -95,13 +94,12 @@ public class DataInstanceModel extends BaseTreeModel implements Serializable
         }
         setTypes(txt);
 
-        if (instance instanceof BackReferencingDataInstance) {
+        if (instance.isBackReferencing()) {
             txt = "<br>Applied To:";
-            BackReferencingDataInstance br = (BackReferencingDataInstance)instance;
             if (includeLinks) {
-                txt += "&nbsp;&nbsp;&nbsp;" + Utils.toUrl(br.getBackRefId(), br.getBackRefName());
+                txt += "&nbsp;&nbsp;&nbsp;" + Utils.toUrl(instance.getBackRefId(), instance.getBackRefName());
             } else {
-                txt += "&nbsp;&nbsp;&nbsp;" + br.getBackRefName();
+                txt += "&nbsp;&nbsp;&nbsp;" + instance.getBackRefName();
             }
             setBackref(txt);
         }

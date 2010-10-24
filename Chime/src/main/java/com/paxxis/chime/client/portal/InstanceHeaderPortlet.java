@@ -50,7 +50,6 @@ import com.paxxis.chime.client.Utils;
 import com.paxxis.chime.client.InstanceUpdateListener.Type;
 import com.paxxis.chime.client.common.ApplyVoteRequest;
 import com.paxxis.chime.client.common.ApplyVoteResponse;
-import com.paxxis.chime.client.common.BackReferencingDataInstance;
 import com.paxxis.chime.client.common.Dashboard;
 import com.paxxis.chime.client.common.DataField;
 import com.paxxis.chime.client.common.DataFieldValue;
@@ -148,12 +147,26 @@ public class InstanceHeaderPortlet extends PortletContainer {
         	        	listStore.add(model);
     	            }
     	            
-    	        	model = new DataRowModel(DataRowModel.NAME, "<b>Applied Shapes:</b>");
-    	        	model.set(DataRowModel.VALUE, getTypes(_instance));
-    	        	listStore.add(model);
+    	            if (_instance instanceof Shape) {
+    	            	if (!_instance.getId().equals(Shape.SHAPE_ID)) {
+            	        	model = new DataRowModel(DataRowModel.NAME, "<b>Tabular:</b>");
+            	        	String tabular = "No";
+            	        	Shape s = (Shape)_instance;
+            	        	if (s.isTabular()) {
+            	        		tabular = "Yes";
+            	        	}
+            	        	
+            	        	model.set(DataRowModel.VALUE, tabular);
+            	            listStore.add(model);
+    	            	}
+    	            } else {
+        	        	model = new DataRowModel(DataRowModel.NAME, "<b>Applied Shapes:</b>");
+        	        	model.set(DataRowModel.VALUE, getTypes(_instance));
+        	            listStore.add(model);
+    	            }
         	        
-    	        	if (_instance instanceof BackReferencingDataInstance) {
-        	        	model = new DataRowModel(DataRowModel.NAME, "<b>Applied To:</b>");
+    	        	if (_instance.isBackReferencing() && !(instance instanceof Shape)) {
+        	        	model = new DataRowModel(DataRowModel.NAME, "<b>Parent:</b>");
         	        	model.set(DataRowModel.VALUE, getBackReference(_instance));
         	        	listStore.add(model);
     	        	}
@@ -504,14 +517,13 @@ public class InstanceHeaderPortlet extends PortletContainer {
 
     private String getBackReference(DataInstance instance) {
         StringBuffer buf = new StringBuffer();
-        if (instance instanceof BackReferencingDataInstance) {
-            BackReferencingDataInstance inst = (BackReferencingDataInstance)instance;
-            buf.append( Utils.toHoverUrl(inst.getBackRefId(), inst.getBackRefName()));
+        if (instance.isBackReferencing() && !(instance instanceof Shape)) {
+            buf.append( Utils.toHoverUrl(instance.getBackRefId(), instance.getBackRefName()));
         }
 
         return buf.toString();
     }
-
+ 
     private String getDescription(DataInstance instance) {
         return instance.getDescription();
     }

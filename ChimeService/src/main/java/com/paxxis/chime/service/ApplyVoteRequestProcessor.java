@@ -17,25 +17,23 @@
 
 package com.paxxis.chime.service;
 
-import com.paxxis.chime.data.VoteUtils;
-import com.paxxis.chime.data.DataInstanceUtils;
+import org.apache.log4j.Logger;
+
+import com.mysql.jdbc.CommunicationsException;
 import com.paxxis.chime.client.common.ApplyVoteRequest;
 import com.paxxis.chime.client.common.ApplyVoteResponse;
-import com.paxxis.chime.client.common.BackReferencingDataInstance;
 import com.paxxis.chime.client.common.DataInstance;
 import com.paxxis.chime.client.common.DataInstanceEvent;
-import com.paxxis.chime.client.common.DataInstanceEvent.EventType;
 import com.paxxis.chime.client.common.ErrorMessage;
 import com.paxxis.chime.client.common.Message;
 import com.paxxis.chime.client.common.User;
+import com.paxxis.chime.client.common.DataInstanceEvent.EventType;
+import com.paxxis.chime.client.common.Shape;
+import com.paxxis.chime.common.MessagePayload;
+import com.paxxis.chime.data.DataInstanceUtils;
+import com.paxxis.chime.data.VoteUtils;
 import com.paxxis.chime.database.DatabaseConnection;
 import com.paxxis.chime.database.DatabaseConnectionPool;
-import com.paxxis.chime.service.MessageProcessor;
-import com.paxxis.chime.service.NotificationTopicSender;
-import com.mysql.jdbc.CommunicationsException;
-import com.paxxis.chime.common.MessagePayload;
-import com.paxxis.chime.service.ServiceBusMessageProducer;
-import org.apache.log4j.Logger;
 
 /**
  *
@@ -112,9 +110,8 @@ public class ApplyVoteRequestProcessor extends MessageProcessor {
                     //CacheManager.instance().remove(dtr.getDataInstance());
 
                     // if this is a back referencing instance we need to update the cache
-                    if (instance instanceof BackReferencingDataInstance) {
-                        BackReferencingDataInstance inst = (BackReferencingDataInstance)instance;
-                        DataInstance dataInst = DataInstanceUtils.getInstance(inst.getBackRefId(),
+                    if (instance.isBackReferencing() && !(instance instanceof Shape)) {
+                        DataInstance dataInst = DataInstanceUtils.getInstance(instance.getBackRefId(),
                                 requestMessage.getUser(), database, true, false);
                     }
                 }

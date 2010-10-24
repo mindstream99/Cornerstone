@@ -17,7 +17,8 @@
 
 package com.paxxis.chime.data;
 
-import com.paxxis.chime.client.common.BackReferencingDataInstance;
+import java.util.List;
+
 import com.paxxis.chime.client.common.DataField;
 import com.paxxis.chime.client.common.DataFieldValue;
 import com.paxxis.chime.client.common.DataInstance;
@@ -28,7 +29,6 @@ import com.paxxis.chime.client.common.Tag;
 import com.paxxis.chime.client.common.TagContext;
 import com.paxxis.chime.client.common.User;
 import com.paxxis.chime.database.DatabaseConnection;
-import java.util.List;
 
 /**
  *
@@ -71,10 +71,9 @@ public class ReferenceUtils {
             }
         }
 
-        if (instance instanceof BackReferencingDataInstance) {
-            BackReferencingDataInstance inst = (BackReferencingDataInstance)instance;
-            InstanceId brId = inst.getBackRefId();
-            inst.setBackRefName(DataInstanceUtils.getInstance(brId, user, database, false, true).getName());
+        if (instance.isBackReferencing() && !(instance instanceof Shape)) {
+            InstanceId brId = instance.getBackRefId();
+            instance.setBackRefName(DataInstanceUtils.getInstance(brId, user, database, false, true).getName());
         }
 
         List<DataInstance> images = AttachmentUtils.getImages(instance.getId(), database);

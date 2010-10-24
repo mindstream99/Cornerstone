@@ -159,7 +159,11 @@ public class ShapeField extends LayoutContainer
     private void generateContent() {
         StringBuffer buffer = new StringBuffer();
         buffer.append("<b>Description:</b> " + _field.getDescription());
-        buffer.append("<br><b>Shape:</b> " + Utils.toHoverUrl(_field.getShape()));
+        String prefix = "";
+        if (_field.getShape().isTabular()) {
+        	prefix = "Tabular ";
+        }
+        buffer.append("<br><b>" + prefix + "Shape:</b> " + Utils.toHoverUrl(_field.getShape()));
         buffer.append("<br><b>Maximum Values:</b> ");
         if (_field.getMaxValues() == 0) {
             buffer.append("Unlimited");

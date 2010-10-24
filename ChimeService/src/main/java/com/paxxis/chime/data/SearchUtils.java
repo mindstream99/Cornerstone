@@ -429,16 +429,16 @@ public class SearchUtils {
                 }
                 terms.add("(" + term + typeTerm + ")");
             }
-            else if (param.fieldName.equalsIgnoreCase("backrefId"))
+            else if (param.fieldName.equalsIgnoreCase("Parent"))
             {
                 String term = "";
                 switch (param.operator)
                 {
                     case Reference:
-                        term = "backrefId:" + param.fieldValue.toString();
+                        term = "parentId:" + param.fieldValue.toString();
                         break;
                     case NotReference:
-                        term = "(marker:marker AND !backrefId:" + param.fieldValue.toString() + ")";
+                        term = "(marker:marker AND !parentId:" + param.fieldValue.toString() + ")";
                         break;
                 }
                 terms.add("(" + term + typeTerm + ")");

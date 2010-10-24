@@ -17,6 +17,14 @@
 
 package com.paxxis.chime.data;
 
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+
+import org.apache.log4j.Logger;
+
 import com.paxxis.chime.client.common.Comment;
 import com.paxxis.chime.client.common.CommentsBundle;
 import com.paxxis.chime.client.common.Community;
@@ -24,46 +32,40 @@ import com.paxxis.chime.client.common.Cursor;
 import com.paxxis.chime.client.common.DataField;
 import com.paxxis.chime.client.common.DataFieldValue;
 import com.paxxis.chime.client.common.DataInstance;
-import com.paxxis.chime.client.common.DataInstance.LockType;
-import com.paxxis.chime.client.common.DataInstance.ReviewAction;
-import com.paxxis.chime.client.common.DataInstance.TagAction;
-import com.paxxis.chime.client.common.DataInstanceRequest.Operator;
-import com.paxxis.chime.client.common.DataInstanceRequest.SortOrder;
-import com.paxxis.chime.client.common.Shape;
 import com.paxxis.chime.client.common.DataSocialContext;
 import com.paxxis.chime.client.common.Discussion;
 import com.paxxis.chime.client.common.DiscussionsBundle;
 import com.paxxis.chime.client.common.FieldData;
 import com.paxxis.chime.client.common.Folder;
 import com.paxxis.chime.client.common.InstanceId;
-import com.paxxis.chime.client.common.ReviewsBundle;
 import com.paxxis.chime.client.common.Review;
+import com.paxxis.chime.client.common.ReviewsBundle;
 import com.paxxis.chime.client.common.Scope;
+import com.paxxis.chime.client.common.Shape;
 import com.paxxis.chime.client.common.Tag;
 import com.paxxis.chime.client.common.TagContext;
 import com.paxxis.chime.client.common.User;
 import com.paxxis.chime.client.common.UserMessagesBundle;
 import com.paxxis.chime.client.common.UserSocialContext;
+import com.paxxis.chime.client.common.DataInstance.LockType;
+import com.paxxis.chime.client.common.DataInstance.ReviewAction;
+import com.paxxis.chime.client.common.DataInstance.TagAction;
+import com.paxxis.chime.client.common.DataInstanceRequest.Operator;
+import com.paxxis.chime.client.common.DataInstanceRequest.SortOrder;
 import com.paxxis.chime.client.common.portal.PortalTemplate;
+import com.paxxis.chime.data.VoteUtils.UserVote;
 import com.paxxis.chime.database.DataSet;
 import com.paxxis.chime.database.DatabaseConnection;
 import com.paxxis.chime.database.IDataValue;
 import com.paxxis.chime.database.StringData;
+import com.paxxis.chime.extension.ChimeExtensionManager;
 import com.paxxis.chime.service.DataInstanceHelperFactory;
 import com.paxxis.chime.service.Tools;
-import com.paxxis.chime.data.VoteUtils.UserVote;
-import com.paxxis.chime.extension.ChimeExtensionManager;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import org.apache.log4j.Logger;
 
 
 /**
  *
- * @author Robert Englanderert Englander
+ * @author Robert Englander
  */
 public class DataInstanceUtils {
     private static final Logger _logger = Logger.getLogger(DataInstanceUtils.class);
@@ -670,6 +672,7 @@ public class DataInstanceUtils {
                 type.setHasImageGallery(mask[9] == 'Y');
                 type.setCanDiscuss(mask[10] == 'Y');
                 type.setCanMultiType(mask[11] == 'Y');
+                type.setTabular(mask[12] == 'Y');
             }
 
             if (fetchType != FetchType.Shallow) {

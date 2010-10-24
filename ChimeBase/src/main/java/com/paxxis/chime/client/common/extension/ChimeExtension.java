@@ -47,6 +47,20 @@ public abstract class ChimeExtension {
     public abstract DataInstance getDataInstance(InstanceId id);
     public abstract CALExtension getCalExtension();
 
+    /**
+     * The method is used to pass the current state of the license to the extension.
+     * Licensed extensions should override this method in order to validate the license, 
+     * and should disable their functionality if the license is not valid.  Unlicensed 
+     * extensions need not override this method.
+     * 
+     * Licensed extensions should default to the disabled state until a valid license
+     * is processed.
+     * 
+     * @param license
+     */
+    public void processLicense(String license) {
+    }
+    
     public void addMapping(String objectName, InstanceId shapeId, HashMap<String, String> fieldMap) {
         this.idMap.put(objectName, shapeId);
         this.fieldMap.put(objectName, fieldMap);

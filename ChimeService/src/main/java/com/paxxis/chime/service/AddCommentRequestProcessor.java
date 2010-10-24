@@ -17,24 +17,25 @@
 
 package com.paxxis.chime.service;
 
+import org.apache.log4j.Logger;
+
+import com.mysql.jdbc.CommunicationsException;
+import com.paxxis.chime.client.common.AddCommentRequest;
+import com.paxxis.chime.client.common.AddCommentResponse;
+import com.paxxis.chime.client.common.DataInstance;
+import com.paxxis.chime.client.common.DataInstanceEvent;
+import com.paxxis.chime.client.common.ErrorMessage;
+import com.paxxis.chime.client.common.InstanceId;
+import com.paxxis.chime.client.common.Message;
+import com.paxxis.chime.client.common.User;
+import com.paxxis.chime.client.common.DataInstanceEvent.EventType;
+import com.paxxis.chime.client.common.Shape;
+import com.paxxis.chime.common.MessagePayload;
 import com.paxxis.chime.data.CacheManager;
 import com.paxxis.chime.data.CommentUtils;
 import com.paxxis.chime.data.DataInstanceUtils;
-import com.paxxis.chime.client.common.AddCommentRequest;
-import com.paxxis.chime.client.common.AddCommentResponse;
-import com.paxxis.chime.client.common.BackReferencingDataInstance;
-import com.paxxis.chime.client.common.DataInstance;
-import com.paxxis.chime.client.common.DataInstanceEvent;
-import com.paxxis.chime.client.common.DataInstanceEvent.EventType;
 import com.paxxis.chime.database.DatabaseConnection;
 import com.paxxis.chime.database.DatabaseConnectionPool;
-import com.paxxis.chime.client.common.ErrorMessage;
-import com.paxxis.chime.client.common.Message;
-import com.paxxis.chime.client.common.User;
-import com.mysql.jdbc.CommunicationsException;
-import com.paxxis.chime.client.common.InstanceId;
-import com.paxxis.chime.common.MessagePayload;
-import org.apache.log4j.Logger;
 
 /**
  *
@@ -114,8 +115,8 @@ public class AddCommentRequestProcessor extends MessageProcessor {
 
                 // if the instance is back referencing, we need to clear the back referenced instance
                 // from the cache as well.  could we be updating the cached instance instead?
-                if (instance instanceof BackReferencingDataInstance) {
-                    InstanceId backRef = ((BackReferencingDataInstance)instance).getBackRefId();
+                if (instance.isBackReferencing() && !(instance instanceof Shape)) {
+                    InstanceId backRef = instance.getBackRefId();
                     DataInstance back = CacheManager.instance().get(backRef);
                     if (back != null) {
                        // CacheManager.instance().remove(back);

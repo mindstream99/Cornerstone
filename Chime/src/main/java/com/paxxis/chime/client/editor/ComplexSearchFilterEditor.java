@@ -291,6 +291,15 @@ public class ComplexSearchFilterEditor extends ChimeWindow
                             dateField.setVisible(false);
                             numberField.setVisible(false);
                         }
+                        else if (field.getName().equals("Parent"))
+                        {
+                            _operatorStore.add(_referenceOperatorList);
+                            _filterInput.setShape(Shape.REFERENCE_ID, true);
+                            _filterInput.setVisible(true);
+                            textField.setVisible(false);
+                            dateField.setVisible(false);
+                            numberField.setVisible(false);
+                        }
                         else
                         {
                             Shape type = field.getShape();
@@ -617,7 +626,13 @@ public class ComplexSearchFilterEditor extends ChimeWindow
         _dataFieldStore.add(new DataFieldModel(f));
 
         if (type != null) {
-            List<DataField> fields = type.getFields();
+        	if (type.isBackReferencing()) {
+                f = new DataField();
+                f.setName("Parent");
+                _dataFieldStore.add(new DataFieldModel(f));
+        	}
+        	
+        	List<DataField> fields = type.getFields();
             for (DataField field : fields)
             {
                 if (!field.isPrivate())

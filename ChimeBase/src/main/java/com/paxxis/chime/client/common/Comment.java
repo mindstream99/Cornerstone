@@ -21,8 +21,10 @@ package com.paxxis.chime.client.common;
  *
  * @author Robert Englander
  */
-public class Comment extends BackReferencingDataInstance {
-    @Override
+public class Comment extends DataInstance {
+	private static final long serialVersionUID = 1L;
+
+	@Override
     public Comment copy() {
         return super.copy(new Comment());
     }

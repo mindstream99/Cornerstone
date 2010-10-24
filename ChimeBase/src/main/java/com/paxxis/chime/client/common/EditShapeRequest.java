@@ -25,7 +25,9 @@ import java.util.List;
  * @author Robert Englander
  */
 public class EditShapeRequest extends RequestMessage {
-    public enum Operation
+	private static final long serialVersionUID = 1L;
+
+	public enum Operation
     {
         Create,
         AddFields,
@@ -60,7 +62,8 @@ public class EditShapeRequest extends RequestMessage {
     private List<FieldDefinition> _fieldDefs = new ArrayList<FieldDefinition>();
     private Operation _operation = Operation.Create;
     private List<Scope> _scopes = new ArrayList<Scope>();
-
+    private boolean isTabular = false;
+    
     public void addScope(Scope scope)
     {
         _scopes.add(scope);
@@ -129,6 +132,14 @@ public class EditShapeRequest extends RequestMessage {
     public List<FieldDefinition> getFieldDefinitions()
     {
         return _fieldDefs;
+    }
+    
+    public void setTabular(boolean tabular) {
+    	isTabular = tabular;
+    }
+    
+    public boolean isTabular() {
+    	return isTabular;
     }
     
     public Operation getOperation()

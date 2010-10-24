@@ -17,34 +17,37 @@
 
 package com.paxxis.chime.data;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+
 import com.paxxis.chime.client.common.DataField;
 import com.paxxis.chime.client.common.DataInstance;
 import com.paxxis.chime.client.common.DataSocialContext;
-import com.paxxis.chime.client.common.Shape;
 import com.paxxis.chime.client.common.FieldData;
 import com.paxxis.chime.client.common.FieldDefinition;
 import com.paxxis.chime.client.common.InstanceId;
 import com.paxxis.chime.client.common.Scope;
-import com.paxxis.chime.client.common.Tag;
+import com.paxxis.chime.client.common.Shape;
 import com.paxxis.chime.client.common.ShapeTagContext;
+import com.paxxis.chime.client.common.Tag;
 import com.paxxis.chime.client.common.User;
 import com.paxxis.chime.database.DataSet;
 import com.paxxis.chime.database.DatabaseConnection;
 import com.paxxis.chime.database.IDataValue;
 import com.paxxis.chime.database.StringData;
 import com.paxxis.chime.service.Tools;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
 
  
 /** 
  * 
  * @author Robert Englander
  */
-public class ShapeUtils
-{
-    private ShapeUtils()
+public class ShapeUtils {
+	private static final String DEFAULT_MASK = "'NYYYYYYYYYYYN'";
+	private static final String TABULAR_MASK = "'NYNNNNNNNNNNY'";
+
+	private ShapeUtils()
     {}
     
     public static Shape createInstanceColumn(Shape shape, Shape columnType, String name,
@@ -158,10 +161,7 @@ public class ShapeUtils
         dataSet.close();
     }
 
-    public static List<Shape> findShapes(String string, boolean includeInternals, DatabaseConnection database) throws Exception
-    {
-        Shape type = ShapeUtils.getInstance("Shape", database, true);
-
+    public static List<Shape> findShapes(String string, boolean includeInternals, DatabaseConnection database) throws Exception {
         // TODO add the 1000 row limiting code
         
         List<Shape> types = new ArrayList<Shape>();
@@ -195,7 +195,7 @@ public class ShapeUtils
     }
 
     public static Shape createInstance(String shapeName, String description, User user,
-            List<FieldDefinition> fieldDefs, List<Scope> scopes, DatabaseConnection database) throws Exception
+            List<FieldDefinition> fieldDefs, boolean tabular, List<Scope> scopes, DatabaseConnection database) throws Exception
     {
         Shape result = null;
         
@@ -209,8 +209,13 @@ public class ShapeUtils
 
             List<FieldData> fieldData = new ArrayList<FieldData>();
 
+            String mask = DEFAULT_MASK;
+            if (tabular) {
+            	mask = TABULAR_MASK;
+            }
+            
             DataInstance inst = DataInstanceUtils.createInstance(shapes, shapeName, description, null,
-                    new String[] {"charVal", "'NYYYYYYYYYYY'"}, fieldData, scopes, user, database);
+                    new String[] {"charVal", mask}, fieldData, scopes, user, database);
 
             result = addFields(inst.getId(), fieldDefs, database);
             
@@ -400,6 +405,7 @@ public class ShapeUtils
         shape.setHasImageGallery(mask[9] == 'Y');
         shape.setCanDiscuss(mask[10] == 'Y');
         shape.setCanMultiType(mask[11] == 'Y');
+        shape.setTabular(mask[12] == 'Y');
 
 
         shape.setName(name.asString());

@@ -20,9 +20,10 @@ package com.paxxis.chime.client.common;
 import com.paxxis.chime.client.common.DataInstanceRequest.Operator;
 import java.io.Serializable;
 
-public class SearchFilter implements Serializable
-{
-    private Shape dataShape = null;
+public class SearchFilter implements Serializable {
+	private static final long serialVersionUID = 1L;
+
+	private Shape dataShape = null;
     private String _displayValue = null;
     private DataField _field = null;
     private Operator _operator = null;

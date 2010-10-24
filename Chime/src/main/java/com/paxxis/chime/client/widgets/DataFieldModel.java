@@ -1,5 +1,23 @@
+/*
+ * Copyright 2010 the original author or authors.
+ * Copyright 2009 Paxxis Technology LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.paxxis.chime.client.widgets;
 
+import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
 
@@ -14,6 +32,11 @@ import com.paxxis.chime.client.common.DataInstance;
 import com.paxxis.chime.client.common.Shape;
 import com.paxxis.chime.client.portal.DataRowModel;
 
+/**
+ * 
+ * @author Robert Englander
+ *
+ */
 public class DataFieldModel extends DataRowModel {
 	public static final String EDIT = "edit";
  
@@ -63,14 +86,36 @@ public class DataFieldModel extends DataRowModel {
 	}
 	
     private void generateContent() {
-        StringBuffer buffer = new StringBuffer();
+    	if (dataField.getShape().isTabular()) {
+    		generateTabularContent();
+    	} else {
+    		generateNonTabularContent();
+    	}
+    }
+    
+    private void generateTabularContent() {
+        List<DataFieldValue> values = dataInstance.getFieldValues(shape, dataField);
+        TabularFieldData tabData = new TabularFieldData(dataField.getShape());
+        
+        for (DataFieldValue value : values) {
+        	Serializable ser = value.getValue();
+        	if (ser instanceof DataInstance) {
+        		tabData.add((DataInstance)ser);
+        	}
+        }
+
+        set(DataRowModel.NAME, "<b>" + dataField.getName() + ":</b>");
+        set(DataRowModel.VALUE, tabData);
+    }
+    
+    private void generateNonTabularContent() {
+    	StringBuffer buffer = new StringBuffer();
         List<DataFieldValue> values = dataInstance.getFieldValues(shape, dataField);
         String stringContent = "";
         String sep = "";
+        boolean isInternal = dataField.getShape().isPrimitive();
         for (DataFieldValue value : values) {
             String valueName = value.getValue().toString().trim();
-            boolean isInternal = dataField.getShape().isPrimitive();
-
             boolean isImageReference = false;
 
             if (isInternal) {

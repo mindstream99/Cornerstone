@@ -129,7 +129,7 @@ public class DataFieldModel extends DataRowModel {
                 	String vname = valueName.replaceAll(" ", "&nbsp;");
                     String name = Utils.toExternalUrl(valueName, vname);
                     buffer.append(sep + name);
-                    sep = "   ";
+                    sep = "    ";
                 }
                 else if (dataField.getShape().isNumeric())
                 {
@@ -140,7 +140,7 @@ public class DataFieldModel extends DataRowModel {
                     String formatted = fmt.format(dval);
 
                     buffer.append(sep + formatted);
-                    sep = "   ";
+                    sep = "    ";
                 }
                 else if (dataField.getShape().isDate())
                 {
@@ -148,7 +148,7 @@ public class DataFieldModel extends DataRowModel {
                     DateTimeFormat dtf = DateTimeFormat.getFormat("MMM d, yyyy");
                     String formatted = dtf.format(dval);
                     buffer.append(sep + formatted);
-                    sep = "   ";
+                    sep = "    ";
                 }
                 else
                 {
@@ -167,7 +167,7 @@ public class DataFieldModel extends DataRowModel {
                 String name = Utils.toHoverUrl(value.getReferenceId(), vname);
                 buffer.append(sep + name);
                 stringContent = buffer.toString();
-                sep = "   ";
+                sep = "    ";
             }
         }
         

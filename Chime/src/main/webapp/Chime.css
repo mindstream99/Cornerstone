@@ -72,6 +72,15 @@ root {
     border-width: 2px;
 }
 
+/* this class is added to grids that require cells to wrap */
+.chimeGrid .x-grid3-cell-inner,.x-grid3-hd-inner {
+  overflow: hidden;
+  -o-text-overflow: ellipsis;
+  text-overflow: ellipsis;
+  padding: 3px 3px 3px 5px;
+  white-space: normal;
+}
+
 .grid16-icon {
   background-image: url(resources/images/chime/grid.png) !important;
 }

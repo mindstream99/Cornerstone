@@ -28,7 +28,6 @@ import com.extjs.gxt.ui.client.util.Margins;
 import com.extjs.gxt.ui.client.widget.LayoutContainer;
 import com.extjs.gxt.ui.client.widget.grid.ColumnConfig;
 import com.extjs.gxt.ui.client.widget.grid.ColumnModel;
-import com.extjs.gxt.ui.client.widget.grid.Grid;
 import com.extjs.gxt.ui.client.widget.layout.RowData;
 import com.extjs.gxt.ui.client.widget.layout.RowLayout;
 import com.google.gwt.core.client.GWT;
@@ -48,7 +47,7 @@ import com.paxxis.chime.client.portal.DataRowModel;
 public class FileDetailPanel extends LayoutContainer {
 
     private DataInstance dataInstance;
-    private Grid<DataRowModel> grid;
+    private ChimeGrid<DataRowModel> grid;
     private ListStore<DataRowModel> listStore;
 
     public FileDetailPanel(DataInstance instance) {
@@ -86,7 +85,7 @@ public class FileDetailPanel extends LayoutContainer {
         ColumnModel cm = new ColumnModel(configs);
         
         listStore = new ListStore<DataRowModel>();
-        grid = new Grid<DataRowModel>(listStore, cm);
+        grid = new ChimeGrid<DataRowModel>(listStore, cm);
         grid.getView().setAutoFill(true);
         grid.setSelectionModel(null);
         grid.getView().setForceFit(true);

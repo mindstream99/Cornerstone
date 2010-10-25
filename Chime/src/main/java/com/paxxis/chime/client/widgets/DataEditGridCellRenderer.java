@@ -25,6 +25,7 @@ import com.paxxis.chime.client.editor.FieldEditorListener;
 import com.paxxis.chime.client.editor.MultiDateEditorWindow;
 import com.paxxis.chime.client.editor.MultiReferenceEditorWindow;
 import com.paxxis.chime.client.editor.MultiTextEditorWindow;
+import com.paxxis.chime.client.editor.TabularDataEditor;
 import com.paxxis.chime.client.editor.TextFieldEditorWindow;
 
 public class DataEditGridCellRenderer implements GridCellRenderer<DataFieldModel> {
@@ -97,8 +98,13 @@ public class DataEditGridCellRenderer implements GridCellRenderer<DataFieldModel
                     Shape shape = model.getShape();
                     DataInstance inst = model.getDataInstance();
                     if (!field.getShape().isPrimitive()) {
-                        MultiReferenceEditorWindow w = new MultiReferenceEditorWindow(inst, shape, field, fieldEditListener);
-                        w.show();
+                    	if (field.getShape().isTabular()) {
+                            TabularDataEditor w = new TabularDataEditor(inst, shape, field, fieldEditListener);
+                            w.show();
+                    	} else {
+                            MultiReferenceEditorWindow w = new MultiReferenceEditorWindow(inst, shape, field, fieldEditListener);
+                            w.show();
+                    	}
                     } else {
                     	Shape fieldShape = field.getShape();
                         if (fieldShape.getId().equals(Shape.RICHTEXT_ID)) {

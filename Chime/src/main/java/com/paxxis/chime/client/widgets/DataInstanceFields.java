@@ -54,7 +54,7 @@ public class DataInstanceFields extends LayoutContainer
     private boolean pendingRefresh;
     private List<String> pendingExclusions = new ArrayList<String>();
 
-    private Grid<DataFieldModel> grid = null;
+    private ChimeGrid<DataFieldModel> grid = null;
     private ListStore<DataFieldModel> listStore;
     
     public DataInstanceFields(InstanceUpdateListener saveListener) {
@@ -119,7 +119,7 @@ public class DataInstanceFields extends LayoutContainer
         ColumnModel cm = new ColumnModel(configs);
         
         listStore = new ListStore<DataFieldModel>();
-        grid = new Grid<DataFieldModel>(listStore, cm);
+        grid = new ChimeGrid<DataFieldModel>(listStore, cm);
         grid.getView().setAutoFill(true);
         grid.setSelectionModel(null);
         grid.getView().setForceFit(true);

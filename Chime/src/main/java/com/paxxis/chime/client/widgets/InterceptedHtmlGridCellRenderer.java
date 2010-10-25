@@ -25,13 +25,13 @@ import com.extjs.gxt.ui.client.event.Events;
 import com.extjs.gxt.ui.client.event.Listener;
 import com.extjs.gxt.ui.client.store.ListStore;
 import com.extjs.gxt.ui.client.util.Margins;
+import com.extjs.gxt.ui.client.widget.Html;
 import com.extjs.gxt.ui.client.widget.LayoutContainer;
 import com.extjs.gxt.ui.client.widget.grid.ColumnConfig;
 import com.extjs.gxt.ui.client.widget.grid.ColumnData;
 import com.extjs.gxt.ui.client.widget.grid.ColumnModel;
 import com.extjs.gxt.ui.client.widget.grid.Grid;
 import com.extjs.gxt.ui.client.widget.grid.GridCellRenderer;
-import com.extjs.gxt.ui.client.widget.layout.FlowData;
 import com.extjs.gxt.ui.client.widget.layout.RowData;
 import com.extjs.gxt.ui.client.widget.layout.RowLayout;
 import com.google.gwt.user.client.Command;
@@ -49,9 +49,9 @@ import com.paxxis.chime.client.portal.DataRowModel;
  *
  */
 public class InterceptedHtmlGridCellRenderer implements GridCellRenderer<DataRowModel> {
-	private static final int MINGRIDHEIGHT = 40;
-	private static final int MAXGRIDHEIGHT = 240;
-	private static final int GRIDROWHEIGHT = 20;
+	private static final int MINHEIGHT = 60;
+	private static final int MAXHEIGHT = 250;
+	private static final int GRIDINCR = 20;
 	
 	/** the default margins for placing the renderer in the cell */
 	private Margins margins = new Margins(3, 3, 3, 0);
@@ -75,7 +75,6 @@ public class InterceptedHtmlGridCellRenderer implements GridCellRenderer<DataRow
 		// put the component inside of a basic layout container so that
 		// the margins can be applied.
 		final LayoutContainer lc = new LayoutContainer();
-		//lc.setLayout(new RowLayout());
 
 		Object obj = model.get(property);
 		if (obj instanceof TabularFieldData) {
@@ -101,7 +100,7 @@ public class InterceptedHtmlGridCellRenderer implements GridCellRenderer<DataRow
 
 	        ColumnModel cm = new ColumnModel(configs);
 	        ListStore<DataFieldModel> listStore = new ListStore<DataFieldModel>();
-	        final Grid<DataFieldModel> fieldGrid = new Grid<DataFieldModel>(listStore, cm);
+	        final ChimeGrid<DataFieldModel> fieldGrid = new ChimeGrid<DataFieldModel>(listStore, cm);
 	        fieldGrid.getView().setAutoFill(false);
 	        fieldGrid.setSelectionModel(null);
 	        fieldGrid.getView().setForceFit(false);
@@ -109,7 +108,7 @@ public class InterceptedHtmlGridCellRenderer implements GridCellRenderer<DataRow
 	        fieldGrid.setTrackMouseOver(false);
 	        fieldGrid.setStripeRows(true);
 	        fieldGrid.setAutoExpandColumn(lastColId);
-	        fieldGrid.setAutoHeight(false);
+	        fieldGrid.setAutoHeight(true);
 	        fieldGrid.setBorders(true);
 	        
 	        lc.add(fieldGrid, new RowData(1, -1, margins));
@@ -130,29 +129,43 @@ public class InterceptedHtmlGridCellRenderer implements GridCellRenderer<DataRow
 	        );
 
 	        List<DataInstance> instances = tabData.getInstances();
-	        int gridHeight = 0;
+	        int lcHeight = 0;
 	        for (DataInstance instance : instances) {
 		        for (DataField field : dataFields) {
 		        	DataFieldModel fieldModel = new DataFieldModel(instance, shape, field, null);
 		        	listStore.add(fieldModel);
 		        }
 	        	
-	        	gridHeight += GRIDROWHEIGHT;
+	        	lcHeight += GRIDINCR;
 	        }
 	        
-	        if (gridHeight < MINGRIDHEIGHT) {
-	        	gridHeight = MINGRIDHEIGHT;
-	        } else if (gridHeight > MAXGRIDHEIGHT) {
-	        	gridHeight = MAXGRIDHEIGHT;
+	        if (lcHeight < MINHEIGHT) {
+	        	lcHeight = MINHEIGHT;
+	        } else if (lcHeight > MAXHEIGHT) {
+	        	lcHeight = MAXHEIGHT;
 	        }
 	        
-	        fieldGrid.setHeight(gridHeight);
+	        lc.setHeight(lcHeight);
 	        
 		} else {
-			InterceptedHtml html = new InterceptedHtml();
+			lc.setLayout(new RowLayout());
+			final Html html = new Html();
 			html.setHtml(obj.toString());
-			html.setWordWrap(true);
-			lc.add(html, new FlowData(margins));
+	        lc.add(html, new RowData(1, -1, margins));
+	        lc.addListener(Events.Resize,
+	            new Listener<BoxComponentEvent>() {
+	                public void handleEvent(BoxComponentEvent evt) {
+	                	DeferredCommand.addCommand(
+	                		new Command() {
+	                			public void execute() {
+	                            	lc.layout();
+	                            	html.setWidth(lc.getWidth());
+	                			}
+	                		}
+	                	);
+	                }
+	            }
+	        );
 		}
 		
 		return lc;

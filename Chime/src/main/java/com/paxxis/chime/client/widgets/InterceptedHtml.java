@@ -17,13 +17,13 @@
 
 package com.paxxis.chime.client.widgets;
 
+import com.extjs.gxt.ui.client.widget.Html;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.Element;
 import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.Event;
 import com.google.gwt.user.client.History;
 import com.google.gwt.user.client.Timer;
-import com.google.gwt.user.client.ui.HTML;
 import com.paxxis.chime.client.Utils;
 import com.paxxis.chime.client.common.InstanceId;
 import com.paxxis.chime.client.detailpopup.DetailPopupManager;
@@ -32,7 +32,7 @@ import com.paxxis.chime.client.detailpopup.DetailPopupManager;
  *
  * @author Robert Englander
  */
-public class InterceptedHtml extends HTML {
+public class InterceptedHtml extends Html {
 
     public interface InterceptedLinkListener {
         public boolean onLink(String url);
@@ -90,10 +90,10 @@ public class InterceptedHtml extends HTML {
         		html = part1 + part2 + part3;
         	}
 
-        	setHTML(html);
+        	super.setHtml(html);
             //String newHtml = html.replaceAll("chime://#detail-", GWT.getHostPageBaseURL() + "#detail-");
         } else {
-            setHTML(html);
+            super.setHtml(html);
         }
     }
     

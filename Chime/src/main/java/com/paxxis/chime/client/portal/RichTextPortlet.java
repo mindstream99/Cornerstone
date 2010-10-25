@@ -90,7 +90,7 @@ public class RichTextPortlet extends PortletContainer {
 
                         getListener().onLayoutProxyEdit(getSpecification());
                     }
-                }, _html.getHTML()
+                }, _html.getHtml()
             );
 
             w.show();

@@ -30,7 +30,6 @@ import com.extjs.gxt.ui.client.util.Margins;
 import com.extjs.gxt.ui.client.widget.LayoutContainer;
 import com.extjs.gxt.ui.client.widget.grid.ColumnConfig;
 import com.extjs.gxt.ui.client.widget.grid.ColumnModel;
-import com.extjs.gxt.ui.client.widget.grid.Grid;
 import com.extjs.gxt.ui.client.widget.layout.BorderLayout;
 import com.extjs.gxt.ui.client.widget.layout.BorderLayoutData;
 import com.extjs.gxt.ui.client.widget.layout.CardLayout;
@@ -211,7 +210,7 @@ public class AnalyticDetailPanel extends LayoutContainer {
         }
 
         ColumnModel cm = new ColumnModel(configs);
-        Grid<TableRowModel> grid = new Grid<TableRowModel>(store, cm);
+        ChimeGrid<TableRowModel> grid = new ChimeGrid<TableRowModel>(store, cm);
         grid.setStyleAttribute("borderTop", "none");
         grid.setAutoExpandColumn(String.valueOf(colNames.size() - 1));
         grid.getView().setAutoFill(true);

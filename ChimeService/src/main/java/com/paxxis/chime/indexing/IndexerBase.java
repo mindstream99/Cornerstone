@@ -407,10 +407,11 @@ abstract public class IndexerBase implements Runnable {
                         }
 
                         doc.add(new Field("content", data, Field.Store.NO, Field.Index.TOKENIZED));
-                    }
-                    else
-                    {
-                        data = String.valueOf(value.getReferenceId());
+                    } else {
+                    	// TODO if the field is tabular, the value contains the underlying data instance along
+                    	// with the reference id.  this is an opportunity to add more to the index, improving 
+                    	// search results.
+                        data = value.getReferenceId().getValue();
                         doc.add(new Field(fieldName + "Id", data, Field.Store.NO, Field.Index.UN_TOKENIZED));
                         doc.add(new Field("refId", data, Field.Store.NO, Field.Index.UN_TOKENIZED));
                     }

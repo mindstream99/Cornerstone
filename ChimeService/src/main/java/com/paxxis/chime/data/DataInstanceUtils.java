@@ -678,21 +678,31 @@ public class DataInstanceUtils {
             if (fetchType != FetchType.Shallow) {
                 for (Shape shape : instance.getShapes()) {
                     List<DataField> fields = shape.getFields();
-                    for (DataField field : fields)
-                    {
+                    for (DataField field : fields) {
                         int colName = field.getColumn();
 
                         Shape dt = field.getShape();
 
-                        // get the display values
+                        // get the field values
                         List<DataFieldValue> values = null;
-                        if (dt.isPrimitive())
-                        {
+                        if (dt.isPrimitive()) {
                             values = FieldDataUtils.getInternalFieldValues(database, shape, colName, dt, instance.getId());
-                        }
-                        else
-                        {
-                            values = FieldDataUtils.getExternalFieldValues(database, shape, colName, dt, instance.getId());
+                        } else {
+                            // TODO When the field is tabular, Chime must return more than just the reference ids; the
+                        	// data instances must be returned.  this can be a drag on performance if there are a lot of
+                        	// values in the field.  for now, after retrieving the values, we run through the list and get
+                        	// the data instances with their field data.  an improvement in the works will use a denormalized
+                        	// json representation of tabular field data from a single database field which can quickly be
+                        	// rendered as a list of data instances with field data.  
+                        	values = FieldDataUtils.getExternalFieldValues(database, shape, colName, dt, instance.getId());
+                            
+                            if (dt.isTabular()) {
+                            	for (DataFieldValue fval : values) {
+                            		DataInstance fieldInstance = DataInstanceUtils.getInstance(fval.getReferenceId(), user, 
+                            				database, FetchType.Deep, true);
+                            		fval.setValue(fieldInstance);
+                            	}
+                            }
                         }
 
                         instance.setFieldValues(shape, field, values);

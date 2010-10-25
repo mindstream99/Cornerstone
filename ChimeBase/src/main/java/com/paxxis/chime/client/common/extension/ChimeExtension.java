@@ -17,11 +17,12 @@
 
 package com.paxxis.chime.client.common.extension;
 
+import java.util.HashMap;
+
 import com.paxxis.chime.client.common.Community;
 import com.paxxis.chime.client.common.DataInstance;
 import com.paxxis.chime.client.common.InstanceId;
 import com.paxxis.chime.client.common.User;
-import java.util.HashMap;
 
 /**
  *
@@ -35,7 +36,7 @@ public abstract class ChimeExtension {
     private User user = null;
     private Community community = null;
     private String calClassName = null;
-    private HashMap<String, String> propertyMap = new HashMap<String, String>();
+	private HashMap<String, Object> propertyMap = new HashMap<String, Object>();
     private HashMap<String, InstanceId> idMap = new HashMap<String, InstanceId>();
     private HashMap<String, HashMap<String, String>> fieldMap = new HashMap<String, HashMap<String, String>>();
 
@@ -59,12 +60,12 @@ public abstract class ChimeExtension {
         return fieldMap.get(objectName).get(fieldName);
     }
 
-    public void setPropertyMap(HashMap<String, String> map) {
+	public void setPropertyMap(HashMap<String, Object> map) {
         propertyMap.clear();
         propertyMap.putAll(map);
     }
 
-    public HashMap<String, String> getPropertyMap() {
+	public HashMap<String, Object> getPropertyMap() {
         return propertyMap;
     }
 

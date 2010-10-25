@@ -22,7 +22,7 @@ import java.util.HashMap;
 import java.util.List;
 
 /**
- *
+ * 
  * @author Robert Englander
  */
 public class ExtensionDefinition {
@@ -34,17 +34,17 @@ public class ExtensionDefinition {
     public String userName;
     public String communityId;
     public List<ExtensionShapeMapping> shapeMapList = new ArrayList<ExtensionShapeMapping>();
-    private HashMap<String, String> propertyMap = new HashMap<String, String>();
+	private HashMap<String, Object> propertyMap = new HashMap<String, Object>();
 
     public ExtensionDefinition() {
     }
 
-    public void setPropertyMap(HashMap<String, String> map) {
+	public void setPropertyMap(HashMap<String, Object> map) {
         propertyMap.clear();
         propertyMap.putAll(map);
     }
 
-    public HashMap<String, String> getPropertyMap() {
+	public HashMap<String, Object> getPropertyMap() {
         return propertyMap;
     }
 

@@ -179,68 +179,15 @@ set the bean's chimeConfiguration property.
         <property name="connectionPool" ref="connectionPool"/>
 
     </bean>
-
-    <!-- the object-to-shape mapping for the extension -->
-    <bean id="cybernodeMapping" class="com.paxxis.chime.extension.ExtensionShapeMapping">
-        <property name="objectName" value="cybernode"/>
-        <property name="shapeId" value="75e5ea8550404d6891bd34e1b669693d00"/>
-        <property name="fieldMap">
-            <map>
-                <entry key="CPU (Proc)" value="CPU (Proc)"/>
-                <entry key="System Memory" value="System Memory Usage"/>
-                <entry key="CPU" value="CPU Usage"/>
-                <entry key="Memory" value="Memory Usage"/>
-                <entry key="DiskSpace" value="Diskspace Usage"/>
-            </map>
-        </property>
-    </bean>
-
-    <bean id="serviceMapping" class="com.paxxis.chime.extension.ExtensionShapeMapping">
-        <property name="objectName" value="service"/>
-        <property name="shapeId" value="a0f9d454f36d4c7ea2e747233588ada400"/>
-        <property name="fieldMap">
-            <map>
-                <entry key="thread-deadlock-monitor" value="Thread Deadlock"/>
-                <entry key="CPU (Proc)" value="CPU (Proc)"/>
-                <entry key="Memory Limit" value="Memory Limit"/>
-                <entry key="Memory" value="Memory Usage"/>
-                <entry key="Avg Enqueue Time" value="Average Enqueue Time"/>
-            </map>
-        </property>
-    </bean> 
-  
-    <!-- the extension -->
-    <bean id="mozartChimeExtension" class="com.paxxis.chime.extension.ExtensionDefinition">
-        <property name="id" value="MZ"/>
-        <property name="name" value="Mozart Extension"/>
-        <property name="className" value="com.vibrant.mozart.MozartChimeExtension"/>
-        <property name="calClassName" value="com.vibrant.mozart.MozartCALExtension"/>
-        <property name="userName" value="mozart"/>
-        <property name="communityId" value="3280e06354154348a4491f0efeac187c00"/>
-
-        <property name="propertyMap">
-            <map>
-                <entry key="criticalEventTypeId" value="173f4a62fa804c5a952f10969ccbbc2a00"/>
-                <entry key="warningEventTypeId" value="173f4a62fa804c5a952f10969ccbbc2a00"/>
-                <entry key="infoEventTypeId" value="173f4a62fa804c5a952f10969ccbbc2a00"/>
-                <entry key="dataCenterShapeId" value="bd55ebbba3e34bcca1ce0b2e87fe621900"/>
-                <entry key="serviceDefinitionShapeId" value="033c1c1f93684bd2b54bc6c8a1f27ad500"/>
-            </map>
-        </property>
-
-        <property name="shapeMappings">
-            <list>
-                <ref bean="cybernodeMapping"/>
-                <ref bean="serviceMapping"/>
-            </list>
-        </property>
-    </bean> 
-
+    
     <bean id="chimeUpdateNotifier" class="com.paxxis.chime.service.NotificationTopicSender">
         <property name="chimeConfiguration" ref="chimeConfiguration"/>
         <property name="notificationTopicName" value="ChimeUpdateTopic"/>
     </bean>
 
+<!-- Uncomment this to enable the extension -->
+	<!--import resource="ChimeExtensionConfig.xml"/-->	
+	
     <!-- the extension manager -->
     <bean id="extensionManager" class="com.paxxis.chime.extension.ChimeExtensionManager">
         <property name="extensions">

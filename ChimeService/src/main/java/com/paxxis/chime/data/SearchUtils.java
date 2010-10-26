@@ -40,15 +40,16 @@ import com.paxxis.chime.client.common.Community;
 import com.paxxis.chime.client.common.Cursor;
 import com.paxxis.chime.client.common.DataField;
 import com.paxxis.chime.client.common.DataInstance;
-import com.paxxis.chime.client.common.InstanceId;
-import com.paxxis.chime.client.common.Parameter;
-import com.paxxis.chime.client.common.Shape;
-import com.paxxis.chime.client.common.User;
 import com.paxxis.chime.client.common.DataInstance.ReviewAction;
 import com.paxxis.chime.client.common.DataInstance.TagAction;
 import com.paxxis.chime.client.common.DataInstanceRequest.ClauseOperator;
 import com.paxxis.chime.client.common.DataInstanceRequest.Operator;
 import com.paxxis.chime.client.common.DataInstanceRequest.SortOrder;
+import com.paxxis.chime.client.common.InstanceId;
+import com.paxxis.chime.client.common.Parameter;
+import com.paxxis.chime.client.common.Shape;
+import com.paxxis.chime.client.common.User;
+import com.paxxis.chime.client.common.constants.SearchFieldConstants;
 import com.paxxis.chime.client.common.extension.ChimeExtension;
 import com.paxxis.chime.client.common.extension.MemoryIndexer;
 import com.paxxis.chime.database.DataSet;
@@ -275,7 +276,7 @@ public class SearchUtils {
     {
         ClauseOperator op = ClauseOperator.MatchAll;
         Parameter p = new Parameter();
-        p.fieldName = "name";
+        p.fieldName = SearchFieldConstants.NAME;
         p.fieldValue = text;
         p.operator = Operator.StartsWith;
         p.dataShape = shape;
@@ -292,7 +293,7 @@ public class SearchUtils {
         List<Parameter> params = new ArrayList<Parameter>();
 
         Parameter p = new Parameter();
-        p.fieldName = "name";
+        p.fieldName = SearchFieldConstants.NAME;
         p.fieldValue = text;
         p.operator = Operator.StartsWith;
         p.dataShape = shape;
@@ -301,7 +302,7 @@ public class SearchUtils {
         if (excludeInternals)
         {
             p = new Parameter();
-            p.fieldName = "internalType";
+            p.fieldName = SearchFieldConstants.IS_INTERNAL;
             p.operator = Operator.Equals;
             p.fieldValue = "0";
             params.add(p);
@@ -329,15 +330,15 @@ public class SearchUtils {
                 }
             }
 
-            if (param.fieldName.equalsIgnoreCase("reference")) {
+            if (param.fieldName.equalsIgnoreCase(SearchFieldConstants.REFERENCE)) {
                 String term = "refId:" + param.fieldValue + " AND !dataTypeId:500 AND !dataTypeId:600 AND !dataTypeId:1000";
                 terms.add(term);
                 finalTerm = "";
-            } else if (param.fieldName.equalsIgnoreCase("id")) {
+            } else if (param.fieldName.equalsIgnoreCase(SearchFieldConstants.ID)) {
                 String term = "instanceid:" + param.fieldValue;
                 terms.add(term);
                 finalTerm = "";
-            } else if (param.fieldName.equalsIgnoreCase("shape")) {
+            } else if (param.fieldName.equalsIgnoreCase(SearchFieldConstants.SHAPE)) {
                 String op = "";
                 if (param.operator == Operator.NotReference) {
                     op = "marker:marker AND !";
@@ -351,7 +352,7 @@ public class SearchUtils {
                 }
 
                 terms.add(term);
-            } else if (param.fieldName.equalsIgnoreCase("name")) {
+            } else if (param.fieldName.equalsIgnoreCase(SearchFieldConstants.NAME)) {
                 String name = param.fieldValue.toString().trim().toLowerCase();
                 String term = "marker:marker";
                 if (name.length() > 0)
@@ -377,7 +378,7 @@ public class SearchUtils {
                 terms.add("(" + term + typeTerm + ")");
 
             }
-            else if (param.fieldName.equalsIgnoreCase("description"))
+            else if (param.fieldName.equalsIgnoreCase(SearchFieldConstants.DESCRIPTION))
             {
                 String name = param.fieldValue.toString().trim().toLowerCase();
                 String term = "marker:marker";
@@ -404,7 +405,7 @@ public class SearchUtils {
                 terms.add("(" + term + typeTerm + ")");
 
             }
-            else if (param.fieldName.equalsIgnoreCase("tag"))
+            else if (param.fieldName.equalsIgnoreCase(SearchFieldConstants.TAG))
             {
                 String term = "";
                 switch (param.operator)
@@ -418,7 +419,7 @@ public class SearchUtils {
                 }
                 terms.add("(" + term + typeTerm + ")");
             }
-            else if (param.fieldName.equalsIgnoreCase("TagAppliedUser"))
+            else if (param.fieldName.equalsIgnoreCase(SearchFieldConstants.TAG_USER))
             {
                 String term = "";
                 switch (param.operator)
@@ -429,7 +430,8 @@ public class SearchUtils {
                 }
                 terms.add("(" + term + typeTerm + ")");
             }
-            else if (param.fieldName.equalsIgnoreCase("Parent"))
+
+            else if (param.fieldName.equalsIgnoreCase(SearchFieldConstants.PARENT))
             {
                 String term = "";
                 switch (param.operator)
@@ -443,7 +445,7 @@ public class SearchUtils {
                 }
                 terms.add("(" + term + typeTerm + ")");
             }
-            else if (param.fieldName.equalsIgnoreCase("editor (user)"))
+            else if (param.fieldName.equalsIgnoreCase(SearchFieldConstants.USER))
             {
                 String term = "";
                 String sval = param.fieldValue.toString();
@@ -478,7 +480,7 @@ public class SearchUtils {
                 }
                 terms.add("(" + term + typeTerm + ")");
             }
-            else if (param.fieldName.equalsIgnoreCase("editor (community)"))
+            else if (param.fieldName.equalsIgnoreCase(SearchFieldConstants.COMMUNITY))
             {
                 String term = "";
                 switch (param.operator)
@@ -492,13 +494,13 @@ public class SearchUtils {
                 }
                 terms.add("(" + term + typeTerm + ")");
             }
-            else if (param.fieldName.equalsIgnoreCase("internalType"))
+            else if (param.fieldName.equalsIgnoreCase(SearchFieldConstants.IS_INTERNAL))
             {
                 String term = "internalType:";
                 term += param.fieldValue.toString();
                 terms.add("(" + term + typeTerm + ")");
             }
-            else if (param.fieldName.equalsIgnoreCase("activity"))
+            else if (param.fieldName.equalsIgnoreCase(SearchFieldConstants.ACTIVITY))
             {
                 String term = "latestActivity:";
                 long end = new Date().getTime();
@@ -568,7 +570,7 @@ public class SearchUtils {
                 term += "[" + Tools.longToNumeric(start) + " TO " + Tools.longToNumeric(end) + "]";
                 terms.add("(" + term + typeTerm + ")");
             }
-            else if (param.fieldName.equalsIgnoreCase("created/updated"))
+            else if (param.fieldName.equalsIgnoreCase(SearchFieldConstants.CREATED))
             {
                 String term = "updated:";
                 long end = new Date().getTime();
@@ -638,7 +640,7 @@ public class SearchUtils {
                 term += "[" + Tools.longToNumeric(start) + " TO " + Tools.longToNumeric(end) + "]";
                 terms.add("(" + term + typeTerm + ")");
             }
-            else if (param.fieldName.equalsIgnoreCase("expired"))
+            else if (param.fieldName.equalsIgnoreCase(SearchFieldConstants.EXPIRED))
             {
                 String term = "expiration:";
                 String minString = Tools.minNumeric();
@@ -647,7 +649,7 @@ public class SearchUtils {
                 term += "{" + minString + " TO " + valueString + "}";
                 terms.add("(" + term + typeTerm + ")");
             }
-            else if (param.fieldName.equalsIgnoreCase("average rating"))
+            else if (param.fieldName.equalsIgnoreCase(SearchFieldConstants.AVG_RATING))
             {
                 float val = Float.parseFloat(param.fieldValue.toString());
                 String value = Tools.floatToNumeric(val);
@@ -1297,7 +1299,7 @@ public class SearchUtils {
                 Parameter param = new Parameter();
                 if (word.startsWith("[") && word.length() > 2) {
                 } else {
-                    param.fieldName = "name";
+                    param.fieldName = SearchFieldConstants.NAME;
                     param.operator = Operator.Contains;
                     param.fieldValue = word;
                     param.dataShape = searchType;
@@ -1312,7 +1314,7 @@ public class SearchUtils {
 
         String combinedWords = buf.toString().toLowerCase();
         Parameter param = new Parameter();
-        param.fieldName = "name";
+        param.fieldName = SearchFieldConstants.NAME;
         param.operator = Operator.Contains;
         param.fieldValue = combinedWords + "^10";
         params.add(0, param);

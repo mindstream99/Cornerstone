@@ -52,13 +52,14 @@ import com.paxxis.chime.client.ServiceManager;
 import com.paxxis.chime.client.ShapeResponseObject;
 import com.paxxis.chime.client.common.DataField;
 import com.paxxis.chime.client.common.DataInstance;
+import com.paxxis.chime.client.common.DataInstanceRequest.ClauseOperator;
+import com.paxxis.chime.client.common.DataInstanceRequest.Operator;
+import com.paxxis.chime.client.common.DataInstanceRequest.SortOrder;
 import com.paxxis.chime.client.common.SearchCriteria;
 import com.paxxis.chime.client.common.SearchFilter;
 import com.paxxis.chime.client.common.Shape;
 import com.paxxis.chime.client.common.ShapeRequest;
-import com.paxxis.chime.client.common.DataInstanceRequest.ClauseOperator;
-import com.paxxis.chime.client.common.DataInstanceRequest.Operator;
-import com.paxxis.chime.client.common.DataInstanceRequest.SortOrder;
+import com.paxxis.chime.client.common.constants.SearchFieldConstants;
 import com.paxxis.chime.client.editor.ComplexSearchFilterEditor;
 import com.paxxis.chime.client.editor.NamedSearchSaver;
 import com.paxxis.chime.client.editor.SearchFilterEditor;
@@ -360,7 +361,7 @@ public class AdvancedSearchPanel extends ChimeLayoutContainer
     	filterMenu = new Menu();
     	_addFilterButton.setMenu(filterMenu);
     	
-    	MenuItem item = new MenuItem("Name");
+    	MenuItem item = new MenuItem(SearchFieldConstants.NAME);
     	filterMenu.add(item);
         item.addSelectionListener(
             new SelectionListener<MenuEvent>() {
@@ -368,7 +369,7 @@ public class AdvancedSearchPanel extends ChimeLayoutContainer
                 public void componentSelected(MenuEvent ce) {
                 	SearchFilter filter = new SearchFilter();
                 	DataField field = new DataField();
-                	field.setName("Name");
+                	field.setName(SearchFieldConstants.NAME);
                     filter.setDataField(field);
                     filter.setValue("");
                     SearchFilterEditor w = new SearchFilterEditor(SearchFilterEditor.Type.Text, filter,
@@ -384,7 +385,7 @@ public class AdvancedSearchPanel extends ChimeLayoutContainer
             }
         );
 
-    	item = new MenuItem("Description");
+    	item = new MenuItem(SearchFieldConstants.DESCRIPTION);
     	filterMenu.add(item);
         item.addSelectionListener(
             new SelectionListener<MenuEvent>() {
@@ -392,7 +393,7 @@ public class AdvancedSearchPanel extends ChimeLayoutContainer
                 public void componentSelected(MenuEvent ce) {
                 	SearchFilter filter = new SearchFilter();
                 	DataField field = new DataField();
-                	field.setName("Description");
+                	field.setName(SearchFieldConstants.DESCRIPTION);
                     filter.setDataField(field);
                     filter.setValue("");
                     SearchFilterEditor w = new SearchFilterEditor(SearchFilterEditor.Type.Text, filter,
@@ -408,7 +409,7 @@ public class AdvancedSearchPanel extends ChimeLayoutContainer
             }
         );
 
-    	item = new MenuItem("Average Rating");
+    	item = new MenuItem(SearchFieldConstants.AVG_RATING);
     	filterMenu.add(item);
         item.addSelectionListener(
             new SelectionListener<MenuEvent>() {
@@ -416,7 +417,7 @@ public class AdvancedSearchPanel extends ChimeLayoutContainer
                 public void componentSelected(MenuEvent ce) {
                 	SearchFilter filter = new SearchFilter();
                 	DataField field = new DataField();
-                	field.setName("Average Rating");
+                	field.setName(SearchFieldConstants.AVG_RATING);
                     filter.setDataField(field);
                     filter.setValue("");
                     SearchFilterEditor w = new SearchFilterEditor(SearchFilterEditor.Type.Number, filter,
@@ -432,7 +433,7 @@ public class AdvancedSearchPanel extends ChimeLayoutContainer
             }
         );
 
-        item = new MenuItem("Tag");
+        item = new MenuItem(SearchFieldConstants.TAG);
     	filterMenu.add(item);
         item.addSelectionListener(
             new SelectionListener<MenuEvent>() {
@@ -440,7 +441,7 @@ public class AdvancedSearchPanel extends ChimeLayoutContainer
                 public void componentSelected(MenuEvent ce) {
                 	SearchFilter filter = new SearchFilter();
                 	DataField field = new DataField();
-                	field.setName("Tag");
+                	field.setName(SearchFieldConstants.TAG);
                     filter.setDataField(field);
                     filter.setValue("-1");
                     SearchFilterEditor w = new SearchFilterEditor(SearchFilterEditor.Type.Reference, filter, Shape.TAG_ID,
@@ -456,7 +457,7 @@ public class AdvancedSearchPanel extends ChimeLayoutContainer
             }
         );
 
-        item = new MenuItem("Editor (User)");
+        item = new MenuItem(SearchFieldConstants.USER);
     	filterMenu.add(item);
         item.addSelectionListener(
             new SelectionListener<MenuEvent>() {
@@ -464,7 +465,7 @@ public class AdvancedSearchPanel extends ChimeLayoutContainer
                 public void componentSelected(MenuEvent ce) {
                 	SearchFilter filter = new SearchFilter();
                 	DataField field = new DataField();
-                	field.setName("Editor (User)");
+                	field.setName(SearchFieldConstants.USER);
                     filter.setDataField(field);
                     filter.setValue("-1");
                     SearchFilterEditor w = new SearchFilterEditor(SearchFilterEditor.Type.Reference, filter, Shape.USER_ID,
@@ -480,7 +481,7 @@ public class AdvancedSearchPanel extends ChimeLayoutContainer
             }
         );
 
-        item = new MenuItem("Editor (Community)");
+        item = new MenuItem(SearchFieldConstants.COMMUNITY);
     	filterMenu.add(item);
         item.addSelectionListener(
             new SelectionListener<MenuEvent>() {
@@ -488,7 +489,7 @@ public class AdvancedSearchPanel extends ChimeLayoutContainer
                 public void componentSelected(MenuEvent ce) {
                 	SearchFilter filter = new SearchFilter();
                 	DataField field = new DataField();
-                	field.setName("Editor (Community)");
+                	field.setName(SearchFieldConstants.COMMUNITY);
                     filter.setDataField(field);
                     filter.setValue("-1");
                     SearchFilterEditor w = new SearchFilterEditor(SearchFilterEditor.Type.Reference, filter, Shape.COMMUNITY_ID,
@@ -504,7 +505,7 @@ public class AdvancedSearchPanel extends ChimeLayoutContainer
             }
         );
 
-        item = new MenuItem("Activity");
+        item = new MenuItem(SearchFieldConstants.ACTIVITY);
     	filterMenu.add(item);
         item.addSelectionListener(
             new SelectionListener<MenuEvent>() {
@@ -512,7 +513,7 @@ public class AdvancedSearchPanel extends ChimeLayoutContainer
                 public void componentSelected(MenuEvent ce) {
                 	SearchFilter filter = new SearchFilter();
                 	DataField field = new DataField();
-                	field.setName("Activity");
+                	field.setName(SearchFieldConstants.ACTIVITY);
                     filter.setDataField(field);
                     filter.setValue("");
                     SearchFilterEditor w = new SearchFilterEditor(SearchFilterEditor.Type.Activity, filter,
@@ -528,7 +529,7 @@ public class AdvancedSearchPanel extends ChimeLayoutContainer
             }
         );
 
-        item = new MenuItem("Created/Updated");
+        item = new MenuItem(SearchFieldConstants.CREATED);
     	filterMenu.add(item);
         item.addSelectionListener(
             new SelectionListener<MenuEvent>() {
@@ -536,7 +537,7 @@ public class AdvancedSearchPanel extends ChimeLayoutContainer
                 public void componentSelected(MenuEvent ce) {
                 	SearchFilter filter = new SearchFilter();
                 	DataField field = new DataField();
-                	field.setName("Created/Updated");
+                	field.setName(SearchFieldConstants.CREATED);
                     filter.setDataField(field);
                     filter.setValue("");
                     SearchFilterEditor w = new SearchFilterEditor(SearchFilterEditor.Type.Activity, filter,
@@ -552,7 +553,7 @@ public class AdvancedSearchPanel extends ChimeLayoutContainer
             }
         );
 
-        item = new MenuItem("Shape");
+        item = new MenuItem(SearchFieldConstants.SHAPE);
     	filterMenu.add(item);
         item.addSelectionListener(
             new SelectionListener<MenuEvent>() {
@@ -560,7 +561,7 @@ public class AdvancedSearchPanel extends ChimeLayoutContainer
                 public void componentSelected(MenuEvent ce) {
                 	SearchFilter filter = new SearchFilter();
                 	DataField field = new DataField();
-                	field.setName("Shape");
+                	field.setName(SearchFieldConstants.SHAPE);
                     filter.setDataField(field);
                     filter.setValue("-1");
                     SearchFilterEditor w = new SearchFilterEditor(SearchFilterEditor.Type.Reference, filter, Shape.SHAPE_ID,
@@ -584,7 +585,7 @@ public class AdvancedSearchPanel extends ChimeLayoutContainer
                 public void componentSelected(MenuEvent ce) {
                 	SearchFilter filter = new SearchFilter();
                 	DataField field = new DataField();
-                	field.setName("Shape");
+                	field.setName(SearchFieldConstants.SHAPE);
                     filter.setDataField(field);
                     filter.setValue("-1");
                     ComplexSearchFilterEditor w = new ComplexSearchFilterEditor(
@@ -679,7 +680,7 @@ public class AdvancedSearchPanel extends ChimeLayoutContainer
                     filter.setEnabled(true);
                     filter.setOperator(Operator.Reference);
                     DataField f = new DataField();
-                    f.setName("Shape");
+                    f.setName(SearchFieldConstants.SHAPE);
                     filter.setDataField(f);
                     //_activeFilter = filter;
 

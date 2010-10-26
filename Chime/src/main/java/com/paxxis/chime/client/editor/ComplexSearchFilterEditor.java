@@ -52,10 +52,11 @@ import com.paxxis.chime.client.ServiceManager;
 import com.paxxis.chime.client.ShapeResponseObject;
 import com.paxxis.chime.client.common.DataField;
 import com.paxxis.chime.client.common.DataInstance;
+import com.paxxis.chime.client.common.DataInstanceRequest.Operator;
 import com.paxxis.chime.client.common.SearchFilter;
 import com.paxxis.chime.client.common.Shape;
 import com.paxxis.chime.client.common.ShapeRequest;
-import com.paxxis.chime.client.common.DataInstanceRequest.Operator;
+import com.paxxis.chime.client.common.constants.SearchFieldConstants;
 import com.paxxis.chime.client.editor.SearchFilterEditor.FilterListener;
 import com.paxxis.chime.client.widgets.ChimeWindow;
 
@@ -221,7 +222,7 @@ public class ComplexSearchFilterEditor extends ChimeWindow
                         filter.setDataField(field);
                         updateState();
 
-                        if (field.getName().equals("Name"))
+                        if (field.getName().equals(SearchFieldConstants.NAME))
                         {
                             _operatorStore.add(_textOperatorList);
                             _filterInput.setVisible(false);
@@ -230,7 +231,7 @@ public class ComplexSearchFilterEditor extends ChimeWindow
                             dateField.setVisible(false);
                             textField.setRawValue("");
                         }
-                        else if (field.getName().equals("Description"))
+                        else if (field.getName().equals(SearchFieldConstants.DESCRIPTION))
                         {
                             _operatorStore.add(_textOperatorList);
                             _filterInput.setVisible(false);
@@ -239,7 +240,7 @@ public class ComplexSearchFilterEditor extends ChimeWindow
                             dateField.setVisible(false);
                             textField.setRawValue("");
                         }
-                        else if (field.getName().equals("Average Rating"))
+                        else if (field.getName().equals(SearchFieldConstants.AVG_RATING))
                         {
                             _operatorStore.add(_numericOperatorList);
                             _filterInput.setVisible(false);
@@ -248,7 +249,7 @@ public class ComplexSearchFilterEditor extends ChimeWindow
                             numberField.setVisible(true);
                             numberField.setRawValue("");
                         }
-                        else if (field.getName().equals("Tag"))
+                        else if (field.getName().equals(SearchFieldConstants.TAG))
                         {
                             _operatorStore.add(_referenceOperatorList);
                             _filterInput.setShape(Shape.TAG_ID, true);
@@ -257,7 +258,7 @@ public class ComplexSearchFilterEditor extends ChimeWindow
                             dateField.setVisible(false);
                             numberField.setVisible(false);
                         }
-                        else if (field.getName().equals("Editor (User)"))
+                        else if (field.getName().equals(SearchFieldConstants.USER))
                         {
                             _operatorStore.add(_referenceOperatorList);
                             _filterInput.setShape(Shape.USER_ID, true);
@@ -266,7 +267,7 @@ public class ComplexSearchFilterEditor extends ChimeWindow
                             dateField.setVisible(false);
                             numberField.setVisible(false);
                         }
-                        else if (field.getName().equals("Editor (Community)"))
+                        else if (field.getName().equals(SearchFieldConstants.COMMUNITY))
                         {
                             _operatorStore.add(_referenceOperatorList);
                             _filterInput.setShape(Shape.COMMUNITY_ID, true);
@@ -275,7 +276,7 @@ public class ComplexSearchFilterEditor extends ChimeWindow
                             dateField.setVisible(false);
                             numberField.setVisible(false);
                         }
-                        else if (field.getName().equals("Activity"))
+                        else if (field.getName().equals(SearchFieldConstants.ACTIVITY))
                         {
                             _operatorStore.add(_activityOperatorList);
                             _filterInput.setVisible(false);
@@ -283,7 +284,7 @@ public class ComplexSearchFilterEditor extends ChimeWindow
                             dateField.setVisible(false);
                             numberField.setVisible(false);
                         }
-                        else if (field.getName().equals("Created/Updated"))
+                        else if (field.getName().equals(SearchFieldConstants.CREATED))
                         {
                             _operatorStore.add(_activityOperatorList);
                             _filterInput.setVisible(false);
@@ -291,7 +292,7 @@ public class ComplexSearchFilterEditor extends ChimeWindow
                             dateField.setVisible(false);
                             numberField.setVisible(false);
                         }
-                        else if (field.getName().equals("Parent"))
+                        else if (field.getName().equals(SearchFieldConstants.PARENT))
                         {
                             _operatorStore.add(_referenceOperatorList);
                             _filterInput.setShape(Shape.REFERENCE_ID, true);
@@ -601,34 +602,34 @@ public class ComplexSearchFilterEditor extends ChimeWindow
         _dataFieldStore.removeAll();
         
         DataField f = new DataField();
-        f.setName("Name");
+        f.setName(SearchFieldConstants.NAME);
         _dataFieldStore.add(new DataFieldModel(f));
         f = new DataField();
-        f.setName("Description");
+        f.setName(SearchFieldConstants.DESCRIPTION);
         _dataFieldStore.add(new DataFieldModel(f));
         f = new DataField();
-        f.setName("Average Rating");
+        f.setName(SearchFieldConstants.AVG_RATING);
         _dataFieldStore.add(new DataFieldModel(f));
         f = new DataField();
-        f.setName("Tag");
+        f.setName(SearchFieldConstants.TAG);
         _dataFieldStore.add(new DataFieldModel(f));
         f = new DataField();
-        f.setName("Editor (User)");
+        f.setName(SearchFieldConstants.USER);
         _dataFieldStore.add(new DataFieldModel(f));
         f = new DataField();
-        f.setName("Editor (Community)");
+        f.setName(SearchFieldConstants.COMMUNITY);
         _dataFieldStore.add(new DataFieldModel(f));
         f = new DataField();
-        f.setName("Activity");
+        f.setName(SearchFieldConstants.ACTIVITY);
         _dataFieldStore.add(new DataFieldModel(f));
         f = new DataField();
-        f.setName("Created/Updated");
+        f.setName(SearchFieldConstants.CREATED);
         _dataFieldStore.add(new DataFieldModel(f));
 
         if (type != null) {
         	if (type.isBackReferencing()) {
                 f = new DataField();
-                f.setName("Parent");
+                f.setName(SearchFieldConstants.PARENT);
                 _dataFieldStore.add(new DataFieldModel(f));
         	}
         	

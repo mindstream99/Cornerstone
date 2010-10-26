@@ -31,16 +31,17 @@ import com.extjs.gxt.ui.client.widget.HtmlContainer;
 import com.extjs.gxt.ui.client.widget.LayoutContainer;
 import com.extjs.gxt.ui.client.widget.button.IconButton;
 import com.extjs.gxt.ui.client.widget.layout.HBoxLayout;
+import com.extjs.gxt.ui.client.widget.layout.HBoxLayout.HBoxLayoutAlign;
 import com.extjs.gxt.ui.client.widget.layout.HBoxLayoutData;
 import com.extjs.gxt.ui.client.widget.layout.RowData;
 import com.extjs.gxt.ui.client.widget.layout.RowLayout;
-import com.extjs.gxt.ui.client.widget.layout.HBoxLayout.HBoxLayoutAlign;
 import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.user.client.Element;
+import com.paxxis.chime.client.common.DataInstanceRequest.Operator;
 import com.paxxis.chime.client.common.InstanceId;
 import com.paxxis.chime.client.common.SearchFilter;
 import com.paxxis.chime.client.common.Shape;
-import com.paxxis.chime.client.common.DataInstanceRequest.Operator;
+import com.paxxis.chime.client.common.constants.SearchFieldConstants;
 
 /**
  *
@@ -167,7 +168,7 @@ public class SearchFilterPanel extends LayoutContainer
         boolean isTag = false;
         boolean isUser = false;
         boolean isCommunity = false;
-        if (_filter.getDataField().getName().equalsIgnoreCase("Tag"))
+        if (_filter.getDataField().getName().equalsIgnoreCase(SearchFieldConstants.TAG))
         {
             isTag = true;
             
@@ -180,31 +181,15 @@ public class SearchFilterPanel extends LayoutContainer
                 field = "Tagged";
             }
         }
-        else if (_filter.getDataField().getName().equalsIgnoreCase("Editor (User)"))
+        else if (_filter.getDataField().getName().equalsIgnoreCase(SearchFieldConstants.USER))
         {
             isUser = true;
-
-            if (op == Operator.NotReference)
-            {
-                field = "Editor (User)";
-            }
-            else
-            {
-                field = "Editor (User)";
-            }
+            field = SearchFieldConstants.USER;
         }
-        else if (_filter.getDataField().getName().equalsIgnoreCase("Editor (Community)"))
+        else if (_filter.getDataField().getName().equalsIgnoreCase(SearchFieldConstants.COMMUNITY))
         {
             isCommunity = true;
-
-            if (op == Operator.NotReference)
-            {
-                field = "Editor (Community)";
-            }
-            else
-            {
-                field = "Editor (Community)";
-            }
+            field = SearchFieldConstants.COMMUNITY;
         }
         else
         {

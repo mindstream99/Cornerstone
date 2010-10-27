@@ -70,7 +70,7 @@ public class FileDetailPanel extends LayoutContainer {
         column.setWidth(150);
         column.setSortable(false);
         column.setMenuDisabled(true);
-        column.setRenderer(new InterceptedHtmlGridCellRenderer());
+        column.setRenderer(new FieldDataGridCellRenderer());
         configs.add(column);
         
         column = new ColumnConfig();
@@ -79,7 +79,7 @@ public class FileDetailPanel extends LayoutContainer {
         column.setWidth(300);
         column.setSortable(false);
         column.setMenuDisabled(true);
-        column.setRenderer(new InterceptedHtmlGridCellRenderer());
+        column.setRenderer(new FieldDataGridCellRenderer());
         configs.add(column);
         
         ColumnModel cm = new ColumnModel(configs);

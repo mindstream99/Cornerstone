@@ -68,7 +68,7 @@ import com.paxxis.chime.client.editor.SingleLineTextEditorWindow;
 import com.paxxis.chime.client.editor.TextEditorWindow;
 import com.paxxis.chime.client.widgets.ChimeGrid;
 import com.paxxis.chime.client.widgets.ChimeMessageBox;
-import com.paxxis.chime.client.widgets.InterceptedHtmlGridCellRenderer;
+import com.paxxis.chime.client.widgets.FieldDataGridCellRenderer;
 import com.paxxis.chime.client.widgets.LockPanel;
 import com.paxxis.chime.client.widgets.PasswordWindow;
 import com.paxxis.chime.client.widgets.SubscribePanel;
@@ -445,7 +445,7 @@ public class InstanceHeaderPortlet extends PortletContainer {
         column.setWidth(150);
         column.setSortable(false);
         column.setMenuDisabled(true);
-        column.setRenderer(new InterceptedHtmlGridCellRenderer());
+        column.setRenderer(new FieldDataGridCellRenderer());
         configs.add(column);
         
         column = new ColumnConfig();
@@ -454,7 +454,7 @@ public class InstanceHeaderPortlet extends PortletContainer {
         column.setWidth(300);
         column.setSortable(false);
         column.setMenuDisabled(true);
-        column.setRenderer(new InterceptedHtmlGridCellRenderer());
+        column.setRenderer(new FieldDataGridCellRenderer());
         configs.add(column);
         
         ColumnModel cm = new ColumnModel(configs);

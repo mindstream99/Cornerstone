@@ -30,7 +30,7 @@ import com.paxxis.chime.client.common.Shape;
 import com.paxxis.chime.client.widgets.ChimeGrid;
 import com.paxxis.chime.client.widgets.ChimeWindow;
 import com.paxxis.chime.client.widgets.DataFieldModel;
-import com.paxxis.chime.client.widgets.InterceptedHtmlGridCellRenderer;
+import com.paxxis.chime.client.widgets.FieldDataGridCellRenderer;
 
 public class TabularDataEditor extends ChimeWindow {
 
@@ -131,7 +131,7 @@ public class TabularDataEditor extends ChimeWindow {
 	        column.setWidth(150);
 	        column.setSortable(false);
 	        column.setMenuDisabled(true);
-	        column.setRenderer(new InterceptedHtmlGridCellRenderer());
+	        column.setRenderer(new FieldDataGridCellRenderer());
 	        configs.add(column);
 	        lastColId = field.getName();
         }

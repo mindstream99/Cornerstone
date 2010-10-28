@@ -48,6 +48,7 @@ import com.paxxis.chime.client.common.EditCommunityRequest;
 import com.paxxis.chime.client.common.EditCommunityResponse;
 import com.paxxis.chime.client.common.Shape;
 import com.paxxis.chime.client.common.ShapeRequest;
+import com.paxxis.chime.client.common.constants.SearchFieldConstants;
 import com.paxxis.chime.client.pages.PageManager;
 import com.paxxis.chime.client.widgets.ChimeMessageBox;
 import com.paxxis.chime.client.widgets.ChimeWindow;
@@ -218,7 +219,7 @@ public class CommunityCreatorWindow extends ChimeWindow
 
         DataInstanceRequest request = new DataInstanceRequest();
         request.setUser(ServiceManager.getActiveUser());
-        request.addQueryParameter(communityShape, "name", nameField.getValue().trim());
+        request.addQueryParameter(communityShape, SearchFieldConstants.NAME, nameField.getValue().trim());
         ServiceManager.getService().sendDataInstanceRequest(request, callback);
     }
 

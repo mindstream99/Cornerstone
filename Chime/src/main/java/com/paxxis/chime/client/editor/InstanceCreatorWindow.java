@@ -38,7 +38,6 @@ import com.extjs.gxt.ui.client.widget.form.TextField;
 import com.extjs.gxt.ui.client.widget.layout.FormLayout;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.DeferredCommand;
-import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.paxxis.chime.client.ChimeAsyncCallback;
 import com.paxxis.chime.client.ChimeListStore;
 import com.paxxis.chime.client.DataInputListener;
@@ -55,12 +54,13 @@ import com.paxxis.chime.client.common.DataInstance;
 import com.paxxis.chime.client.common.DataInstanceRequest;
 import com.paxxis.chime.client.common.DataInstanceResponse;
 import com.paxxis.chime.client.common.EditDataInstanceRequest;
+import com.paxxis.chime.client.common.EditDataInstanceRequest.Operation;
 import com.paxxis.chime.client.common.EditDataInstanceResponse;
 import com.paxxis.chime.client.common.Scope;
 import com.paxxis.chime.client.common.Shape;
 import com.paxxis.chime.client.common.ShapeRequest;
 import com.paxxis.chime.client.common.User;
-import com.paxxis.chime.client.common.EditDataInstanceRequest.Operation;
+import com.paxxis.chime.client.common.constants.SearchFieldConstants;
 import com.paxxis.chime.client.pages.PageManager;
 import com.paxxis.chime.client.widgets.ChimeMessageBox;
 import com.paxxis.chime.client.widgets.ChimeMessageBoxEvent;
@@ -298,7 +298,7 @@ public class InstanceCreatorWindow extends ChimeWindow
 
         DataInstanceRequest request = new DataInstanceRequest();
         request.setUser(ServiceManager.getActiveUser());
-        request.addQueryParameter(dataType, "name", nameField.getValue().trim());
+        request.addQueryParameter(dataType, SearchFieldConstants.NAME, nameField.getValue().trim());
         ServiceManager.getService().sendDataInstanceRequest(request, callback);
     }
 

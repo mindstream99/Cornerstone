@@ -31,7 +31,6 @@ import com.extjs.gxt.ui.client.widget.form.TextArea;
 import com.extjs.gxt.ui.client.widget.form.TextField;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.DeferredCommand;
-import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.paxxis.chime.client.ChimeAsyncCallback;
 import com.paxxis.chime.client.DataInstanceResponseObject;
 import com.paxxis.chime.client.LoginResponseObject;
@@ -49,6 +48,7 @@ import com.paxxis.chime.client.common.EditUserResponse;
 import com.paxxis.chime.client.common.Shape;
 import com.paxxis.chime.client.common.ShapeRequest;
 import com.paxxis.chime.client.common.User;
+import com.paxxis.chime.client.common.constants.SearchFieldConstants;
 import com.paxxis.chime.client.pages.PageManager;
 import com.paxxis.chime.client.widgets.ChimeMessageBox;
 import com.paxxis.chime.client.widgets.ChimeWindow;
@@ -247,7 +247,7 @@ public class UserCreatorWindow extends ChimeWindow
 
         DataInstanceRequest request = new DataInstanceRequest();
         request.setUser(ServiceManager.getActiveUser());
-        request.addQueryParameter(userShape, "name", nameField.getValue().trim());
+        request.addQueryParameter(userShape, SearchFieldConstants.NAME, nameField.getValue().trim());
         ServiceManager.getService().sendDataInstanceRequest(request, callback);
     }
 

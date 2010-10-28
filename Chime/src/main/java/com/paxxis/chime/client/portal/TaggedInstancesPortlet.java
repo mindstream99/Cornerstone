@@ -25,10 +25,11 @@ import com.paxxis.chime.client.ServiceManager;
 import com.paxxis.chime.client.common.Cursor;
 import com.paxxis.chime.client.common.DataInstance;
 import com.paxxis.chime.client.common.DataInstanceRequest;
-import com.paxxis.chime.client.common.Tag;
 import com.paxxis.chime.client.common.DataInstanceRequest.Depth;
 import com.paxxis.chime.client.common.DataInstanceRequest.Operator;
 import com.paxxis.chime.client.common.DataInstanceRequest.SortOrder;
+import com.paxxis.chime.client.common.Tag;
+import com.paxxis.chime.client.common.constants.SearchFieldConstants;
 import com.paxxis.chime.client.common.portal.PortletSpecification;
 import com.paxxis.chime.client.common.portal.PortletSpecification.PortletType;
 
@@ -99,7 +100,7 @@ public class TaggedInstancesPortlet extends PortletContainer {
                 req.setCursor(new Cursor(20));
                 req.setDepth(Depth.Shallow);
                 req.setSortOrder(SortOrder.ByName);
-                req.addQueryParameter(null, "Tag", tag.getId().getValue(), Operator.Reference);
+                req.addQueryParameter(null, SearchFieldConstants.TAG, tag.getId().getValue(), Operator.Reference);
 
                 if (globalItemAttached) {
                     globalResultsPanel.query(req);
@@ -110,7 +111,7 @@ public class TaggedInstancesPortlet extends PortletContainer {
                     req.setCursor(new Cursor(20));
                     req.setDepth(Depth.Shallow);
                     req.setSortOrder(SortOrder.ByName);
-                    req.addQueryParameter(null, "TagAppliedUser", tag.getId().getValue(), Operator.Reference);
+                    req.addQueryParameter(null, SearchFieldConstants.TAG_USER, tag.getId().getValue(), Operator.Reference);
                     userResultsPanel.query(req);
     	    	} else {
                     userResultsPanel.query(req);

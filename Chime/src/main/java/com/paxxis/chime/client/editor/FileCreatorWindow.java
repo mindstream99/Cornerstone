@@ -35,17 +35,16 @@ import com.extjs.gxt.ui.client.widget.button.ButtonBar;
 import com.extjs.gxt.ui.client.widget.form.AdapterField;
 import com.extjs.gxt.ui.client.widget.form.FileUploadField;
 import com.extjs.gxt.ui.client.widget.form.FormPanel;
-import com.extjs.gxt.ui.client.widget.form.TextArea;
-import com.extjs.gxt.ui.client.widget.form.TextField;
 import com.extjs.gxt.ui.client.widget.form.FormPanel.Encoding;
 import com.extjs.gxt.ui.client.widget.form.FormPanel.Method;
+import com.extjs.gxt.ui.client.widget.form.TextArea;
+import com.extjs.gxt.ui.client.widget.form.TextField;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.json.client.JSONObject;
 import com.google.gwt.json.client.JSONParser;
 import com.google.gwt.json.client.JSONValue;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.DeferredCommand;
-import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.paxxis.chime.client.ChimeAsyncCallback;
 import com.paxxis.chime.client.DataInstanceResponseObject;
 import com.paxxis.chime.client.LoginResponseObject;
@@ -58,11 +57,12 @@ import com.paxxis.chime.client.common.DataInstance;
 import com.paxxis.chime.client.common.DataInstanceRequest;
 import com.paxxis.chime.client.common.DataInstanceResponse;
 import com.paxxis.chime.client.common.EditDataInstanceRequest;
+import com.paxxis.chime.client.common.EditDataInstanceRequest.Operation;
 import com.paxxis.chime.client.common.EditDataInstanceResponse;
 import com.paxxis.chime.client.common.Scope;
 import com.paxxis.chime.client.common.Shape;
 import com.paxxis.chime.client.common.ShapeRequest;
-import com.paxxis.chime.client.common.EditDataInstanceRequest.Operation;
+import com.paxxis.chime.client.common.constants.SearchFieldConstants;
 import com.paxxis.chime.client.widgets.ChimeMessageBox;
 import com.paxxis.chime.client.widgets.ChimeMessageBoxEvent;
 import com.paxxis.chime.client.widgets.ChimeWindow;
@@ -307,7 +307,7 @@ public class FileCreatorWindow extends ChimeWindow
 
         DataInstanceRequest request = new DataInstanceRequest();
         request.setUser(ServiceManager.getActiveUser());
-        request.addQueryParameter(fileShape, "name", nameField.getValue().trim());
+        request.addQueryParameter(fileShape, SearchFieldConstants.NAME, nameField.getValue().trim());
         ServiceManager.getService().sendDataInstanceRequest(request, callback);
     }
 

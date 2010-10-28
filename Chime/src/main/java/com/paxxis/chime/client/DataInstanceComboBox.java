@@ -54,20 +54,20 @@ import com.google.gwt.user.client.DeferredCommand;
 import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.Event;
 import com.google.gwt.user.client.Timer;
-import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.KeyboardListener;
 import com.google.gwt.user.client.ui.RootPanel;
 import com.paxxis.chime.client.common.Cursor;
 import com.paxxis.chime.client.common.DataInstance;
 import com.paxxis.chime.client.common.DataInstanceRequest;
+import com.paxxis.chime.client.common.DataInstanceRequest.ClauseOperator;
+import com.paxxis.chime.client.common.DataInstanceRequest.Depth;
+import com.paxxis.chime.client.common.DataInstanceRequest.Operator;
 import com.paxxis.chime.client.common.DataInstanceResponse;
 import com.paxxis.chime.client.common.FindInstancesRequest;
 import com.paxxis.chime.client.common.InstanceId;
 import com.paxxis.chime.client.common.Shape;
 import com.paxxis.chime.client.common.ShapeRequest;
-import com.paxxis.chime.client.common.DataInstanceRequest.ClauseOperator;
-import com.paxxis.chime.client.common.DataInstanceRequest.Depth;
-import com.paxxis.chime.client.common.DataInstanceRequest.Operator;
+import com.paxxis.chime.client.common.constants.SearchFieldConstants;
 import com.paxxis.chime.client.widgets.InstancePreviewPopup;
 
 /**
@@ -1384,9 +1384,9 @@ protected void onSelect(DataInstanceModel model)
         req.setDepth(Depth.Shallow);
         req.setUser(ServiceManager.getActiveUser());
         if (dataIsId) {
-            req.addQueryParameter(dataShape, "id", rawData, Operator.Equals);
+            req.addQueryParameter(dataShape, SearchFieldConstants.ID, rawData, Operator.Equals);
         } else {
-            req.addQueryParameter(dataShape, "name", rawData, Operator.Contains);
+            req.addQueryParameter(dataShape, SearchFieldConstants.NAME, rawData, Operator.Contains);
         }
         ServiceManager.getService().sendDataInstanceRequest(req, callback);
                 

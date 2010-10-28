@@ -63,7 +63,10 @@ class JournalNotificationProcessor extends MessageNotifier {
                 dbconn.startTransaction();
 
                 String sql = "select distinct type_id from Chime.EventJournal";
-                DataSet dataSet = dbconn.getDataSet(sql, true);
+                
+                // important to set readOnly parameter on the dataset to false so that another instance of
+                // ChimeService doesn't attempt to accomplish the same thing
+                DataSet dataSet = dbconn.getDataSet(sql, false);
                 List<String> typeIds = new ArrayList<String>();
                 while (dataSet.next()) {
                     String id = dataSet.getFieldValue("type_id").asString();

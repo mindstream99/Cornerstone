@@ -72,6 +72,10 @@ set the bean's chimeConfiguration property.
         <property name="parameters">
             <map>
 
+				<!--  licensing
+                <entry key="chime.licensing.file" value="[the license file goes here]"/>
+				-->
+				
                 <!-- events/notification -->
                 <entry key="chime.notification.email.sender" value="notifier@paxxis.com"/>
                 <entry key="chime.notification.email.senderpw" value="paxxis!"/>
@@ -153,6 +157,10 @@ set the bean's chimeConfiguration property.
         <property name="sweepCycle" value="0.5"/>
     </bean>
 
+	<bean id="licenseProcessor" class="com.paxxis.chime.license.LicenseProcessor">
+        <property name="chimeConfiguration" ref="chimeConfiguration"/>
+	</bean>
+	
     <bean id="templateLoader" class="com.paxxis.chime.service.TemplateLoader">
         <property name="templateFiles">
             <list>
@@ -185,21 +193,24 @@ set the bean's chimeConfiguration property.
         <property name="notificationTopicName" value="ChimeUpdateTopic"/>
     </bean>
 
-<!-- Uncomment this to enable the extension -->
+	<!-- add resource imports to include extension configurations, like the example below -->
 	<!--import resource="ChimeExtensionConfig.xml"/-->	
 	
     <!-- the extension manager -->
     <bean id="extensionManager" class="com.paxxis.chime.extension.ChimeExtensionManager">
         <property name="extensions">
             <list>
-<!-- Uncomment this to enable the extension, MozartChimeExtension will need to be on the classpath for this to work!!! -->
-            	<!-- ref bean="mozartChimeExtension"/-->
+				<!-- Add references to extensions here, like the example below.  These bean names should be
+				     defined in the extension configurations imported earlier.
+					 Note:  extension jars must be on the ChimeService classpath!!! -->
+            	<!-- ref bean="someChimeExtension"/-->
             </list>
         </property>
         <property name="connectionPool" ref="connectionPool"/>
         <property name="updateNotifier" ref="chimeUpdateNotifier"/>
         <property name="editNotifier" ref="chimeEventNotifier"/>
         <property name="eventNotifier" ref="chimeEventSender"/>
+        <property name="licenseProcessor" ref="licenseProcessor"/>
     </bean>
 
     <!-- the service object itself -->

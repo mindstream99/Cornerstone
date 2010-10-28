@@ -77,11 +77,16 @@ public class ChimeExtensionManager implements ExtensionContext {
     private List<ExtensionDefinition> definitions = new ArrayList<ExtensionDefinition>();
     private List<ChimeExtension> extensions = new ArrayList<ChimeExtension>();
     private DatabaseConnectionPool dbPool = null;
-
+    private LicenseProcessor licenseProcessor = null;
+    
     public ChimeExtensionManager() {
         super();
     }
 
+    public void setLicenseProcessor(LicenseProcessor processor) {
+    	licenseProcessor = processor;
+    }
+    
     public void setUpdateNotifier(NotificationTopicSender sender) {
         updateSender = sender;
     }
@@ -248,7 +253,7 @@ public class ChimeExtensionManager implements ExtensionContext {
                 }
 
                 ext.initialize();
-                LicenseProcessor.instance().validate(ext);
+                licenseProcessor.validate(ext);
                 extensions.add(ext);
             } catch (ClassNotFoundException ex) {
                 Logger.getLogger(ChimeExtensionManager.class.getName()).log(Level.ERROR, null, ex);

@@ -48,12 +48,6 @@ public class LicenseProcessor {
 		}
 	}
 
-    private static LicenseProcessor INSTANCE = null;
-
-    public static LicenseProcessor instance() {
-        return INSTANCE;
-    }
-
     public LicenseProcessor() {
     }
 
@@ -63,9 +57,6 @@ public class LicenseProcessor {
 
     public void initialize() {
         scheduledExecutor = Executors.newScheduledThreadPool(1);
-        
-        INSTANCE = this;
-
         scheduleValidation();
     }
 

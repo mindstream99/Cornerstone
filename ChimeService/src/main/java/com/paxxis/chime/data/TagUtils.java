@@ -17,11 +17,15 @@
 
 package com.paxxis.chime.data;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+
 import com.paxxis.chime.client.common.DataInstance;
-import com.paxxis.chime.client.common.Shape;
 import com.paxxis.chime.client.common.FieldData;
 import com.paxxis.chime.client.common.InstanceId;
 import com.paxxis.chime.client.common.Scope;
+import com.paxxis.chime.client.common.Shape;
 import com.paxxis.chime.client.common.Tag;
 import com.paxxis.chime.client.common.TagContext;
 import com.paxxis.chime.client.common.User;
@@ -30,9 +34,6 @@ import com.paxxis.chime.database.DatabaseConnection;
 import com.paxxis.chime.database.StringData;
 import com.paxxis.chime.service.ApplyTagsResponse;
 import com.paxxis.chime.service.Tools;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
 
 /**
  * 
@@ -177,7 +178,7 @@ public class TagUtils
                 boolean ok = true;
                 
                 // do not tag a tag with itself
-                if (instance.getShapes().get(0).getName().equals("Tag"))
+                if (instance.getShapes().get(0).getId().equals(Shape.TAG_ID))
                 {
                     if (instanceId.equals(tag.getId()))
                     {

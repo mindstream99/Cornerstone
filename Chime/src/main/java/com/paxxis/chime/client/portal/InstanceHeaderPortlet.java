@@ -43,10 +43,10 @@ import com.google.gwt.user.client.DeferredCommand;
 import com.google.gwt.user.client.Timer;
 import com.paxxis.chime.client.ChimeAsyncCallback;
 import com.paxxis.chime.client.InstanceUpdateListener;
+import com.paxxis.chime.client.InstanceUpdateListener.Type;
 import com.paxxis.chime.client.ServiceManager;
 import com.paxxis.chime.client.ServiceResponseObject;
 import com.paxxis.chime.client.Utils;
-import com.paxxis.chime.client.InstanceUpdateListener.Type;
 import com.paxxis.chime.client.common.ApplyVoteRequest;
 import com.paxxis.chime.client.common.ApplyVoteResponse;
 import com.paxxis.chime.client.common.Dashboard;
@@ -71,8 +71,8 @@ import com.paxxis.chime.client.widgets.ChimeMessageBox;
 import com.paxxis.chime.client.widgets.FieldDataGridCellRenderer;
 import com.paxxis.chime.client.widgets.LockPanel;
 import com.paxxis.chime.client.widgets.PasswordWindow;
-import com.paxxis.chime.client.widgets.SubscribePanel;
 import com.paxxis.chime.client.widgets.PasswordWindow.PasswordChangeListener;
+import com.paxxis.chime.client.widgets.SubscribePanel;
 
 /**
  *
@@ -207,7 +207,7 @@ public class InstanceHeaderPortlet extends PortletContainer {
     }
 
     private boolean fullView() {
-    	boolean isUserInstance = _instance.getShapes().get(0).getName().equals("User");
+    	boolean isUserInstance = _instance.getShapes().get(0).getId().equals(Shape.USER_ID);
     	if (isUserInstance) {
         	User user = ServiceManager.getActiveUser();
         	return user.isAdmin() || user.getId().equals(_instance.getId());

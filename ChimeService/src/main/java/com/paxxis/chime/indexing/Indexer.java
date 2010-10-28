@@ -265,7 +265,7 @@ class IndexUpdater extends IndexerBase {
                     DataInstance inst = DataInstanceUtils.getInstance(_data.getId(), user, database, true, false);
                     Document doc = buildDocument(inst, user, database);
 
-                    if (_data.getShapes().get(0).getName().equals("File")) {
+                    if (_data.getShapes().get(0).getId().equals(Shape.FILE_ID)) {
                         indexFileContents(doc, _data);
                     }
 

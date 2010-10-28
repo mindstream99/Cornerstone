@@ -31,8 +31,8 @@ import com.paxxis.chime.client.common.DataField;
 import com.paxxis.chime.client.common.DataFieldValue;
 import com.paxxis.chime.client.common.DataInstance;
 import com.paxxis.chime.client.common.DataInstanceRequest;
-import com.paxxis.chime.client.common.Shape;
 import com.paxxis.chime.client.common.DataInstanceRequest.Depth;
+import com.paxxis.chime.client.common.Shape;
 
 /**
  * 
@@ -112,7 +112,7 @@ public class InstancePreviewPopup extends ChimePopup {
                     List<DataInstance> list = response.getResponse().getDataInstances();
                     if (list.size() == 1) {
                         DataInstance dataInstance = list.get(0);
-                		boolean isImage = dataInstance.getShapes().get(0).getName().equals("Image");
+                		boolean isImage = dataInstance.getShapes().get(0).getId().equals(Shape.IMAGE_ID);
                         if (!isImage && dataInstance.getImages().size() == 0) {
                         	hide();
                         } else {
@@ -137,7 +137,7 @@ public class InstancePreviewPopup extends ChimePopup {
 	
 	private void render(Component parent, DataInstance inst) {
 		DataInstance image = null;
-		if (inst.getShapes().get(0).getName().equals("Image")) {
+		if (inst.getShapes().get(0).getId().equals(Shape.IMAGE_ID)) {
 			image = inst;
 		} else {
 			image = inst.getImages().get(0);

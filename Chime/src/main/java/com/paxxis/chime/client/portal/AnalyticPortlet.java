@@ -26,7 +26,6 @@ import com.extjs.gxt.ui.client.widget.layout.FitLayout;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.DeferredCommand;
 import com.google.gwt.user.client.Timer;
-import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.paxxis.chime.client.ChimeAsyncCallback;
 import com.paxxis.chime.client.DataInstanceResponseObject;
 import com.paxxis.chime.client.ServiceManager;
@@ -34,6 +33,7 @@ import com.paxxis.chime.client.ServiceManagerListener;
 import com.paxxis.chime.client.ServiceResponseObject;
 import com.paxxis.chime.client.common.DataInstance;
 import com.paxxis.chime.client.common.DataInstanceRequest;
+import com.paxxis.chime.client.common.DataInstanceRequest.Depth;
 import com.paxxis.chime.client.common.DataInstanceResponse;
 import com.paxxis.chime.client.common.ErrorMessage;
 import com.paxxis.chime.client.common.InstanceId;
@@ -41,7 +41,6 @@ import com.paxxis.chime.client.common.RunCALScriptRequest;
 import com.paxxis.chime.client.common.RunCALScriptResponse;
 import com.paxxis.chime.client.common.Shape;
 import com.paxxis.chime.client.common.User;
-import com.paxxis.chime.client.common.DataInstanceRequest.Depth;
 import com.paxxis.chime.client.common.cal.IValue;
 import com.paxxis.chime.client.common.cal.Table;
 import com.paxxis.chime.client.common.portal.PortletSpecification;
@@ -379,7 +378,7 @@ public class AnalyticPortlet extends PortletContainer {
                                 List<DataInstance> instances = response.getDataInstances();
                                 if (instances.size() > 0) {
                                     DataInstance instance = instances.get(0);
-                                    if (instance.getShapes().get(0).getName().equals("Analytic")) {
+                                    if (instance.getShapes().get(0).getId().equals(Shape.ANALYTIC_ID)) {
                                         setDataInstance(instance);
                                     }
                                 }

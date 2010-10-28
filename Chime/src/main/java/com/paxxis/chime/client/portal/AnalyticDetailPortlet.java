@@ -36,6 +36,7 @@ import com.paxxis.chime.client.common.DataInstance;
 import com.paxxis.chime.client.common.ErrorMessage;
 import com.paxxis.chime.client.common.RunCALScriptRequest;
 import com.paxxis.chime.client.common.RunCALScriptResponse;
+import com.paxxis.chime.client.common.Shape;
 import com.paxxis.chime.client.common.User;
 import com.paxxis.chime.client.common.cal.IValue;
 import com.paxxis.chime.client.common.cal.Table;
@@ -70,7 +71,7 @@ public class AnalyticDetailPortlet extends PortletContainer {
     	        getBody().removeAll();
     	        script = "";
     	        newScript = true;
-    	        if (instance.getShapes().get(0).getName().equals("Analytic")) {
+    	        if (instance.getShapes().get(0).getId().equals(Shape.ANALYTIC_ID)) {
     	            dataInstance = instance;
     	            detailPanel = new AnalyticDetailPanel(dataInstance, 400, true);
     	            getBody().add(detailPanel, new RowData(1, -1));

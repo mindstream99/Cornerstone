@@ -17,14 +17,16 @@
 
 package com.paxxis.chime.data;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import com.paxxis.chime.client.common.DataInstance;
 import com.paxxis.chime.client.common.InstanceId;
+import com.paxxis.chime.client.common.Shape;
 import com.paxxis.chime.client.common.User;
 import com.paxxis.chime.database.DatabaseConnection;
 import com.paxxis.chime.database.StringData;
 import com.paxxis.chime.service.Tools;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  *
@@ -205,7 +207,7 @@ public class PrimaryDataUtils {
 
             result = DataInstanceUtils.getInstance(instance.getId(), user, database, true, false);
 
-            if (result.getShapes().get(0).getName().equals("Shape")) {
+            if (result.getShapes().get(0).getId().equals(Shape.SHAPE_ID)) {
                 CacheManager.instance().putShape(result);
             }
 

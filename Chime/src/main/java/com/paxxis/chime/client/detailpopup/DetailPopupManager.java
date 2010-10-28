@@ -48,11 +48,11 @@ import com.paxxis.chime.client.common.DataField;
 import com.paxxis.chime.client.common.DataFieldValue;
 import com.paxxis.chime.client.common.DataInstance;
 import com.paxxis.chime.client.common.DataInstanceRequest;
+import com.paxxis.chime.client.common.DataInstanceRequest.Depth;
 import com.paxxis.chime.client.common.InstanceId;
 import com.paxxis.chime.client.common.Shape;
 import com.paxxis.chime.client.common.User;
 import com.paxxis.chime.client.common.UserProfile;
-import com.paxxis.chime.client.common.DataInstanceRequest.Depth;
 import com.paxxis.chime.client.widgets.ImageContainer;
 import com.paxxis.chime.client.widgets.InterceptedHtml;
 
@@ -246,7 +246,7 @@ public class DetailPopupManager {
 
         imageLayoutContainer.removeAll();
         DataInstance image = null;
-        if (dataInstance.getShapes().get(0).getName().equals("Image")) {
+        if (dataInstance.getShapes().get(0).getId().equals(Shape.IMAGE_ID)) {
             image = dataInstance;
         } else {
             List<DataInstance> images = dataInstance.getImages();
@@ -259,7 +259,7 @@ public class DetailPopupManager {
             imageLayoutContainer.setVisible(true);
             imageLayoutContainer.setWidth(125);
             Shape type = image.getShapes().get(0);
-            if (type.getName().equals("Image")) {
+            if (type.getId().equals(Shape.IMAGE_ID)) {
                 DataField field = type.getField("File ID");
                 List<DataFieldValue> vals = image.getFieldValues(type, field);
                 if (vals.size() > 0) {

@@ -17,28 +17,6 @@
 
 package com.paxxis.chime.data;
 
-import com.paxxis.chime.client.common.DataField;
-import com.paxxis.chime.client.common.DataFieldValue;
-import com.paxxis.chime.client.common.DataInstance;
-import com.paxxis.chime.client.common.DataInstanceRequest.ClauseOperator;
-import com.paxxis.chime.client.common.DataInstanceRequest.Operator;
-import com.paxxis.chime.client.common.Shape;
-import com.paxxis.chime.client.common.Parameter;
-import com.paxxis.chime.client.common.User;
-import com.paxxis.chime.client.common.cal.ExtensionHelper;
-import com.paxxis.chime.client.common.cal.IValue;
-import com.paxxis.chime.client.common.cal.QueryParameter;
-import com.paxxis.chime.client.common.cal.QueryProvider;
-import com.paxxis.chime.client.common.cal.Rule;
-import com.paxxis.chime.client.common.cal.RuleSet;
-import com.paxxis.chime.client.common.cal.Runtime;
-import com.paxxis.chime.client.common.extension.ChimeExtension;
-import com.paxxis.chime.database.DatabaseConnection;
-import com.paxxis.chime.cal.parser.CALRuleParser;
-import com.paxxis.chime.client.common.InstanceId;
-import com.paxxis.chime.data.DataInstanceUtils.FetchType;
-import com.paxxis.chime.extension.CALExtensionHelper;
-import com.paxxis.chime.extension.ChimeExtensionManager;
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -51,8 +29,32 @@ import java.util.List;
 import java.util.StringTokenizer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
 import org.htmlparser.Parser;
 import org.htmlparser.visitors.TextExtractingVisitor;
+
+import com.paxxis.chime.cal.parser.CALRuleParser;
+import com.paxxis.chime.client.common.DataField;
+import com.paxxis.chime.client.common.DataFieldValue;
+import com.paxxis.chime.client.common.DataInstance;
+import com.paxxis.chime.client.common.DataInstanceRequest.ClauseOperator;
+import com.paxxis.chime.client.common.DataInstanceRequest.Operator;
+import com.paxxis.chime.client.common.InstanceId;
+import com.paxxis.chime.client.common.Parameter;
+import com.paxxis.chime.client.common.Shape;
+import com.paxxis.chime.client.common.User;
+import com.paxxis.chime.client.common.cal.ExtensionHelper;
+import com.paxxis.chime.client.common.cal.IValue;
+import com.paxxis.chime.client.common.cal.QueryParameter;
+import com.paxxis.chime.client.common.cal.QueryProvider;
+import com.paxxis.chime.client.common.cal.Rule;
+import com.paxxis.chime.client.common.cal.RuleSet;
+import com.paxxis.chime.client.common.cal.Runtime;
+import com.paxxis.chime.client.common.extension.ChimeExtension;
+import com.paxxis.chime.data.DataInstanceUtils.FetchType;
+import com.paxxis.chime.database.DatabaseConnection;
+import com.paxxis.chime.extension.CALExtensionHelper;
+import com.paxxis.chime.extension.ChimeExtensionManager;
 
 /**
  *
@@ -220,7 +222,7 @@ public class CALUtils {
 
         Shape scriptType = instance.getShapes().get(0);
 
-        if (!scriptType.getName().equals("Analytic")) {
+        if (!scriptType.getId().equals(Shape.ANALYTIC_ID)) {
             throw new Exception("Attempt to execute wrong Shape: " + scriptType.getName());
         }
 

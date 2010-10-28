@@ -17,12 +17,15 @@
 
 package com.paxxis.chime.data;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import com.paxxis.chime.client.common.Community;
 import com.paxxis.chime.client.common.DataInstance;
-import com.paxxis.chime.client.common.Shape;
 import com.paxxis.chime.client.common.FieldData;
 import com.paxxis.chime.client.common.InstanceId;
 import com.paxxis.chime.client.common.Scope;
+import com.paxxis.chime.client.common.Shape;
 import com.paxxis.chime.client.common.User;
 import com.paxxis.chime.client.common.UserProfile;
 import com.paxxis.chime.database.DataSet;
@@ -30,8 +33,6 @@ import com.paxxis.chime.database.DatabaseConnection;
 import com.paxxis.chime.database.IDataValue;
 import com.paxxis.chime.database.StringData;
 import com.paxxis.chime.service.Tools;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  *
@@ -125,7 +126,7 @@ public class UserUtils {
 
         // go through the bundle looking for 1 that is a User
         for (DataInstance inst : bundle.getInstances()) {
-            if (inst.getShapes().get(0).getName().equals("User")) {
+            if (inst.getShapes().get(0).getId().equals(Shape.USER_ID)) {
                 result = (User)inst;
                 break;
             }

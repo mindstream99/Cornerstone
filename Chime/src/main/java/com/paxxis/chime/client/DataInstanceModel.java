@@ -25,9 +25,9 @@ import com.extjs.gxt.ui.client.data.BaseTreeModel;
 import com.google.gwt.core.client.GWT;
 import com.paxxis.chime.client.common.DataFieldValue;
 import com.paxxis.chime.client.common.DataInstance;
-import com.paxxis.chime.client.common.Shape;
 import com.paxxis.chime.client.common.DataInstance.ReviewAction;
 import com.paxxis.chime.client.common.DataInstance.TagAction;
+import com.paxxis.chime.client.common.Shape;
 
 /**
  *
@@ -397,7 +397,7 @@ public class DataInstanceModel extends BaseTreeModel implements Serializable {
 
     public void setupDownloadLink() {
         Shape type = _instance.getShapes().get(0);
-        if (type.getName().equals("File")) {
+        if (type.getId().equals(Shape.FILE_ID)) {
             String fileName = _instance.getName();
             if (-1 == fileName.indexOf(".")) {
                 List<DataFieldValue> vals = _instance.getFieldValues(type, type.getField("Extension"));

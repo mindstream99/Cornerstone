@@ -29,10 +29,10 @@ import com.paxxis.chime.client.common.DataField;
 import com.paxxis.chime.client.common.DataFieldValue;
 import com.paxxis.chime.client.common.DataInstance;
 import com.paxxis.chime.client.common.DataInstanceRequest;
+import com.paxxis.chime.client.common.DataInstanceRequest.Depth;
 import com.paxxis.chime.client.common.DataInstanceResponse;
 import com.paxxis.chime.client.common.InstanceId;
 import com.paxxis.chime.client.common.Shape;
-import com.paxxis.chime.client.common.DataInstanceRequest.Depth;
 import com.paxxis.chime.client.common.portal.PortletSpecification;
 import com.paxxis.chime.client.editor.DataInstanceSelectionListener;
 import com.paxxis.chime.client.editor.DataInstanceSelectionWindow;
@@ -139,7 +139,7 @@ public class ImageRendererPortlet extends PortletContainer {
                                 {
                                     DataInstance instance = instances.get(0);
                                     Shape type = instance.getShapes().get(0);
-                                    if (type.getName().equals("Image")) {
+                                    if (type.getId().equals(Shape.IMAGE_ID)) {
                                         DataField field = type.getField("File ID");
                                         List<DataFieldValue> vals = instance.getFieldValues(type, field);
                                         if (vals.size() == 1) {

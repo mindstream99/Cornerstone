@@ -24,6 +24,7 @@ import com.paxxis.chime.client.common.DataInstanceRequest;
 import com.paxxis.chime.client.common.DataInstanceRequest.ClauseOperator;
 import com.paxxis.chime.client.common.DataInstanceRequest.Operator;
 import com.paxxis.chime.client.common.DataInstanceRequest.SortOrder;
+import com.paxxis.chime.client.common.constants.SearchFieldConstants;
 import com.paxxis.chime.client.common.Parameter;
 import com.paxxis.chime.client.common.SearchCriteria;
 import com.paxxis.chime.client.common.SearchFilter;
@@ -75,7 +76,7 @@ class EventPurger implements Runnable {
             // event shape
             SearchFilter filter = new SearchFilter();
             DataField field = new DataField();
-            field.setName("Shape");
+            field.setName(SearchFieldConstants.SHAPE);
             filter.setDataField(field);
             filter.setOperator(Operator.Reference);
             filter.setValue(eventShape.getId(), eventShape.getName());
@@ -84,7 +85,7 @@ class EventPurger implements Runnable {
             // that has expired
             filter = new SearchFilter();
             field = new DataField();
-            field.setName("expired");
+            field.setName(SearchFieldConstants.EXPIRED);
             filter.setDataField(field);
             criteria.addFilter(filter);
 

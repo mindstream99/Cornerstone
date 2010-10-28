@@ -83,6 +83,7 @@ set the bean's chimeConfiguration property.
                 <entry key="chime.notification.email.replyto" value="chime-noreply@paxxis.com"/>
 
                 <entry key="chime.notification.watchNotification" value="1440"/>
+                <entry key="chime.notification.watchChunkSize" value="25"/>
                 <entry key="chime.notification.eventPurge" value="60"/>
                 <entry key="chime.notification.periodicNotification" value="60"/>
                 <entry key="chime.notification.periodicSummarize" value="true"/>

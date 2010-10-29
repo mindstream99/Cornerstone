@@ -150,6 +150,14 @@ public class DataFieldModel extends DataRowModel {
                     buffer.append(sep + formatted);
                     sep = "    ";
                 }
+                else if (dataField.getShape().isTimestamp())
+                {
+                    Date dval = (Date)value.getValue();
+                    DateTimeFormat dtf = DateTimeFormat.getFormat("MM/dd/yyyy HH:mm;ss");
+                    String formatted = dtf.format(dval);
+                    buffer.append(sep + formatted);
+                    sep = "    ";
+                }
                 else
                 {
                     buffer.append(sep + value.getValue());

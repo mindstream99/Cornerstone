@@ -67,7 +67,7 @@ class EventPurger implements Runnable {
             int purgeCount = 0;
 
             User admin = new User();
-            admin.setId(User.SYSTEM);
+            admin.setId(User.SYSTEM); 
 
             Shape eventShape = ShapeUtils.getInstanceById(Shape.EVENT_ID, database, true);
 

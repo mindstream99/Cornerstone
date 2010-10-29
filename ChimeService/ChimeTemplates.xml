@@ -64,5 +64,6 @@
         <mapping instance="1100" specification="shapeless"/>
         <mapping instance="2000" specification="shapeless"/>
         <mapping instance="2200" specification="shapeless"/>
+        <mapping instance="2300" specification="shapeless"/>
     </mappings>
 </templates>

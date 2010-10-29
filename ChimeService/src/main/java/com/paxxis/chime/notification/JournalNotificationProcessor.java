@@ -48,7 +48,7 @@ class JournalNotificationProcessor extends MessageNotifier {
     JournalNotificationProcessor(DatabaseConnectionPool pool, ChimeConfiguration cfg) {
         super(cfg);
         dbPool = pool;
-        config = cfg;
+        config = cfg; 
     }
 
     public void run() {

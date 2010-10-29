@@ -39,6 +39,9 @@ import com.extjs.gxt.ui.client.widget.form.ComboBox;
 import com.extjs.gxt.ui.client.widget.form.DateField;
 import com.extjs.gxt.ui.client.widget.form.FormPanel;
 import com.extjs.gxt.ui.client.widget.form.TextField;
+import com.extjs.gxt.ui.client.widget.form.Time;
+import com.extjs.gxt.ui.client.widget.form.TimeField;
+import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.DeferredCommand;
 import com.paxxis.chime.client.ChimeAsyncCallback;
@@ -52,10 +55,10 @@ import com.paxxis.chime.client.ServiceManager;
 import com.paxxis.chime.client.ShapeResponseObject;
 import com.paxxis.chime.client.common.DataField;
 import com.paxxis.chime.client.common.DataInstance;
-import com.paxxis.chime.client.common.DataInstanceRequest.Operator;
 import com.paxxis.chime.client.common.SearchFilter;
 import com.paxxis.chime.client.common.Shape;
 import com.paxxis.chime.client.common.ShapeRequest;
+import com.paxxis.chime.client.common.DataInstanceRequest.Operator;
 import com.paxxis.chime.client.common.constants.SearchFieldConstants;
 import com.paxxis.chime.client.editor.SearchFilterEditor.FilterListener;
 import com.paxxis.chime.client.widgets.ChimeWindow;
@@ -85,6 +88,7 @@ public class ComplexSearchFilterEditor extends ChimeWindow
     private TextField<String> textField = null;
     private TextField<Number> numberField = null;
     private DateField dateField = null;
+    private TimeField timeField = null;
     
     private FormPanel form;
     private Button _okButton;
@@ -229,6 +233,7 @@ public class ComplexSearchFilterEditor extends ChimeWindow
                             textField.setVisible(true);
                             numberField.setVisible(false);
                             dateField.setVisible(false);
+                            timeField.setVisible(false);
                             textField.setRawValue("");
                         }
                         else if (field.getName().equals(SearchFieldConstants.DESCRIPTION))
@@ -238,6 +243,7 @@ public class ComplexSearchFilterEditor extends ChimeWindow
                             textField.setVisible(true);
                             numberField.setVisible(false);
                             dateField.setVisible(false);
+                            timeField.setVisible(false);
                             textField.setRawValue("");
                         }
                         else if (field.getName().equals(SearchFieldConstants.AVG_RATING))
@@ -246,6 +252,7 @@ public class ComplexSearchFilterEditor extends ChimeWindow
                             _filterInput.setVisible(false);
                             textField.setVisible(false);
                             dateField.setVisible(false);
+                            timeField.setVisible(false);
                             numberField.setVisible(true);
                             numberField.setRawValue("");
                         }
@@ -256,6 +263,7 @@ public class ComplexSearchFilterEditor extends ChimeWindow
                             _filterInput.setVisible(true);
                             textField.setVisible(false);
                             dateField.setVisible(false);
+                            timeField.setVisible(false);
                             numberField.setVisible(false);
                         }
                         else if (field.getName().equals(SearchFieldConstants.USER))
@@ -265,6 +273,7 @@ public class ComplexSearchFilterEditor extends ChimeWindow
                             _filterInput.setVisible(true);
                             textField.setVisible(false);
                             dateField.setVisible(false);
+                            timeField.setVisible(false);
                             numberField.setVisible(false);
                         }
                         else if (field.getName().equals(SearchFieldConstants.COMMUNITY))
@@ -274,6 +283,7 @@ public class ComplexSearchFilterEditor extends ChimeWindow
                             _filterInput.setVisible(true);
                             textField.setVisible(false);
                             dateField.setVisible(false);
+                            timeField.setVisible(false);
                             numberField.setVisible(false);
                         }
                         else if (field.getName().equals(SearchFieldConstants.ACTIVITY))
@@ -282,6 +292,7 @@ public class ComplexSearchFilterEditor extends ChimeWindow
                             _filterInput.setVisible(false);
                             textField.setVisible(false);
                             dateField.setVisible(false);
+                            timeField.setVisible(false);
                             numberField.setVisible(false);
                         }
                         else if (field.getName().equals(SearchFieldConstants.CREATED))
@@ -290,6 +301,7 @@ public class ComplexSearchFilterEditor extends ChimeWindow
                             _filterInput.setVisible(false);
                             textField.setVisible(false);
                             dateField.setVisible(false);
+                            timeField.setVisible(false);
                             numberField.setVisible(false);
                         }
                         else if (field.getName().equals(SearchFieldConstants.PARENT))
@@ -299,6 +311,7 @@ public class ComplexSearchFilterEditor extends ChimeWindow
                             _filterInput.setVisible(true);
                             textField.setVisible(false);
                             dateField.setVisible(false);
+                            timeField.setVisible(false);
                             numberField.setVisible(false);
                         }
                         else
@@ -309,6 +322,7 @@ public class ComplexSearchFilterEditor extends ChimeWindow
                                 _filterInput.setVisible(false);
                                 textField.setVisible(false);
                                 dateField.setVisible(false);
+                                timeField.setVisible(false);
                                 numberField.setVisible(true);
                                 numberField.setRawValue("");
                             } else if (type.isDate()) {
@@ -316,13 +330,24 @@ public class ComplexSearchFilterEditor extends ChimeWindow
                                 _filterInput.setVisible(false);
                                 textField.setVisible(false);
                                 numberField.setVisible(false);
+                                timeField.setVisible(false);
                                 dateField.setVisible(false); // operator choice drives this
                                 dateField.setRawValue("");
+                            } else if (type.isTimestamp()) {
+                                _operatorStore.add(_dateOperatorList);
+                                _filterInput.setVisible(false);
+                                textField.setVisible(false);
+                                numberField.setVisible(false);
+                                timeField.setVisible(false);
+                                dateField.setVisible(false);
+                                timeField.setVisible(false); // operator choice drives this
+                                timeField.setRawValue("");
                             } else if (type.isPrimitive()) {
                                 _operatorStore.add(_textOperatorList);
                                 _filterInput.setVisible(false);
                                 textField.setVisible(true);
                                 dateField.setVisible(false);
+                                timeField.setVisible(false);
                                 numberField.setVisible(false);
                                 textField.setRawValue("");
                             } else {
@@ -331,6 +356,7 @@ public class ComplexSearchFilterEditor extends ChimeWindow
                                 _filterInput.setVisible(true);
                                 textField.setVisible(false);
                                 dateField.setVisible(false);
+                                timeField.setVisible(false);
                                 numberField.setVisible(false);
                             }
                         }
@@ -365,12 +391,15 @@ public class ComplexSearchFilterEditor extends ChimeWindow
                     {
                         Operator operator = model.getOperator();
                         filter.setOperator(operator);
-                        boolean showDateField = operator == Operator.AfterDate ||
+                        boolean show = operator == Operator.AfterDate ||
 						                        operator == Operator.OnOrAfterDate ||
 						                        operator == Operator.OnDate ||
 						                        operator == Operator.OnOrBeforeDate ||
                                                 operator == Operator.BeforeDate;
-                        dateField.setVisible(showDateField);
+                        
+                        dateField.setVisible(show);
+                        timeField.setVisible(show && filter.getDataField().getShape().isTimestamp());
+
                         updateState();
                     }
                     
@@ -408,6 +437,7 @@ public class ComplexSearchFilterEditor extends ChimeWindow
 	        public void handleEvent(FieldEvent evt) {
 	        	Date dt = dateField.getValue();
 	        	if (dt != null) {
+	        		timeField.setDateValue(dt);
                     filter.setValue(dt);
             	} else {
                     filter.setValue(null);
@@ -421,6 +451,30 @@ public class ComplexSearchFilterEditor extends ChimeWindow
         dateField.addListener(Events.Valid, l);
         dateField.addListener(Events.Invalid, l);
         dateField.addListener(Events.Change, l);
+
+        timeField = new TimeField();
+        timeField.setFormat(DateTimeFormat.getFormat("HH:mm::ss"));
+        timeField.setVisible(false);
+        timeField.setEmptyText("HH:mm::ss");
+        form.add(timeField);
+        timeField.setHideLabel(true);
+        Listener<FieldEvent> l3 = new Listener<FieldEvent>() {
+	        public void handleEvent(FieldEvent evt) {
+	        	Date dt = timeField.getDateValue();
+	        	if (dt != null) {
+                    filter.setValue(dt);
+            	} else {
+                    filter.setValue(null);
+            	}
+
+            	validate();
+	        }
+	    };
+
+	    timeField.addListener(Events.KeyPress, l3);
+	    timeField.addListener(Events.Valid, l3);
+	    timeField.addListener(Events.Invalid, l3);
+	    timeField.addListener(Events.Change, l3);
 
         textField = new TextField<String>();
         textField.setVisible(false);
@@ -533,7 +587,31 @@ public class ComplexSearchFilterEditor extends ChimeWindow
         		}
     		}
     	}
-
+    	
+    	/*
+		} else if (dateField.isVisible()) {
+			if (filter.getValue() == null) {
+	    		enable = false;
+	    		error = "Please enter a date.";
+			} else {
+	    		enable = !dateField.isValid();
+	    		if (!enable) {
+	        		error = "Please enter a valid date.";
+	    		}
+			}
+		} else if (timeField.isVisible()) {
+			if (filter.getValue() == null) {
+	    		enable = false;
+	    		error = "Please enter a timestamp.";
+			} else {
+	    		enable = !timeField.isValid();
+	    		if (!enable) {
+	        		error = "Please enter a valid timestamp.";
+	    		}
+			}
+		}
+		*/
+    	
     	error = "<div id='endslice-error-label'>" + error + "</div>";
     	_errorLabel.setHtml(error);
     	_okButton.setEnabled(enable);

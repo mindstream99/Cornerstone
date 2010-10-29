@@ -25,7 +25,7 @@ import java.util.List;
  * @author Robert Englander
  */
 public class Shape extends DataInstance {
-	private static final long serialVersionUID = 2L;
+	private static final long serialVersionUID = 3L;
 
 	public static final InstanceId EVENT_ID = InstanceId.create("a97381dce3d44e139823679460d2a5f100");
     public static final InstanceId SHAPE_ID = InstanceId.create("100");
@@ -47,6 +47,7 @@ public class Shape extends DataInstance {
     public static final InstanceId REFERENCE_ID = InstanceId.create("2000");
     public static final InstanceId FOLDER_ID = InstanceId.create("2100");
     public static final InstanceId DATE_ID = InstanceId.create("2200");
+    public static final InstanceId TIMESTAMP_ID = InstanceId.create("2300");
 
     private boolean _primitive = false;
     private boolean _viewable = false;
@@ -216,6 +217,14 @@ public class Shape extends DataInstance {
         return getId().equals(Shape.DATE_ID);
     }
 
+    public boolean isTimestamp() {
+        return getId().equals(Shape.TIMESTAMP_ID);
+    }
+
+    public boolean isDateOrTimestamp() {
+    	return isDate() || isTimestamp();
+    }
+    
     public boolean canMultiType() {
         return canMultiType;
     }

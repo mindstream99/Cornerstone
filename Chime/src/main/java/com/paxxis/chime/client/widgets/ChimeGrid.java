@@ -18,6 +18,9 @@
 package com.paxxis.chime.client.widgets;
 
 import com.extjs.gxt.ui.client.data.ModelData;
+import com.extjs.gxt.ui.client.dnd.GridDragSource;
+import com.extjs.gxt.ui.client.dnd.GridDropTarget;
+import com.extjs.gxt.ui.client.dnd.DND.Feedback;
 import com.extjs.gxt.ui.client.store.ListStore;
 import com.extjs.gxt.ui.client.widget.grid.ColumnModel;
 import com.extjs.gxt.ui.client.widget.grid.Grid;
@@ -30,8 +33,19 @@ import com.extjs.gxt.ui.client.widget.grid.Grid;
 public class ChimeGrid<M extends ModelData> extends Grid<M> {
 
 	public ChimeGrid(ListStore<M> store, ColumnModel cm) {
+		this(store, cm, false);
+	}
+	
+	public ChimeGrid(ListStore<M> store, ColumnModel cm, boolean canReorder) {
 		super(store, cm);
 	    addStyleName("chimeGrid");
+	    
+	    if (canReorder) {
+            GridDropTarget target = new GridDropTarget(this);
+            target.setFeedback(Feedback.INSERT);
+            target.setAllowSelfAsSource(true);
+            GridDragSource source = new GridDragSource(this);
+        }
 	}
 
 }

@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.extjs.gxt.ui.client.Style.HorizontalAlignment;
+import com.extjs.gxt.ui.client.Style.SelectionMode;
 import com.extjs.gxt.ui.client.event.ButtonEvent;
 import com.extjs.gxt.ui.client.event.SelectionListener;
 import com.extjs.gxt.ui.client.store.ListStore;
@@ -12,8 +13,13 @@ import com.extjs.gxt.ui.client.widget.LayoutContainer;
 import com.extjs.gxt.ui.client.widget.button.Button;
 import com.extjs.gxt.ui.client.widget.button.ButtonBar;
 import com.extjs.gxt.ui.client.widget.form.FormPanel;
+import com.extjs.gxt.ui.client.widget.form.TextField;
+import com.extjs.gxt.ui.client.widget.grid.CellEditor;
 import com.extjs.gxt.ui.client.widget.grid.ColumnConfig;
 import com.extjs.gxt.ui.client.widget.grid.ColumnModel;
+import com.extjs.gxt.ui.client.widget.grid.GridSelectionModel;
+import com.extjs.gxt.ui.client.widget.grid.RowEditor;
+import com.extjs.gxt.ui.client.widget.grid.EditorGrid.ClicksToEdit;
 import com.extjs.gxt.ui.client.widget.toolbar.FillToolItem;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.DeferredCommand;
@@ -29,7 +35,8 @@ import com.paxxis.chime.client.common.InstanceId;
 import com.paxxis.chime.client.common.Shape;
 import com.paxxis.chime.client.widgets.ChimeGrid;
 import com.paxxis.chime.client.widgets.ChimeWindow;
-import com.paxxis.chime.client.widgets.DataFieldModel;
+import com.paxxis.chime.client.widgets.DataDeleteGridCellRenderer;
+import com.paxxis.chime.client.widgets.DataFieldValueModel;
 import com.paxxis.chime.client.widgets.FieldDataGridCellRenderer;
 
 public class TabularDataEditor extends ChimeWindow {
@@ -45,8 +52,8 @@ public class TabularDataEditor extends ChimeWindow {
     private Button restoreButton;
     private Button createButton = null;
 
-    private ChimeGrid<DataFieldModel> fieldGrid;
-    private ListStore<DataFieldModel> listStore = new ListStore<DataFieldModel>();
+    private ChimeGrid<DataFieldValueModel> fieldGrid;
+    private ListStore<DataFieldValueModel> listStore = new ListStore<DataFieldValueModel>();
     private FormPanel _form = new FormPanel();
     private ServiceManagerListener _serviceManagerListener = null;
 
@@ -120,33 +127,51 @@ public class TabularDataEditor extends ChimeWindow {
 
         List<ColumnConfig> configs = new ArrayList<ColumnConfig>();
 
+        ColumnConfig column = new ColumnConfig();
+        column.setId("delete");
+        column.setFixed(true);
+        column.setHeader("");
+        column.setWidth(35);
+        column.setSortable(false);
+        column.setMenuDisabled(true);
+        column.setRenderer(new DataDeleteGridCellRenderer());
+        configs.add(column);
+
         Shape shape = dataField.getShape();
         String lastColId = "";
         List<DataField> dataFields = shape.getFields();
         for (DataField field : dataFields) {
-	        ColumnConfig column = new ColumnConfig();
+	        column = new ColumnConfig();
 	        column.setId(field.getName());
 	        column.setFixed(false);
 	        column.setHeader(field.getName());
 	        column.setWidth(150);
 	        column.setSortable(false);
 	        column.setMenuDisabled(true);
+	        column.setEditor(getCellEditor(field));
 	        column.setRenderer(new FieldDataGridCellRenderer());
 	        configs.add(column);
 	        lastColId = field.getName();
         }
 
         ColumnModel cm = new ColumnModel(configs);
-        fieldGrid = new ChimeGrid<DataFieldModel>(listStore, cm);
+        fieldGrid = new ChimeGrid<DataFieldValueModel>(listStore, cm, true);
         fieldGrid.getView().setAutoFill(false);
-        fieldGrid.setSelectionModel(null);
+        GridSelectionModel<DataFieldValueModel> sm = new GridSelectionModel<DataFieldValueModel>();
+        sm.setSelectionMode(SelectionMode.SINGLE);
+        fieldGrid.setSelectionModel(sm);
         fieldGrid.getView().setForceFit(false);
         fieldGrid.setHideHeaders(false);
         fieldGrid.setTrackMouseOver(false);
-        fieldGrid.setStripeRows(true);
+        fieldGrid.setStripeRows(false);
         fieldGrid.setAutoExpandColumn(lastColId);
         fieldGrid.setBorders(true);
         fieldGrid.setHeight(300);
+
+        // add the row editor plugin
+        RowEditor<DataFieldValueModel> editor = new RowEditor<DataFieldValueModel>();
+        editor.setClicksToEdit(ClicksToEdit.TWO);
+        fieldGrid.addPlugin(editor);
 
         _form.add(fieldGrid);
         
@@ -248,6 +273,21 @@ public class TabularDataEditor extends ChimeWindow {
         ServiceManager.addListener(_serviceManagerListener);
     }
 
+    private CellEditor getCellEditor(DataField field) {
+    	CellEditor editor = null;
+    	
+    	Shape shape = field.getShape();
+    	if (shape.isPrimitive()) {
+    		
+    	} else {
+    		
+    	}
+    	
+    	// TODO
+    	editor = new CellEditor(new TextField<String>());
+    	return editor;
+    }
+    
     private void createNewInstance() {
         InstanceCreatorWindow w = new InstanceCreatorWindow(dataField.getShape(),
             new InstanceCreatorWindow.InstanceCreationListener() {
@@ -265,6 +305,13 @@ public class TabularDataEditor extends ChimeWindow {
     }
 
     private void addValue(DataFieldValue value) {
+    	if (value == null) {
+            DataInstance inst = new DataInstance();
+            inst.setName("XXXXXXX");
+            inst.addShape(dataField.getShape());
+            DataFieldValueModel model = new DataFieldValueModel(inst, dataField.getShape(), null);
+            listStore.add(model);
+    	}
 
         validate();
     }

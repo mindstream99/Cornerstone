@@ -28,10 +28,10 @@ import com.paxxis.chime.client.editor.MultiTextEditorWindow;
 import com.paxxis.chime.client.editor.TabularDataEditor;
 import com.paxxis.chime.client.editor.TextFieldEditorWindow;
 
-public class DataEditGridCellRenderer implements GridCellRenderer<DataFieldModel> {
+public class DataEditGridCellRenderer implements GridCellRenderer<DataFieldValueModel> {
     private FieldEditListener fieldEditListener;
     private FieldEditorListener textListener;
-    private DataFieldModel model = null;
+    private DataFieldValueModel model = null;
     private InstanceUpdateListener saveListener = null;
 
     public DataEditGridCellRenderer() {
@@ -79,9 +79,9 @@ public class DataEditGridCellRenderer implements GridCellRenderer<DataFieldModel
     }
 
     @Override
-	public Object render(final DataFieldModel model, String property,
+	public Object render(final DataFieldValueModel model, String property,
 			ColumnData config, int rowIndex, int colIndex,
-			ListStore<DataFieldModel> store, Grid<DataFieldModel> grid) {
+			ListStore<DataFieldValueModel> store, Grid<DataFieldValueModel> grid) {
 
     	this.model = model;
     	saveListener = model.getUpdateListener();

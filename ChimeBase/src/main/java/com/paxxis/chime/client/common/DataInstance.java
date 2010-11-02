@@ -29,7 +29,7 @@ import java.util.List;
  * @author Robert Englander
  */
 public class DataInstance implements Serializable {
-	private static final long serialVersionUID = 2L;
+	private static final long serialVersionUID = 3L;
 
 	public enum TagAction
     {
@@ -125,6 +125,10 @@ public class DataInstance implements Serializable {
     
     public boolean isGone() {
     	return isGone;
+    }
+    
+    public boolean isTabular() {
+    	return shapes.get(0).isTabular();
     }
     
     public void finishLoading(DataInstanceHelper helper, Object database)
@@ -832,7 +836,13 @@ public class DataInstance implements Serializable {
             DataFieldValue val;
             if (value instanceof DataInstance) {
             	DataInstance inst = (DataInstance)value;
-                val = new DataFieldValue(inst.getId(), inst.getName(), field.getShape().getId(), InstanceId.UNKNOWN, null);
+            	Serializable serVal;
+            	if (field.getShape().isTabular()) {
+            		serVal = inst;
+            	} else {
+            		serVal = inst.getName();
+            	}
+                val = new DataFieldValue(inst.getId(), serVal, field.getShape().getId(), InstanceId.UNKNOWN, null);
             } else {
                 val = new DataFieldValue(value, field.getShape().getId(), InstanceId.UNKNOWN, null);
             }

@@ -25,6 +25,7 @@ import com.paxxis.chime.client.ServiceManager;
 import com.paxxis.chime.client.common.DataField;
 import com.paxxis.chime.client.common.DataFieldValue;
 import com.paxxis.chime.client.common.DataInstance;
+import com.paxxis.chime.client.common.InstanceId;
 import com.paxxis.chime.client.common.Shape;
 import com.paxxis.chime.client.portal.DataRowModel;
 
@@ -89,21 +90,30 @@ public class DataFieldValueModel extends DataRowModel {
 	}
 	
 	@SuppressWarnings("unchecked")
-	public Object setXX(String propertyName, Object value) {
-		if (propertyName.equals(DataFieldValueModel.NAME) ||
-			propertyName.equals(DataFieldValueModel.VALUE)) {
-			return super.set(propertyName, value);
-		} else {
-			List<DataField> fields = shape.getFields();
-			for (DataField field : fields) {
-				if (propertyName.equals(field.getName())) {
-					set(field.getName(), value);
-					List<DataFieldValue> values = dataInstance.getFieldValues(shape, field);
+	public Object set(String propertyName, Object value) {
+		boolean remove = (value == null);
+		
+		if (!(propertyName.equals(DataFieldValueModel.NAME) ||
+			propertyName.equals(DataFieldValueModel.VALUE))) {
+
+			DataField field = shape.getField(propertyName);
+			List<DataFieldValue> values = dataInstance.getFieldValues(shape, field);
+			if (remove) {
+				values.clear();
+			} else {
+				if (!values.isEmpty()) {
 					values.get(0).setValue((Serializable)value);
-					break;
+				} else {
+					DataFieldValue newVal = new DataFieldValue((Serializable)value, shape.getId(), InstanceId.UNKNOWN, null);
+					values.add(newVal);
 				}
 			}
-			return value;
+		}
+
+		if (remove) {
+			return super.remove(propertyName);
+		} else {
+			return super.set(propertyName, value);
 		}
 	}
 	

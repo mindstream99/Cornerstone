@@ -30,7 +30,7 @@ import java.util.List;
  * @author Robert Englander
  */
 public class SearchCriteria implements Serializable {
-	private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 2L;
 
 	private SortOrder _sortOrder = SortOrder.ByName;
     private ClauseOperator _operator = ClauseOperator.MatchAll;
@@ -151,7 +151,14 @@ public class SearchCriteria implements Serializable {
                 Operator op = filter.getOperator();
                 Serializable value = filter.getValue();
                  
-                req.addQueryParameter(filter.getDataShape(), fieldName, value, op);
+                DataField subField = filter.getSubField();
+                Shape subShape = null;
+                if (subField != null) {
+                	subShape = field.getShape();
+                	fieldName = subField.getName();
+                }
+                
+                req.addQueryParameter(filter.getDataShape(), subShape, fieldName, value, op);
             }
         }
         

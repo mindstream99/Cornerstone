@@ -1,3 +1,20 @@
+/*
+ * Copyright 2010 the original author or authors.
+ * Copyright 2009 Paxxis Technology LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.paxxis.chime.client.editor;
 
 import java.util.ArrayList;
@@ -12,7 +29,9 @@ import com.extjs.gxt.ui.client.widget.Html;
 import com.extjs.gxt.ui.client.widget.LayoutContainer;
 import com.extjs.gxt.ui.client.widget.button.Button;
 import com.extjs.gxt.ui.client.widget.button.ButtonBar;
+import com.extjs.gxt.ui.client.widget.form.DateField;
 import com.extjs.gxt.ui.client.widget.form.FormPanel;
+import com.extjs.gxt.ui.client.widget.form.NumberField;
 import com.extjs.gxt.ui.client.widget.form.TextField;
 import com.extjs.gxt.ui.client.widget.grid.CellEditor;
 import com.extjs.gxt.ui.client.widget.grid.ColumnConfig;
@@ -31,7 +50,6 @@ import com.paxxis.chime.client.ServiceManagerListener;
 import com.paxxis.chime.client.common.DataField;
 import com.paxxis.chime.client.common.DataFieldValue;
 import com.paxxis.chime.client.common.DataInstance;
-import com.paxxis.chime.client.common.InstanceId;
 import com.paxxis.chime.client.common.Shape;
 import com.paxxis.chime.client.widgets.ChimeGrid;
 import com.paxxis.chime.client.widgets.ChimeWindow;
@@ -39,6 +57,11 @@ import com.paxxis.chime.client.widgets.DataDeleteGridCellRenderer;
 import com.paxxis.chime.client.widgets.DataFieldValueModel;
 import com.paxxis.chime.client.widgets.FieldDataGridCellRenderer;
 
+/**
+ * 
+ * @author Robert Englander
+ *
+ */
 public class TabularDataEditor extends ChimeWindow {
 
     private Html errorLabel;
@@ -278,13 +301,23 @@ public class TabularDataEditor extends ChimeWindow {
     	
     	Shape shape = field.getShape();
     	if (shape.isPrimitive()) {
-    		
+    		if (shape.isNumeric()) {
+    			NumberField f = new NumberField();
+    			f.setAutoValidate(true);
+    	    	editor = new CellEditor(f);
+    	    	
+    		} else if (shape.isDate()) {
+    			DateField df = new DateField();
+    			df.setAutoValidate(true);
+    			editor = new CellEditor(df);
+    		} else {
+    	    	editor = new CellEditor(new TextField<String>());
+    		}
     	} else {
-    		
+        	// TODO
+        	editor = new CellEditor(new TextField<String>());
     	}
     	
-    	// TODO
-    	editor = new CellEditor(new TextField<String>());
     	return editor;
     }
     
@@ -307,9 +340,12 @@ public class TabularDataEditor extends ChimeWindow {
     private void addValue(DataFieldValue value) {
     	if (value == null) {
             DataInstance inst = new DataInstance();
-            inst.setName("XXXXXXX");
+            inst.setName("XTabularRowData");
             inst.addShape(dataField.getShape());
             DataFieldValueModel model = new DataFieldValueModel(inst, dataField.getShape(), null);
+            listStore.add(model);
+    	} else {
+            DataFieldValueModel model = new DataFieldValueModel((DataInstance)value.getValue(), dataField.getShape(), null);
             listStore.add(model);
     	}
 
@@ -336,12 +372,15 @@ public class TabularDataEditor extends ChimeWindow {
 
     private void notifyListener() {
         List<DataFieldValue> values = dataInstance.getFieldValues(dataType, dataField);
+        
+        // existing tabular field data is always cleared by the service and replaced
+        // with the new data.  So clear the values and build new values from the listStore.
         values.clear();
-        //values.addAll(fieldValues);
 
-        // we clear the id of each value so that the service will treat it all as new.
-        for (DataFieldValue val : values) {
-            val.setId(InstanceId.create("-1"));
+        List<DataFieldValueModel> models = listStore.getModels();
+        for (DataFieldValueModel model : models) {
+        	DataInstance inst = model.getDataInstance();
+        	dataInstance.appendFieldValue(dataType, dataField, inst, false);
         }
 
         if (typesListener != null) {

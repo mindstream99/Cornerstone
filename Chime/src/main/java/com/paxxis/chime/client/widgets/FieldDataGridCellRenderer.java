@@ -53,9 +53,9 @@ import com.paxxis.chime.client.portal.DataRowModel;
  *
  */
 public class FieldDataGridCellRenderer implements GridCellRenderer<DataRowModel> {
-	private static final int MINHEIGHT = 60;
-	private static final int MAXHEIGHT = 250;
-	private static final int GRIDINCR = 20;
+	private static final int MINHEIGHT = 100;
+	private static final int MAXHEIGHT = 400;
+	private static final int GRIDINCR = 30;
 	
 	/** the default margins for placing the renderer in the cell */
 	private Margins margins = new Margins(3, 3, 3, 0);
@@ -125,7 +125,7 @@ public class FieldDataGridCellRenderer implements GridCellRenderer<DataRowModel>
 		        fieldGrid.setTrackMouseOver(false);
 		        fieldGrid.setStripeRows(true);
 		        fieldGrid.setAutoExpandColumn(lastColId);
-		        fieldGrid.setAutoHeight(true);
+		        fieldGrid.setAutoHeight(false);
 		        fieldGrid.setBorders(true);
 		        
 		        lc.add(fieldGrid, new RowData(1, -1, margins));
@@ -146,22 +146,22 @@ public class FieldDataGridCellRenderer implements GridCellRenderer<DataRowModel>
 		        );
 
 		        List<DataFieldValue> values = model.get(DataFieldValueModel.VALUE);
-		        int lcHeight = 0;
+		        int gridHeight = 0;
 		        for (DataFieldValue fieldValue : values) {
 		        	DataInstance instance = (DataInstance)fieldValue.getValue();
-		        	DataFieldValueModel fieldModel = new DataFieldValueModel(instance, shape, null);
+		        	DataFieldValueModel fieldModel = new DataFieldValueModel(instance, fieldShape, null);
 		        	listStore.add(fieldModel);
 		        	
-		        	lcHeight += GRIDINCR;
+		        	gridHeight += GRIDINCR;
 		        }
 		        
-		        if (lcHeight < MINHEIGHT) {
-		        	lcHeight = MINHEIGHT;
-		        } else if (lcHeight > MAXHEIGHT) {
-		        	lcHeight = MAXHEIGHT;
+		        if (gridHeight < MINHEIGHT) {
+		        	gridHeight = MINHEIGHT;
+		        } else if (gridHeight > MAXHEIGHT) {
+		        	gridHeight = MAXHEIGHT;
 		        }
 		        
-		        lc.setHeight(lcHeight);
+		        fieldGrid.setHeight(gridHeight);
 			} else {
 				
 				renderHtml(lc, generateContent(inst, shape, dataField));

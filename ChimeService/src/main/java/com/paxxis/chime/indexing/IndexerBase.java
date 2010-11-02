@@ -93,7 +93,7 @@ abstract public class IndexerBase implements Runnable {
                 doc.add(new Field("content", results, Field.Store.NO, Field.Index.TOKENIZED));
             }
         } catch (Exception e) {
-            int x = 1;
+        	_logger.error(e.getLocalizedMessage());
         }
     }
 
@@ -103,7 +103,7 @@ abstract public class IndexerBase implements Runnable {
     
     public static Document createDocument(DataInstance instance, User indexingUser, DatabaseConnection database) throws Exception {
     	Document doc = new Document();
-        String isTransient = "N";
+    	String isTransient = "N";
         if (instance.isTransient()) {
             isTransient = "Y";
         }
@@ -154,8 +154,6 @@ abstract public class IndexerBase implements Runnable {
         }
 
         // get the full user instance
-        Shape userType = ShapeUtils.getInstance("User", database, true);
-
         User theUser = (User)CacheManager.instance().get(user.getId());
         if (theUser == null) {
             theUser = (User)DataInstanceUtils.getInstance(user.getId(), indexingUser, database, true, true);
@@ -356,6 +354,11 @@ abstract public class IndexerBase implements Runnable {
             }
         }
 
+        populateFieldData(doc, instance);
+        return doc;
+    }
+    
+    private static void populateFieldData(Document doc, DataInstance instance) throws Exception {
         for (Shape shape : instance.getShapes()) {
             List<DataField> fields = shape.getFields();
             for (DataField field : fields)
@@ -408,17 +411,20 @@ abstract public class IndexerBase implements Runnable {
 
                         doc.add(new Field("content", data, Field.Store.NO, Field.Index.TOKENIZED));
                     } else {
-                    	// TODO if the field is tabular, the value contains the underlying data instance along
-                    	// with the reference id.  this is an opportunity to add more to the index, improving 
-                    	// search results.
-                        data = value.getReferenceId().getValue();
-                        doc.add(new Field(fieldName + "Id", data, Field.Store.NO, Field.Index.UN_TOKENIZED));
-                        doc.add(new Field("refId", data, Field.Store.NO, Field.Index.UN_TOKENIZED));
+                    	// if the field is tabular, the value contains the underlying data instance along
+                    	// with the reference id. in that case we don't index the reference, instead we index
+                    	// the field data in the referenced instance.
+                    	if (field.getShape().isTabular()) {
+                            DataInstance inst = (DataInstance)value.getValue();
+                            populateFieldData(doc, inst);
+                    	} else {
+                            data = value.getReferenceId().getValue();
+                            doc.add(new Field(fieldName + "Id", data, Field.Store.NO, Field.Index.UN_TOKENIZED));
+                            doc.add(new Field("refId", data, Field.Store.NO, Field.Index.UN_TOKENIZED));
+                    	}
                     }
                 }
             }
         }
-        
-        return doc;
     }
 }

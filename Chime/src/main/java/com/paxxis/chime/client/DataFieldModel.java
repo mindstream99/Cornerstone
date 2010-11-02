@@ -25,34 +25,34 @@ import java.io.Serializable;
  *
  * @author Robert Englander
  */
-public class DataFieldModel  extends BaseTreeModel implements Serializable
-{
-    private DataField _dataField;
+public class DataFieldModel  extends BaseTreeModel implements Serializable {
+	private static final long serialVersionUID = 2L;
+	private DataField dataField;
+	private DataField subField;
     
-    public DataFieldModel()
-    {
-        
+    public DataFieldModel() {
     }
     
-    public DataFieldModel(DataField dataField)
-    {
-        _dataField = dataField;
+    public DataFieldModel(DataField dataField) {
+    	this(dataField, null);
+    }
+    
+    public DataFieldModel(DataField field, DataField subField) {
+        this.dataField = field;
+        this.subField = subField;
+        String name = dataField.getName();
+        if (subField != null) {
+        	name += " : " + subField.getName();
+        }
         
-        setName(dataField.getName());
+        set("name", name);
     }
 
-    public DataField getDataField()
-    {
-        return _dataField;
+    public DataField getDataField() {
+        return dataField;
     }
-    
-    public String getName()
-    {
-        return _dataField.getName();
-    }
-    
-    public void setName(String name) 
-    {
-        set("name", name);
+
+    public DataField getSubField() {
+        return subField;
     }
 }

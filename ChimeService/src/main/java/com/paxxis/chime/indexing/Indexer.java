@@ -263,13 +263,17 @@ class IndexUpdater extends IndexerBase {
 
                 try {
                     DataInstance inst = DataInstanceUtils.getInstance(_data.getId(), user, database, true, false);
-                    Document doc = buildDocument(inst, user, database);
 
-                    if (_data.getShapes().get(0).getId().equals(Shape.FILE_ID)) {
-                        indexFileContents(doc, _data);
+                    // TBD for now we don't index tabular instances.  a future release may allow it.
+                    if (!inst.isTabular()) {
+                        Document doc = buildDocument(inst, user, database);
+
+                        if (_data.getShapes().get(0).getId().equals(Shape.FILE_ID)) {
+                            indexFileContents(doc, _data);
+                        }
+
+                        writer.addDocument(doc);
                     }
-
-                    writer.addDocument(doc);
                 } catch (Exception e) {
                     // we want to report the exception in the log
                 }
@@ -408,34 +412,30 @@ class IndexBuilder extends IndexerBase {
         Indexer.instance().setReady();
     }
     
-    private int doIndex(IndexWriter[] writers, DatabaseConnection database) throws Exception
-    {
+    private int doIndex(IndexWriter[] writers, DatabaseConnection database) throws Exception {
         int cnt = 0;
         
         String sql = "select id from " + Tools.getTableSet() + " order by id";
         
         DataSet dataSet = database.getDataSet(sql, true);
         DatabaseConnection db = _pool.borrowInstance(this);
-        while (dataSet.next())
-        {
+        while (dataSet.next()) {
             IDataValue idVal = dataSet.getFieldValue("id");
-            try
-            {
-                cnt++;
-
+            try {
                 DataInstance instance = DataInstanceUtils.getInstance(InstanceId.create(idVal.asString()), _user, db, true, true);
 
-                Document doc = buildDocument(instance, _user, database);
+                // TBD for now we don't index tabular instances.  a future release may allow it.
+                if (!instance.isTabular()) {
+                    cnt++;
+                    Document doc = buildDocument(instance, _user, database);
 
-                int idx = Indexer.indexByInstance(instance);
-                IndexWriter writer = writers[idx];
-                Term term = new Term("instanceid", String.valueOf(instance.getId()));
-                writer.deleteDocuments(term);
-                writer.addDocument(doc);
-
-            }
-            catch (Throwable t)
-            {
+                    int idx = Indexer.indexByInstance(instance);
+                    IndexWriter writer = writers[idx];
+                    Term term = new Term("instanceid", String.valueOf(instance.getId()));
+                    writer.deleteDocuments(term);
+                    writer.addDocument(doc);
+                }
+            } catch (Throwable t) {
                 _logger.error(t);
             }
         }

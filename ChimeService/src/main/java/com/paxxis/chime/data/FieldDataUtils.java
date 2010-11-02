@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import com.paxxis.chime.client.common.DataField;
 import com.paxxis.chime.client.common.DataFieldValue;
 import com.paxxis.chime.client.common.DataInstance;
 import com.paxxis.chime.client.common.FieldData;
@@ -55,7 +56,7 @@ public class FieldDataUtils {
             int position = 1;
             for (FieldData field : fieldData)
             {
-                createFieldData(instance, field, position++, database);
+                createFieldData(instance, field, user, position++, database);
             }
 
             result = DataInstanceUtils.getInstance(instance.getId(), user, database, true, false);
@@ -88,7 +89,7 @@ public class FieldDataUtils {
         {
             for (FieldData field : fieldData)
             {
-                deleteFieldData(instance, field, database);
+                deleteFieldData(instance, field, user, database);
             }
 
             result = DataInstanceUtils.getInstance(instance.getId(), user, database, true, false);
@@ -141,7 +142,7 @@ public class FieldDataUtils {
         return result;
     }
 
-    static void createFieldData(DataInstance instance, FieldData fieldData, int position, DatabaseConnection database) throws Exception
+    static void createFieldData(DataInstance instance, FieldData fieldData, User user, int position, DatabaseConnection database) throws Exception
     {
         String tableName = Tools.getTableSet();
         int colid = fieldData.field.getColumn();
@@ -187,12 +188,31 @@ public class FieldDataUtils {
 
             column = "foreign_id";
 
-            if (fieldData.value instanceof DataInstance)
-            {
-                value = String.valueOf(((DataInstance)fieldData.value).getId());
-            }
-            else // instance of DataFieldValue
-            {
+            DataFieldValue fieldValue = (DataFieldValue)fieldData.value;
+            if (fieldValue.getValue() instanceof DataInstance) {
+            	// this is a tabular row instance, and must first be created.
+            	DataInstance rowInst = (DataInstance)fieldValue.getValue();
+            	List<Shape> shapes = rowInst.getShapes();
+            	String name = rowInst.getName();
+            	String desc = "";
+            	List<FieldData> fData = new ArrayList<FieldData>();
+            	for (Shape s : shapes) {
+            		List<DataField> rowFields = s.getFields();
+            		for (DataField rowField : rowFields) {
+                		List<DataFieldValue> vals = rowInst.getFieldValues(s, rowField);
+                    	for (DataFieldValue val : vals) {
+                    		FieldData f = new FieldData();
+                        	f.shape = s;
+                        	f.field = rowField;
+                        	f.value = val.getValue();
+                        	fData.add(f);
+                    	}
+            		}
+            	}
+            	rowInst = DataInstanceUtils.createInstance(shapes, name, desc, null, new String[2], fData,
+            			instance.getSocialContext().getScopes(), user, database);
+                value = rowInst.getId().getValue();
+            } else {
                 value = String.valueOf(((DataFieldValue)fieldData.value).getReferenceId());
             }
 
@@ -230,7 +250,7 @@ public class FieldDataUtils {
         database.executeStatement(sql);
     }
 
-    private static void deleteFieldData(DataInstance instance, FieldData fieldData, DatabaseConnection database) throws Exception
+    private static void deleteFieldData(DataInstance instance, FieldData fieldData, User user, DatabaseConnection database) throws Exception
     {
         String tableName = Tools.getTableSet();
         int colid = fieldData.field.getColumn();
@@ -245,6 +265,13 @@ public class FieldDataUtils {
                 tableName += "_Text";
             }
         } else {
+            // if the deleted reference is to an instance of a tabular shape, then
+            // the instance itself gets deleted too
+            if (fieldShape.isTabular()) {
+                DataInstance inst = (DataInstance)((DataFieldValue)fieldData.value).getValue();
+                DataInstanceUtils.deleteInstance(inst, user, database);
+            }
+
             tableName += "_Reference";
         }
 
@@ -375,7 +402,9 @@ public class FieldDataUtils {
             IDataValue refId = dataSet.getFieldValue("refId");
             IDataValue instId = dataSet.getFieldValue("instId");
             IDataValue timestamp = dataSet.getFieldValue("timestamp");
+            
             values.add(new DataFieldValue(refId.asInstanceId(), name.asString(), shape2.getId(), instId.asInstanceId(), timestamp.asDate()));
+
             found = dataSet.next();
         }
 

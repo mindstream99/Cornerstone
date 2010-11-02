@@ -349,7 +349,7 @@ public class DataInstanceUtils {
             position = 1;
             for (FieldData field : fieldData)
             {
-                FieldDataUtils.createFieldData(instance, field, position++, database);
+                FieldDataUtils.createFieldData(instance, field, user, position++, database);
             }
             
             for (Scope scope : scopes)

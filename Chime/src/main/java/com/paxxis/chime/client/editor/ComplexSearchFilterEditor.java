@@ -221,9 +221,11 @@ public class ComplexSearchFilterEditor extends ChimeWindow
                         _operatorFieldComboBox.setValue(null);
 
                         DataField field = model.getDataField();
+                        DataField subField = model.getSubField();
 
                         filter.clear();
                         filter.setDataField(field);
+                        filter.setSubField(subField);
                         updateState();
 
                         if (field.getName().equals(SearchFieldConstants.NAME))
@@ -316,8 +318,14 @@ public class ComplexSearchFilterEditor extends ChimeWindow
                         }
                         else
                         {
-                            Shape type = field.getShape();
-                            if (type.isNumeric()) {
+                            Shape shape;
+                            if (subField == null) {
+                                shape = field.getShape();
+                            } else {
+                                shape = subField.getShape();
+                            }
+                            
+                            if (shape.isNumeric()) {
                                 _operatorStore.add(_numericOperatorList);
                                 _filterInput.setVisible(false);
                                 textField.setVisible(false);
@@ -325,7 +333,7 @@ public class ComplexSearchFilterEditor extends ChimeWindow
                                 timeField.setVisible(false);
                                 numberField.setVisible(true);
                                 numberField.setRawValue("");
-                            } else if (type.isDate()) {
+                            } else if (shape.isDate()) {
                                 _operatorStore.add(_dateOperatorList);
                                 _filterInput.setVisible(false);
                                 textField.setVisible(false);
@@ -333,7 +341,7 @@ public class ComplexSearchFilterEditor extends ChimeWindow
                                 timeField.setVisible(false);
                                 dateField.setVisible(false); // operator choice drives this
                                 dateField.setRawValue("");
-                            } else if (type.isTimestamp()) {
+                            } else if (shape.isTimestamp()) {
                                 _operatorStore.add(_dateOperatorList);
                                 _filterInput.setVisible(false);
                                 textField.setVisible(false);
@@ -342,7 +350,7 @@ public class ComplexSearchFilterEditor extends ChimeWindow
                                 dateField.setVisible(false);
                                 timeField.setVisible(false); // operator choice drives this
                                 timeField.setRawValue("");
-                            } else if (type.isPrimitive()) {
+                            } else if (shape.isPrimitive()) {
                                 _operatorStore.add(_textOperatorList);
                                 _filterInput.setVisible(false);
                                 textField.setVisible(true);
@@ -352,7 +360,7 @@ public class ComplexSearchFilterEditor extends ChimeWindow
                                 textField.setRawValue("");
                             } else {
                                 _operatorStore.add(_referenceOperatorList);
-                                _filterInput.setShape(type.getId(), !type.isPrimitive());
+                                _filterInput.setShape(shape.getId(), !shape.isPrimitive());
                                 _filterInput.setVisible(true);
                                 textField.setVisible(false);
                                 dateField.setVisible(false);
@@ -667,16 +675,15 @@ public class ComplexSearchFilterEditor extends ChimeWindow
         };
 
         // we've been handed a shallow instance, so we need to go get the
-        // full datatype instance
+        // full shape instance
         ShapeRequest request = new ShapeRequest();
         request.setId(shape.getId());
 
         ServiceManager.getService().sendShapeRequest(request, callback);
     }
 
-    protected void setupFields(Shape type)
-    {
-        filter.setDataShape(type);
+    protected void setupFields(Shape shape) {
+        filter.setDataShape(shape);
         _dataFieldStore.removeAll();
         
         DataField f = new DataField();
@@ -704,19 +711,24 @@ public class ComplexSearchFilterEditor extends ChimeWindow
         f.setName(SearchFieldConstants.CREATED);
         _dataFieldStore.add(new DataFieldModel(f));
 
-        if (type != null) {
-        	if (type.isBackReferencing()) {
+        if (shape != null) {
+        	if (shape.isBackReferencing()) {
                 f = new DataField();
                 f.setName(SearchFieldConstants.PARENT);
                 _dataFieldStore.add(new DataFieldModel(f));
         	}
         	
-        	List<DataField> fields = type.getFields();
-            for (DataField field : fields)
-            {
-                if (!field.isPrivate())
-                {
-                    _dataFieldStore.add(new DataFieldModel(field));
+        	List<DataField> fields = shape.getFields();
+            for (DataField field : fields) {
+                if (!field.isPrivate()) {
+                	Shape fieldShape = field.getShape();
+                	if (fieldShape.isTabular()) {
+                		for (DataField tableField : fieldShape.getFields()) {
+                            _dataFieldStore.add(new DataFieldModel(field, tableField));
+                		}
+                	} else {
+                        _dataFieldStore.add(new DataFieldModel(field));
+                	}
                 }
             }
         }

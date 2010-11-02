@@ -205,15 +205,18 @@ public class DataInstanceRequest extends RequestMessage {
         addQueryParameter(type, fieldName, fieldValue, Operator.Contains);
     }
 
-    public void addQueryParameter(Shape type, String fieldName, Serializable fieldValue, Operator operator)
-    {
-        addQueryParam(type, fieldName, fieldValue, operator, ClauseOperator.MatchAll);
+    public void addQueryParameter(Shape type, String fieldName, Serializable fieldValue, Operator operator) {
+    	addQueryParameter(type, null, fieldName, fieldValue, operator);
     }
     
-    private void addQueryParam(Shape type, String fieldName, Serializable fieldValue, Operator operator, ClauseOperator clauseOperator)
-    {
+    public void addQueryParameter(Shape type, Shape subShape, String fieldName, Serializable fieldValue, Operator operator) {
+        addQueryParam(type, subShape, fieldName, fieldValue, operator, ClauseOperator.MatchAll);
+    }
+    
+    private void addQueryParam(Shape type, Shape subShape, String fieldName, Serializable fieldValue, Operator operator, ClauseOperator clauseOperator) {
         Parameter param = new Parameter();
         param.dataShape = type;
+        param.subShape = subShape;
         param.fieldName = fieldName;
         param.fieldValue = fieldValue;
         param.operator = operator;

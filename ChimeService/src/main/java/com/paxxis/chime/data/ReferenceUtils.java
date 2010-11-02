@@ -56,7 +56,13 @@ public class ReferenceUtils {
                List<DataFieldValue> values = instance.getFieldValues(type, field);
                for (DataFieldValue value : values) {
                    if (!value.isInternal()) {
-                       value.setValue(DataInstanceUtils.getInstance(value.getReferenceId(), user, database, false, true).getName());
+                       if (field.getShape().isTabular()) {
+                           DataInstance inst = DataInstanceUtils.getInstance(value.getReferenceId(), user, database, true, true);
+                           value.setValue(inst);
+                       } else {
+                           DataInstance inst = DataInstanceUtils.getInstance(value.getReferenceId(), user, database, false, true);
+                           value.setValue(inst.getName());
+                       }
                    }
                }
            }

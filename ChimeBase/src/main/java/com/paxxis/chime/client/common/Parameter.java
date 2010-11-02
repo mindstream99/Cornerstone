@@ -26,9 +26,10 @@ import java.io.Serializable;
  * @author Robert Englander
  */
 public class Parameter implements Serializable {
-	private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 2L;
 
-	public Shape dataShape;
+    public Shape dataShape;
+    public Shape subShape;
     public String fieldName;
     public Serializable fieldValue;    
     public Operator operator;

@@ -17,8 +17,9 @@
 
 package com.paxxis.chime.client.common;
 
-import com.paxxis.chime.client.common.DataInstanceRequest.Operator;
 import java.io.Serializable;
+
+import com.paxxis.chime.client.common.DataInstanceRequest.Operator;
 
 public class SearchFilter implements Serializable {
 	private static final long serialVersionUID = 1L;
@@ -26,6 +27,7 @@ public class SearchFilter implements Serializable {
 	private Shape dataShape = null;
     private String _displayValue = null;
     private DataField _field = null;
+    private DataField _subField = null;
     private Operator _operator = null;
     private Serializable _value = null;
     private boolean _enabled = true;
@@ -85,6 +87,16 @@ public class SearchFilter implements Serializable {
             }
         }
 
+        if (_subField == null) {
+            if (inst._subField != null) {
+                return false;
+            }
+        } else {
+            if (!_subField.equals(inst._subField)) {
+                return false;
+            }
+        }
+
         if (_operator == null) {
             if (inst._operator != null) {
                 return false;
@@ -117,6 +129,7 @@ public class SearchFilter implements Serializable {
         int hash = 3;
         hash = 37 * hash + (this.dataShape != null ? this.dataShape.hashCode() : 0);
         hash = 37 * hash + (this._field != null ? this._field.hashCode() : 0);
+        hash = 37 * hash + (this._subField != null ? this._subField.hashCode() : 0);
         hash = 37 * hash + (this._operator != null ? this._operator.hashCode() : 0);
         hash = 37 * hash + (this._value != null ? this._value.hashCode() : 0);
         return hash;
@@ -126,6 +139,7 @@ public class SearchFilter implements Serializable {
         SearchFilter filter = new SearchFilter();
         filter.setEnabled(isEnabled());
         filter.setDataField(getDataField());
+        filter.setSubField(getSubField());
         filter.setOperator(getOperator());
         filter.setValue(getValue(), getDisplayValue());
         filter.setDataShape(getDataShape());
@@ -182,10 +196,20 @@ public class SearchFilter implements Serializable {
     {
         _field = field;
     }
-    
+
     public DataField getDataField()
     {
         return _field;
+    }
+    
+    public void setSubField(DataField field)
+    {
+        _subField = field;
+    }
+    
+    public DataField getSubField()
+    {
+        return _subField;
     }
     
     public void setOperator(Operator operator)

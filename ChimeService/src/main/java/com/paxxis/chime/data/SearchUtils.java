@@ -683,7 +683,14 @@ public class SearchUtils {
 
                 terms.add("(" + term + typeTerm + ")");
             } else if (shape != null) {
-                DataField field = shape.getField(param.fieldName);
+                DataField field;
+                Shape localShape = shape;
+                if (param.subShape != null) {
+                    localShape = param.subShape;
+                }
+
+                field = localShape.getField(param.fieldName);
+
                 String fieldName = "field" + field.getId();
                 String term = "";
 

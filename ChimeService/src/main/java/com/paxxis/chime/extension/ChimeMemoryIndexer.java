@@ -78,7 +78,7 @@ public class ChimeMemoryIndexer implements MemoryIndexer {
             ChimeAnalyzer analyzer = new ChimeAnalyzer();
 
             IndexWriter writer = new IndexWriter(ramDirectory, analyzer);
-            Term term = new Term("id", instance.getId().getValue());
+            Term term = new Term("instanceid", instance.getId().getValue());
 
             writer.deleteDocuments(term);
 

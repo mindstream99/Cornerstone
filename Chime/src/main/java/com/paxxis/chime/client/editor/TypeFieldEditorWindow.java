@@ -260,8 +260,8 @@ public class TypeFieldEditorWindow extends ChimeWindow
         	}
         }
         
-        // rich text fields can only have 1 value
-        if (validType && dataType.getId().equals(Shape.RICHTEXT_ID)) {
+        // rich text fields can only have 1 value.  same is true for fields in a tabular shape
+        if (validType && (dataType.getId().equals(Shape.RICHTEXT_ID) || shape.isTabular())) {
         	maxValuesField.setValue(1);
         	maxValuesField.setEnabled(false);
         } else {

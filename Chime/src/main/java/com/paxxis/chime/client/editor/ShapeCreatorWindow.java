@@ -142,7 +142,7 @@ public class ShapeCreatorWindow extends ChimeWindow
 
         tabularField = new CheckBox();
         tabularField.setHideLabel(true);
-        tabularField.setBoxLabel("Tabular");
+        tabularField.setBoxLabel("Use As Table Row Definition");
         _form.add(tabularField);
         
         permissionSet = new FieldSet();

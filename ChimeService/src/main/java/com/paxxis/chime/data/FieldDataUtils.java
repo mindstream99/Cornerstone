@@ -32,6 +32,7 @@ import com.paxxis.chime.client.common.User;
 import com.paxxis.chime.database.DataSet;
 import com.paxxis.chime.database.DatabaseConnection;
 import com.paxxis.chime.database.DateValue;
+import com.paxxis.chime.database.DoubleData;
 import com.paxxis.chime.database.IDataValue;
 import com.paxxis.chime.database.StringData;
 import com.paxxis.chime.extension.ChimeExtensionManager;
@@ -159,6 +160,8 @@ public class FieldDataUtils {
 
                 if (fieldData.value instanceof String) {
                     value = fieldData.value.toString();
+                } else if (fieldData.value instanceof Number) {
+                	value = (Double)fieldData.value;
                 } else {
                     value = ((DataFieldValue)fieldData.value).getValue();
                 }
@@ -362,6 +365,8 @@ public class FieldDataUtils {
             Serializable sval;
             if (value instanceof DateValue) {
                 sval = value.asDate();
+            } else if (value instanceof DoubleData) {
+            	sval = value.asDouble();
             } else {
                 sval = value.asString();
             }

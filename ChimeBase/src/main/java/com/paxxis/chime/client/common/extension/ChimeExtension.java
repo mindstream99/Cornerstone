@@ -18,6 +18,7 @@
 package com.paxxis.chime.client.common.extension;
 
 import java.util.HashMap;
+import java.util.List;
 
 import com.paxxis.chime.client.common.Community;
 import com.paxxis.chime.client.common.DataInstance;
@@ -39,6 +40,7 @@ public abstract class ChimeExtension {
 	private HashMap<String, Object> propertyMap = new HashMap<String, Object>();
     private HashMap<String, InstanceId> idMap = new HashMap<String, InstanceId>();
     private HashMap<String, HashMap<String, String>> fieldMap = new HashMap<String, HashMap<String, String>>();
+    private HashMap<String, List<String>> nameConfigMap = new HashMap<String, List<String>>();
 
     protected ChimeExtension() {
     }
@@ -61,9 +63,10 @@ public abstract class ChimeExtension {
     public void processLicense(String license) {
     }
     
-    public void addMapping(String objectName, InstanceId shapeId, HashMap<String, String> fieldMap) {
+    public void addMapping(String objectName, InstanceId shapeId, HashMap<String, String> fieldMap, List<String> nameConfig) {
         this.idMap.put(objectName, shapeId);
         this.fieldMap.put(objectName, fieldMap);
+        this.nameConfigMap.put(objectName, nameConfig);
     }
 
     public InstanceId getShapeId(String objectName) {
@@ -74,6 +77,10 @@ public abstract class ChimeExtension {
         return fieldMap.get(objectName).get(fieldName);
     }
 
+	public List<String> getShapeNameConfig(String objectName) {
+		return nameConfigMap.get(objectName);
+	}
+	
 	public void setPropertyMap(HashMap<String, Object> map) {
         propertyMap.clear();
         propertyMap.putAll(map);

@@ -17,7 +17,9 @@
 
 package com.paxxis.chime.extension;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 /**
  *
@@ -25,6 +27,7 @@ import java.util.HashMap;
  */
 public class ExtensionShapeMapping {
     private String objectName = null;
+    private List<String> nameConfig = new ArrayList<String>();
     private String shapeId = null;
     private HashMap<String, String> fieldMap = new HashMap<String, String>();
 
@@ -46,6 +49,14 @@ public class ExtensionShapeMapping {
     public void setObjectName(String objectName) {
         this.objectName = objectName;
     }
+    
+    public void setNameConfig(List<String> nameConfig) {
+		this.nameConfig = nameConfig;
+	}
+
+	public List<String> getNameConfig() {
+		return nameConfig;
+	}
 
     public String getShapeId() {
         return shapeId;

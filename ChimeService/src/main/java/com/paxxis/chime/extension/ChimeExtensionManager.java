@@ -17,6 +17,14 @@
 
 package com.paxxis.chime.extension;
 
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.List;
+
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
+
 import com.paxxis.chime.client.common.CommentsBundle;
 import com.paxxis.chime.client.common.Community;
 import com.paxxis.chime.client.common.DataField;
@@ -26,7 +34,6 @@ import com.paxxis.chime.client.common.DataInstanceEvent;
 import com.paxxis.chime.client.common.DataInstanceEvent.EventType;
 import com.paxxis.chime.client.common.DataInstanceRequest;
 import com.paxxis.chime.client.common.DataSocialContext;
-import com.paxxis.chime.client.common.Shape;
 import com.paxxis.chime.client.common.DiscussionsBundle;
 import com.paxxis.chime.client.common.FieldData;
 import com.paxxis.chime.client.common.InstanceId;
@@ -34,6 +41,7 @@ import com.paxxis.chime.client.common.Message;
 import com.paxxis.chime.client.common.ReviewsBundle;
 import com.paxxis.chime.client.common.Scope;
 import com.paxxis.chime.client.common.Scope.Permission;
+import com.paxxis.chime.client.common.Shape;
 import com.paxxis.chime.client.common.TagContext;
 import com.paxxis.chime.client.common.User;
 import com.paxxis.chime.client.common.extension.ChimeExtension;
@@ -41,24 +49,18 @@ import com.paxxis.chime.client.common.extension.ExtensionContext;
 import com.paxxis.chime.client.common.extension.MemoryIndexer;
 import com.paxxis.chime.client.common.portal.PortalTemplate;
 import com.paxxis.chime.common.JavaObjectPayload;
+import com.paxxis.chime.data.DataInstanceUtils;
+import com.paxxis.chime.data.PortalTemplateUtils;
+import com.paxxis.chime.data.ShapeUtils;
+import com.paxxis.chime.data.UserUtils;
 import com.paxxis.chime.database.DatabaseConnection;
 import com.paxxis.chime.database.DatabaseConnectionPool;
-import com.paxxis.chime.data.DataInstanceUtils;
-import com.paxxis.chime.data.ShapeUtils;
-import com.paxxis.chime.data.PortalTemplateUtils;
-import com.paxxis.chime.data.UserUtils;
 import com.paxxis.chime.license.LicenseProcessor;
 import com.paxxis.chime.service.DataInstanceRequestProcessor;
 import com.paxxis.chime.service.NotificationTopicSender;
 import com.paxxis.chime.service.RequestQueueSender;
 import com.paxxis.chime.service.ServiceBusMessageProducer;
 import com.paxxis.chime.service.Tools;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
 
 /**
  *
@@ -249,7 +251,7 @@ public class ChimeExtensionManager implements ExtensionContext {
 
                     String id = mapping.getShapeId();
                     String objectName = mapping.getObjectName();
-                    ext.addMapping(objectName, InstanceId.create(id), mapping.getFieldMap());
+                    ext.addMapping(objectName, InstanceId.create(id), mapping.getFieldMap(), mapping.getNameConfig());
                 }
 
                 ext.initialize();

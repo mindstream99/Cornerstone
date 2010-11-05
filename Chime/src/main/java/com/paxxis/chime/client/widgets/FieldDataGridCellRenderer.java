@@ -163,7 +163,6 @@ public class FieldDataGridCellRenderer implements GridCellRenderer<DataRowModel>
 		        
 		        fieldGrid.setHeight(gridHeight);
 			} else {
-				
 				renderHtml(lc, generateContent(inst, shape, dataField));
 			}
 			

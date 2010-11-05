@@ -29,6 +29,7 @@ import com.extjs.gxt.ui.client.widget.Html;
 import com.extjs.gxt.ui.client.widget.LayoutContainer;
 import com.extjs.gxt.ui.client.widget.button.Button;
 import com.extjs.gxt.ui.client.widget.button.ButtonBar;
+import com.extjs.gxt.ui.client.widget.form.AdapterField;
 import com.extjs.gxt.ui.client.widget.form.DateField;
 import com.extjs.gxt.ui.client.widget.form.FormPanel;
 import com.extjs.gxt.ui.client.widget.form.NumberField;
@@ -43,6 +44,9 @@ import com.extjs.gxt.ui.client.widget.toolbar.FillToolItem;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.DeferredCommand;
 import com.google.gwt.user.client.Element;
+import com.paxxis.chime.client.DataInputListener;
+import com.paxxis.chime.client.DataInstanceComboBox;
+import com.paxxis.chime.client.DataInstanceModel;
 import com.paxxis.chime.client.LoginResponseObject;
 import com.paxxis.chime.client.ServiceManager;
 import com.paxxis.chime.client.ServiceManagerAdapter;
@@ -50,6 +54,7 @@ import com.paxxis.chime.client.ServiceManagerListener;
 import com.paxxis.chime.client.common.DataField;
 import com.paxxis.chime.client.common.DataFieldValue;
 import com.paxxis.chime.client.common.DataInstance;
+import com.paxxis.chime.client.common.InstanceId;
 import com.paxxis.chime.client.common.Shape;
 import com.paxxis.chime.client.widgets.ChimeGrid;
 import com.paxxis.chime.client.widgets.ChimeWindow;
@@ -296,7 +301,7 @@ public class TabularDataEditor extends ChimeWindow {
         ServiceManager.addListener(_serviceManagerListener);
     }
 
-    private CellEditor getCellEditor(DataField field) {
+    private CellEditor getCellEditor(final DataField field) {
     	CellEditor editor = null;
     	
     	Shape shape = field.getShape();
@@ -305,18 +310,89 @@ public class TabularDataEditor extends ChimeWindow {
     			NumberField f = new NumberField();
     			f.setAutoValidate(true);
     	    	editor = new CellEditor(f);
-    	    	
+                f.setAutoWidth(true);
     		} else if (shape.isDate()) {
     			DateField df = new DateField();
     			df.setAutoValidate(true);
+                df.setAutoWidth(true);
     			editor = new CellEditor(df);
     		} else {
-    	    	editor = new CellEditor(new TextField<String>());
+    			TextField<String> f = new TextField<String>();
+                f.setAutoWidth(true);
+    	    	editor = new CellEditor(f);
     		}
     	} else {
-        	// TODO
-        	editor = new CellEditor(new TextField<String>());
-    	}
+    		EditorDataInputListener listener = new EditorDataInputListener() {
+            	
+                @Override
+                public void onDataInstance(DataInstance instance) {
+                	if (instance == null) {
+                    	editor.setValue(null);
+                	} else {
+                    	editor.setValue(instance);
+                    	editor.setData("DataInstance", instance);
+                	}
+                }
+
+                @Override
+                public void onStringData(String text) {
+                	editor.setValue(null);
+                }
+                
+            };
+
+            final DataInstanceComboBox combo = new DataInstanceComboBox(listener, shape, true, false, true);
+            AdapterField af = new AdapterField(combo);
+            af.setResizeWidget(true);
+
+            editor = new CellEditor(af) {  
+                @Override  
+                public Object preProcessValue(Object value) {  
+                    if (value == null) {  
+                        return value;  
+                    }  
+
+                    DataInstance instance = (DataInstance)value;
+                    final String val = instance.getName();
+                    
+                    // TODO this seems like an odd way of getting the existing raw value into the combo box.  the problem
+                    // is that the CellEditor wants a model, but we have no way of getting to the models in the list store
+                    // until after the combo requests something, which doesn't happen until the user types something.  chicken/egg?
+                    // so we need to push the raw text, which is the name of the instance.  this is done inside a deferred command
+                    // because at this point, the combo box hasn't been rendered yet, and you can't call setRawVaoue until after
+                    // rendering.
+                    DeferredCommand.addCommand(
+                    	new Command() {
+                    		public void execute() {
+                                DataInstanceComboBox combo = (DataInstanceComboBox)((AdapterField)getField()).getWidget();
+                                combo.setRawValue(val);
+                    		}
+                    	}
+                    );
+                    
+                    DataFieldValue fieldValue = new DataFieldValue(instance.getId(), instance.getName(), instance.getShapes().get(0).getId(),
+							InstanceId.UNKNOWN, null);
+                    DataInstanceModel model = new DataInstanceModel(instance, false, 100, false);
+                    return val;
+                }  
+            
+                @Override  
+                public Object postProcessValue(Object value) {  
+                    if (value == null) {  
+                        return value;  
+                    }  
+
+                    // the value is just the name of the selected data instance, but we want to give back
+                    // a data field value for the selected instance
+                    DataInstance instance = (DataInstance)getData("DataInstance");
+                    DataFieldValue val = new DataFieldValue(instance.getId(), instance.getName(), instance.getShapes().get(0).getId(),
+                    							InstanceId.UNKNOWN, null);
+                    return val;
+                }  
+            };
+            
+            listener.setEditor(editor);
+        }
     	
     	return editor;
     }
@@ -479,3 +555,11 @@ public class TabularDataEditor extends ChimeWindow {
     */
 }
 
+abstract class EditorDataInputListener implements DataInputListener {
+	protected CellEditor editor = null;
+	
+	public void setEditor(CellEditor e) {
+		editor = e;
+	}
+
+}

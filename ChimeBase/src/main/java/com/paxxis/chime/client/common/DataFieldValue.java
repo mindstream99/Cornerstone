@@ -62,6 +62,10 @@ public class DataFieldValue implements Serializable {
         value = source.getValue();
     }
     
+    public String toString() {
+    	return value.toString();
+    }
+    
     public boolean isInternal() {
         return isInternal;
     }

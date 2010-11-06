@@ -265,7 +265,7 @@ class IndexUpdater extends IndexerBase {
                     DataInstance inst = DataInstanceUtils.getInstance(_data.getId(), user, database, true, false);
 
                     // TBD for now we don't index tabular instances.  a future release may allow it.
-                    if (!inst.isTabular()) {
+                    if (!(inst.isTabular() && !(inst instanceof Shape))) {
                         Document doc = buildDocument(inst, user, database);
 
                         if (_data.getShapes().get(0).getId().equals(Shape.FILE_ID)) {
@@ -425,7 +425,7 @@ class IndexBuilder extends IndexerBase {
                 DataInstance instance = DataInstanceUtils.getInstance(InstanceId.create(idVal.asString()), _user, db, true, true);
 
                 // TBD for now we don't index tabular instances.  a future release may allow it.
-                if (!instance.isTabular()) {
+                if (!(instance.isTabular() && !(instance instanceof Shape))) {
                     cnt++;
                     Document doc = buildDocument(instance, _user, database);
 

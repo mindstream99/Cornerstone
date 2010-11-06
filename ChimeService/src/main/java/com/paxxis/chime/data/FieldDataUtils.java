@@ -200,17 +200,22 @@ public class FieldDataUtils {
             	String desc = "";
             	List<FieldData> fData = new ArrayList<FieldData>();
             	for (Shape s : shapes) {
-            		List<DataField> rowFields = s.getFields();
-            		for (DataField rowField : rowFields) {
-                		List<DataFieldValue> vals = rowInst.getFieldValues(s, rowField);
-                    	for (DataFieldValue val : vals) {
-                    		FieldData f = new FieldData();
-                        	f.shape = s;
-                        	f.field = rowField;
-                        	f.value = val.getValue();
-                        	fData.add(f);
-                    	}
-            		}
+                    List<DataField> rowFields = s.getFields();
+                    for (DataField rowField : rowFields) {
+                        List<DataFieldValue> vals = rowInst.getFieldValues(s, rowField);
+                        for (DataFieldValue val : vals) {
+                            FieldData f = new FieldData();
+                            f.shape = s;
+                            f.field = rowField;
+
+                            if (val.getValue() instanceof DataFieldValue) {
+                                f.value = val.getValue();
+                            } else {
+                                f.value = val;
+                            }
+                            fData.add(f);
+                        }
+                    }
             	}
             	rowInst = DataInstanceUtils.createInstance(shapes, name, desc, null, new String[2], fData,
             			instance.getSocialContext().getScopes(), user, database);

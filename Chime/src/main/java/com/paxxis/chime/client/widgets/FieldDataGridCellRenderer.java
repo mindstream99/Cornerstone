@@ -60,14 +60,27 @@ public class FieldDataGridCellRenderer implements GridCellRenderer<DataRowModel>
 	/** the default margins for placing the renderer in the cell */
 	private Margins margins = new Margins(3, 3, 3, 0);
 	
+	private boolean useInterceptedHtml = true;
+	
 	public FieldDataGridCellRenderer() {
+		this(true);
 	}
 	
+	public FieldDataGridCellRenderer(boolean intercepted) {
+		useInterceptedHtml = intercepted;
+	}
+
 	/**
 	 * Constructor
 	 * @param m the margins to use when placing the renderer in the cell.
 	 */
 	public FieldDataGridCellRenderer(Margins m) {
+		this(true);
+		margins = m;
+	}
+
+	public FieldDataGridCellRenderer(Margins m, boolean intercepted) {
+		this(intercepted);
 		margins = m;
 	}
 	
@@ -174,9 +187,10 @@ public class FieldDataGridCellRenderer implements GridCellRenderer<DataRowModel>
 	}
 
 	private void renderHtml(final LayoutContainer lc, String content) {
-		lc.setLayout(new RowLayout());
+		lc.setLayout(new RowLayout()); 
 		final InterceptedHtml html = new InterceptedHtml();
 		html.setHtml(content);
+		
         lc.add(html, new RowData(1, -1, margins));
         lc.addListener(Events.Resize,
             new Listener<BoxComponentEvent>() {
@@ -193,7 +207,7 @@ public class FieldDataGridCellRenderer implements GridCellRenderer<DataRowModel>
             }
         );
 	}
-	
+
     private String generateContent(DataInstance dataInstance, Shape shape, DataField dataField) {
     	StringBuffer buffer = new StringBuffer();
         List<DataFieldValue> values = dataInstance.getFieldValues(shape, dataField);
@@ -258,7 +272,14 @@ public class FieldDataGridCellRenderer implements GridCellRenderer<DataRowModel>
                 }
             } else {
             	String vname = valueName.replaceAll(" ", "&nbsp;");
-                String name = Utils.toHoverUrl(value.getReferenceId(), vname);
+                String name;
+                
+                if (useInterceptedHtml) {
+                    name = Utils.toHoverUrl(value.getReferenceId(), vname);
+                } else {
+                    name = vname;
+                }
+
                 buffer.append(sep + name);
                 stringContent = buffer.toString();
                 sep = "    ";

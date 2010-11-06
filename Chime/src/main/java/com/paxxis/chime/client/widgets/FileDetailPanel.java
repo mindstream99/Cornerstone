@@ -28,6 +28,7 @@ import com.extjs.gxt.ui.client.util.Margins;
 import com.extjs.gxt.ui.client.widget.LayoutContainer;
 import com.extjs.gxt.ui.client.widget.grid.ColumnConfig;
 import com.extjs.gxt.ui.client.widget.grid.ColumnModel;
+import com.extjs.gxt.ui.client.widget.grid.GridSelectionModel;
 import com.extjs.gxt.ui.client.widget.layout.RowData;
 import com.extjs.gxt.ui.client.widget.layout.RowLayout;
 import com.google.gwt.core.client.GWT;
@@ -87,7 +88,13 @@ public class FileDetailPanel extends LayoutContainer {
         listStore = new ListStore<DataRowModel>();
         grid = new ChimeGrid<DataRowModel>(listStore, cm);
         grid.getView().setAutoFill(true);
-        grid.setSelectionModel(null);
+        grid.setSelectionModel(
+        	new GridSelectionModel<DataRowModel>() {
+        		protected boolean isSelectable(int row, int cell, boolean acceptsNav) {		        	
+        			return false;
+        		}
+        	}
+        );
         grid.getView().setForceFit(true);
         grid.setHideHeaders(true);
         grid.setTrackMouseOver(false);

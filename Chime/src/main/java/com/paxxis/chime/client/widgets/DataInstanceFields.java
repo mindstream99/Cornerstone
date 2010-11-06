@@ -28,7 +28,6 @@ import com.extjs.gxt.ui.client.util.Margins;
 import com.extjs.gxt.ui.client.widget.LayoutContainer;
 import com.extjs.gxt.ui.client.widget.grid.ColumnConfig;
 import com.extjs.gxt.ui.client.widget.grid.ColumnModel;
-import com.extjs.gxt.ui.client.widget.grid.Grid;
 import com.extjs.gxt.ui.client.widget.layout.RowData;
 import com.extjs.gxt.ui.client.widget.layout.RowLayout;
 import com.google.gwt.user.client.Command;
@@ -121,7 +120,7 @@ public class DataInstanceFields extends LayoutContainer
         listStore = new ListStore<DataFieldValueModel>();
         grid = new ChimeGrid<DataFieldValueModel>(listStore, cm);
         grid.getView().setAutoFill(true);
-        grid.setSelectionModel(null);
+        grid.setSelectionModel(null); 
         grid.getView().setForceFit(true);
         grid.setHideHeaders(true);
         grid.setTrackMouseOver(false);

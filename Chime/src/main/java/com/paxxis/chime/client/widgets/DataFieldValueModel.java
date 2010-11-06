@@ -102,10 +102,22 @@ public class DataFieldValueModel extends DataRowModel {
 				values.clear();
 			} else {
 				if (!values.isEmpty()) {
-					values.get(0).setValue((Serializable)value);
+					if (value instanceof DataInstance) {
+						DataInstance d = (DataInstance)value;
+						values.get(0).setValue(d.getName());
+						values.get(0).setId(d.getId());
+					} else {
+						values.get(0).setValue((Serializable)value);
+					}
 				} else {
-					DataFieldValue newVal = new DataFieldValue((Serializable)value, shape.getId(), InstanceId.UNKNOWN, null);
-					values.add(newVal);
+					if (value instanceof DataInstance) {
+						DataInstance d = (DataInstance)value;
+						DataFieldValue newVal = new DataFieldValue(d.getId(), d.getName(), shape.getId(), InstanceId.UNKNOWN, null);
+						values.add(newVal);
+					} else {
+						DataFieldValue newVal = new DataFieldValue((Serializable)value, shape.getId(), InstanceId.UNKNOWN, null);
+						values.add(newVal);
+					}
 				}
 			}
 		}
@@ -135,7 +147,14 @@ public class DataFieldValueModel extends DataRowModel {
 				//set(field.getName(), values);
 
 				if (!values.isEmpty()) {
-					set(field.getName(), values.get(0).getValue());
+					if (!values.get(0).getReferenceId().equals(InstanceId.UNKNOWN)) {
+						DataInstance t = new DataInstance();
+						t.setName(values.get(0).getValue().toString());
+						t.setId(values.get(0).getReferenceId());
+						set(field.getName(), t);
+					} else {
+						set(field.getName(), values.get(0).getValue());
+					}
 				}
 			}
 		}

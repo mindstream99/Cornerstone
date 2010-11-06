@@ -25,6 +25,7 @@ import com.extjs.gxt.ui.client.Style.SelectionMode;
 import com.extjs.gxt.ui.client.event.ButtonEvent;
 import com.extjs.gxt.ui.client.event.SelectionListener;
 import com.extjs.gxt.ui.client.store.ListStore;
+import com.extjs.gxt.ui.client.util.Margins;
 import com.extjs.gxt.ui.client.widget.Html;
 import com.extjs.gxt.ui.client.widget.LayoutContainer;
 import com.extjs.gxt.ui.client.widget.button.Button;
@@ -46,7 +47,6 @@ import com.google.gwt.user.client.DeferredCommand;
 import com.google.gwt.user.client.Element;
 import com.paxxis.chime.client.DataInputListener;
 import com.paxxis.chime.client.DataInstanceComboBox;
-import com.paxxis.chime.client.DataInstanceModel;
 import com.paxxis.chime.client.LoginResponseObject;
 import com.paxxis.chime.client.ServiceManager;
 import com.paxxis.chime.client.ServiceManagerAdapter;
@@ -88,7 +88,6 @@ public class TabularDataEditor extends ChimeWindow {
     private DataInstance dataInstance;
     private Shape dataType;
     private DataField dataField;
-    //private List<DataFieldValue> fieldValues = new ArrayList<DataFieldValue>();
 
     private FieldEditListener editListener = null;
     private AppliedTypesEditListener typesListener = null;
@@ -166,7 +165,7 @@ public class TabularDataEditor extends ChimeWindow {
         configs.add(column);
 
         Shape shape = dataField.getShape();
-        String lastColId = "";
+        //String lastColId = "";
         List<DataField> dataFields = shape.getFields();
         for (DataField field : dataFields) {
 	        column = new ColumnConfig();
@@ -177,22 +176,23 @@ public class TabularDataEditor extends ChimeWindow {
 	        column.setSortable(false);
 	        column.setMenuDisabled(true);
 	        column.setEditor(getCellEditor(field));
-	        column.setRenderer(new FieldDataGridCellRenderer());
+	        column.setRenderer(new FieldDataGridCellRenderer(new Margins(1), false));
 	        configs.add(column);
-	        lastColId = field.getName();
+	        //lastColId = field.getName();
         }
 
         ColumnModel cm = new ColumnModel(configs);
-        fieldGrid = new ChimeGrid<DataFieldValueModel>(listStore, cm, true);
+        fieldGrid = new ChimeGrid<DataFieldValueModel>(listStore, cm, false, true);
         fieldGrid.getView().setAutoFill(false);
         GridSelectionModel<DataFieldValueModel> sm = new GridSelectionModel<DataFieldValueModel>();
         sm.setSelectionMode(SelectionMode.SINGLE);
         fieldGrid.setSelectionModel(sm);
         fieldGrid.getView().setForceFit(false);
+        fieldGrid.getView().setShowDirtyCells(false);
         fieldGrid.setHideHeaders(false);
         fieldGrid.setTrackMouseOver(false);
         fieldGrid.setStripeRows(false);
-        fieldGrid.setAutoExpandColumn(lastColId);
+        //fieldGrid.setAutoExpandColumn(lastColId);
         fieldGrid.setBorders(true);
         fieldGrid.setHeight(300);
 
@@ -329,7 +329,7 @@ public class TabularDataEditor extends ChimeWindow {
                 	if (instance == null) {
                     	editor.setValue(null);
                 	} else {
-                    	editor.setValue(instance);
+                    	editor.setValue(instance.getName());
                     	editor.setData("DataInstance", instance);
                 	}
                 }
@@ -352,27 +352,25 @@ public class TabularDataEditor extends ChimeWindow {
                         return value;  
                     }  
 
-                    DataInstance instance = (DataInstance)value;
-                    final String val = instance.getName();
+                    final String val;
+                    if (value instanceof DataInstance) {
+                        DataInstance instance = (DataInstance)value;
+                        val = instance.getName();
+                    } else {
+                    	DataFieldValue dfVal = (DataFieldValue)value;
+                    	val = dfVal.toString();
+                    }
                     
-                    // TODO this seems like an odd way of getting the existing raw value into the combo box.  the problem
-                    // is that the CellEditor wants a model, but we have no way of getting to the models in the list store
-                    // until after the combo requests something, which doesn't happen until the user types something.  chicken/egg?
-                    // so we need to push the raw text, which is the name of the instance.  this is done inside a deferred command
-                    // because at this point, the combo box hasn't been rendered yet, and you can't call setRawVaoue until after
-                    // rendering.
                     DeferredCommand.addCommand(
                     	new Command() {
                     		public void execute() {
                                 DataInstanceComboBox combo = (DataInstanceComboBox)((AdapterField)getField()).getWidget();
-                                combo.setRawValue(val);
+                                combo.getStore().removeAll();
+                                combo.applyInput(val);
                     		}
                     	}
                     );
                     
-                    DataFieldValue fieldValue = new DataFieldValue(instance.getId(), instance.getName(), instance.getShapes().get(0).getId(),
-							InstanceId.UNKNOWN, null);
-                    DataInstanceModel model = new DataInstanceModel(instance, false, 100, false);
                     return val;
                 }  
             
@@ -382,9 +380,7 @@ public class TabularDataEditor extends ChimeWindow {
                         return value;  
                     }  
 
-                    // the value is just the name of the selected data instance, but we want to give back
-                    // a data field value for the selected instance
-                    DataInstance instance = (DataInstance)getData("DataInstance");
+                    DataInstance instance = getData("DataInstance");
                     DataFieldValue val = new DataFieldValue(instance.getId(), instance.getName(), instance.getShapes().get(0).getId(),
                     							InstanceId.UNKNOWN, null);
                     return val;

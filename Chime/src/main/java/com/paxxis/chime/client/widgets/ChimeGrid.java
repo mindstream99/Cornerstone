@@ -17,13 +17,17 @@
 
 package com.paxxis.chime.client.widgets;
 
+import java.util.List;
+
 import com.extjs.gxt.ui.client.data.ModelData;
 import com.extjs.gxt.ui.client.dnd.GridDragSource;
 import com.extjs.gxt.ui.client.dnd.GridDropTarget;
 import com.extjs.gxt.ui.client.dnd.DND.Feedback;
+import com.extjs.gxt.ui.client.event.Events;
 import com.extjs.gxt.ui.client.store.ListStore;
 import com.extjs.gxt.ui.client.widget.grid.ColumnModel;
 import com.extjs.gxt.ui.client.widget.grid.Grid;
+import com.extjs.gxt.ui.client.widget.grid.GridView;
 
 /**
  * 
@@ -32,20 +36,59 @@ import com.extjs.gxt.ui.client.widget.grid.Grid;
  */
 public class ChimeGrid<M extends ModelData> extends Grid<M> {
 
-	public ChimeGrid(ListStore<M> store, ColumnModel cm) {
-		this(store, cm, false);
+	// the standard Grid doesn't provide a selection model that prohibits
+	// selection.  Passing null to setSelectionModel of the grid class
+	// will result in null pointer exceptions in its afterRenderView method.
+	// To provide for null selection, ChimeGrid overrides the afterRenderView method.
+	// Due to the fact that we can't call the GridView methods directly, the ChimeGridView
+	// class is used in order to make those calls possible.
+	static class ChimeGridView extends GridView {
+		public void afterRender() {
+			super.afterRender();
+		}
+		
+		public void onRowSelect(int idx) {
+			super.onRowSelect(idx);
+		}
 	}
 	
-	public ChimeGrid(ListStore<M> store, ColumnModel cm, boolean canReorder) {
+	public ChimeGrid(ListStore<M> store, ColumnModel cm) {
+		this(store, cm, true, false);
+	}
+	
+	public ChimeGrid(ListStore<M> store, ColumnModel cm, boolean autoCellHeight, boolean canReorder) {
 		super(store, cm);
-	    addStyleName("chimeGrid");
+		if (autoCellHeight) {
+		    addStyleName("chimeGrid");
+		}
 	    
 	    if (canReorder) {
             GridDropTarget target = new GridDropTarget(this);
             target.setFeedback(Feedback.INSERT);
             target.setAllowSelfAsSource(true);
-            GridDragSource source = new GridDragSource(this);
+            new GridDragSource(this);
         }
+	    
+	    setView(new ChimeGridView());
 	}
 
+	/**
+	 * Overridden so that a null selection model gives us the behavior
+	 * we want.
+	 */
+	protected void afterRenderView() {
+		ChimeGridView vw = (ChimeGridView)getView();
+		viewReady = true;
+	    vw.afterRender();
+	    onAfterRenderView();
+
+	    if (sm != null) {
+		    List<M> list = sm.getSelectedItems();
+		    for (M m : list) {
+		      vw.onRowSelect(store.indexOf(m));
+		    }
+	    }
+
+	    fireEvent(Events.ViewReady);
+	  }	
 }

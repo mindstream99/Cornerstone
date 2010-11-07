@@ -22,6 +22,7 @@ import com.extjs.gxt.ui.client.event.ButtonEvent;
 import com.extjs.gxt.ui.client.event.ComponentEvent;
 import com.extjs.gxt.ui.client.event.SelectionListener;
 import com.extjs.gxt.ui.client.util.KeyNav;
+import com.extjs.gxt.ui.client.widget.Html;
 import com.extjs.gxt.ui.client.widget.button.Button;
 import com.extjs.gxt.ui.client.widget.button.ButtonBar;
 import com.extjs.gxt.ui.client.widget.form.FormPanel;
@@ -40,7 +41,6 @@ import com.paxxis.chime.client.common.DataField;
 import com.paxxis.chime.client.common.DataInstance;
 import com.paxxis.chime.client.common.EditDataInstanceRequest;
 import com.paxxis.chime.client.common.Shape;
-import com.paxxis.chime.client.widgets.ChimeMessageBox;
 import com.paxxis.chime.client.widgets.ChimeWindow;
 
 /**
@@ -62,6 +62,7 @@ public class TypeFieldEditorWindow extends ChimeWindow
     private DataField dataField;
     private FieldDefinitionEditListener editListener;
     private Shape shape;
+    private Html errorLabel;
     
     public TypeFieldEditorWindow(Shape shape, FieldDefinitionEditListener listener) {
         this(shape, null, listener);
@@ -193,6 +194,9 @@ public class TypeFieldEditorWindow extends ChimeWindow
         );
         
         _buttonBar.add(_cancelButton);
+
+        errorLabel = new Html("<div id='endslice-error-label'>&nbsp;</div>");
+        _form.add(errorLabel);
         
         _form.add(_buttonBar);
         add(_form);
@@ -246,14 +250,30 @@ public class TypeFieldEditorWindow extends ChimeWindow
         String name = nameField.getValue();
         boolean validName = name != null && name.trim().length() > 0;
 
+        String msg = "";
+        if (validName) {
+            for (DataField field : shape.getFields()) {
+                if (field.getName().equalsIgnoreCase(name)) {
+            		validName = false;
+            		msg = "This shape already has a field named '" + field.getName() + "'";
+            		break;
+                }
+            }
+        }
+
         String desc = descriptionField.getValue();
         boolean validDesc = desc != null && desc.trim().length() > 0;
-
+        if (validName && !validDesc) {
+    		msg = "Description is required";
+        }
+        
         boolean validType = (dataType != null);
+        if (validName && validDesc && !validType) {
+    		msg = "Please select a shape";
+        }
 
         // tabular shapes can't have tabular fields
-        String msg = null;
-        if (validType) {
+        if (validName && validDesc && validType) {
         	if (shape.isTabular() && dataType.isTabular()) {
         		validType = false;
         		msg = "Can not add a tabular field to a tabular shape.";
@@ -270,15 +290,17 @@ public class TypeFieldEditorWindow extends ChimeWindow
         
         Number number = maxValuesField.getValue();
         boolean validNumber = (number != null && number.doubleValue() >= 0);
+        if (validName && validDesc && validType && !validNumber) {
+    		msg = "Please enter the maximum number of values (0 or greater, where 0 means unlimited)";
+        }
 
         _okButton.setEnabled(validName && validDesc && validType && validNumber);
 
-        if (msg != null) {
-        	ChimeMessageBox.alert("Chime", msg, null);
+        if (!msg.isEmpty()) {
+        	msg += "<br>&nbsp;";
         }
+        errorLabel.setHtml("<div id='endslice-error-label'>" + msg + "</div>");
     }
-
-
 
     protected void handleLoginResponse(final LoginResponseObject resp)
     {

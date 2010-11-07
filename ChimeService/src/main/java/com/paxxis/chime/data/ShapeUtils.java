@@ -238,12 +238,21 @@ public class ShapeUtils {
         for (FieldDefinition def : fieldDefs)
         {
             Shape colType = getInstance(def.typeName, database, true);
+            checkFieldNameAvailable(shape, def.name);
             shape = createInstanceColumn(shape, colType, def.name, def.description, def.maxValues, database);
         }
         
         return shape;
     }
-    
+
+    private static void checkFieldNameAvailable(Shape shape, String name) throws Exception {
+        for (DataField field : shape.getFields()) {
+            if (field.getName().equalsIgnoreCase(name)) {
+                throw new Exception("Duplicate Field Name Not Allowed: " + name);
+            }
+        }
+    }
+
     public static Shape removeFields(InstanceId shapeId, List<FieldDefinition> fieldDefs, DatabaseConnection database) throws Exception
     {
         Shape shape = getInstanceById(shapeId, database, false);

@@ -476,7 +476,7 @@ public class DataInstance implements Serializable {
         return copy(new DataInstance());
     }
 
-    protected <T extends DataInstance> T copy(T target) {
+    public <T extends DataInstance> T copy(T target) {
         if (!(target instanceof DataInstance)) {
             throw new RuntimeException();
         }

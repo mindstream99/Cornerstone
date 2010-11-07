@@ -25,6 +25,8 @@ import com.extjs.gxt.ui.client.Style.SelectionMode;
 import com.extjs.gxt.ui.client.event.ButtonEvent;
 import com.extjs.gxt.ui.client.event.SelectionListener;
 import com.extjs.gxt.ui.client.store.ListStore;
+import com.extjs.gxt.ui.client.store.StoreEvent;
+import com.extjs.gxt.ui.client.store.StoreListener;
 import com.extjs.gxt.ui.client.util.Margins;
 import com.extjs.gxt.ui.client.widget.Html;
 import com.extjs.gxt.ui.client.widget.LayoutContainer;
@@ -86,6 +88,7 @@ public class TabularDataEditor extends ChimeWindow {
     private ServiceManagerListener _serviceManagerListener = null;
 
     private DataInstance dataInstance;
+    private DataInstance origInstance;
     private Shape dataType;
     private DataField dataField;
 
@@ -98,17 +101,46 @@ public class TabularDataEditor extends ChimeWindow {
 
         editListener = listener;
         dataInstance = instance;
+        origInstance = instance.copy();
         dataType = type;
         dataField = field;
     }
 
     protected void onRender(Element parent, int index) { 
     	super.onRender(parent, index);
-        setup();
+    	
+    	listStore.addStoreListener(
+    		new StoreListener<DataFieldValueModel>() {
+    			  public void storeAdd(StoreEvent<DataFieldValueModel> se) {
+    				  validate();
+    			  }
+
+    			  public void storeClear(StoreEvent<DataFieldValueModel> se) {
+    				  validate();
+    			  }
+
+    			  public void storeDataChanged(StoreEvent<DataFieldValueModel> se) {
+    				  validate();
+    			  }
+
+    			  public void storeRemove(StoreEvent<DataFieldValueModel> se) {
+    				  validate();
+    			  }
+
+    			  public void storeUpdate(StoreEvent<DataFieldValueModel> se) {
+    				  validate();
+    			  }
+    		}
+    	);
+    	setup();
     }
     
     private void setup() {
-
+    	// this form of copy is used so that the data instance object itself isn't recreated.
+    	// this is necessary because the current implementation of the controller, in this
+    	// case DataDetailPanel, expects the instance to be directly modified.
+    	origInstance.copy(dataInstance);
+    	
         listStore.removeAll();
 
         DeferredCommand.addCommand(
@@ -165,7 +197,6 @@ public class TabularDataEditor extends ChimeWindow {
         configs.add(column);
 
         Shape shape = dataField.getShape();
-        //String lastColId = "";
         List<DataField> dataFields = shape.getFields();
         for (DataField field : dataFields) {
 	        column = new ColumnConfig();
@@ -178,7 +209,6 @@ public class TabularDataEditor extends ChimeWindow {
 	        column.setEditor(getCellEditor(field));
 	        column.setRenderer(new FieldDataGridCellRenderer(new Margins(1), false));
 	        configs.add(column);
-	        //lastColId = field.getName();
         }
 
         ColumnModel cm = new ColumnModel(configs);
@@ -192,7 +222,6 @@ public class TabularDataEditor extends ChimeWindow {
         fieldGrid.setHideHeaders(false);
         fieldGrid.setTrackMouseOver(false);
         fieldGrid.setStripeRows(false);
-        //fieldGrid.setAutoExpandColumn(lastColId);
         fieldGrid.setBorders(true);
         fieldGrid.setHeight(300);
 
@@ -348,28 +377,20 @@ public class TabularDataEditor extends ChimeWindow {
             editor = new CellEditor(af) {  
                 @Override  
                 public Object preProcessValue(Object value) {  
-                    if (value == null) {  
-                        return value;  
-                    }  
-
-                    final String val;
-                    if (value instanceof DataInstance) {
-                        DataInstance instance = (DataInstance)value;
-                        val = instance.getName();
+                    String val = null;
+                    if (value == null) {
+                    	updateCombo(val);
                     } else {
-                    	DataFieldValue dfVal = (DataFieldValue)value;
-                    	val = dfVal.toString();
+                        if (value instanceof DataInstance) {
+                            DataInstance instance = (DataInstance)value;
+                            val = instance.getName();
+                        } else {
+                        	DataFieldValue dfVal = (DataFieldValue)value;
+                        	val = dfVal.toString();
+                        }
+                    	
+                    	updateCombo(val);
                     }
-                    
-                    DeferredCommand.addCommand(
-                    	new Command() {
-                    		public void execute() {
-                                DataInstanceComboBox combo = (DataInstanceComboBox)((AdapterField)getField()).getWidget();
-                                combo.getStore().removeAll();
-                                combo.applyInput(val);
-                    		}
-                    	}
-                    );
                     
                     return val;
                 }  
@@ -385,6 +406,17 @@ public class TabularDataEditor extends ChimeWindow {
                     							InstanceId.UNKNOWN, null);
                     return val;
                 }  
+
+                private void updateCombo(final String val) {
+                    DeferredCommand.addCommand(
+                    	new Command() {
+                    		public void execute() {
+                                DataInstanceComboBox combo = (DataInstanceComboBox)((AdapterField)getField()).getWidget();
+                                combo.applyInput(val);
+                    		}
+                    	}
+                    );
+                }
             };
             
             listener.setEditor(editor);
@@ -424,20 +456,7 @@ public class TabularDataEditor extends ChimeWindow {
         validate();
     }
 
-    protected void handleLoginResponse(final LoginResponseObject resp)
-    {
-        DeferredCommand.addCommand(
-            new Command()
-            {
-                public void execute()
-                {
-                }
-            }
-        );
-    }
-
-    protected void doCancel()
-    {
+    protected void doCancel() {
         ServiceManager.removeListener(_serviceManagerListener);
         hide();
     }
@@ -465,63 +484,28 @@ public class TabularDataEditor extends ChimeWindow {
     }
 
     /**
-     * Check that the new list of items meets the following criteria:
-     *
-     * 1) No duplicates
-     * 2) No empty references
-     *
-     * If the criteria isn't met, an appropriate error message is provided.
-     *
      * Compares the new list with the existing list to determine if any changes
      * were made.
      *
-     * Finally, checks to see if any more items can be added.
+     * Also checks to see if any more items can be added.
      *
-     * Based on all this, the Save, Restore, and Add buttons are enabled or
+     * Based on all this, the Save and Restore are enabled or
      * disabled.
      */
     private void validate() {
-        //validateFieldData();
-    }
-
-    /*
-    private void validateFieldData() {
         boolean hasNulls = false;
-        for (DataFieldValue fv : fieldValues) {
-            if (fv == null) {
-                hasNulls = true;
-                break;
-            }
-        }
-
         boolean hasDuplicates = false;
-        String duplicateName = null;
-
-        if (!hasNulls) {
-            int cnt = fieldValues.size();
-            for (int i = 0; i < (cnt - 1); i++) {
-                for (int j = (i + 1); j < cnt; j++) {
-                    DataFieldValue f1 = fieldValues.get(i);
-                    DataFieldValue f2 = fieldValues.get(j);
-                    if (f1.getReferenceId().equals(f2.getReferenceId())) {
-                        hasDuplicates = true;
-                        duplicateName = f1.getValue().toString();
-                        break;
-                    }
-                }
-            }
-        }
 
         boolean changes = false;
         if (!hasNulls && !hasDuplicates) {
-            if (fieldValues.size() != dataInstance.getFieldValues(dataType, dataField).size()) {
+            if (listStore.getCount() != origInstance.getFieldValues(dataType, dataField).size()) {
                 changes = true;
             } else {
-                List<DataFieldValue> list = dataInstance.getFieldValues(dataType, dataField);
+                List<DataFieldValue> list = origInstance.getFieldValues(dataType, dataField);
                 for (int i = 0; i < list.size(); i++) {
-                    DataFieldValue f1 = list.get(i);
-                    DataFieldValue f2 = fieldValues.get(i);
-                    if (!f1.getReferenceId().equals(f2.getReferenceId())) {
+                    DataFieldValue fieldVal = list.get(i);
+                    DataFieldValueModel model = listStore.getAt(i);
+                    if (!equivalent(fieldVal, model)) {
                         changes = true;
                         break;
                     }
@@ -531,24 +515,61 @@ public class TabularDataEditor extends ChimeWindow {
 
         // have we hit the limit?
         int max = dataField.getMaxValues();
-        boolean maxedOut = fieldValues.size() == max && max != 0;
+        boolean maxedOut = listStore.getCount() >= max && max != 0;
 
         String errorText = "&nbsp;";
         if (hasNulls) {
             errorText = "Please fill in empty items";
         }
-        else if (hasDuplicates) {
-            errorText = "Duplicate item: " + duplicateName;
-        }
 
         errorLabel.setHtml("<div id='endslice-error-label'>" + errorText + "</div>");
-        _okButton.setEnabled(!hasDuplicates && !hasNulls && changes);
+        boolean canSave = !hasDuplicates && !hasNulls && changes;
+        _okButton.setEnabled(canSave);
+        restoreButton.setEnabled(canSave);
         addButton.setEnabled(!maxedOut);
         if (createButton != null) {
             createButton.setEnabled(!maxedOut);
         }
     }
-    */
+    
+    /**
+     * Determine if the contents of a data field value is equivalent to the contents
+     * of a data field value model.  Equivalence here refers to field by field data. 
+     */
+    private boolean equivalent(DataFieldValue fieldValue, DataFieldValueModel model) {
+    	DataInstance modelInstance = model.getDataInstance();
+    	DataInstance otherInstance = (DataInstance)fieldValue.getValue();
+    	for (DataField modelField : modelInstance.getShapes().get(0).getFields()) {
+    		DataField otherField = otherInstance.getShapes().get(0).getField(modelField.getName());
+    		List<DataFieldValue> modelValues = modelInstance.getFieldValues(modelField.getName());
+    		List<DataFieldValue> otherValues = otherInstance.getFieldValues(otherField.getName());
+    		if (modelValues.size() != otherValues.size()) {
+    			return false;
+    		}
+    		
+    		if (modelValues.size() > 0) {
+    			// modified rows will have a DataFieldValue as the value within the DataFieldValues
+    			// retrieved here.  in that case, it's those instances we want to use for comparison.
+    			DataFieldValue modelValue = modelValues.get(0);
+    			if (modelValue.getValue() instanceof DataFieldValue) {
+    				modelValue = (DataFieldValue)modelValue.getValue();
+    			}
+    			
+    			DataFieldValue otherValue = otherValues.get(0);
+    			if (otherValue.getValue() instanceof DataFieldValue) {
+    				otherValue = (DataFieldValue)otherValue.getValue();
+    			}
+    			
+    			// check for equivalence but don't include the id in that check because if the user
+    			// has already edited the value, the id will be UNKNOWN.  we don't care about that.
+    			if (!modelValue.equals(otherValue, true)) {
+    				return false;
+    			}
+    		}
+    	}
+    	
+    	return true;
+    }
 }
 
 abstract class EditorDataInputListener implements DataInputListener {

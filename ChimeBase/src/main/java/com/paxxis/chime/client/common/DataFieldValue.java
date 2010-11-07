@@ -59,7 +59,78 @@ public class DataFieldValue implements Serializable {
         id = source.getId();
         shapeId = source.getShapeId();
         referenceId = source.getReferenceId();
-        value = source.getValue();
+        
+        Serializable ser = source.getValue();
+        if (ser instanceof DataInstance) {
+        	DataInstance di = (DataInstance)ser;
+        	value = di.copy();
+        } else {
+            value = ser;
+        }
+    }
+    
+    public boolean equals(Object other) {
+    	return equals(other, false);
+    }
+    
+    public boolean equals(Object other, boolean skipId) {
+        if (this == other) {
+            return true;
+        }
+
+        if (other == null) {
+            return false;
+        }
+
+        if (other.getClass() != getClass()) {
+            return false;
+        }
+
+        DataFieldValue fieldValue = (DataFieldValue)other;
+
+        if (!skipId) {
+            if (id == null) {
+                if (fieldValue.id != null) {
+                    return false;
+                }
+            } else {
+                if (!id.equals(fieldValue.id)) {
+                    return false;
+                }
+            }
+        }
+
+        if (shapeId == null) {
+            if (fieldValue.shapeId != null) {
+                return false;
+            }
+        } else {
+            if (!shapeId.equals(fieldValue.shapeId)) {
+                return false;
+            }
+        }
+
+        if (referenceId == null) {
+            if (fieldValue.referenceId != null) {
+                return false;
+            }
+        } else {
+            if (!referenceId.equals(fieldValue.referenceId)) {
+                return false;
+            }
+        }
+
+        if (value == null) {
+            if (fieldValue.value != null) {
+                return false;
+            }
+        } else {
+            if (!value.equals(fieldValue.value)) {
+                return false;
+            }
+        }
+
+        return true;
     }
     
     public String toString() {

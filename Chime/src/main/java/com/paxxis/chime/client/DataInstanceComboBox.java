@@ -289,9 +289,8 @@ public class DataInstanceComboBox extends TwinTriggerField<DataInstanceModel> im
             list.layout();
             view.setVisible(true);
             // don't query if there's already a keystroke timer going
-            if (strokeCounter == 0)
-            {
-                findInstances(getRawValue());
+            if (strokeCounter == 0) {
+                findInstances(getRawValue(), true);
             }
         }
     }
@@ -626,6 +625,7 @@ public class DataInstanceComboBox extends TwinTriggerField<DataInstanceModel> im
     	DeferredCommand.addCommand(
 			new Command() {
 				public void execute() {
+					store.removeAll();
 			        setRawValue(txt);
 			        processKeyboardSelection(false);
 				}
@@ -909,13 +909,17 @@ public class DataInstanceComboBox extends TwinTriggerField<DataInstanceModel> im
         ServiceManager.getService().sendShapeRequest(req, callback);
     } 
     
-    public void findInstances(String startsWith)
+    public void findInstances(String startsWith) {
+    	findInstances(startsWith, false);
+    }
+    
+    public void findInstances(String startsWith, boolean force)
     {
         if (_searchable)
         {
             boolean proceed = true;
 
-            if (lastStartsWith != null)
+            if (lastStartsWith != null && !force)
             {
                 proceed = !lastStartsWith.equals(startsWith);
             }
@@ -1196,8 +1200,7 @@ protected void onSelect(DataInstanceModel model)
 
     private void processClearTrigger(ComponentEvent ce) {
         setValue((DataInstanceModel)null);
-        findInstances("");
-
+        
         if (!expanded) {
             onTwinTriggerClick(ce);
         }

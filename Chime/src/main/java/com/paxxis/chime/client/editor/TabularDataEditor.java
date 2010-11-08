@@ -29,12 +29,10 @@ import com.extjs.gxt.ui.client.store.StoreEvent;
 import com.extjs.gxt.ui.client.store.StoreListener;
 import com.extjs.gxt.ui.client.util.Margins;
 import com.extjs.gxt.ui.client.widget.Html;
-import com.extjs.gxt.ui.client.widget.LayoutContainer;
 import com.extjs.gxt.ui.client.widget.button.Button;
 import com.extjs.gxt.ui.client.widget.button.ButtonBar;
 import com.extjs.gxt.ui.client.widget.form.AdapterField;
 import com.extjs.gxt.ui.client.widget.form.DateField;
-import com.extjs.gxt.ui.client.widget.form.FormPanel;
 import com.extjs.gxt.ui.client.widget.form.NumberField;
 import com.extjs.gxt.ui.client.widget.form.TextField;
 import com.extjs.gxt.ui.client.widget.grid.CellEditor;
@@ -43,6 +41,8 @@ import com.extjs.gxt.ui.client.widget.grid.ColumnModel;
 import com.extjs.gxt.ui.client.widget.grid.GridSelectionModel;
 import com.extjs.gxt.ui.client.widget.grid.RowEditor;
 import com.extjs.gxt.ui.client.widget.grid.EditorGrid.ClicksToEdit;
+import com.extjs.gxt.ui.client.widget.layout.RowData;
+import com.extjs.gxt.ui.client.widget.layout.RowLayout;
 import com.extjs.gxt.ui.client.widget.toolbar.FillToolItem;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.DeferredCommand;
@@ -84,7 +84,6 @@ public class TabularDataEditor extends ChimeWindow {
 
     private ChimeGrid<DataFieldValueModel> fieldGrid;
     private ListStore<DataFieldValueModel> listStore = new ListStore<DataFieldValueModel>();
-    private FormPanel _form = new FormPanel();
     private ServiceManagerListener _serviceManagerListener = null;
 
     private DataInstance dataInstance;
@@ -109,6 +108,10 @@ public class TabularDataEditor extends ChimeWindow {
     protected void onRender(Element parent, int index) { 
     	super.onRender(parent, index);
     	
+    }
+    
+    protected void init() {
+    	initialize();
     	listStore.addStoreListener(
     		new StoreListener<DataFieldValueModel>() {
     			  public void storeAdd(StoreEvent<DataFieldValueModel> se) {
@@ -163,7 +166,8 @@ public class TabularDataEditor extends ChimeWindow {
         );
     }
 
-    protected void init() {
+    private void initialize() {
+    	setLayout(new RowLayout());
         setModal(true);
         setHeading("Edit " + dataField.getName() + " [" + dataType.getName() + "]");
 
@@ -173,16 +177,6 @@ public class TabularDataEditor extends ChimeWindow {
         setClosable(true);
         setResizable(false);
         setWidth(600);
-
-        _form.setHeaderVisible(false);
-        _form.setBorders(false);
-        _form.setBodyBorder(false);
-        _form.setStyleAttribute("padding", "5");
-        _form.setButtonAlign(HorizontalAlignment.CENTER);
-        _form.setFrame(true);
-        _form.setFieldWidth(450);
-        _form.setLabelWidth(85);
-        _form.setHideLabels(true);
 
         List<ColumnConfig> configs = new ArrayList<ColumnConfig>();
 
@@ -230,7 +224,7 @@ public class TabularDataEditor extends ChimeWindow {
         editor.setClicksToEdit(ClicksToEdit.TWO);
         fieldGrid.addPlugin(editor);
 
-        _form.add(fieldGrid);
+        add(fieldGrid, new RowData(1, -1, new Margins(3)));
         
         addRestoreButtonBar = new ButtonBar();
         addRestoreButtonBar.setAlignment(HorizontalAlignment.LEFT);
@@ -279,18 +273,10 @@ public class TabularDataEditor extends ChimeWindow {
         addRestoreButtonBar.add(new FillToolItem());
         addRestoreButtonBar.add(restoreButton);
 
-        _form.add(addRestoreButtonBar);
-
-        LayoutContainer c = new LayoutContainer();
-        c.setHeight(10);
-        _form.add(c);
+        add(addRestoreButtonBar, new RowData(1, -1, new Margins(3, 3, 8, 3)));
 
         errorLabel = new Html("<div id='endslice-error-label'>&nbsp;</div>");
-        _form.add(errorLabel);
-
-        c = new LayoutContainer();
-        c.setHeight(10);
-        _form.add(c);
+        add(errorLabel, new RowData(1, -1, new Margins(3, 3, 10, 3)));
 
         saveCancelButtonBar = new ButtonBar();
         saveCancelButtonBar.setAlignment(HorizontalAlignment.CENTER);
@@ -319,9 +305,7 @@ public class TabularDataEditor extends ChimeWindow {
 
         saveCancelButtonBar.add(_cancelButton);
 
-        _form.add(saveCancelButtonBar);
-        add(_form);
-
+        add(saveCancelButtonBar, new RowData(1, -1, new Margins(7, 3, 3, 3)));
         _serviceManagerListener = new ServiceManagerAdapter() {
             public void onLoginResponse(LoginResponseObject resp) {
             }

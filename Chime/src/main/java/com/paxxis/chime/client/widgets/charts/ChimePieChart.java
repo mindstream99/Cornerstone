@@ -25,10 +25,14 @@ public class ChimePieChart extends ChimeChart {
         setLayout(new RowLayout());
 
         PortletSpecification spec = getSpecification();
+        
+        String title = spec.getProperty("field").toString();
+        title = spec.getProperty("title", title).toString();
+
 	    options.setHeight(-1);
 	    options.setWidth(-1);
 	    options.setTitleFontSize(14.0); 
-	    options.setTitle(spec.getProperty("field").toString());
+	    options.setTitle(title);
 	    options.setLegend(LegendPosition.RIGHT);
 	    options.setEnableTooltip(true);
 	    options.set3D(true);

@@ -73,10 +73,13 @@ public class ChimeColumnChart extends ChimeChart {
         	}
         }
 
+        String title = spec.getProperty("field").toString();
+        title = spec.getProperty("title", title).toString();
+
 	    options.setHeight(-1);
 	    options.setWidth(-1);
 	    options.setTitleFontSize(14.0); 
-	    options.setTitle(spec.getProperty("field").toString());
+	    options.setTitle(title);
 	    options.setLegend(LegendPosition.NONE);
 	    options.setTitleY(spec.getProperty("labelY").toString());
 	    options.setAxisFontSize(12.0);

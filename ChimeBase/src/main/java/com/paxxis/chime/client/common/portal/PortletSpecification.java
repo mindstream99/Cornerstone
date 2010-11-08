@@ -25,9 +25,10 @@ import java.util.Set;
  *
  * @author Robert Englander
  */
-public class PortletSpecification implements Serializable
-{
-    public enum PortletType
+public class PortletSpecification implements Serializable {
+	private static final long serialVersionUID = 1L;
+
+	public enum PortletType
     {
         PortalPage,
         NamedSearch,
@@ -166,6 +167,15 @@ public class PortletSpecification implements Serializable
     public void setProperty(String name, Serializable value)
     {
         _properties.put(name, value);
+    }
+    
+    public Serializable getProperty(String name, Serializable defaultValue) {
+    	Serializable result = getProperty(name);
+    	if (result == null) {
+    		result = defaultValue;
+    	}
+    	
+    	return result;
     }
     
     public Serializable getProperty(String name)

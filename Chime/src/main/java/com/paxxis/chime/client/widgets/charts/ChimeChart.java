@@ -38,10 +38,10 @@ public abstract class ChimeChart extends ChimeLayoutContainer {
 	
 	public ChimeChart(PortletSpecification spec) {
 		this.spec = spec;
-                Object obj = spec.getProperty("square");
-                if (obj != null) {
-                   makeSquare = obj.toString().equals("true");
-                }
+        Object obj = spec.getProperty("square");
+        if (obj != null) {
+           makeSquare = obj.toString().equals("true");
+        }
 
 		resetData();
 	}
@@ -50,9 +50,9 @@ public abstract class ChimeChart extends ChimeLayoutContainer {
 		
 	}
 
-        protected boolean makeSquare() {
-            return makeSquare;
-        }
+    protected boolean makeSquare() {
+        return makeSquare;
+    }
 	
 	protected PortletSpecification getSpecification() {
 		return spec;

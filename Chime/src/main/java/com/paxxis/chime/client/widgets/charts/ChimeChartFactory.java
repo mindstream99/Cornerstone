@@ -86,7 +86,7 @@ public class ChimeChartFactory {
 		spec.setProperty("valueCol", valueCol);
 		spec.setProperty("min", minValue);
 		spec.setProperty("max", maxValue);
-                spec.setProperty("square", false);		
+        spec.setProperty("square", false);		
 		return create(spec);
 	}
 	

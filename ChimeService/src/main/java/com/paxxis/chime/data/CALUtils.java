@@ -50,6 +50,7 @@ import com.paxxis.chime.client.common.cal.QueryProvider;
 import com.paxxis.chime.client.common.cal.Rule;
 import com.paxxis.chime.client.common.cal.RuleSet;
 import com.paxxis.chime.client.common.cal.Runtime;
+import com.paxxis.chime.client.common.constants.TextConstants;
 import com.paxxis.chime.client.common.extension.ChimeExtension;
 import com.paxxis.chime.data.DataInstanceUtils.FetchType;
 import com.paxxis.chime.database.DatabaseConnection;
@@ -235,14 +236,8 @@ public class CALUtils {
 
         String script = values.get(0).getValue().toString();
 
-        // replace html line breaks
-        script = script.replaceAll("<br>", "\n");
-
-        // extract the text from the html
-        Parser htmlparser = Parser.createParser(script, null);
-        TextExtractingVisitor visitor = new TextExtractingVisitor();
-        htmlparser.visitAllNodesWith(visitor);
-        script = visitor.getExtractedText();
+        // replace encoded line breaks
+        script = script.replaceAll(TextConstants.NEWLINE, "\n");
 
         Rule rule = null;
         synchronized(monitor) {
@@ -342,6 +337,15 @@ public class CALUtils {
             }
 
             p.fieldName = qparam.getFieldExpression().valueAsString();
+
+            p.subShape = null;
+            IValue subFieldName = qparam.getSubFieldExpression();
+            if (subFieldName != null) {
+                DataField dataField = p.dataShape.getField(p.fieldName);
+                p.subShape = dataField.getShape();
+                p.fieldName = subFieldName.valueAsString();
+            }
+
             p.fieldValue = qparam.getValueExpression().valueAsString();
 
             switch (qparam.getOperator()) {

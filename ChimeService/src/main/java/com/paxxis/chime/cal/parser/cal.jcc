@@ -430,8 +430,9 @@ void narrowByFieldValueClause(InstructionQueue queue, Token t) :
 {
     ValueExpression.Operator operator;
     IValue shapeExp = null;
-    IValue fieldExp;
-    IValue valueExp;
+    IValue fieldExp = null;
+    IValue subFieldExp = null;
+    IValue valueExp = null;
 }
 {
     (
@@ -440,6 +441,10 @@ void narrowByFieldValueClause(InstructionQueue queue, Token t) :
     )?
     <METHODSEP>
     fieldExp = valueOperand(queue)
+    (
+        <METHODSEP>
+        subFieldExp = valueOperand(queue)
+    )?
     (
         <EQUALS> { operator = ValueExpression.Operator.VALEQUALS; }
         |
@@ -482,7 +487,7 @@ void narrowByFieldValueClause(InstructionQueue queue, Token t) :
         }
 
         Query query = (Query)rv;
-        query.addParameter(new QueryParameter(shapeExp, fieldExp, operator, valueExp));
+        query.addParameter(new QueryParameter(shapeExp, fieldExp, subFieldExp, operator, valueExp));
     }
 }
 

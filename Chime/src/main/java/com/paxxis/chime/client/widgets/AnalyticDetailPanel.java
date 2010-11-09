@@ -45,6 +45,7 @@ import com.paxxis.chime.client.common.DataInstance;
 import com.paxxis.chime.client.common.cal.DateVariable;
 import com.paxxis.chime.client.common.cal.IValue;
 import com.paxxis.chime.client.common.cal.Table;
+import com.paxxis.chime.client.common.constants.TextConstants;
 import com.paxxis.chime.client.widgets.charts.ChimeChart;
 import com.paxxis.chime.client.widgets.charts.ChimeChartFactory;
 import com.paxxis.chime.client.widgets.charts.ChimeChartFactory.ChartType;
@@ -56,8 +57,9 @@ import com.paxxis.chime.client.widgets.charts.ChimeChartFactory.ChartType;
  *
  */
 class TableRowModel extends BaseTreeModel implements Serializable {
+	private static final long serialVersionUID = 1L;
 
-    public TableRowModel(Table table, int idx) {
+	public TableRowModel(Table table, int idx) {
         List<IValue> row = table.getRow(idx);
 
         // the column header index defines the property names
@@ -104,7 +106,7 @@ public class AnalyticDetailPanel extends LayoutContainer {
             scriptContainer = new LayoutContainer();
             scriptContainer.setStyleAttribute("backgroundColor", "white");
             scriptContainer.setBorders(true);
-            scriptContainer.setScrollMode(Scroll.AUTOY);
+            scriptContainer.setScrollMode(Scroll.AUTO);
             scriptContainer.setLayout(new RowLayout());
             scriptContainer.setStyleAttribute("font", "normal 12px arial, tahoma, sans-serif");
 
@@ -146,8 +148,17 @@ public class AnalyticDetailPanel extends LayoutContainer {
             DataField field = dataInstance.getShapes().get(0).getField("Script");
             List<DataFieldValue> vals = dataInstance.getFieldValues(dataInstance.getShapes().get(0), field);
             if (vals.size() > 0) {
-                String script = vals.get(0).getValue().toString();
-                scriptHtml.setHtml(script);
+            	// replace encoded newlines, and replace all whitespace with non breaking spaces so that
+            	// the panel won't wrap the code
+            	String script = vals.get(0).getValue().toString()
+                	.replaceAll(TextConstants.NEWLINE, "<br>")
+                	.replaceAll(" ", "&nbsp;")
+                	.trim();
+            	if (script.isEmpty()) {
+                    scriptHtml.setHtml("No Script Available");
+            	} else {
+                    scriptHtml.setHtml(script);
+            	}
             } else {
                 scriptHtml.setHtml("No Script Available");
             }

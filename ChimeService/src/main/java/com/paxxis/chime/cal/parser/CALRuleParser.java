@@ -435,8 +435,9 @@ public class CALRuleParser implements CALRuleParserConstants {
   static final public void narrowByFieldValueClause(InstructionQueue queue, Token t) throws ParseException {
     ValueExpression.Operator operator;
     IValue shapeExp = null;
-    IValue fieldExp;
-    IValue valueExp;
+    IValue fieldExp = null;
+    IValue subFieldExp = null;
+    IValue valueExp = null;
     if (jj_2_6(2)) {
       shapeExp = valueOperand(queue);
     } else {
@@ -444,6 +445,15 @@ public class CALRuleParser implements CALRuleParserConstants {
     }
     jj_consume_token(METHODSEP);
     fieldExp = valueOperand(queue);
+    switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+    case METHODSEP:
+      jj_consume_token(METHODSEP);
+      subFieldExp = valueOperand(queue);
+      break;
+    default:
+      jj_la1[10] = jj_gen;
+      ;
+    }
     switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
     case EQUALS:
       jj_consume_token(EQUALS);
@@ -496,7 +506,7 @@ public class CALRuleParser implements CALRuleParserConstants {
       }
       break;
     default:
-      jj_la1[10] = jj_gen;
+      jj_la1[11] = jj_gen;
       jj_consume_token(-1);
       throw new ParseException();
     }
@@ -515,7 +525,7 @@ public class CALRuleParser implements CALRuleParserConstants {
         }
 
         Query query = (Query)rv;
-        query.addParameter(new QueryParameter(shapeExp, fieldExp, operator, valueExp));
+        query.addParameter(new QueryParameter(shapeExp, fieldExp, subFieldExp, operator, valueExp));
   }
 
   static final public void printClause(InstructionQueue queue) throws ParseException {
@@ -566,7 +576,7 @@ public class CALRuleParser implements CALRuleParserConstants {
           durable = true;
       break;
     default:
-      jj_la1[11] = jj_gen;
+      jj_la1[12] = jj_gen;
       ;
     }
     switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
@@ -575,7 +585,7 @@ public class CALRuleParser implements CALRuleParserConstants {
           dynamic = true;
       break;
     default:
-      jj_la1[12] = jj_gen;
+      jj_la1[13] = jj_gen;
       ;
     }
     if (jj_2_8(2)) {
@@ -601,7 +611,7 @@ public class CALRuleParser implements CALRuleParserConstants {
           v = valueExpression(queue);
           break;
         default:
-          jj_la1[13] = jj_gen;
+          jj_la1[14] = jj_gen;
           ;
         }
         jj_consume_token(RPAREN);
@@ -630,7 +640,7 @@ public class CALRuleParser implements CALRuleParserConstants {
             var = new ReferenceVariable(t.image);
         break;
       default:
-        jj_la1[14] = jj_gen;
+        jj_la1[15] = jj_gen;
         jj_consume_token(-1);
         throw new ParseException();
       }
@@ -659,7 +669,7 @@ public class CALRuleParser implements CALRuleParserConstants {
             queue.addInstruction(si);
       break;
     default:
-      jj_la1[15] = jj_gen;
+      jj_la1[16] = jj_gen;
       ;
     }
   }
@@ -677,7 +687,7 @@ public class CALRuleParser implements CALRuleParserConstants {
                 inst.setStringMatching(true);
       break;
     default:
-      jj_la1[16] = jj_gen;
+      jj_la1[17] = jj_gen;
       ;
     }
     jj_consume_token(LPAREN);
@@ -699,7 +709,7 @@ public class CALRuleParser implements CALRuleParserConstants {
         ;
         break;
       default:
-        jj_la1[17] = jj_gen;
+        jj_la1[18] = jj_gen;
         break label_4;
       }
     }
@@ -713,7 +723,7 @@ public class CALRuleParser implements CALRuleParserConstants {
                               inst.setDefaultCase(q);
       break;
     default:
-      jj_la1[18] = jj_gen;
+      jj_la1[19] = jj_gen;
       ;
     }
     jj_consume_token(RBRACE);
@@ -780,7 +790,7 @@ public class CALRuleParser implements CALRuleParserConstants {
       jj_consume_token(RBRACE);
       break;
     default:
-      jj_la1[19] = jj_gen;
+      jj_la1[20] = jj_gen;
       ;
     }
   }
@@ -804,7 +814,7 @@ public class CALRuleParser implements CALRuleParserConstants {
       setvariables(queue, instr);
       break;
     default:
-      jj_la1[20] = jj_gen;
+      jj_la1[21] = jj_gen;
       jj_consume_token(-1);
       throw new ParseException();
     }
@@ -821,7 +831,7 @@ public class CALRuleParser implements CALRuleParserConstants {
         ;
         break;
       default:
-        jj_la1[21] = jj_gen;
+        jj_la1[22] = jj_gen;
         break label_6;
       }
       jj_consume_token(COMMA);
@@ -854,14 +864,14 @@ public class CALRuleParser implements CALRuleParserConstants {
                isTable = true;
           break;
         default:
-          jj_la1[22] = jj_gen;
+          jj_la1[23] = jj_gen;
           jj_consume_token(-1);
           throw new ParseException();
         }
       }
       break;
     default:
-      jj_la1[23] = jj_gen;
+      jj_la1[24] = jj_gen;
       ;
     }
         RuleVariable rv = queue.getVariable(t.image);
@@ -932,7 +942,7 @@ public class CALRuleParser implements CALRuleParserConstants {
        exp.setOperator(ValueExpression.Operator.NOT, left);
       break;
     default:
-      jj_la1[24] = jj_gen;
+      jj_la1[25] = jj_gen;
       jj_consume_token(-1);
       throw new ParseException();
     }
@@ -959,7 +969,7 @@ public class CALRuleParser implements CALRuleParserConstants {
        {if (true) return t;}
       break;
     default:
-      jj_la1[25] = jj_gen;
+      jj_la1[26] = jj_gen;
       jj_consume_token(-1);
       throw new ParseException();
     }
@@ -996,7 +1006,7 @@ public class CALRuleParser implements CALRuleParserConstants {
       t = getNewLine();
       break;
     default:
-      jj_la1[26] = jj_gen;
+      jj_la1[27] = jj_gen;
       jj_consume_token(-1);
       throw new ParseException();
     }
@@ -1013,7 +1023,7 @@ public class CALRuleParser implements CALRuleParserConstants {
         ;
         break;
       default:
-        jj_la1[27] = jj_gen;
+        jj_la1[28] = jj_gen;
         break label_8;
       }
     }
@@ -1101,7 +1111,7 @@ public class CALRuleParser implements CALRuleParserConstants {
            {if (true) return ValueExpression.Operator.BOOLEQUALS;}
       break;
     default:
-      jj_la1[28] = jj_gen;
+      jj_la1[29] = jj_gen;
       jj_consume_token(-1);
       throw new ParseException();
     }
@@ -1148,7 +1158,7 @@ public class CALRuleParser implements CALRuleParserConstants {
       {if (true) return v;}
       break;
     default:
-      jj_la1[31] = jj_gen;
+      jj_la1[32] = jj_gen;
       if (jj_2_13(2)) {
         v = objectOperation(queue);
       {if (true) return v;}
@@ -1175,14 +1185,14 @@ public class CALRuleParser implements CALRuleParserConstants {
                isTable = true;
               break;
             default:
-              jj_la1[29] = jj_gen;
+              jj_la1[30] = jj_gen;
               jj_consume_token(-1);
               throw new ParseException();
             }
           }
           break;
         default:
-          jj_la1[30] = jj_gen;
+          jj_la1[31] = jj_gen;
           ;
         }
         RuleVariable rv = queue.getVariable(t.image);
@@ -1265,7 +1275,7 @@ public class CALRuleParser implements CALRuleParserConstants {
           ;
           break;
         default:
-          jj_la1[32] = jj_gen;
+          jj_la1[33] = jj_gen;
           break label_9;
         }
         jj_consume_token(COMMA);
@@ -1274,7 +1284,7 @@ public class CALRuleParser implements CALRuleParserConstants {
       }
       break;
     default:
-      jj_la1[33] = jj_gen;
+      jj_la1[34] = jj_gen;
       ;
     }
     jj_consume_token(RBRACKET);
@@ -1312,7 +1322,7 @@ public class CALRuleParser implements CALRuleParserConstants {
           exp.setMethodName(t.image); useInvoke = false;
       break;
     default:
-      jj_la1[34] = jj_gen;
+      jj_la1[35] = jj_gen;
       ;
     }
     jj_consume_token(LPAREN);
@@ -1339,7 +1349,7 @@ public class CALRuleParser implements CALRuleParserConstants {
           ;
           break;
         default:
-          jj_la1[35] = jj_gen;
+          jj_la1[36] = jj_gen;
           break label_10;
         }
         jj_consume_token(COMMA);
@@ -1348,7 +1358,7 @@ public class CALRuleParser implements CALRuleParserConstants {
       }
       break;
     default:
-      jj_la1[36] = jj_gen;
+      jj_la1[37] = jj_gen;
       ;
     }
     jj_consume_token(RPAREN);
@@ -1381,7 +1391,7 @@ public class CALRuleParser implements CALRuleParserConstants {
                          {if (true) return t.image;}
       break;
     default:
-      jj_la1[37] = jj_gen;
+      jj_la1[38] = jj_gen;
       jj_consume_token(-1);
       throw new ParseException();
     }
@@ -1540,48 +1550,13 @@ public class CALRuleParser implements CALRuleParserConstants {
     finally { jj_save(15, xla); }
   }
 
-  static private boolean jj_3R_92() {
-    if (jj_scan_token(name)) return true;
-    Token xsp;
-    xsp = jj_scanpos;
-    if (jj_3R_98()) jj_scanpos = xsp;
-    return false;
-  }
-
-  static private boolean jj_3R_62() {
-    if (jj_scan_token(STRCAT)) return true;
+  static private boolean jj_3_8() {
+    if (jj_3R_17()) return true;
     return false;
   }
 
   static private boolean jj_3_1() {
     if (jj_3R_11()) return true;
-    return false;
-  }
-
-  static private boolean jj_3R_74() {
-    if (jj_scan_token(METHODSEP)) return true;
-    if (jj_scan_token(name)) return true;
-    return false;
-  }
-
-  static private boolean jj_3R_61() {
-    if (jj_scan_token(DIV)) return true;
-    return false;
-  }
-
-  static private boolean jj_3R_31() {
-    if (jj_scan_token(ARRAY)) return true;
-    if (jj_scan_token(LPAREN)) return true;
-    return false;
-  }
-
-  static private boolean jj_3R_60() {
-    if (jj_scan_token(MULT)) return true;
-    return false;
-  }
-
-  static private boolean jj_3_8() {
-    if (jj_3R_17()) return true;
     return false;
   }
 
@@ -1647,11 +1622,6 @@ public class CALRuleParser implements CALRuleParserConstants {
     return false;
   }
 
-  static private boolean jj_3R_30() {
-    if (jj_scan_token(DYNAMIC)) return true;
-    return false;
-  }
-
   static private boolean jj_3R_19() {
     if (jj_scan_token(name)) return true;
     Token xsp;
@@ -1664,8 +1634,8 @@ public class CALRuleParser implements CALRuleParserConstants {
     return false;
   }
 
-  static private boolean jj_3R_84() {
-    if (jj_scan_token(name)) return true;
+  static private boolean jj_3R_30() {
+    if (jj_scan_token(DYNAMIC)) return true;
     return false;
   }
 
@@ -1681,6 +1651,11 @@ public class CALRuleParser implements CALRuleParserConstants {
 
   static private boolean jj_3R_29() {
     if (jj_scan_token(DURABLE)) return true;
+    return false;
+  }
+
+  static private boolean jj_3R_84() {
+    if (jj_scan_token(name)) return true;
     return false;
   }
 
@@ -1719,22 +1694,10 @@ public class CALRuleParser implements CALRuleParserConstants {
     return false;
   }
 
-  static private boolean jj_3R_55() {
-    if (jj_scan_token(SHAPE)) return true;
-    if (jj_3R_84()) return true;
-    return false;
-  }
-
   static private boolean jj_3R_36() {
     if (jj_scan_token(SET)) return true;
     if (jj_scan_token(TO)) return true;
     if (jj_3R_15()) return true;
-    return false;
-  }
-
-  static private boolean jj_3R_54() {
-    if (jj_scan_token(DATAINSTANCE)) return true;
-    if (jj_3R_84()) return true;
     return false;
   }
 
@@ -1744,20 +1707,26 @@ public class CALRuleParser implements CALRuleParserConstants {
     return false;
   }
 
-  static private boolean jj_3R_53() {
-    if (jj_scan_token(QUERY)) return true;
+  static private boolean jj_3R_55() {
+    if (jj_scan_token(SHAPE)) return true;
     if (jj_3R_84()) return true;
     return false;
   }
 
-  static private boolean jj_3R_52() {
-    if (jj_scan_token(TABLE)) return true;
+  static private boolean jj_3R_54() {
+    if (jj_scan_token(DATAINSTANCE)) return true;
     if (jj_3R_84()) return true;
     return false;
   }
 
   static private boolean jj_3R_80() {
     if (jj_scan_token(BREAK)) return true;
+    return false;
+  }
+
+  static private boolean jj_3R_53() {
+    if (jj_scan_token(QUERY)) return true;
+    if (jj_3R_84()) return true;
     return false;
   }
 
@@ -1768,14 +1737,8 @@ public class CALRuleParser implements CALRuleParserConstants {
     return false;
   }
 
-  static private boolean jj_3R_51() {
-    if (jj_scan_token(ARRAY)) return true;
-    if (jj_3R_84()) return true;
-    return false;
-  }
-
-  static private boolean jj_3R_50() {
-    if (jj_scan_token(BOOLEAN)) return true;
+  static private boolean jj_3R_52() {
+    if (jj_scan_token(TABLE)) return true;
     if (jj_3R_84()) return true;
     return false;
   }
@@ -1790,8 +1753,8 @@ public class CALRuleParser implements CALRuleParserConstants {
     return false;
   }
 
-  static private boolean jj_3R_49() {
-    if (jj_scan_token(DATE)) return true;
+  static private boolean jj_3R_51() {
+    if (jj_scan_token(ARRAY)) return true;
     if (jj_3R_84()) return true;
     return false;
   }
@@ -1801,8 +1764,8 @@ public class CALRuleParser implements CALRuleParserConstants {
     return false;
   }
 
-  static private boolean jj_3R_48() {
-    if (jj_scan_token(INTEGER)) return true;
+  static private boolean jj_3R_50() {
+    if (jj_scan_token(BOOLEAN)) return true;
     if (jj_3R_84()) return true;
     return false;
   }
@@ -1813,8 +1776,8 @@ public class CALRuleParser implements CALRuleParserConstants {
     return false;
   }
 
-  static private boolean jj_3R_47() {
-    if (jj_scan_token(DOUBLE)) return true;
+  static private boolean jj_3R_49() {
+    if (jj_scan_token(DATE)) return true;
     if (jj_3R_84()) return true;
     return false;
   }
@@ -1830,6 +1793,24 @@ public class CALRuleParser implements CALRuleParserConstants {
 
   static private boolean jj_3R_95() {
     if (jj_scan_token(DOUBLEQUOTE)) return true;
+    if (true) { jj_la = 0; jj_scanpos = jj_lastpos; return false;}
+    return false;
+  }
+
+  static private boolean jj_3R_48() {
+    if (jj_scan_token(INTEGER)) return true;
+    if (jj_3R_84()) return true;
+    return false;
+  }
+
+  static private boolean jj_3R_47() {
+    if (jj_scan_token(DOUBLE)) return true;
+    if (jj_3R_84()) return true;
+    return false;
+  }
+
+  static private boolean jj_3R_94() {
+    if (jj_scan_token(SINGLEQUOTE)) return true;
     if (true) { jj_la = 0; jj_scanpos = jj_lastpos; return false;}
     return false;
   }
@@ -1877,12 +1858,6 @@ public class CALRuleParser implements CALRuleParserConstants {
   static private boolean jj_3R_46() {
     if (jj_scan_token(STRING)) return true;
     if (jj_3R_84()) return true;
-    return false;
-  }
-
-  static private boolean jj_3R_94() {
-    if (jj_scan_token(SINGLEQUOTE)) return true;
-    if (true) { jj_la = 0; jj_scanpos = jj_lastpos; return false;}
     return false;
   }
 
@@ -1985,11 +1960,6 @@ public class CALRuleParser implements CALRuleParserConstants {
     return false;
   }
 
-  static private boolean jj_3_6() {
-    if (jj_3R_16()) return true;
-    return false;
-  }
-
   static private boolean jj_3_11() {
     if (jj_3R_18()) return true;
     if (jj_3R_16()) return true;
@@ -2001,6 +1971,11 @@ public class CALRuleParser implements CALRuleParserConstants {
     Token xsp;
     xsp = jj_scanpos;
     if (jj_3R_21()) jj_scanpos = xsp;
+    return false;
+  }
+
+  static private boolean jj_3_6() {
+    if (jj_3R_16()) return true;
     return false;
   }
 
@@ -2063,14 +2038,14 @@ public class CALRuleParser implements CALRuleParserConstants {
     return false;
   }
 
-  static private boolean jj_3R_82() {
-    if (jj_scan_token(NARROW)) return true;
-    if (jj_3R_84()) return true;
+  static private boolean jj_3R_42() {
+    if (jj_scan_token(FALSE)) return true;
     return false;
   }
 
-  static private boolean jj_3R_42() {
-    if (jj_scan_token(FALSE)) return true;
+  static private boolean jj_3R_82() {
+    if (jj_scan_token(NARROW)) return true;
+    if (jj_3R_84()) return true;
     return false;
   }
 
@@ -2131,24 +2106,8 @@ public class CALRuleParser implements CALRuleParserConstants {
     return false;
   }
 
-  static private boolean jj_3_5() {
-    if (jj_3R_15()) return true;
-    if (jj_scan_token(92)) return true;
-    return false;
-  }
-
-  static private boolean jj_3R_28() {
-    if (jj_3R_82()) return true;
-    return false;
-  }
-
   static private boolean jj_3R_73() {
     if (jj_scan_token(IS)) return true;
-    return false;
-  }
-
-  static private boolean jj_3R_27() {
-    if (jj_3R_81()) return true;
     return false;
   }
 
@@ -2157,8 +2116,8 @@ public class CALRuleParser implements CALRuleParserConstants {
     return false;
   }
 
-  static private boolean jj_3R_26() {
-    if (jj_3R_80()) return true;
+  static private boolean jj_3_5() {
+    if (jj_3R_15()) return true;
     if (jj_scan_token(92)) return true;
     return false;
   }
@@ -2168,14 +2127,14 @@ public class CALRuleParser implements CALRuleParserConstants {
     return false;
   }
 
-  static private boolean jj_3R_34() {
-    if (jj_scan_token(REFERENCE)) return true;
-    if (jj_3R_84()) return true;
+  static private boolean jj_3R_28() {
+    if (jj_3R_82()) return true;
     return false;
   }
 
-  static private boolean jj_3R_25() {
-    if (jj_3R_79()) return true;
+  static private boolean jj_3R_34() {
+    if (jj_scan_token(REFERENCE)) return true;
+    if (jj_3R_84()) return true;
     return false;
   }
 
@@ -2184,8 +2143,8 @@ public class CALRuleParser implements CALRuleParserConstants {
     return false;
   }
 
-  static private boolean jj_3R_24() {
-    if (jj_3R_78()) return true;
+  static private boolean jj_3R_27() {
+    if (jj_3R_81()) return true;
     return false;
   }
 
@@ -2206,8 +2165,9 @@ public class CALRuleParser implements CALRuleParserConstants {
     return false;
   }
 
-  static private boolean jj_3R_23() {
-    if (jj_3R_77()) return true;
+  static private boolean jj_3R_26() {
+    if (jj_3R_80()) return true;
+    if (jj_scan_token(92)) return true;
     return false;
   }
 
@@ -2222,8 +2182,8 @@ public class CALRuleParser implements CALRuleParserConstants {
     return false;
   }
 
-  static private boolean jj_3_4() {
-    if (jj_3R_14()) return true;
+  static private boolean jj_3R_25() {
+    if (jj_3R_79()) return true;
     return false;
   }
 
@@ -2232,8 +2192,8 @@ public class CALRuleParser implements CALRuleParserConstants {
     return false;
   }
 
-  static private boolean jj_3R_22() {
-    if (jj_3R_76()) return true;
+  static private boolean jj_3R_24() {
+    if (jj_3R_78()) return true;
     return false;
   }
 
@@ -2243,8 +2203,8 @@ public class CALRuleParser implements CALRuleParserConstants {
     return false;
   }
 
-  static private boolean jj_3_3() {
-    if (jj_3R_13()) return true;
+  static private boolean jj_3R_23() {
+    if (jj_3R_77()) return true;
     return false;
   }
 
@@ -2255,6 +2215,11 @@ public class CALRuleParser implements CALRuleParserConstants {
     jj_scanpos = xsp;
     if (jj_3R_99()) return true;
     }
+    return false;
+  }
+
+  static private boolean jj_3_4() {
+    if (jj_3R_14()) return true;
     return false;
   }
 
@@ -2272,6 +2237,40 @@ public class CALRuleParser implements CALRuleParserConstants {
 
   static private boolean jj_3R_83() {
     if (jj_3R_15()) return true;
+    return false;
+  }
+
+  static private boolean jj_3R_32() {
+    if (jj_scan_token(TABLE)) return true;
+    if (jj_3R_84()) return true;
+    return false;
+  }
+
+  static private boolean jj_3R_22() {
+    if (jj_3R_76()) return true;
+    return false;
+  }
+
+  static private boolean jj_3R_64() {
+    if (jj_scan_token(STREQUALS)) return true;
+    return false;
+  }
+
+  static private boolean jj_3_3() {
+    if (jj_3R_13()) return true;
+    return false;
+  }
+
+  static private boolean jj_3R_63() {
+    if (jj_scan_token(EQUALS)) return true;
+    return false;
+  }
+
+  static private boolean jj_3R_92() {
+    if (jj_scan_token(name)) return true;
+    Token xsp;
+    xsp = jj_scanpos;
+    if (jj_3R_98()) jj_scanpos = xsp;
     return false;
   }
 
@@ -2317,19 +2316,30 @@ public class CALRuleParser implements CALRuleParserConstants {
     return false;
   }
 
-  static private boolean jj_3R_32() {
-    if (jj_scan_token(TABLE)) return true;
-    if (jj_3R_84()) return true;
+  static private boolean jj_3R_62() {
+    if (jj_scan_token(STRCAT)) return true;
     return false;
   }
 
-  static private boolean jj_3R_64() {
-    if (jj_scan_token(STREQUALS)) return true;
+  static private boolean jj_3R_74() {
+    if (jj_scan_token(METHODSEP)) return true;
+    if (jj_scan_token(name)) return true;
     return false;
   }
 
-  static private boolean jj_3R_63() {
-    if (jj_scan_token(EQUALS)) return true;
+  static private boolean jj_3R_61() {
+    if (jj_scan_token(DIV)) return true;
+    return false;
+  }
+
+  static private boolean jj_3R_31() {
+    if (jj_scan_token(ARRAY)) return true;
+    if (jj_scan_token(LPAREN)) return true;
+    return false;
+  }
+
+  static private boolean jj_3R_60() {
+    if (jj_scan_token(MULT)) return true;
     return false;
   }
 
@@ -2345,7 +2355,7 @@ public class CALRuleParser implements CALRuleParserConstants {
   static private Token jj_scanpos, jj_lastpos;
   static private int jj_la;
   static private int jj_gen;
-  static final private int[] jj_la1 = new int[38];
+  static final private int[] jj_la1 = new int[39];
   static private int[] jj_la1_0;
   static private int[] jj_la1_1;
   static private int[] jj_la1_2;
@@ -2355,13 +2365,13 @@ public class CALRuleParser implements CALRuleParserConstants {
       jj_la1_init_2();
    }
    private static void jj_la1_init_0() {
-      jj_la1_0 = new int[] {0x0,0x0,0x0,0x80000000,0x0,0x0,0x100000,0x0,0x0,0x0,0x3d600000,0x0,0x0,0x2b80,0x0,0x8000,0x0,0x0,0x0,0x0,0x0,0x100000,0x2000,0x2000,0x2b80,0x0,0x180,0x0,0x3eef0000,0x2000,0x2000,0x2380,0x100000,0x2b80,0x0,0x100000,0x2b80,0x180,};
+      jj_la1_0 = new int[] {0x0,0x0,0x0,0x80000000,0x0,0x0,0x100000,0x0,0x0,0x0,0x0,0x3d600000,0x0,0x0,0x2b80,0x0,0x8000,0x0,0x0,0x0,0x0,0x0,0x100000,0x2000,0x2000,0x2b80,0x0,0x180,0x0,0x3eef0000,0x2000,0x2000,0x2380,0x100000,0x2b80,0x0,0x100000,0x2b80,0x180,};
    }
    private static void jj_la1_init_1() {
-      jj_la1_1 = new int[] {0x0,0x0,0x0,0x0,0x200000,0x0,0x0,0x0,0x800,0x19000008,0xe00000,0x40000,0x80000,0x3000,0x4004,0x0,0x0,0x10,0x80,0x2000000,0x1,0x0,0x0,0x0,0x3000,0x3000,0x0,0x100,0x0,0x0,0x0,0x3000,0x0,0x3000,0x40000000,0x0,0x3000,0x3000,};
+      jj_la1_1 = new int[] {0x0,0x0,0x0,0x0,0x200000,0x0,0x0,0x0,0x800,0x19000008,0x40000000,0xe00000,0x40000,0x80000,0x3000,0x4004,0x0,0x0,0x10,0x80,0x2000000,0x1,0x0,0x0,0x0,0x3000,0x3000,0x0,0x100,0x0,0x0,0x0,0x3000,0x0,0x3000,0x40000000,0x0,0x3000,0x3000,};
    }
    private static void jj_la1_init_2() {
-      jj_la1_2 = new int[] {0x103ffc0,0x3ffc0,0x3ffc0,0x0,0x0,0x3ffc0,0x0,0x3ffc0,0x0,0x440000,0x1,0x0,0x0,0xb800008,0xc0,0x0,0x800,0x0,0x0,0x0,0x1000000,0x0,0x0,0x0,0xb800008,0x0,0x800000,0x0,0xf,0x0,0x0,0xa800000,0x0,0xb800008,0x0,0x0,0xb800008,0xa800000,};
+      jj_la1_2 = new int[] {0x103ffc0,0x3ffc0,0x3ffc0,0x0,0x0,0x3ffc0,0x0,0x3ffc0,0x0,0x440000,0x0,0x1,0x0,0x0,0xb800008,0xc0,0x0,0x800,0x0,0x0,0x0,0x1000000,0x0,0x0,0x0,0xb800008,0x0,0x800000,0x0,0xf,0x0,0x0,0xa800000,0x0,0xb800008,0x0,0x0,0xb800008,0xa800000,};
    }
   static final private JJCalls[] jj_2_rtns = new JJCalls[16];
   static private boolean jj_rescan = false;
@@ -2385,7 +2395,7 @@ public class CALRuleParser implements CALRuleParserConstants {
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 38; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 39; i++) jj_la1[i] = -1;
     for (int i = 0; i < jj_2_rtns.length; i++) jj_2_rtns[i] = new JJCalls();
   }
 
@@ -2400,7 +2410,7 @@ public class CALRuleParser implements CALRuleParserConstants {
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 38; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 39; i++) jj_la1[i] = -1;
     for (int i = 0; i < jj_2_rtns.length; i++) jj_2_rtns[i] = new JJCalls();
   }
 
@@ -2418,7 +2428,7 @@ public class CALRuleParser implements CALRuleParserConstants {
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 38; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 39; i++) jj_la1[i] = -1;
     for (int i = 0; i < jj_2_rtns.length; i++) jj_2_rtns[i] = new JJCalls();
   }
 
@@ -2429,7 +2439,7 @@ public class CALRuleParser implements CALRuleParserConstants {
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 38; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 39; i++) jj_la1[i] = -1;
     for (int i = 0; i < jj_2_rtns.length; i++) jj_2_rtns[i] = new JJCalls();
   }
 
@@ -2446,7 +2456,7 @@ public class CALRuleParser implements CALRuleParserConstants {
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 38; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 39; i++) jj_la1[i] = -1;
     for (int i = 0; i < jj_2_rtns.length; i++) jj_2_rtns[i] = new JJCalls();
   }
 
@@ -2456,7 +2466,7 @@ public class CALRuleParser implements CALRuleParserConstants {
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 38; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 39; i++) jj_la1[i] = -1;
     for (int i = 0; i < jj_2_rtns.length; i++) jj_2_rtns[i] = new JJCalls();
   }
 
@@ -2573,7 +2583,7 @@ public class CALRuleParser implements CALRuleParserConstants {
       la1tokens[jj_kind] = true;
       jj_kind = -1;
     }
-    for (int i = 0; i < 38; i++) {
+    for (int i = 0; i < 39; i++) {
       if (jj_la1[i] == jj_gen) {
         for (int j = 0; j < 32; j++) {
           if ((jj_la1_0[i] & (1<<j)) != 0) {

@@ -106,11 +106,6 @@ public class AnalyticDetailPortlet extends PortletContainer {
 
     protected void init() {
     	super.init();
-        //fieldListener  = new FileEditorListener() {
-        //    public void onEdit(String fileId, String mimeType, String extension, long size) {
-        //        sendEdit(fileId, mimeType, extension, size);
-        //    }
-        //};
 
     	getBody().setLayout(new RowLayout());
         editButton = new ToolButton("x-tool-save");
@@ -193,7 +188,11 @@ public class AnalyticDetailPortlet extends PortletContainer {
         if (dataInstance != null) {
             DataField field = dataInstance.getShapes().get(0).getField("Script");
             List<DataFieldValue> vals = dataInstance.getFieldValues(dataInstance.getShapes().get(0), field);
-            result = (vals.size() > 0);
+            if (!vals.isEmpty()) {
+            	DataFieldValue value = vals.get(0);
+            	String script = value.getValue().toString().trim();
+            	result = !script.isEmpty();
+            }
         }
         return result;
     }

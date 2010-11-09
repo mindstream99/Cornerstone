@@ -28,15 +28,17 @@ public class QueryParameter implements Serializable {
     private ValueExpression.Operator operator;
     private IValue shapeExpression = null;
     private IValue fieldExpression = null;
+    private IValue subFieldExpression = null;
     private IValue valueExpression = null;
 
     public QueryParameter() {
     }
 
-    public QueryParameter(IValue shapeExpression, IValue fieldExpression, ValueExpression.Operator operator, IValue valueExpression) {
+    public QueryParameter(IValue shapeExpression, IValue fieldExpression, IValue subFieldExpression, ValueExpression.Operator operator, IValue valueExpression) {
         this.operator = operator;
         this.shapeExpression = shapeExpression;
         this.fieldExpression = fieldExpression;
+        this.subFieldExpression = subFieldExpression;
         this.valueExpression = valueExpression;
     }
 
@@ -56,6 +58,10 @@ public class QueryParameter implements Serializable {
 
     public IValue getFieldExpression() {
         return fieldExpression;
+    }
+
+    public IValue getSubFieldExpression() {
+        return subFieldExpression;
     }
 
     public IValue getValueExpression() {

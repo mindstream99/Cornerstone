@@ -195,7 +195,7 @@ public class VoteUtils {
             CacheManager.instance().put(user);
 
             // the owner of the instance that was voted on needs its profile updated too
-            User instanceOwner = UserUtils.getUserByName(instance.getUpdatedBy().getName(), user, database);
+            User instanceOwner = UserUtils.getUserByLoginId(instance.getUpdatedBy().getName(), user, database);
             UserUtils.updateUserProfile(instanceOwner, database);
             CacheManager.instance().put(instanceOwner);
 

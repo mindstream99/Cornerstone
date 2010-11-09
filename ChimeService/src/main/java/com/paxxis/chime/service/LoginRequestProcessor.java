@@ -17,19 +17,20 @@
 
 package com.paxxis.chime.service;
 
-import com.paxxis.chime.data.CacheManager;
-import com.paxxis.chime.data.UserUtils;
+import org.apache.log4j.Logger;
+
 import com.mysql.jdbc.CommunicationsException;
-import com.paxxis.chime.client.common.LoginRequest;
-import com.paxxis.chime.client.common.LoginResponse;
-import com.paxxis.chime.client.common.User;
-import com.paxxis.chime.database.DatabaseConnection;
-import com.paxxis.chime.database.DatabaseConnectionPool;
 import com.paxxis.chime.client.common.ErrorMessage;
 import com.paxxis.chime.client.common.InstanceId;
+import com.paxxis.chime.client.common.LoginRequest;
+import com.paxxis.chime.client.common.LoginResponse;
 import com.paxxis.chime.client.common.Message;
+import com.paxxis.chime.client.common.User;
 import com.paxxis.chime.common.MessagePayload;
-import org.apache.log4j.Logger;
+import com.paxxis.chime.data.CacheManager;
+import com.paxxis.chime.data.UserUtils;
+import com.paxxis.chime.database.DatabaseConnection;
+import com.paxxis.chime.database.DatabaseConnectionPool;
 /**
  *
  * @author Robert Englander
@@ -44,14 +45,12 @@ public class LoginRequestProcessor extends MessageProcessor {
      * Constructor
      *
      */
-    public LoginRequestProcessor(MessagePayload payloadType, DatabaseConnectionPool pool)
-    {
+    public LoginRequestProcessor(MessagePayload payloadType, DatabaseConnectionPool pool) {
         super(payloadType);
         _pool = pool;
     }
     
-    protected Message process(boolean ignorePreviousChanges)
-    {
+    protected Message process(boolean ignorePreviousChanges) {
         Object payload = getPayload();
         LoginRequest requestMessage = (LoginRequest)new LoginRequest().createInstance(payload);
         
@@ -62,18 +61,15 @@ public class LoginRequestProcessor extends MessageProcessor {
         boolean tryAgain = true;
         boolean retried = false;
         
-        while (tryAgain)
-        {
+        while (tryAgain) {
             tryAgain = false;
             LoginResponse lr = new LoginResponse();
             lr.setRequest(requestMessage);
             response = lr;
             
-            try
-            {
+            try {
                 User user = requestMessage.getUser();
-                if (user != null)
-                {
+                if (user != null) {
                     // look for the match in the cache
                     user = CacheManager.instance().getUserSession(user);
                     if (user != null) {
@@ -84,16 +80,16 @@ public class LoginRequestProcessor extends MessageProcessor {
                     // that the session doesn't exist.  if that's the case we want to
                     // return a LoginResponse with a null user, indicating to the caller
                     // that the session doesn't exist.
-                }
-                else
-                {
-                    String userName = requestMessage.getUserName();
+                } else {
+                    String loginId = requestMessage.getUserName();
                     String password = requestMessage.getPassword();
 
-                    user = UserUtils.getUserByName(userName, null, database);
+                    User admin = new User();
+                    admin.setId(User.ADMIN);
+                    user = UserUtils.getUserByLoginId(loginId, admin, database);
 
                     if (user == null || !password.equals(user.getPassword())) {
-                        throw new Exception("The user name and/or password are not valid.");
+                        throw new Exception("The login id and/or password are not valid.");
                     }
 
                 }
@@ -104,21 +100,14 @@ public class LoginRequestProcessor extends MessageProcessor {
                 }
 
                 lr.setUser(user);
-            }
-            catch (Exception e)
-            {
-                if (e.getCause() instanceof CommunicationsException)
-                {
-                    if (!retried && !database.isConnected())
-                    {
+            } catch (Exception e) {
+                if (e.getCause() instanceof CommunicationsException) {
+                    if (!retried && !database.isConnected()) {
                         retried = true;
                         tryAgain = true;
-                        
                         _pool.connect(database);
                     }
-                }
-                else
-                {
+                } else {
                     ErrorMessage em = new ErrorMessage();
                     em.setMessage(e.getMessage());
                     response = em;

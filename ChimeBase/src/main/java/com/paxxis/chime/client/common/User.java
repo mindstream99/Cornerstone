@@ -33,6 +33,7 @@ public class User extends DataInstance {
     public static final String EMAILADDR_FIELD = "Email Address";
     public static final String HOME_FIELD = "Home";
     public static final String FAVORITES_FIELD = "Favorites";
+    public static final String LOGINID = "Login ID";
 
     public static final InstanceId SYSTEM = InstanceId.create("19900");
     public static final InstanceId ADMIN = InstanceId.create("19800");
@@ -255,6 +256,18 @@ public class User extends DataInstance {
         }
 
         return email;
+    }
+
+    public String getLoginId() {
+        Shape type = getShapes().get(0);
+        DataField field = type.getField(User.LOGINID);
+        List<DataFieldValue> values = getFieldValues(type, field);
+        String id = "";
+        if (values.size() > 0) {
+            id = values.get(0).getValue().toString();
+        }
+
+        return id;
     }
 
     public DataInstance getHome() {

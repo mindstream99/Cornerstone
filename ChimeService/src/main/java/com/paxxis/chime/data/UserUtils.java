@@ -21,17 +21,21 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.paxxis.chime.client.common.Community;
-import com.paxxis.chime.client.common.DataInstance;
+import com.paxxis.chime.client.common.DataInstanceRequest;
 import com.paxxis.chime.client.common.FieldData;
 import com.paxxis.chime.client.common.InstanceId;
+import com.paxxis.chime.client.common.Parameter;
 import com.paxxis.chime.client.common.Scope;
 import com.paxxis.chime.client.common.Shape;
 import com.paxxis.chime.client.common.User;
 import com.paxxis.chime.client.common.UserProfile;
+import com.paxxis.chime.client.common.DataInstanceRequest.ClauseOperator;
+import com.paxxis.chime.client.common.DataInstanceRequest.SortOrder;
 import com.paxxis.chime.database.DataSet;
 import com.paxxis.chime.database.DatabaseConnection;
 import com.paxxis.chime.database.IDataValue;
 import com.paxxis.chime.database.StringData;
+import com.paxxis.chime.service.InstancesResponse;
 import com.paxxis.chime.service.Tools;
 
 /**
@@ -43,31 +47,38 @@ public class UserUtils {
     private UserUtils() {
     }
 
-    public static User createUser(String name, String description, String password, User user, DatabaseConnection database) throws Exception {
+    public static User createUser(String name, String loginId, String description, String password, User user, DatabaseConnection database) throws Exception {
 
         database.startTransaction();
         User newUser = null;
 
         try {
-            Shape userShape = ShapeUtils.getInstance("User", database, true);
+            Shape userShape = ShapeUtils.getInstanceById(Shape.USER_ID, database, true);
             List<Shape> shapes = new ArrayList<Shape>();
             shapes.add(userShape);
 
             // everyone can see the user
-            // after creation we need to modify the scope so that the user can edit his/herself
+            // after creation we need to modify the scope so that the user can edit him/herself
             List<Scope> scopes = new ArrayList<Scope>();
             scopes.add(new Scope(Community.Global, Scope.Permission.R));
 
             String sqlInserts[] = {"charVal", "'" + password + "'"};
 
+            List<FieldData> dataList = new ArrayList<FieldData>();
+            FieldData fieldData = new FieldData();
+            fieldData.shape = userShape;
+            fieldData.field = userShape.getField(User.LOGINID);
+            fieldData.value = loginId;
+            dataList.add(fieldData);
+            
             newUser = (User)DataInstanceUtils.createInstance(shapes, name,
                     description, null, sqlInserts,
-                    new ArrayList<FieldData>(), scopes, user, database);
+                    dataList, scopes, user, database);
 
             // ok, now modify the scopes
             ScopeUtils.applyScope(newUser.getId(), new Scope(new Community(newUser.getId()), Scope.Permission.RU), database);
 
-            newUser = getUserByName(name, user, database);
+            newUser = getUserById(newUser.getId(), user, database);
             database.commitTransaction();
         } catch (Exception e) {
             database.rollbackTransaction();
@@ -115,24 +126,24 @@ public class UserUtils {
         return result;
     }
 
-    public static User getUserByName(String name, User user, DatabaseConnection database) throws Exception
-    {
-        String sql = "select * from Chime.DataInstance where name = '" + name + "'";
+    public static User getUserByLoginId(String loginId, User user, DatabaseConnection database) throws Exception {
 
-        InstancesBundle bundle = DataInstanceUtils.getInstances(sql, null, user, database, true);
+    	// the index doesn't support exact matching, so we use a Contains operator.  login ids can't have spaces,
+    	// so this will actually provide the result we want.
+    	List<Parameter> params = new ArrayList<Parameter>();
+    	Parameter param = new Parameter();
+    	param.dataShape = ShapeUtils.getInstanceById(Shape.USER_ID, database, true);
+    	param.fieldName = "Login ID";
+    	param.fieldValue = loginId;
+    	param.operator = DataInstanceRequest.Operator.Contains;
+    	param.subShape = null;
+    	params.add(param);
+    	InstancesResponse response = SearchUtils.getInstancesByIndex(User.class, params, ClauseOperator.MatchAll, 
+    			user, false, false, null, SortOrder.ByName, database);
+    	
         User result = null;
-
-        // TODO this is a horrible hack, and MUST be fixed
-
-        // go through the bundle looking for 1 that is a User
-        for (DataInstance inst : bundle.getInstances()) {
-            if (inst.getShapes().get(0).getId().equals(Shape.USER_ID)) {
-                result = (User)inst;
-                break;
-            }
-        }
-
-        if (result != null) {
+        if (!response.list.isEmpty()) {
+            result = getUserById(((User)response.list.get(0)).getId(), user, database);
             updateUserProfile(result, database);
         }
         

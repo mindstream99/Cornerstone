@@ -48,6 +48,7 @@ import com.paxxis.chime.client.common.EditUserResponse;
 import com.paxxis.chime.client.common.Shape;
 import com.paxxis.chime.client.common.ShapeRequest;
 import com.paxxis.chime.client.common.User;
+import com.paxxis.chime.client.common.DataInstanceRequest.ClauseOperator;
 import com.paxxis.chime.client.common.constants.SearchFieldConstants;
 import com.paxxis.chime.client.pages.PageManager;
 import com.paxxis.chime.client.widgets.ChimeMessageBox;
@@ -78,6 +79,7 @@ public class UserCreatorWindow extends ChimeWindow
     //private FieldSet visibilitySet;
     private ServiceManagerListener _serviceManagerListener = null;
     private TextField<String> nameField;
+    private TextField<String> loginIdField;
     private TextField<String> passwordField;
     private UserCreationListener creationListener = null;
     private Shape userShape = null;
@@ -142,6 +144,23 @@ public class UserCreatorWindow extends ChimeWindow
         };
 
         _form.add(nameField);
+
+        loginIdField = new TextField<String>();
+        loginIdField.setFieldLabel("Login ID");
+        new KeyNav(loginIdField) {
+            @Override
+            public void onKeyPress(final ComponentEvent cd) {
+                DeferredCommand.addCommand(
+                    new Command() {
+                        public void execute() {
+                            validate();
+                        }
+                    }
+                );
+            }
+        };
+
+        _form.add(loginIdField);
 
         passwordField = new TextField<String>();
         passwordField.setPassword(true);
@@ -229,11 +248,11 @@ public class UserCreatorWindow extends ChimeWindow
                     DataInstanceResponse response = resp.getResponse();
                     List<DataInstance> instances = response.getDataInstances();
 
-                    // if there are others with this name, ask the user to confirm the create.
+                    // if there are others with this name or login id, ask the user to confirm the create.
                     // in the future, we'll show them to the user as part of the confirmation
                     int count = instances.size();
                     if (count > 0) {
-                        String msg = "There is already a user with this name.";
+                        String msg = "There is already a user with this name or login id.";
 
                         ChimeMessageBox.alert("Create User", msg, null);
                     } else {
@@ -247,7 +266,9 @@ public class UserCreatorWindow extends ChimeWindow
 
         DataInstanceRequest request = new DataInstanceRequest();
         request.setUser(ServiceManager.getActiveUser());
+        request.setClauseOperator(ClauseOperator.MatchAny);
         request.addQueryParameter(userShape, SearchFieldConstants.NAME, nameField.getValue().trim());
+        request.addQueryParameter(userShape, User.LOGINID, loginIdField.getValue().trim());
         ServiceManager.getService().sendDataInstanceRequest(request, callback);
     }
 
@@ -274,6 +295,7 @@ public class UserCreatorWindow extends ChimeWindow
         req.setUser(ServiceManager.getActiveUser());
 
         req.setName(nameField.getValue().trim());
+        req.setLoginId(loginIdField.getValue().trim());
         req.setDescription(descriptionField.getValue());
         req.setPassword(passwordField.getValue());
         req.setOperation(EditUserRequest.Operation.Create);
@@ -284,11 +306,13 @@ public class UserCreatorWindow extends ChimeWindow
 
     private void validate() {
         String name = nameField.getValue();
+        String loginId = loginIdField.getValue();
         String pw = passwordField.getValue();
         String desc = descriptionField.getValue();
         boolean valid = name != null && name.trim().length() > 0 &&
-                pw != null && pw.trim().length() > 0 &&
-                desc != null && desc.trim().length() > 0;
+        				loginId != null && loginId.trim().length() > 0 &&
+                        pw != null && pw.trim().length() > 0 &&
+                        desc != null && desc.trim().length() > 0;
         _okButton.setEnabled(valid && userShape != null);
     }
     protected void handleLoginResponse(final LoginResponseObject resp)

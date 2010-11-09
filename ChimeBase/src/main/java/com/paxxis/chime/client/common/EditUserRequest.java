@@ -22,7 +22,8 @@ package com.paxxis.chime.client.common;
  * @author Robert Englander
  */
 public class EditUserRequest extends RequestMessage {
-    private final static int VERSION = 1;
+	private static final long serialVersionUID = 1L;
+	private final static int VERSION = 1;
 
     @Override
     public MessageConstants.MessageType getMessageType() {
@@ -52,6 +53,7 @@ public class EditUserRequest extends RequestMessage {
     private User _user = null;
     private Operation _op = Operation.Create;
     private String _name = null;
+    private String _loginId = null;
     private String _password = null;
     private String _oldPassword = null;
     private String _description = null;
@@ -79,6 +81,14 @@ public class EditUserRequest extends RequestMessage {
 
     public void setName(String name) {
         _name = name;
+    }
+
+    public String getLoginId() {
+        return _loginId;
+    }
+
+    public void setLoginId(String id) {
+        _loginId = id;
     }
 
     public String getPassword() {

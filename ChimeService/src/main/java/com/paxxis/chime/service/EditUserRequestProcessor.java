@@ -17,22 +17,20 @@
 
 package com.paxxis.chime.service;
 
-import com.paxxis.chime.data.UserUtils;
+import org.apache.log4j.Logger;
+
+import com.mysql.jdbc.CommunicationsException;
 import com.paxxis.chime.client.common.DataInstanceEvent;
-import com.paxxis.chime.client.common.DataInstanceEvent.EventType;
 import com.paxxis.chime.client.common.EditUserRequest;
 import com.paxxis.chime.client.common.EditUserResponse;
 import com.paxxis.chime.client.common.ErrorMessage;
 import com.paxxis.chime.client.common.Message;
 import com.paxxis.chime.client.common.User;
+import com.paxxis.chime.client.common.DataInstanceEvent.EventType;
+import com.paxxis.chime.common.MessagePayload;
+import com.paxxis.chime.data.UserUtils;
 import com.paxxis.chime.database.DatabaseConnection;
 import com.paxxis.chime.database.DatabaseConnectionPool;
-import com.paxxis.chime.service.MessageProcessor;
-import com.paxxis.chime.service.NotificationTopicSender;
-import com.mysql.jdbc.CommunicationsException;
-import com.paxxis.chime.common.MessagePayload;
-import com.paxxis.chime.service.ServiceBusMessageProducer;
-import org.apache.log4j.Logger;
 
 /**
  *
@@ -86,7 +84,7 @@ public class EditUserRequestProcessor extends MessageProcessor {
                 if (requestMessage.getOperation() == EditUserRequest.Operation.Create)
                 {
                     long start = System.currentTimeMillis();
-                    User newUser = UserUtils.createUser(requestMessage.getName(),
+                    User newUser = UserUtils.createUser(requestMessage.getName(), requestMessage.getLoginId(),
                                             requestMessage.getDescription(), requestMessage.getPassword(), user, database);
                     long end = System.currentTimeMillis();
                     _logger.info("User created in " + (end - start) + " msecs");

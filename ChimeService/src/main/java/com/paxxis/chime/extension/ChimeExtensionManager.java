@@ -234,7 +234,7 @@ public class ChimeExtensionManager implements ExtensionContext {
                 user.setName("admin");
 
                 DatabaseConnection dbconn = dbPool.borrowInstance(this);
-                User extuser = UserUtils.getUserByName(def.getUserName(), user, dbconn);
+                User extuser = UserUtils.getUserByLoginId(def.getUserName(), user, dbconn);
                 extuser.setSessionToken(Tools.PERMANENT_SESSIONTOKEN);
                 Community extcomm = null;
                 for (Community c : extuser.getCommunities()) {

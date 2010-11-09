@@ -1033,6 +1033,7 @@ public class SearchUtils {
     }
 
     static boolean firstTime = true;
+    static boolean loadExtensions = true;
     static IndexReader[] readers;
 
     public static List<String> getInstanceHitIds(Class instanceClass, List<Parameter> params, ClauseOperator clauseOperator,
@@ -1058,19 +1059,22 @@ public class SearchUtils {
     private static MultiSearcher getSearcher() throws Exception {
         String[] indexNames = Indexer.getIndexNames();
 
-        if (firstTime) {
+        if (loadExtensions) {
             List<IndexReader> extReaders = new ArrayList<IndexReader>();
             ChimeExtensionManager extMgr = ChimeExtensionManager.instance();
-            for (ChimeExtension ext : extMgr.getExtensions()) {
-                MemoryIndexer indexer = ext.getMemoryIndexer();
-                if (indexer != null) {
-                    if (indexer instanceof ChimeMemoryIndexer) {
-                        ChimeMemoryIndexer memIndexer = (ChimeMemoryIndexer)indexer;
-                        RAMDirectory ramdir = memIndexer.getRamDirectory();
-                        IndexReader reader = IndexReader.open(ramdir);
-                        extReaders.add(reader);
-                    }
-                }
+            if (extMgr != null){
+	            for (ChimeExtension ext : extMgr.getExtensions()) {
+	                MemoryIndexer indexer = ext.getMemoryIndexer();
+	                if (indexer != null) {
+	                    if (indexer instanceof ChimeMemoryIndexer) {
+	                        ChimeMemoryIndexer memIndexer = (ChimeMemoryIndexer)indexer;
+	                        RAMDirectory ramdir = memIndexer.getRamDirectory();
+	                        IndexReader reader = IndexReader.open(ramdir);
+	                        extReaders.add(reader);
+	                    }
+	                }
+	            }
+	            loadExtensions = false;
             }
 
             readers = new IndexReader[indexNames.length + extReaders.size()];
@@ -1099,7 +1103,7 @@ public class SearchUtils {
 
 
         searcher = new MultiSearcher(searchers);
-        firstTime = false;
+        if (!loadExtensions) firstTime = false;
         return searcher;
     }
 
@@ -1333,50 +1337,7 @@ public class SearchUtils {
 
         try
         {
-            String[] indexNames = Indexer.getIndexNames();
-
-            if (firstTime) {
-                List<IndexReader> extReaders = new ArrayList<IndexReader>();
-                ChimeExtensionManager extMgr = ChimeExtensionManager.instance();
-                for (ChimeExtension ext : extMgr.getExtensions()) {
-                    MemoryIndexer indexer = ext.getMemoryIndexer();
-                    if (indexer != null) {
-                        if (indexer instanceof ChimeMemoryIndexer) {
-                            ChimeMemoryIndexer memIndexer = (ChimeMemoryIndexer)indexer;
-                            RAMDirectory ramdir = memIndexer.getRamDirectory();
-                            IndexReader reader = IndexReader.open(ramdir);
-                            extReaders.add(reader);
-                        }
-                    }
-                }
-
-                readers = new IndexReader[indexNames.length + extReaders.size()];
-                int j = 0;
-                for (int i = indexNames.length; i < readers.length; i++) {
-                    readers[i] = extReaders.get(j++);
-                }
-            }
-
-            Searcher[] searchers = new Searcher[readers.length];
-            MultiSearcher searcher = null;
-            for (int i = 0; i < searchers.length; i++) {
-                if (firstTime && i < indexNames.length) {
-                    readers[i] = IndexReader.open("index/" + indexNames[i]);
-                } else {
-                    IndexReader newReader = readers[i].reopen();
-                    if (newReader != readers[i]) {
-                        readers[i].close();
-                        readers[i] = newReader;
-                    }
-                }
-
-                Searcher s = new IndexSearcher(readers[i]);
-                searchers[i] = s;
-            }
-
-
-            searcher = new MultiSearcher(searchers);
-            firstTime = false;
+            MultiSearcher searcher = getSearcher();
 
             TopFieldDocs referenceHits = getInstanceHitsByIndex(readers, searcher, params, ClauseOperator.MatchAny, user, false, false, sortOrder, 101);
             int len = referenceHits.scoreDocs.length;
@@ -1389,7 +1350,6 @@ public class SearchUtils {
                 referenceIds[i] = doc.get("instanceid");
             }
 
-            searcher = new MultiSearcher(searchers);
             ChimeAnalyzer analyzer = new ChimeAnalyzer();
 
             List<String> terms = new ArrayList<String>();

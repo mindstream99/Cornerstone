@@ -31,6 +31,7 @@ import com.paxxis.chime.client.common.User;
 import com.paxxis.chime.client.common.UserProfile;
 import com.paxxis.chime.client.common.DataInstanceRequest.ClauseOperator;
 import com.paxxis.chime.client.common.DataInstanceRequest.SortOrder;
+import com.paxxis.chime.client.common.constants.SearchFieldConstants;
 import com.paxxis.chime.database.DataSet;
 import com.paxxis.chime.database.DatabaseConnection;
 import com.paxxis.chime.database.IDataValue;
@@ -133,7 +134,14 @@ public class UserUtils {
     	List<Parameter> params = new ArrayList<Parameter>();
     	Parameter param = new Parameter();
     	param.dataShape = ShapeUtils.getInstanceById(Shape.USER_ID, database, true);
-    	param.fieldName = "Login ID";
+
+        // if the login id is 'system', we match by name instead of id.  this is done so that
+        // therre will always be a way to login.
+        if ("system".equals(loginId)) {
+            param.fieldName = SearchFieldConstants.NAME;
+        } else {
+            param.fieldName = User.LOGINID;
+        }
     	param.fieldValue = loginId;
     	param.operator = DataInstanceRequest.Operator.Contains;
     	param.subShape = null;

@@ -17,7 +17,10 @@
 
 package com.paxxis.chime.service;
 
-import com.paxxis.chime.data.CacheManager;
+import java.util.HashMap;
+
+import org.apache.log4j.Logger;
+
 import com.paxxis.chime.client.common.AddCommentRequest;
 import com.paxxis.chime.client.common.ApplyReviewRequest;
 import com.paxxis.chime.client.common.ApplyTagRequest;
@@ -26,34 +29,33 @@ import com.paxxis.chime.client.common.BuildIndexRequestMessage;
 import com.paxxis.chime.client.common.CommentsRequest;
 import com.paxxis.chime.client.common.CreateDiscussionRequest;
 import com.paxxis.chime.client.common.DataInstanceRequest;
-import com.paxxis.chime.client.common.EditShapeRequest;
-import com.paxxis.chime.client.common.ShapeRequest;
 import com.paxxis.chime.client.common.DiscussionsRequest;
 import com.paxxis.chime.client.common.EditCommunityRequest;
 import com.paxxis.chime.client.common.EditDataInstanceRequest;
+import com.paxxis.chime.client.common.EditShapeRequest;
 import com.paxxis.chime.client.common.EditUserRequest;
 import com.paxxis.chime.client.common.FindInstancesRequest;
-import com.paxxis.chime.client.common.FindTagsRequest;
 import com.paxxis.chime.client.common.FindShapesRequest;
+import com.paxxis.chime.client.common.FindTagsRequest;
 import com.paxxis.chime.client.common.LockRequest;
 import com.paxxis.chime.client.common.LoginRequest;
 import com.paxxis.chime.client.common.LogoutRequest;
-import com.paxxis.chime.client.common.MultiRequest;
-import com.paxxis.chime.client.common.ReviewsRequest;
-import com.paxxis.chime.client.common.UserContextRequest;
-import com.paxxis.chime.database.DatabaseConnectionPool;
 import com.paxxis.chime.client.common.MessageConstants;
 import com.paxxis.chime.client.common.MessageConstants.MessageType;
 import com.paxxis.chime.client.common.MessageConstants.PayloadType;
+import com.paxxis.chime.client.common.MultiRequest;
 import com.paxxis.chime.client.common.PingRequest;
+import com.paxxis.chime.client.common.ReviewsRequest;
 import com.paxxis.chime.client.common.RunCALScriptRequest;
+import com.paxxis.chime.client.common.ShapeRequest;
 import com.paxxis.chime.client.common.SubscribeRequest;
+import com.paxxis.chime.client.common.UserContextRequest;
 import com.paxxis.chime.client.common.UserMessagesRequest;
 import com.paxxis.chime.common.JavaObjectPayload;
 import com.paxxis.chime.common.MessagePayload;
+import com.paxxis.chime.data.CacheManager;
+import com.paxxis.chime.database.DatabaseConnectionPool;
 import com.paxxis.chime.indexing.BuildIndexRequestProcessor;
-import java.util.HashMap;
-import org.apache.log4j.Logger;
 
 /**
  * 
@@ -64,6 +66,7 @@ public class RequestMessageHandler extends ServiceBusMessageHandler {
 
     // the database connection pool
     private DatabaseConnectionPool _databasePool;
+    private LdapContextFactory _ldapContextFactory;
 
     // the topic sender to use to send events 
     NotificationTopicSender _topicSender = null;
@@ -120,7 +123,7 @@ public class RequestMessageHandler extends ServiceBusMessageHandler {
                 {
                     if (mtype == LoginRequest.messageType())
                     {
-                        return new LoginRequestProcessor(mPayload, _databasePool);
+                        return new LoginRequestProcessor(mPayload, _databasePool, _ldapContextFactory);
                     }
                     else if (mtype == LogoutRequest.messageType())
                     {
@@ -242,7 +245,15 @@ public class RequestMessageHandler extends ServiceBusMessageHandler {
         _databasePool = pool;
     }
     
-    public void setEventNotifier(NotificationTopicSender sender)
+    public void setLdapContextFactory(LdapContextFactory ldapContextFactory) {
+		_ldapContextFactory = ldapContextFactory;
+	}
+
+	public LdapContextFactory getLdapContextFactory() {
+		return _ldapContextFactory;
+	}
+
+	public void setEventNotifier(NotificationTopicSender sender)
     {
         _topicSender = sender;
     }

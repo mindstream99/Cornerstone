@@ -130,6 +130,11 @@ set the bean's chimeConfiguration property.
                 <entry key="chime.service.JndiInitialContextFactory.providerUrl" value="discovery://(multicast://default)"/>
                 -->
                 <entry key="chime.service.JndiInitialContextFactory.providerUrl" value="vm://localhost"/>
+                
+                <!-- entry key="chime.service.ldap.contextFactory" value="com.sun.jndi.ldap.LdapCtxFactory"/>
+                <entry key="chime.service.ldap.url" value="ldap://nycdc01.vibrant.corp:389"/>
+                <entry key="chime.service.ldap.principalSuffix" value="@vibrant.corp"/>
+                <entry key="chime.service.ldap.authType" value="simple"/-->
             </map>
         </property>
     </bean>
@@ -158,6 +163,19 @@ set the bean's chimeConfiguration property.
         <property name="sweepCycle" value="0.5"/>
     </bean>
 
+	<bean id="ldapContextFactory" class="com.paxxis.chime.service.LdapContextFactory">
+        <property name="configurationPropertyMap">
+            <map>
+               <entry key="contextFactory" value="chime.service.ldap.contextFactory"/>
+               <entry key="url" value="chime.service.ldap.url"/>
+               <entry key="principalSuffix" value="chime.service.ldap.principalSuffix"/>
+               <entry key="authType" value="chime.service.ldap.authType"/>
+            </map>
+        </property>
+        <property name="ldapEnabled" value="false"/>
+        <property name="chimeConfiguration" ref="chimeConfiguration"/>
+    </bean>
+    
 	<bean id="licenseProcessor" class="com.paxxis.chime.license.LicenseProcessor">
         <property name="chimeConfiguration" ref="chimeConfiguration"/>
 	</bean>
@@ -242,6 +260,7 @@ set the bean's chimeConfiguration property.
         <property name="chimeConfiguration" ref="chimeConfiguration"/>
         <property name="connectionPool" ref="connectionPool"/>
         <property name="eventNotifier" ref="chimeEventNotifier"/>
+        <property name="ldapContextFactory"   ref="ldapContextFactory"/>
 
         <!-- override configuration values -->
         <property name="poolSize" value="5"/>

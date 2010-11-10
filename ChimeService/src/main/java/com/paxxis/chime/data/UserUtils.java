@@ -22,6 +22,8 @@ import java.util.List;
 
 import com.paxxis.chime.client.common.Community;
 import com.paxxis.chime.client.common.DataInstanceRequest;
+import com.paxxis.chime.client.common.DataInstanceRequest.ClauseOperator;
+import com.paxxis.chime.client.common.DataInstanceRequest.SortOrder;
 import com.paxxis.chime.client.common.FieldData;
 import com.paxxis.chime.client.common.InstanceId;
 import com.paxxis.chime.client.common.Parameter;
@@ -29,16 +31,14 @@ import com.paxxis.chime.client.common.Scope;
 import com.paxxis.chime.client.common.Shape;
 import com.paxxis.chime.client.common.User;
 import com.paxxis.chime.client.common.UserProfile;
-import com.paxxis.chime.client.common.DataInstanceRequest.ClauseOperator;
-import com.paxxis.chime.client.common.DataInstanceRequest.SortOrder;
 import com.paxxis.chime.client.common.constants.SearchFieldConstants;
 import com.paxxis.chime.database.DataSet;
 import com.paxxis.chime.database.DatabaseConnection;
 import com.paxxis.chime.database.IDataValue;
 import com.paxxis.chime.database.StringData;
 import com.paxxis.chime.service.InstancesResponse;
+import com.paxxis.chime.service.LdapContextFactory;
 import com.paxxis.chime.service.Tools;
-
 /**
  *
  * @author Robert Englander
@@ -198,4 +198,19 @@ public class UserUtils {
         dataSet.close();
     }
 
+    public static boolean authenticateUser(String loginId, String password, User user, LdapContextFactory ldap){
+    	boolean authenticated = false;
+    	if (user.getId().equals(User.SYSTEM) || !ldap.isLdapEnabled()) {
+    		authenticated = (password.equals(user.getPassword()));
+        } else {
+        	try {
+	    		if (ldap.getContext(loginId, password)!=null){
+	    			authenticated = true;
+	    		}    		
+	    	} catch(Exception ex){
+	    		
+	    	}
+        }
+    	return authenticated;
+    }
 }

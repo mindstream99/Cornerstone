@@ -21,7 +21,6 @@ import org.apache.log4j.Logger;
 
 import com.mysql.jdbc.CommunicationsException;
 import com.paxxis.chime.client.common.ErrorMessage;
-import com.paxxis.chime.client.common.InstanceId;
 import com.paxxis.chime.client.common.LoginRequest;
 import com.paxxis.chime.client.common.LoginResponse;
 import com.paxxis.chime.client.common.Message;
@@ -40,14 +39,16 @@ public class LoginRequestProcessor extends MessageProcessor {
 
     // the database connection pool
     DatabaseConnectionPool _pool;
+    LdapContextFactory _ldap;
     
     /**
      * Constructor
      *
      */
-    public LoginRequestProcessor(MessagePayload payloadType, DatabaseConnectionPool pool) {
+    public LoginRequestProcessor(MessagePayload payloadType, DatabaseConnectionPool pool, LdapContextFactory ldap) {
         super(payloadType);
         _pool = pool;
+        _ldap = ldap;
     }
     
     protected Message process(boolean ignorePreviousChanges) {
@@ -87,8 +88,8 @@ public class LoginRequestProcessor extends MessageProcessor {
                     User admin = new User();
                     admin.setId(User.ADMIN);
                     user = UserUtils.getUserByLoginId(loginId, admin, database);
-
-                    if (user == null || !password.equals(user.getPassword())) {
+                    
+                    if (user == null || !UserUtils.authenticateUser(loginId, password, user, _ldap)) {
                         throw new Exception("The login id and/or password are not valid.");
                     }
 

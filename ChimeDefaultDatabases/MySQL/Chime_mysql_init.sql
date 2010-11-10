@@ -69,6 +69,7 @@ INSERT INTO `Chime`.`ChimeSchema` VALUES  ('100','800',NULL,1,1,'Community','900
  ('4c4fbffe70994ed0bf43c9f410efca6500','f574d270d05146ba9fe55bbbeacec8e300',NULL,3,NULL,'Retention Days','300',1,'The number of days to retain events of this type (0 means forever, and blank means never).','N','Y'),
  ('500','800',NULL,2,2,'Community Moderator','900',0,'Community Moderator','N','N'),
  ('600','900',NULL,1,1,'Favorites','2000',0,'Favorite Content','N','Y'),
+ ('700', '800', NULL, 6, 6, 'Login ID', '200', 1, 'The ID used to log into Chime.', 'N', 'N'),
  ('800','1200',NULL,1,1,'TemplateDefinition','200',1,'The template definition','Y','N'),
  ('9f349cf32a554c96993f2d02acb0a4e900','f574d270d05146ba9fe55bbbeacec8e300',NULL,2,NULL,'Periodic Notification','900',0,'Communities whose periodic notifications will include this event.','N','Y'),
  ('e6cb20e100b8453194c65107fdb9a27a00','f574d270d05146ba9fe55bbbeacec8e300',NULL,1,NULL,'Immediate Notification','900',0,'Communities that will be notified immediately when this event occurs.','N','Y'),

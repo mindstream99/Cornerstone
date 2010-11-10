@@ -214,7 +214,8 @@ CREATE TABLE  `Chime`.`DataInstance_History` (
 
 /*!40000 ALTER TABLE `DataInstance_History` DISABLE KEYS */;
 LOCK TABLES `DataInstance_History` WRITE;
-INSERT INTO `Chime`.`DataInstance_History` VALUES  ('100000200','100000200','19900','system','Create','2010-02-26 10:33:11'),
+INSERT INTO `Chime`.`DataInstance_History` VALUES  
+ ('100000200','100000200','19900','system','Create','2010-02-26 10:33:11',''),
  ('100000300','100000300','19800','admin','Create','2010-02-26 14:19:42',''),
  ('100000400','100000400','19800','admin','Create','2010-05-15 12:08:59',''),
  ('100000500','100000500','19800','admin','Create','2010-05-15 12:09:46',''),

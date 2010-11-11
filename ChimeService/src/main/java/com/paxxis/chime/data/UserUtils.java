@@ -49,6 +49,10 @@ public class UserUtils {
     }
 
     public static User createUser(String name, String loginId, String description, String password, User user, DatabaseConnection database) throws Exception {
+    	return createUser(name, loginId, description, password, null, user, database);
+    }
+    
+    public static User createUser(String name, String loginId, String description, String password, String emailAddress, User user, DatabaseConnection database) throws Exception {
 
         database.startTransaction();
         User newUser = null;
@@ -71,6 +75,14 @@ public class UserUtils {
             fieldData.field = userShape.getField(User.LOGINID);
             fieldData.value = loginId;
             dataList.add(fieldData);
+            
+            if (emailAddress != null && !emailAddress.equals("")){
+            	FieldData emailData = new FieldData();
+            	emailData.shape = userShape;
+            	emailData.field = userShape.getField(User.EMAILADDR_FIELD);
+            	emailData.value = emailAddress;
+            	dataList.add(emailData);
+            }
             
             newUser = (User)DataInstanceUtils.createInstance(shapes, name,
                     description, null, sqlInserts,
@@ -197,19 +209,29 @@ public class UserUtils {
 
         dataSet.close();
     }
+    
+    public static User createLdapUser(String loginId, String password, LdapContextFactory ldap, User user, DatabaseConnection database) throws Exception {
+    	User newUser = null;
+    	if (ldap.isLdapEnabled() && ldap.isAutoCreate()){
+	    	Shape userShape = ShapeUtils.getInstanceById(Shape.USER_ID, database, true);
+	    	newUser = ldap.getLdapUser(loginId, password, userShape);
+	    	
+	    	if (newUser != null){
+	    		newUser = createUser(newUser.getName(), loginId, newUser.getName(), "", newUser.getEmailAddress(), user, database);
+	    	}
+    	}
+    	
+    	return newUser;
+    }
 
     public static boolean authenticateUser(String loginId, String password, User user, LdapContextFactory ldap){
     	boolean authenticated = false;
     	if (user.getId().equals(User.SYSTEM) || !ldap.isLdapEnabled()) {
     		authenticated = (password.equals(user.getPassword()));
         } else {
-        	try {
-	    		if (ldap.getContext(loginId, password)!=null){
-	    			authenticated = true;
-	    		}    		
-	    	} catch(Exception ex){
-	    		
-	    	}
+        	if (ldap.getContext(loginId, password)!=null){
+	    		authenticated = true;
+	    	}    		
         }
     	return authenticated;
     }

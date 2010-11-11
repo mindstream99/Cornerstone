@@ -123,7 +123,7 @@ public class RequestMessageHandler extends ServiceBusMessageHandler {
                 {
                     if (mtype == LoginRequest.messageType())
                     {
-                        return new LoginRequestProcessor(mPayload, _databasePool, _ldapContextFactory);
+                        return new LoginRequestProcessor(mPayload, _databasePool, _ldapContextFactory, _topicSender);
                     }
                     else if (mtype == LogoutRequest.messageType())
                     {

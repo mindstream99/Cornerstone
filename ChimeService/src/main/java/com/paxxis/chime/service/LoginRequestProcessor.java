@@ -20,6 +20,8 @@ package com.paxxis.chime.service;
 import org.apache.log4j.Logger;
 
 import com.mysql.jdbc.CommunicationsException;
+import com.paxxis.chime.client.common.DataInstanceEvent;
+import com.paxxis.chime.client.common.DataInstanceEvent.EventType;
 import com.paxxis.chime.client.common.ErrorMessage;
 import com.paxxis.chime.client.common.LoginRequest;
 import com.paxxis.chime.client.common.LoginResponse;
@@ -40,15 +42,17 @@ public class LoginRequestProcessor extends MessageProcessor {
     // the database connection pool
     DatabaseConnectionPool _pool;
     LdapContextFactory _ldap;
+    NotificationTopicSender _topicSender;
     
     /**
      * Constructor
      *
      */
-    public LoginRequestProcessor(MessagePayload payloadType, DatabaseConnectionPool pool, LdapContextFactory ldap) {
+    public LoginRequestProcessor(MessagePayload payloadType, DatabaseConnectionPool pool, LdapContextFactory ldap, NotificationTopicSender topicSender) {
         super(payloadType);
         _pool = pool;
         _ldap = ldap;
+        _topicSender = topicSender;
     }
     
     protected Message process(boolean ignorePreviousChanges) {
@@ -89,7 +93,18 @@ public class LoginRequestProcessor extends MessageProcessor {
                     admin.setId(User.ADMIN);
                     user = UserUtils.getUserByLoginId(loginId, admin, database);
                     
-                    if (user == null || !UserUtils.authenticateUser(loginId, password, user, _ldap)) {
+                    if (user==null){
+                    	admin = UserUtils.getUserById(User.ADMIN, admin, database);
+                    	user = UserUtils.createLdapUser(loginId, password, _ldap, admin, database);
+                    	if (user == null){
+                    		throw new Exception("The login id and/or password are not valid.");
+                    	}
+                    	DataInstanceEvent event = new DataInstanceEvent();
+                		event.setEventType(EventType.Create);
+                        event.setDataInstance(user);
+                        event.setUser(admin);
+                        _topicSender.send(new ServiceBusMessageProducer(event), getPayloadType());
+                    } else if (!UserUtils.authenticateUser(loginId, password, user, _ldap)) {
                         throw new Exception("The login id and/or password are not valid.");
                     }
 

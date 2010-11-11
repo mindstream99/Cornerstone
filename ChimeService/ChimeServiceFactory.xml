@@ -133,6 +133,7 @@ set the bean's chimeConfiguration property.
                 
                 <!-- entry key="chime.service.ldap.contextFactory" value="com.sun.jndi.ldap.LdapCtxFactory"/>
                 <entry key="chime.service.ldap.url" value="ldap://nycdc01.vibrant.corp:389"/>
+                <entry key="chime.service.ldap.baseDN" value="DC=vibrant,DC=corp"/>
                 <entry key="chime.service.ldap.principalSuffix" value="@vibrant.corp"/>
                 <entry key="chime.service.ldap.authType" value="simple"/-->
             </map>
@@ -168,11 +169,13 @@ set the bean's chimeConfiguration property.
             <map>
                <entry key="contextFactory" value="chime.service.ldap.contextFactory"/>
                <entry key="url" value="chime.service.ldap.url"/>
+               <entry key="baseDN" value="chime.service.ldap.baseDN"/>
                <entry key="principalSuffix" value="chime.service.ldap.principalSuffix"/>
                <entry key="authType" value="chime.service.ldap.authType"/>
             </map>
         </property>
         <property name="ldapEnabled" value="false"/>
+        <property name="autoCreate" value="false"/>
         <property name="chimeConfiguration" ref="chimeConfiguration"/>
     </bean>
     

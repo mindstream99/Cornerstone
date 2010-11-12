@@ -163,8 +163,17 @@ public class UserUtils {
     	
         User result = null;
         if (!response.list.isEmpty()) {
-            result = getUserById(((User)response.list.get(0)).getId(), user, database);
-            updateUserProfile(result, database);
+        	if ("system".equals(loginId)){
+        		result = getUserById(((User)response.list.get(0)).getId(), user, database);
+        	} else {
+	           	for (User aUser : (List<User>)response.list){
+	           		aUser = getUserById(aUser.getId(), user, database);
+	           		if (loginId.equals(aUser.getLoginId())){
+	        			result = aUser;
+	        			break;
+	        		}
+	        	}
+        	}
         }
         
         return result;

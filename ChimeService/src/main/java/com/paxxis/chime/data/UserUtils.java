@@ -235,7 +235,7 @@ public class UserUtils {
 
     public static boolean authenticateUser(String loginId, String password, User user, LdapContextFactory ldap){
     	boolean authenticated = false;
-    	if (user.getId().equals(User.SYSTEM) || !ldap.isLdapEnabled()) {
+    	if (user.isLocalUser() || !ldap.isLdapEnabled()) {
     		authenticated = (password.equals(user.getPassword()));
         } else {
         	if (ldap.getContext(loginId, password)!=null){

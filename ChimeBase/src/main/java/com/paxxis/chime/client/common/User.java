@@ -162,6 +162,20 @@ public class User extends DataInstance {
 
         return false;
     }
+    
+    public boolean isLocalUser(){
+    	// check if this user is a member of the Chime Local Users community
+        Shape type = getShapes().get(0);
+        DataField field = type.getField(User.COMMUNITY_FIELD);
+        List<DataFieldValue> values = getFieldValues(type, field);
+        for (DataFieldValue value : values) {
+            if (value.getReferenceId().equals(Community.ChimeLocalUsers.getId())) {
+                return true;
+            }
+        }
+
+        return false;
+    }
 
     public void setPassword(String password) {
         _password = password;

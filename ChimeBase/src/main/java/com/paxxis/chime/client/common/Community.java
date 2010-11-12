@@ -31,6 +31,7 @@ public class Community extends DataInstance {
 
     public static final Community Global = new Community(InstanceId.create("100"));
     public static final Community ChimeAdministrators = new Community(InstanceId.create("10200"));
+    public static final Community ChimeLocalUsers = new Community(InstanceId.create("19500"));
 
     static {
         Global.setName("Everyone");

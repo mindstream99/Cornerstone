@@ -2,7 +2,7 @@
 --
 -- ------------------------------------------------------
 -- Server version	5.1.49
-  
+
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
@@ -69,7 +69,7 @@ INSERT INTO `Chime`.`ChimeSchema` VALUES  ('100','800',NULL,1,1,'Community','900
  ('4c4fbffe70994ed0bf43c9f410efca6500','f574d270d05146ba9fe55bbbeacec8e300',NULL,3,NULL,'Retention Days','300',1,'The number of days to retain events of this type (0 means forever, and blank means never).','N','Y'),
  ('500','800',NULL,2,2,'Community Moderator','900',0,'Community Moderator','N','N'),
  ('600','900',NULL,1,1,'Favorites','2000',0,'Favorite Content','N','Y'),
- ('700', '800', NULL, 6, 6, 'Login ID', '200', 1, 'The ID used to log into Chime.', 'N', 'N'),
+ ('700','800',NULL,6,6,'Login ID','200',1,'The ID used to log into Chime.','N','N'),
  ('800','1200',NULL,1,1,'TemplateDefinition','200',1,'The template definition','Y','N'),
  ('9f349cf32a554c96993f2d02acb0a4e900','f574d270d05146ba9fe55bbbeacec8e300',NULL,2,NULL,'Periodic Notification','900',0,'Communities whose periodic notifications will include this event.','N','Y'),
  ('e6cb20e100b8453194c65107fdb9a27a00','f574d270d05146ba9fe55bbbeacec8e300',NULL,1,NULL,'Immediate Notification','900',0,'Communities that will be notified immediately when this event occurs.','N','Y'),
@@ -144,8 +144,9 @@ INSERT INTO `Chime`.`DataInstance` VALUES  ('100','Shape','A Chime Shape definit
  ('1400','Image','An image file.','2010-02-23 16:00:44','19900','system','2010-02-23 16:00:44','19900','system',0,0,0,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,0,0,0,0,0,'NYYYYYYYYNYNN','NONE',NULL,NULL,NULL,NULL,NULL),
  ('1500','File','A document file of any type.','2010-02-23 16:01:16','19900','system','2010-02-23 16:01:16','19900','system',0,0,0,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,0,0,0,0,0,'NYYYYYYYNNYNN','NONE',NULL,NULL,NULL,NULL,NULL),
  ('1900','Analytic','A script used to query and process Chime data','2010-02-25 16:10:38','19900','system','2010-02-25 16:10:38','19900','system',0,0,0,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,0,0,50,0,0,'NYYYYYYYYYYYN','NONE',NULL,NULL,NULL,NULL,NULL),
- ('19800','admin','The Chime administrator','2010-02-26 09:43:20','19900','system','2010-02-26 09:43:20','19900','system',0,0,0,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,0,0,0,0,0,'admin','NONE',NULL,NULL,NULL,NULL,NULL),
- ('19900','system','The Chime System','2010-02-23 15:12:56','19900','system','2010-02-23 15:12:56','19900','system',0,0,0,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,0,0,0,0,0,'xyz123','NONE',NULL,NULL,NULL,NULL,NULL),
+ ('19500','Local Users','Members of this community are always authenticated locally, regardless of whether or not LDAP is being used.','2010-11-12 11:01:44','19900','system','2010-11-12 11:01:44','19900','system',0,0,0,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,0,0,0,0,0,NULL,'NONE',NULL,NULL,NULL,NULL,NULL),
+ ('19800','admin','The Chime administrator','2010-02-26 09:43:20','19900','system','2010-11-12 11:05:20','19900','system',0,0,0,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,0,0,0,0,0,'admin','NONE',NULL,NULL,NULL,NULL,NULL),
+ ('19900','system','The Chime System','2010-02-23 15:12:56','19900','system','2010-11-12 11:05:03','19900','system',0,0,0,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,0,0,0,0,0,'xyz123','NONE',NULL,NULL,NULL,NULL,NULL),
  ('200','Text','Raw Text','2010-02-23 15:45:02','19900','system','2010-02-23 15:45:02','19900','system',0,0,0,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,0,0,0,0,0,'YYNNNNNNNNNNN','NONE',NULL,NULL,NULL,NULL,NULL),
  ('2000','Reference','A reference to any chime data instance','2010-02-23 15:45:02','19900','system','2010-02-23 15:45:02','19900','system',0,0,0,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,0,0,0,0,0,'NYNNNNNNNNNNN','NONE',NULL,NULL,NULL,NULL,NULL),
  ('2100','Folder','A folder is a collection of Chime data instance references.','2010-08-07 17:37:04','19900','system','2010-08-07 17:40:07','19900','system',0,0,0,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,0,0,0,0,0,'NYYYYYYYYYYYN','NONE',NULL,NULL,NULL,NULL,NULL),
@@ -214,15 +215,18 @@ CREATE TABLE  `Chime`.`DataInstance_History` (
 
 /*!40000 ALTER TABLE `DataInstance_History` DISABLE KEYS */;
 LOCK TABLES `DataInstance_History` WRITE;
-INSERT INTO `Chime`.`DataInstance_History` VALUES  
- ('100000200','100000200','19900','system','Create','2010-02-26 10:33:11',''),
+INSERT INTO `Chime`.`DataInstance_History` VALUES  ('100000200','100000200','19900','system','Create','2010-02-26 10:33:11',''),
  ('100000300','100000300','19800','admin','Create','2010-02-26 14:19:42',''),
  ('100000400','100000400','19800','admin','Create','2010-05-15 12:08:59',''),
  ('100000500','100000500','19800','admin','Create','2010-05-15 12:09:46',''),
  ('100000600','100000600','19800','admin','Create','2010-05-15 12:10:37',''),
+ ('381a27d5f4864921ab2608b384f4e5b500','19500','19900','system','Create','2010-11-12 11:01:44',''),
+ ('7d6292fb8b9c4802ab7a20c253f7a7b000','19900','19900','system','Modify','2010-11-12 11:05:03','Added User : Community data'),
  ('a8b23fcdd74a4fd0af7e7c89998601c100','a97381dce3d44e139823679460d2a5f100','19900','system','Create','2010-08-08 11:58:52',''),
+ ('bbaf778cfe514fc1ac1a2aa4d2a1bf0300','19800','19900','system','Modify','2010-11-12 11:05:20','Removed User : Community data'),
  ('be40a4e9e61b4f76a937db51ac4a8c9500','0a221845f6c9466f978def67cf999b8400','19900','system','Create','2010-08-07 17:37:05',''),
- ('be9194d7079742a9bcf3320a41fb148500','f574d270d05146ba9fe55bbbeacec8e300','19900','system','Create','2010-08-08 11:53:37','');
+ ('be9194d7079742a9bcf3320a41fb148500','f574d270d05146ba9fe55bbbeacec8e300','19900','system','Create','2010-08-08 11:53:37',''),
+ ('f0e7876967894d6b8d91d2e8ced9c83200','19800','19900','system','Modify','2010-11-12 11:05:20','Added User : Community data');
 UNLOCK TABLES;
 /*!40000 ALTER TABLE `DataInstance_History` ENABLE KEYS */;
 
@@ -257,35 +261,6 @@ UNLOCK TABLES;
 
 
 --
--- Definition of table `Chime`.`DataInstance_Timestamp`
---
-
-DROP TABLE IF EXISTS `Chime`.`DataInstance_Timestamp`;
-CREATE TABLE  `Chime`.`DataInstance_Timestamp` (
-  `ID` varchar(40) NOT NULL,
-  `INSTANCE_ID` varchar(40) DEFAULT NULL,
-  `DATATYPE_ID` varchar(40) DEFAULT NULL,
-  `DATATYPE_COLUMN` int(11) DEFAULT NULL,
-  `VALUE` datetime NULL,
-  `TIMESTAMP` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `POSITION` int(11) DEFAULT NULL,
-  PRIMARY KEY (`ID`),
-  KEY `IDX98` (`INSTANCE_ID`,`DATATYPE_ID`),
-  KEY `IDX97` (`DATATYPE_ID`),
-  KEY `IDX96` (`INSTANCE_ID`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
---
--- Dumping data for table `Chime`.`DataInstance_Timestamp`
---
-
-/*!40000 ALTER TABLE `DataInstance_Timestamp` DISABLE KEYS */;
-LOCK TABLES `DataInstance_Timestamp` WRITE;
-UNLOCK TABLES;
-/*!40000 ALTER TABLE `DataInstance_Timestamp` ENABLE KEYS */;
-
-
---
 -- Definition of table `Chime`.`DataInstance_Reference`
 --
 
@@ -311,7 +286,9 @@ CREATE TABLE  `Chime`.`DataInstance_Reference` (
 /*!40000 ALTER TABLE `DataInstance_Reference` DISABLE KEYS */;
 LOCK TABLES `DataInstance_Reference` WRITE;
 INSERT INTO `Chime`.`DataInstance_Reference` VALUES  ('100','19800','800',4,'10100','2010-02-26 09:56:40',NULL),
- ('200','19800','800',1,'10200','2010-02-26 10:33:50',NULL);
+ ('52052d15da1a4cf1ba9e68766c3dcf7100','19800','800',1,'19500','2010-11-12 11:05:20',2),
+ ('923a4e7955c545329dd011ce43ee63a400','19800','800',1,'10200','2010-11-12 11:05:20',1),
+ ('f265bc74f55b41deb17c298969f56b4e00','19900','800',1,'19500','2010-11-12 11:05:03',1);
 UNLOCK TABLES;
 /*!40000 ALTER TABLE `DataInstance_Reference` ENABLE KEYS */;
 
@@ -344,6 +321,35 @@ LOCK TABLES `DataInstance_Text` WRITE;
 INSERT INTO `Chime`.`DataInstance_Text` VALUES  ('100000100','100000300','1200',1,'{\"columns\":[{\"portlets\":[{\"properties\":[{\"content\":\"<div id=##QUOTE##portal##QUOTE##><div style=##QUOTE##text-align: center;##QUOTE##>Welcome to <span style=##QUOTE##font-weight: bold; font-style: italic;##QUOTE##>Chime</span>.&nbsp; This is the default page presented to users that have not saved any other pages in the favorites.<br><br><br></div></div>\"}],\"pinned\":false,\"type\":\"RichText\",\"showHeader\":true,\"id\":1}],\"width\":1.0}],\"id\":-1}','2010-02-26 14:20:54',NULL);
 UNLOCK TABLES;
 /*!40000 ALTER TABLE `DataInstance_Text` ENABLE KEYS */;
+
+
+--
+-- Definition of table `Chime`.`DataInstance_Timestamp`
+--
+
+DROP TABLE IF EXISTS `Chime`.`DataInstance_Timestamp`;
+CREATE TABLE  `Chime`.`DataInstance_Timestamp` (
+  `ID` varchar(40) NOT NULL,
+  `INSTANCE_ID` varchar(40) DEFAULT NULL,
+  `DATATYPE_ID` varchar(40) DEFAULT NULL,
+  `DATATYPE_COLUMN` int(11) DEFAULT NULL,
+  `VALUE` datetime DEFAULT NULL,
+  `TIMESTAMP` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `POSITION` int(11) DEFAULT NULL,
+  PRIMARY KEY (`ID`),
+  KEY `IDX98` (`INSTANCE_ID`,`DATATYPE_ID`),
+  KEY `IDX97` (`DATATYPE_ID`),
+  KEY `IDX96` (`INSTANCE_ID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+--
+-- Dumping data for table `Chime`.`DataInstance_Timestamp`
+--
+
+/*!40000 ALTER TABLE `DataInstance_Timestamp` DISABLE KEYS */;
+LOCK TABLES `DataInstance_Timestamp` WRITE;
+UNLOCK TABLES;
+/*!40000 ALTER TABLE `DataInstance_Timestamp` ENABLE KEYS */;
 
 
 --
@@ -395,6 +401,7 @@ INSERT INTO `Chime`.`DataInstance_Type` VALUES  ('000','19900','system','800','2
  ('300','300','Number','100','2010-02-24 12:23:57',NULL),
  ('400','400','URL','100','2010-02-24 12:25:19',NULL),
  ('500','500','Review','100','2010-02-24 12:26:19',NULL),
+ ('5e755d1edaf54ceebc947f7bb46c099500','19500','Local Users','900',NULL,1),
  ('600','600','Comment','100','2010-02-24 12:26:33',NULL),
  ('700','700','Tag','100','2010-02-24 12:26:47',NULL),
  ('772caaead0074d7d96cb9e345ef95c9900','f574d270d05146ba9fe55bbbeacec8e300','Event Type','100','2010-02-24 12:26:47',NULL),
@@ -426,7 +433,8 @@ CREATE TABLE  `Chime`.`DataInstance_community` (
 
 /*!40000 ALTER TABLE `DataInstance_community` DISABLE KEYS */;
 LOCK TABLES `DataInstance_community` WRITE;
-INSERT INTO `Chime`.`DataInstance_community` VALUES  ('100000400','100000300','100','R'),
+INSERT INTO `Chime`.`DataInstance_community` VALUES  ('0a3657d10f944f19a86606a9ce187acf00','19500','19500','RM'),
+ ('100000400','100000300','100','R'),
  ('100000500','100000300','10200','RU'),
  ('100000700','100000400','100','R'),
  ('100000800','100000400','10200','RU'),
@@ -438,6 +446,7 @@ INSERT INTO `Chime`.`DataInstance_community` VALUES  ('100000400','100000300','1
  ('375de15373f84fb89596771123a1465f00','2100','19900','RUC'),
  ('394982873d9144c29977c2bd9c6705c700','a97381dce3d44e139823679460d2a5f100','19900','RUC'),
  ('41a83e42d2784f2eae60bb40511f8f5a00','a97381dce3d44e139823679460d2a5f100','100','R'),
+ ('9e2dea1fe7c642369ecaa8419032231400','19500','100','R'),
  ('a9478ee88f6e40baba08ac02f43c1b8d00','f574d270d05146ba9fe55bbbeacec8e300','19900','RUC'),
  ('d8b6772047be42f0819ec7db6c89ee1f00','2100','100','R');
 UNLOCK TABLES;

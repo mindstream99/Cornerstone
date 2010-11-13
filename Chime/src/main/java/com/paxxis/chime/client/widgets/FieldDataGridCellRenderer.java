@@ -93,10 +93,13 @@ public class FieldDataGridCellRenderer implements GridCellRenderer<DataRowModel>
 		// the margins can be applied.
 		final LayoutContainer lc = new LayoutContainer();
 
-		if (property.equals(DataRowModel.NAME)) {
+		if (property.equals(DataRowModel.BLANK)) {
+			lc.setHeight(15);
+			return lc;
+		} else if (property.equals(DataRowModel.NAME)) {
 			return model.get(property);
-		} else if (model instanceof DataFieldValueModel) {
-			DataFieldValueModel fieldValueModel = (DataFieldValueModel)model;
+		} else if (model instanceof TabularDataFieldValueModel) {
+			TabularDataFieldValueModel fieldValueModel = (TabularDataFieldValueModel)model;
 			DataInstance inst = fieldValueModel.getDataInstance();
 			Shape shape = fieldValueModel.getShape();
 			DataField dataField = fieldValueModel.getDataField();
@@ -129,8 +132,8 @@ public class FieldDataGridCellRenderer implements GridCellRenderer<DataRowModel>
 		        }
 
 		        ColumnModel cm = new ColumnModel(configs);
-		        ListStore<DataFieldValueModel> listStore = new ListStore<DataFieldValueModel>();
-		        final ChimeGrid<DataFieldValueModel> fieldGrid = new ChimeGrid<DataFieldValueModel>(listStore, cm);
+		        ListStore<TabularDataFieldValueModel> listStore = new ListStore<TabularDataFieldValueModel>();
+		        final ChimeGrid<TabularDataFieldValueModel> fieldGrid = new ChimeGrid<TabularDataFieldValueModel>(listStore, cm);
 		        fieldGrid.getView().setAutoFill(false);
 		        fieldGrid.setSelectionModel(null);
 		        fieldGrid.getView().setForceFit(false);
@@ -158,11 +161,11 @@ public class FieldDataGridCellRenderer implements GridCellRenderer<DataRowModel>
 		            }
 		        );
 
-		        List<DataFieldValue> values = model.get(DataFieldValueModel.VALUE);
+		        List<DataFieldValue> values = model.get(TabularDataFieldValueModel.VALUE);
 		        int gridHeight = 0;
 		        for (DataFieldValue fieldValue : values) {
 		        	DataInstance instance = (DataInstance)fieldValue.getValue();
-		        	DataFieldValueModel fieldModel = new DataFieldValueModel(instance, fieldShape, null);
+		        	TabularDataFieldValueModel fieldModel = new TabularDataFieldValueModel(instance, fieldShape, null);
 		        	listStore.add(fieldModel);
 		        	
 		        	gridHeight += GRIDINCR;
@@ -180,6 +183,10 @@ public class FieldDataGridCellRenderer implements GridCellRenderer<DataRowModel>
 			}
 			
 			return lc;
+		} else if (model instanceof FieldValueModel) {
+			FieldValueModel fieldValueModel = (FieldValueModel)model;
+			DataField dataField = fieldValueModel.getDataField();
+			return generateFieldContent(dataField, model.get(property));
 		} else {
 			renderHtml(lc, model.get(DataRowModel.VALUE).toString());
 			return lc;
@@ -206,6 +213,52 @@ public class FieldDataGridCellRenderer implements GridCellRenderer<DataRowModel>
                 }
             }
         );
+	}
+	
+	private String generateFieldContent(DataField dataField, Object obj) {
+		String stringContent = "";
+		Shape shape = dataField.getShape();
+		if (shape.isPrimitive()) {
+			if (dataField.getShape().getId().equals(Shape.URL_ID))
+            {
+				stringContent = obj.toString();
+            }
+            else if (dataField.getShape().isNumeric())
+            {
+                // TODO when formatting is added to the field definition, we'll
+                // apply whatever is specified
+                Double dval = Double.valueOf(obj.toString());
+                NumberFormat fmt = NumberFormat.getDecimalFormat();
+                stringContent = fmt.format(dval);
+            }
+            else if (dataField.getShape().isDate())
+            {
+                Date dval = (Date)obj;
+                DateTimeFormat dtf = DateTimeFormat.getFormat("MMM d, yyyy");
+                stringContent = dtf.format(dval);
+            }
+            else if (dataField.getShape().isTimestamp())
+            {
+                Date dval = (Date)obj;
+                DateTimeFormat dtf = DateTimeFormat.getFormat("MMM d, yyyy HH:mm:ss");
+                stringContent = dtf.format(dval);
+            }
+            else
+            {
+            	stringContent = obj.toString();
+            }
+		} else {
+			DataInstance inst = (DataInstance)obj;
+        	String name = inst.getName().replaceAll(" ", "&nbsp;");
+            
+            if (useInterceptedHtml) {
+                stringContent = Utils.toHoverUrl(inst.getId(), name);
+            } else {
+                stringContent = name;
+            }
+		}
+		
+		return stringContent;
 	}
 
     private String generateContent(DataInstance dataInstance, Shape shape, DataField dataField) {

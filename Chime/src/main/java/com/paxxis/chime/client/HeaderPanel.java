@@ -95,7 +95,6 @@ public class HeaderPanel extends LayoutContainer
 
         bar = new ToolBar();
         bar.setAlignment(HorizontalAlignment.RIGHT);
-       
         bar.setStyleAttribute("background", "transparent");
         bar.setBorders(false);
 

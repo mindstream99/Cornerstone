@@ -43,10 +43,10 @@ import com.google.gwt.user.client.DeferredCommand;
 import com.google.gwt.user.client.Timer;
 import com.paxxis.chime.client.ChimeAsyncCallback;
 import com.paxxis.chime.client.InstanceUpdateListener;
-import com.paxxis.chime.client.InstanceUpdateListener.Type;
 import com.paxxis.chime.client.ServiceManager;
 import com.paxxis.chime.client.ServiceResponseObject;
 import com.paxxis.chime.client.Utils;
+import com.paxxis.chime.client.InstanceUpdateListener.Type;
 import com.paxxis.chime.client.common.ApplyVoteRequest;
 import com.paxxis.chime.client.common.ApplyVoteResponse;
 import com.paxxis.chime.client.common.Dashboard;
@@ -60,10 +60,10 @@ import com.paxxis.chime.client.common.User;
 import com.paxxis.chime.client.common.portal.PortalTemplate;
 import com.paxxis.chime.client.common.portal.PortletSpecification;
 import com.paxxis.chime.client.editor.AppliedTypesEditListener;
+import com.paxxis.chime.client.editor.FieldDataEditor;
 import com.paxxis.chime.client.editor.FieldEditorListener;
 import com.paxxis.chime.client.editor.InstancePermissionWindow;
 import com.paxxis.chime.client.editor.LayoutEditorWindow;
-import com.paxxis.chime.client.editor.MultiReferenceEditorWindow;
 import com.paxxis.chime.client.editor.SingleLineTextEditorWindow;
 import com.paxxis.chime.client.editor.TextEditorWindow;
 import com.paxxis.chime.client.widgets.ChimeGrid;
@@ -71,8 +71,8 @@ import com.paxxis.chime.client.widgets.ChimeMessageBox;
 import com.paxxis.chime.client.widgets.FieldDataGridCellRenderer;
 import com.paxxis.chime.client.widgets.LockPanel;
 import com.paxxis.chime.client.widgets.PasswordWindow;
-import com.paxxis.chime.client.widgets.PasswordWindow.PasswordChangeListener;
 import com.paxxis.chime.client.widgets.SubscribePanel;
+import com.paxxis.chime.client.widgets.PasswordWindow.PasswordChangeListener;
 
 /**
  *
@@ -326,7 +326,7 @@ public class InstanceHeaderPortlet extends PortletContainer {
             new SelectionListener<MenuEvent>() {
                 @Override
                 public void componentSelected(MenuEvent ce) {
-                    MultiReferenceEditorWindow w = new MultiReferenceEditorWindow(_instance,
+                    FieldDataEditor w = new FieldDataEditor(_instance,
                         new AppliedTypesEditListener() {
                             public void onEdit(DataInstance instance) {
                                 updateListener.onUpdate(_instance, Type.Type);

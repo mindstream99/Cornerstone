@@ -17,8 +17,6 @@
 
 package com.paxxis.chime.data;
 
-import java.util.ArrayList;
-import java.util.List;
 
 import com.paxxis.chime.client.common.DataInstance;
 import com.paxxis.chime.client.common.InstanceId;
@@ -47,63 +45,16 @@ public class PrimaryDataUtils {
             boolean changedImages = false;
             DataInstance old = DataInstanceUtils.getInstance(instance.getId(), user, database, true, true);
 
-            // IMAGES -- remove the existing images and then just add the new ones.
-
-            // find the existing images that should be removed
-            List<DataInstance> removeImages = new ArrayList<DataInstance>(old.getImages());
-
-            /*
-            for (DataInstance img : old.getImages()) {
-                boolean found = false;
-                for (DataInstance image : instance.getImages()) {
-                    if (image.getId().equals(img.getId())) {
-                        found = true;
-                        break;
-                    }
-                }
-
-                if (!found) {
-                    removeImages.add(img);
-                }
-            }
-            */
-
-            // removeImages images
-            if (removeImages.size() > 0) {
+            if (old.getImages().size() > 0) {
                 String sql = "delete from DataInstance_Attachment where instance_id = '" + instance.getId() +
-                        "' and foreign_id in (";
-                String op = "";
-                for (DataInstance img : removeImages) {
-                    sql += op + "'" + img.getId() + "'";
-                    op = ",";
-                }
-                sql += ")";
+                        "' and filetype = 'I'"; 
                 database.executeStatement(sql);
                 changedImages = true;
             }
 
-            // find the new images to add
-            List<DataInstance> addImages = new ArrayList<DataInstance>(instance.getImages());
-            /*
-            for (DataInstance img : instance.getImages()) {
-                boolean found = false;
-                for (DataInstance image : old.getImages()) {
-                    if (image.getId().equals(img.getId())) {
-                        found = true;
-                        break;
-                    }
-                }
-
-                if (!found) {
-                    addImages.add(img);
-                }
-            }
-            */
-
-            // add the new images
             int fileNum = 1;
-            if (addImages.size() > 0) {
-                for (DataInstance image : addImages) {
+            if (instance.getImages().size() > 0) {
+                for (DataInstance image : instance.getImages()) {
                     InstanceId id = Tools.getNewId(Tools.DEFAULT_EXTID);
                     String sql = "insert into DataInstance_Attachment (id,instance_id, filetype, filenum, foreign_id, timestamp) values ('" +
                             id + "', '" + instance.getId() + "', 'I', " + fileNum + ", '" + image.getId() +
@@ -114,61 +65,15 @@ public class PrimaryDataUtils {
                 changedImages = true;
             }
 
-            // FILES
-
-            // find the existing files that should be removed
-            List<DataInstance> removeFiles = new ArrayList<DataInstance>(old.getFiles());
-            /*
-            for (DataInstance file : old.getFiles()) {
-                boolean found = false;
-                for (DataInstance f : instance.getFiles()) {
-                    if (f.getId().equals(file.getId())) {
-                        found = true;
-                        break;
-                    }
-                }
-
-                if (!found) {
-                    removeFiles.add(file);
-                }
-            }
-            */
-
-            // remove files
-            if (removeFiles.size() > 0) {
+            if (old.getFiles().size() > 0) {
                 String sql = "delete from DataInstance_Attachment where instance_id = '" + instance.getId() +
-                        "' and foreign_id in (";
-                String op = "";
-                for (DataInstance file : removeFiles) {
-                    sql += op + "'" + file.getId() + "'";
-                    op = ",";
-                }
-                sql += ")";
+                        "' and filetype = 'F'"; 
                 database.executeStatement(sql);
                 changedFiles = true;
             }
 
-            // find the new files to add
-            List<DataInstance> addFiles = new ArrayList<DataInstance>(instance.getFiles());
-            /*
-            for (DataInstance file : instance.getFiles()) {
-                boolean found = false;
-                for (DataInstance f : old.getFiles()) {
-                    if (file.getId().equals(f.getId())) {
-                        found = true;
-                        break;
-                    }
-                }
-
-                if (!found) {
-                    addFiles.add(file);
-                }
-            }
-            */
-
-            // add the new files
-            if (addFiles.size() > 0) {
-                for (DataInstance file : addFiles) {
+            if (instance.getFiles().size() > 0) {
+                for (DataInstance file : instance.getFiles()) {
                     InstanceId id = Tools.getNewId(Tools.DEFAULT_EXTID);
                     String sql = "insert into DataInstance_Attachment (id,instance_id, filetype, filenum, foreign_id, timestamp) values ('" +
                             id + "', '" + instance.getId() + "', 'F', 1, '" + file.getId() +

@@ -20,18 +20,16 @@ import com.paxxis.chime.client.common.DataFieldValue;
 import com.paxxis.chime.client.common.DataInstance;
 import com.paxxis.chime.client.common.InstanceId;
 import com.paxxis.chime.client.common.Shape;
+import com.paxxis.chime.client.editor.FieldDataEditor;
 import com.paxxis.chime.client.editor.FieldEditListener;
 import com.paxxis.chime.client.editor.FieldEditorListener;
-import com.paxxis.chime.client.editor.MultiDateEditorWindow;
-import com.paxxis.chime.client.editor.MultiReferenceEditorWindow;
-import com.paxxis.chime.client.editor.MultiTextEditorWindow;
 import com.paxxis.chime.client.editor.TabularDataEditor;
 import com.paxxis.chime.client.editor.TextFieldEditorWindow;
 
-public class DataEditGridCellRenderer implements GridCellRenderer<DataFieldValueModel> {
+public class DataEditGridCellRenderer implements GridCellRenderer<TabularDataFieldValueModel> {
     private FieldEditListener fieldEditListener;
     private FieldEditorListener textListener;
-    private DataFieldValueModel model = null;
+    private TabularDataFieldValueModel model = null;
     private InstanceUpdateListener saveListener = null;
 
     public DataEditGridCellRenderer() {
@@ -79,9 +77,9 @@ public class DataEditGridCellRenderer implements GridCellRenderer<DataFieldValue
     }
 
     @Override
-	public Object render(final DataFieldValueModel model, String property,
+	public Object render(final TabularDataFieldValueModel model, String property,
 			ColumnData config, int rowIndex, int colIndex,
-			ListStore<DataFieldValueModel> store, Grid<DataFieldValueModel> grid) {
+			ListStore<TabularDataFieldValueModel> store, Grid<TabularDataFieldValueModel> grid) {
 
     	this.model = model;
     	saveListener = model.getUpdateListener();
@@ -102,7 +100,7 @@ public class DataEditGridCellRenderer implements GridCellRenderer<DataFieldValue
                             TabularDataEditor w = new TabularDataEditor(inst, shape, field, fieldEditListener);
                             w.show();
                     	} else {
-                            MultiReferenceEditorWindow w = new MultiReferenceEditorWindow(inst, shape, field, fieldEditListener);
+                            FieldDataEditor w = new FieldDataEditor(inst, shape, field, fieldEditListener);
                             w.show();
                     	}
                     } else {
@@ -116,17 +114,8 @@ public class DataEditGridCellRenderer implements GridCellRenderer<DataFieldValue
 
                             TextFieldEditorWindow editor = new TextFieldEditorWindow(shape, field, val, textListener);
                             editor.show();
-                        } else if (fieldShape.getId().equals(Shape.DATE_ID)) {
-                            MultiDateEditorWindow w = new MultiDateEditorWindow(inst, shape, field, fieldEditListener);
-
-                            int x = btn.getAbsoluteLeft();
-                            int y = btn.getAbsoluteTop() + btn.getOffsetHeight() + 1;
-                            w.show();
-                        } else { // TEXT
-                            MultiTextEditorWindow w = new MultiTextEditorWindow(inst, shape, field, fieldEditListener);
-
-                            int x = btn.getAbsoluteLeft();
-                            int y = btn.getAbsoluteTop() + btn.getOffsetHeight() + 1;
+                        } else {
+                            FieldDataEditor w = new FieldDataEditor(inst, shape, field, fieldEditListener);
                             w.show();
                         }
                     }

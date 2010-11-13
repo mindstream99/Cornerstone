@@ -125,6 +125,10 @@ root {
   background-image: url(resources/images/chime/refresh.gif) !important;
 }
 
+.restore-icon {
+  background-image: url(resources/images/chime/reload1.png) !important;
+}
+
 .enabled-filter-icon {
   background-image: url(resources/images/chime/enabled.gif) !important;
 }
@@ -267,6 +271,10 @@ root {
 
 .new-icon {
   background-image: url(resources/images/chime/New16.gif) !important;
+}
+
+.add-icon {
+  background-image: url(resources/images/chime/add.png) !important;
 }
 
 .favorite-icon {

@@ -21,8 +21,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.extjs.gxt.ui.client.Style.HorizontalAlignment;
+import com.extjs.gxt.ui.client.Style.IconAlign;
 import com.extjs.gxt.ui.client.Style.SelectionMode;
 import com.extjs.gxt.ui.client.event.ButtonEvent;
+import com.extjs.gxt.ui.client.event.SelectionChangedEvent;
+import com.extjs.gxt.ui.client.event.SelectionChangedListener;
 import com.extjs.gxt.ui.client.event.SelectionListener;
 import com.extjs.gxt.ui.client.store.ListStore;
 import com.extjs.gxt.ui.client.store.StoreEvent;
@@ -43,10 +46,9 @@ import com.extjs.gxt.ui.client.widget.grid.RowEditor;
 import com.extjs.gxt.ui.client.widget.grid.EditorGrid.ClicksToEdit;
 import com.extjs.gxt.ui.client.widget.layout.RowData;
 import com.extjs.gxt.ui.client.widget.layout.RowLayout;
-import com.extjs.gxt.ui.client.widget.toolbar.FillToolItem;
+import com.extjs.gxt.ui.client.widget.toolbar.ToolBar;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.DeferredCommand;
-import com.google.gwt.user.client.Element;
 import com.paxxis.chime.client.DataInputListener;
 import com.paxxis.chime.client.DataInstanceComboBox;
 import com.paxxis.chime.client.LoginResponseObject;
@@ -60,9 +62,10 @@ import com.paxxis.chime.client.common.InstanceId;
 import com.paxxis.chime.client.common.Shape;
 import com.paxxis.chime.client.widgets.ChimeGrid;
 import com.paxxis.chime.client.widgets.ChimeWindow;
-import com.paxxis.chime.client.widgets.DataDeleteGridCellRenderer;
-import com.paxxis.chime.client.widgets.DataFieldValueModel;
 import com.paxxis.chime.client.widgets.FieldDataGridCellRenderer;
+import com.paxxis.chime.client.widgets.FieldValueModel;
+import com.paxxis.chime.client.widgets.InstanceCellRenderer;
+import com.paxxis.chime.client.widgets.TabularDataFieldValueModel;
 
 /**
  * 
@@ -77,13 +80,13 @@ public class TabularDataEditor extends ChimeWindow {
     private Button _okButton;
     private Button _cancelButton;
 
-    private ButtonBar addRestoreButtonBar;
+    private ToolBar toolBar;
     private Button addButton;
+    private Button deleteButton;
     private Button restoreButton;
-    private Button createButton = null;
 
-    private ChimeGrid<DataFieldValueModel> fieldGrid;
-    private ListStore<DataFieldValueModel> listStore = new ListStore<DataFieldValueModel>();
+    private ChimeGrid<TabularDataFieldValueModel> fieldGrid;
+    private ListStore<TabularDataFieldValueModel> listStore = new ListStore<TabularDataFieldValueModel>();
     private ServiceManagerListener _serviceManagerListener = null;
 
     private DataInstance dataInstance;
@@ -92,7 +95,6 @@ public class TabularDataEditor extends ChimeWindow {
     private DataField dataField;
 
     private FieldEditListener editListener = null;
-    private AppliedTypesEditListener typesListener = null;
 
     public TabularDataEditor(DataInstance instance, Shape type,
                                 DataField field, FieldEditListener listener) {
@@ -105,37 +107,33 @@ public class TabularDataEditor extends ChimeWindow {
         dataField = field;
     }
 
-    protected void onRender(Element parent, int index) { 
-    	super.onRender(parent, index);
-    	
-    }
-    
     protected void init() {
     	initialize();
     	listStore.addStoreListener(
-    		new StoreListener<DataFieldValueModel>() {
-    			  public void storeAdd(StoreEvent<DataFieldValueModel> se) {
+    		new StoreListener<TabularDataFieldValueModel>() {
+    			  public void storeAdd(StoreEvent<TabularDataFieldValueModel> se) {
     				  validate();
     			  }
 
-    			  public void storeClear(StoreEvent<DataFieldValueModel> se) {
+    			  public void storeClear(StoreEvent<TabularDataFieldValueModel> se) {
     				  validate();
     			  }
 
-    			  public void storeDataChanged(StoreEvent<DataFieldValueModel> se) {
+    			  public void storeDataChanged(StoreEvent<TabularDataFieldValueModel> se) {
     				  validate();
     			  }
 
-    			  public void storeRemove(StoreEvent<DataFieldValueModel> se) {
+    			  public void storeRemove(StoreEvent<TabularDataFieldValueModel> se) {
     				  validate();
     			  }
 
-    			  public void storeUpdate(StoreEvent<DataFieldValueModel> se) {
+    			  public void storeUpdate(StoreEvent<TabularDataFieldValueModel> se) {
     				  validate();
     			  }
     		}
     	);
     	setup();
+    	validate();
     }
     
     private void setup() {
@@ -149,15 +147,8 @@ public class TabularDataEditor extends ChimeWindow {
         DeferredCommand.addCommand(
             new Command() {
                 public void execute() {
-                    boolean newOne = true;
-
                     for (DataFieldValue val : dataInstance.getFieldValues(dataType, dataField)) {
                         addValue(val);
-                        newOne = false;
-                    }
-
-                    if (newOne) {
-                        addValue((DataFieldValue)null);
                     }
 
                     validate();
@@ -178,17 +169,56 @@ public class TabularDataEditor extends ChimeWindow {
         setResizable(false);
         setWidth(600);
 
+        toolBar = new ToolBar();
+        toolBar.setAlignment(HorizontalAlignment.LEFT);
+        
+        addButton = new Button("Add");
+        addButton.setIconStyle("add-icon");
+        addButton.setIconAlign(IconAlign.BOTTOM);
+
+        toolBar.add(addButton);
+
+        deleteButton = new Button("Delete");
+        deleteButton.setIconStyle("delete-icon");
+        deleteButton.setIconAlign(IconAlign.BOTTOM);
+        deleteButton.addSelectionListener(
+            new SelectionListener<ButtonEvent>() {
+                @Override
+                public void componentSelected(ButtonEvent evt) {
+                    deleteSelected();
+                }
+            }
+        );
+
+        toolBar.add(deleteButton);
+
+        restoreButton = new Button("Restore");
+        restoreButton.setIconStyle("restore-icon");
+        restoreButton.setIconAlign(IconAlign.BOTTOM);
+        restoreButton.addSelectionListener(
+            new SelectionListener<ButtonEvent>() {
+                @Override
+                public void componentSelected(ButtonEvent evt) {
+                    setup();
+                }
+            }
+        );
+
+        toolBar.add(restoreButton);
+
+        add(toolBar, new RowData(1, -1, new Margins(0)));
+        
         List<ColumnConfig> configs = new ArrayList<ColumnConfig>();
 
         ColumnConfig column = new ColumnConfig();
-        column.setId("delete");
+        column.setId(TabularDataFieldValueModel.BLANK); 
         column.setFixed(true);
         column.setHeader("");
-        column.setWidth(35);
+        column.setWidth(2);
         column.setSortable(false);
         column.setMenuDisabled(true);
-        column.setRenderer(new DataDeleteGridCellRenderer());
         configs.add(column);
+        column.setRenderer(new InstanceCellRenderer(new Margins(1), false));
 
         Shape shape = dataField.getShape();
         List<DataField> dataFields = shape.getFields();
@@ -206,9 +236,9 @@ public class TabularDataEditor extends ChimeWindow {
         }
 
         ColumnModel cm = new ColumnModel(configs);
-        fieldGrid = new ChimeGrid<DataFieldValueModel>(listStore, cm, false, true);
+        fieldGrid = new ChimeGrid<TabularDataFieldValueModel>(listStore, cm, false, true);
         fieldGrid.getView().setAutoFill(false);
-        GridSelectionModel<DataFieldValueModel> sm = new GridSelectionModel<DataFieldValueModel>();
+        GridSelectionModel<TabularDataFieldValueModel> sm = new GridSelectionModel<TabularDataFieldValueModel>();
         sm.setSelectionMode(SelectionMode.SINGLE);
         fieldGrid.setSelectionModel(sm);
         fieldGrid.getView().setForceFit(false);
@@ -218,63 +248,32 @@ public class TabularDataEditor extends ChimeWindow {
         fieldGrid.setStripeRows(false);
         fieldGrid.setBorders(true);
         fieldGrid.setHeight(300);
+        sm.addSelectionChangedListener(
+        	new SelectionChangedListener<TabularDataFieldValueModel>() {
+				@Override
+				public void selectionChanged(SelectionChangedEvent<TabularDataFieldValueModel> evt) {
+					validate();
+				}
+        	}
+        );
 
         // add the row editor plugin
-        RowEditor<DataFieldValueModel> editor = new RowEditor<DataFieldValueModel>();
+        final RowEditor<TabularDataFieldValueModel> editor = new RowEditor<TabularDataFieldValueModel>();
         editor.setClicksToEdit(ClicksToEdit.TWO);
         fieldGrid.addPlugin(editor);
-
-        add(fieldGrid, new RowData(1, -1, new Margins(3)));
-        
-        addRestoreButtonBar = new ButtonBar();
-        addRestoreButtonBar.setAlignment(HorizontalAlignment.LEFT);
-
-        addButton = new Button("Add");
         addButton.addSelectionListener(
             new SelectionListener<ButtonEvent>() {
                 @Override
                 public void componentSelected(ButtonEvent evt) {
-                    addValue((DataFieldValue)null);
+                    editor.stopEditing(false);
+                	addValue((DataFieldValue)null);
+                	editor.startEditing(listStore.getCount() - 1, true);
                 }
             }
         );
 
-        addRestoreButtonBar.add(addButton);
-
-    	boolean show = true;
-    	if (dataField != null && !dataField.getShape().isDirectCreatable()) {
-    		show = false;
-    	}
-    	
-    	if (show) {
-            createButton = new Button("Create...");
-            createButton.addSelectionListener(
-                new SelectionListener<ButtonEvent>() {
-                    @Override
-                    public void componentSelected(ButtonEvent evt) {
-                        createNewInstance();
-                    }
-                }
-            );
-
-            addRestoreButtonBar.add(createButton);
-    	}
-
-        restoreButton = new Button("Restore");
-        restoreButton.addSelectionListener(
-            new SelectionListener<ButtonEvent>() {
-                @Override
-                public void componentSelected(ButtonEvent evt) {
-                    setup();
-                }
-            }
-        );
-
-        addRestoreButtonBar.add(new FillToolItem());
-        addRestoreButtonBar.add(restoreButton);
-
-        add(addRestoreButtonBar, new RowData(1, -1, new Margins(3, 3, 8, 3)));
-
+        add(fieldGrid, new RowData(1, -1, new Margins(3)));
+        
         errorLabel = new Html("<div id='endslice-error-label'>&nbsp;</div>");
         add(errorLabel, new RowData(1, -1, new Margins(3, 3, 10, 3)));
 
@@ -409,6 +408,11 @@ public class TabularDataEditor extends ChimeWindow {
     	return editor;
     }
     
+    private void deleteSelected() {
+    	TabularDataFieldValueModel model = fieldGrid.getSelectionModel().getSelectedItem();
+    	listStore.remove(model);
+    }
+
     private void createNewInstance() {
         InstanceCreatorWindow w = new InstanceCreatorWindow(dataField.getShape(),
             new InstanceCreatorWindow.InstanceCreationListener() {
@@ -430,10 +434,10 @@ public class TabularDataEditor extends ChimeWindow {
             DataInstance inst = new DataInstance();
             inst.setName("XTabularRowData");
             inst.addShape(dataField.getShape());
-            DataFieldValueModel model = new DataFieldValueModel(inst, dataField.getShape(), null);
+            TabularDataFieldValueModel model = new TabularDataFieldValueModel(inst, dataField.getShape(), null);
             listStore.add(model);
     	} else {
-            DataFieldValueModel model = new DataFieldValueModel((DataInstance)value.getValue(), dataField.getShape(), null);
+            TabularDataFieldValueModel model = new TabularDataFieldValueModel((DataInstance)value.getValue(), dataField.getShape(), null);
             listStore.add(model);
     	}
 
@@ -452,17 +456,13 @@ public class TabularDataEditor extends ChimeWindow {
         // with the new data.  So clear the values and build new values from the listStore.
         values.clear();
 
-        List<DataFieldValueModel> models = listStore.getModels();
-        for (DataFieldValueModel model : models) {
+        List<TabularDataFieldValueModel> models = listStore.getModels();
+        for (TabularDataFieldValueModel model : models) {
         	DataInstance inst = model.getDataInstance();
         	dataInstance.appendFieldValue(dataType, dataField, inst, false);
         }
 
-        if (typesListener != null) {
-            typesListener.onEdit(dataInstance);
-        } else {
-            editListener.onEdit(dataInstance, dataType, dataField);
-        }
+        editListener.onEdit(dataInstance, dataType, dataField);
 
         hide();
     }
@@ -488,7 +488,7 @@ public class TabularDataEditor extends ChimeWindow {
                 List<DataFieldValue> list = origInstance.getFieldValues(dataType, dataField);
                 for (int i = 0; i < list.size(); i++) {
                     DataFieldValue fieldVal = list.get(i);
-                    DataFieldValueModel model = listStore.getAt(i);
+                    TabularDataFieldValueModel model = listStore.getAt(i);
                     if (!equivalent(fieldVal, model)) {
                         changes = true;
                         break;
@@ -511,16 +511,14 @@ public class TabularDataEditor extends ChimeWindow {
         _okButton.setEnabled(canSave);
         restoreButton.setEnabled(canSave);
         addButton.setEnabled(!maxedOut);
-        if (createButton != null) {
-            createButton.setEnabled(!maxedOut);
-        }
+        deleteButton.setEnabled(fieldGrid.getSelectionModel().getSelectedItem() != null);
     }
     
     /**
      * Determine if the contents of a data field value is equivalent to the contents
      * of a data field value model.  Equivalence here refers to field by field data. 
      */
-    private boolean equivalent(DataFieldValue fieldValue, DataFieldValueModel model) {
+    private boolean equivalent(DataFieldValue fieldValue, TabularDataFieldValueModel model) {
     	DataInstance modelInstance = model.getDataInstance();
     	DataInstance otherInstance = (DataInstance)fieldValue.getValue();
     	for (DataField modelField : modelInstance.getShapes().get(0).getFields()) {

@@ -175,7 +175,7 @@ public class TagsHeader extends LayoutContainer {
         _sortButton.setMenu(menu);
         bar.add(_sortButton);
 
-        add(bar, new RowData(1, -1, new Margins(5, 5, 5, 5)));
+        add(bar, new RowData(1, -1, new Margins(0, 0, 5, 0)));
         _html = new InterceptedHtml();
         add(_html, new RowData(1, -1, new Margins(5)));
         

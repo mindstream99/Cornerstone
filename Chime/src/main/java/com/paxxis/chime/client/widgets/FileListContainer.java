@@ -38,8 +38,8 @@ import com.paxxis.chime.client.InstanceUpdateListener.Type;
 import com.paxxis.chime.client.common.DataField;
 import com.paxxis.chime.client.common.DataInstance;
 import com.paxxis.chime.client.common.Shape;
+import com.paxxis.chime.client.editor.FieldDataEditor;
 import com.paxxis.chime.client.editor.FieldEditListener;
-import com.paxxis.chime.client.editor.MultiReferenceEditorWindow;
 import com.paxxis.chime.client.pages.PageManager;
 
 /**
@@ -201,7 +201,7 @@ public class FileListContainer extends LayoutContainer {
                 new SelectionListener<IconButtonEvent>() {
             @Override
              public void componentSelected(IconButtonEvent ce) {
-                MultiReferenceEditorWindow w = new MultiReferenceEditorWindow(dataInstance, false, fieldListener);
+                FieldDataEditor w = new FieldDataEditor(dataInstance, false, fieldListener);
                 w.show();
              }
         });

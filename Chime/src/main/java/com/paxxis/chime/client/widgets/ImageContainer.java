@@ -27,6 +27,10 @@ import com.extjs.gxt.ui.client.widget.WidgetComponent;
 import com.extjs.gxt.ui.client.widget.layout.CenterLayout;
 import com.extjs.gxt.ui.client.widget.layout.FlowLayout;
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.event.dom.client.ErrorEvent;
+import com.google.gwt.event.dom.client.ErrorHandler;
+import com.google.gwt.event.dom.client.LoadEvent;
+import com.google.gwt.event.dom.client.LoadHandler;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.DeferredCommand;
 import com.google.gwt.user.client.Event;
@@ -131,16 +135,10 @@ public class ImageContainer extends LayoutContainer {
            add(waiting);
         }
 
-        image.addLoadListener(
-            new LoadListener() {
-
-                public void onError(Widget sender) {
-                	if (imageLoadListener != null) {
-                		imageLoadListener.onFailure();
-                	}
-                }
-
-                public void onLoad(Widget sender) {
+        image.addLoadHandler(
+        	new LoadHandler() {
+				@Override
+				public void onLoad(LoadEvent event) {
                     if (progressBar != null) {
                         remove(progressBar);
                     } else if (waiting != null) {
@@ -158,11 +156,21 @@ public class ImageContainer extends LayoutContainer {
                 	if (imageLoadListener != null) {
                 		imageLoadListener.onSuccess();
                 	}
-                }
-
-            }
+				}
+        	}
         );
 
+        image.addErrorHandler(
+        	new ErrorHandler() {
+				@Override
+				public void onError(ErrorEvent event) {
+                	if (imageLoadListener != null) {
+                		imageLoadListener.onFailure();
+                	}
+				}
+        	}
+        );
+        
         parentContainer.addListener(Events.Resize,
             new Listener<BoxComponentEvent>() {
                 public void handleEvent(BoxComponentEvent evt) {
@@ -196,8 +204,10 @@ public class ImageContainer extends LayoutContainer {
             int h = (int)((float)w * aspectRatio);
             setHeight(h);
             imageComponent.setSize(String.valueOf(w), String.valueOf(h));
+            image.setSize(String.valueOf(w), String.valueOf(h));
         } else {
             imageComponent.setSize(String.valueOf(imageWidth), String.valueOf(imageHeight));
+            image.setSize(String.valueOf(imageWidth), String.valueOf(imageHeight));
         }
     }
 
@@ -221,8 +231,10 @@ public class ImageContainer extends LayoutContainer {
             int iw = (int)(factor * imageWidth);
             int ih = (int)(factor * imageHeight);
             imageComponent.setSize(String.valueOf(iw), String.valueOf(ih));
+            image.setSize(String.valueOf(iw), String.valueOf(ih));
         } else {
             imageComponent.setSize(String.valueOf(imageWidth), String.valueOf(imageHeight));
+            image.setSize(String.valueOf(imageWidth), String.valueOf(imageHeight));
         }
     }
 

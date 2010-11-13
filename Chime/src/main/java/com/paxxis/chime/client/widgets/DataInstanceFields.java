@@ -53,8 +53,8 @@ public class DataInstanceFields extends LayoutContainer
     private boolean pendingRefresh;
     private List<String> pendingExclusions = new ArrayList<String>();
 
-    private ChimeGrid<DataFieldValueModel> grid = null;
-    private ListStore<DataFieldValueModel> listStore;
+    private ChimeGrid<TabularDataFieldValueModel> grid = null;
+    private ListStore<TabularDataFieldValueModel> listStore;
     
     public DataInstanceFields(InstanceUpdateListener saveListener) {
         updateListener = saveListener;
@@ -86,7 +86,7 @@ public class DataInstanceFields extends LayoutContainer
 
         List<ColumnConfig> configs = new ArrayList<ColumnConfig>();
         ColumnConfig column = new ColumnConfig();
-        column.setId(DataFieldValueModel.EDIT);
+        column.setId(TabularDataFieldValueModel.EDIT);
         column.setFixed(true);
         column.setHeader("");
         column.setWidth(25);
@@ -96,7 +96,7 @@ public class DataInstanceFields extends LayoutContainer
         configs.add(column);
         
         column = new ColumnConfig();
-        column.setId(DataFieldValueModel.NAME);
+        column.setId(TabularDataFieldValueModel.NAME);
         column.setFixed(true);
         column.setHeader("");
         column.setWidth(125);
@@ -117,8 +117,8 @@ public class DataInstanceFields extends LayoutContainer
         
         ColumnModel cm = new ColumnModel(configs);
         
-        listStore = new ListStore<DataFieldValueModel>();
-        grid = new ChimeGrid<DataFieldValueModel>(listStore, cm);
+        listStore = new ListStore<TabularDataFieldValueModel>();
+        grid = new ChimeGrid<TabularDataFieldValueModel>(listStore, cm);
         grid.getView().setAutoFill(true);
         grid.setSelectionModel(null); 
         grid.getView().setForceFit(true);
@@ -188,7 +188,7 @@ public class DataInstanceFields extends LayoutContainer
             for (DataField field : fields) {
             	
                 if (!field.isPrivate() && !excludedFields.contains(field.getName())) {
-                	DataFieldValueModel model = new DataFieldValueModel(newInstance, type, field, updateListener);
+                	TabularDataFieldValueModel model = new TabularDataFieldValueModel(newInstance, type, field, updateListener);
                 	listStore.add(model);
                 }
             }
@@ -196,7 +196,7 @@ public class DataInstanceFields extends LayoutContainer
             listStore.commitChanges();
             refreshGrid = true;
         } else {
-        	for (DataFieldValueModel model : listStore.getModels()) {
+        	for (TabularDataFieldValueModel model : listStore.getModels()) {
         		model.update(newInstance);
         	}
         	listStore.commitChanges();

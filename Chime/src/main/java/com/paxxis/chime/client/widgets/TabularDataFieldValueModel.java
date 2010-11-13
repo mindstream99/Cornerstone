@@ -30,15 +30,12 @@ import com.paxxis.chime.client.common.Shape;
 import com.paxxis.chime.client.portal.DataRowModel;
 
 /**
- * A model containing the constituent parts of a data field value.  The model supports
- * two modes of operation.  The first mode keeps all values for a field, as a list, consistent
- * with the way data instances store field values.  The second mode is used to model a single
- * value from the list by including the index of the value in the overall list.
+ * A model containing the constituent parts of a tabular data field value.
  * 
  * @author Robert Englander
  *
  */
-public class DataFieldValueModel extends DataRowModel {
+public class TabularDataFieldValueModel extends DataRowModel {
 	public static final String EDIT = "edit";
 	
 	private static final long serialVersionUID = 1L;
@@ -46,25 +43,18 @@ public class DataFieldValueModel extends DataRowModel {
 	private DataInstance dataInstance;
 	private Shape shape;
 	private DataField dataField;
-    private int index;
 	private InstanceUpdateListener saveListener;
     
-	public DataFieldValueModel(DataInstance inst, Shape shape, DataField field,
+	public TabularDataFieldValueModel(DataInstance inst, Shape shape,
 		    InstanceUpdateListener listener) {
-		this(inst, shape, field, -1, listener);
+		this(inst, shape, null, listener);
 	}
 	
-	public DataFieldValueModel(DataInstance inst, Shape shape,
+	public TabularDataFieldValueModel(DataInstance inst, Shape shape, DataField field,
 		    InstanceUpdateListener listener) {
-		this(inst, shape, null, -1, listener);
-	}
-	
-	public DataFieldValueModel(DataInstance inst, Shape shape, DataField field,
-		    int idx, InstanceUpdateListener listener) {
 		super();
 		this.shape = shape;
 		dataField = field;
-		index = idx;
 		saveListener = listener;
 		update(inst);
 	}
@@ -85,16 +75,12 @@ public class DataFieldValueModel extends DataRowModel {
 		return dataField;
 	}
 
-	public int getValueIndex() {
-		return index;
-	}
-	
 	@SuppressWarnings("unchecked")
 	public Object set(String propertyName, Object value) {
 		boolean remove = (value == null);
 		
-		if (!(propertyName.equals(DataFieldValueModel.NAME) ||
-			propertyName.equals(DataFieldValueModel.VALUE))) {
+		if (!(propertyName.equals(TabularDataFieldValueModel.NAME) ||
+			propertyName.equals(TabularDataFieldValueModel.VALUE))) {
 
 			DataField field = shape.getField(propertyName);
 			List<DataFieldValue> values = dataInstance.getFieldValues(shape, field);

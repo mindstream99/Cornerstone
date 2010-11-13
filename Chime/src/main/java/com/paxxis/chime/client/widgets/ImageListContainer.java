@@ -44,8 +44,8 @@ import com.paxxis.chime.client.common.DataField;
 import com.paxxis.chime.client.common.DataFieldValue;
 import com.paxxis.chime.client.common.DataInstance;
 import com.paxxis.chime.client.common.Shape;
+import com.paxxis.chime.client.editor.FieldDataEditor;
 import com.paxxis.chime.client.editor.FieldEditListener;
-import com.paxxis.chime.client.editor.MultiReferenceEditorWindow;
 import com.paxxis.chime.client.pages.PageManager;
 
 /**
@@ -177,7 +177,7 @@ public class ImageListContainer extends LayoutContainer implements ImageContaine
                 new SelectionListener<IconButtonEvent>() {
             @Override
              public void componentSelected(IconButtonEvent ce) {
-                MultiReferenceEditorWindow w = new MultiReferenceEditorWindow(dataInstance, true, fieldListener);
+                FieldDataEditor w = new FieldDataEditor(dataInstance, true, fieldListener);
                 w.show();
              }
         });

@@ -27,7 +27,6 @@ import com.extjs.gxt.ui.client.event.Listener;
 import com.extjs.gxt.ui.client.event.SelectionListener;
 import com.extjs.gxt.ui.client.util.Margins;
 import com.extjs.gxt.ui.client.util.Padding;
-import com.extjs.gxt.ui.client.widget.HtmlContainer;
 import com.extjs.gxt.ui.client.widget.LayoutContainer;
 import com.extjs.gxt.ui.client.widget.button.IconButton;
 import com.extjs.gxt.ui.client.widget.layout.HBoxLayout;
@@ -43,6 +42,7 @@ import com.paxxis.chime.client.common.SearchFilter;
 import com.paxxis.chime.client.common.Shape;
 import com.paxxis.chime.client.common.DataInstanceRequest.Operator;
 import com.paxxis.chime.client.common.constants.SearchFieldConstants;
+import com.paxxis.chime.client.widgets.InterceptedHtml;
 
 /**
  *
@@ -151,24 +151,20 @@ public class SearchFilterPanel extends LayoutContainer
             add(bar, new FilledColumnLayoutData(55));
         }
         
-        //add(bar, new ColumnData(40));
-        
         LayoutContainer htmlPanel = new LayoutContainer();
         htmlPanel.setLayout(new RowLayout());
         
-        HtmlContainer htmlTitle = new HtmlContainer();
-        htmlTitle.setStyleAttribute("font", "normal 12px arial, tahoma, sans-serif");
-        htmlTitle.setStyleAttribute("top", "8px");
-        htmlTitle.setStyleAttribute("position", "relative");
-        htmlTitle.setStyleAttribute("color", "black");
-        htmlTitle.setBorders(false);
+        InterceptedHtml html = new InterceptedHtml();
+        html.setStyleAttribute("font", "normal 12px arial, tahoma, sans-serif");
+        html.setStyleAttribute("top", "8px");
+        html.setStyleAttribute("position", "relative");
+        html.setStyleAttribute("color", "black");
+        html.setBorders(false);
         
         Operator op = _filter.getOperator();
 
         String field;
         boolean isTag = false;
-        boolean isUser = false;
-        boolean isCommunity = false;
         if (_filter.getDataField().getName().equalsIgnoreCase(SearchFieldConstants.TAG))
         {
             isTag = true;
@@ -184,12 +180,10 @@ public class SearchFilterPanel extends LayoutContainer
         }
         else if (_filter.getDataField().getName().equalsIgnoreCase(SearchFieldConstants.USER))
         {
-            isUser = true;
             field = SearchFieldConstants.USER;
         }
         else if (_filter.getDataField().getName().equalsIgnoreCase(SearchFieldConstants.COMMUNITY))
         {
-            isCommunity = true;
             field = SearchFieldConstants.COMMUNITY;
         }
         else
@@ -335,8 +329,8 @@ public class SearchFilterPanel extends LayoutContainer
 	            break;
         }
 
-        htmlTitle.setHtml(text + "<br>&nbsp;");
-        htmlPanel.add(htmlTitle, new RowData(1, -1));
+        html.setHtml(text + "<br>&nbsp;");
+        htmlPanel.add(html, new RowData(1, -1));
         
         add(htmlPanel, new FilledColumnLayoutData());
         updateButtonState();

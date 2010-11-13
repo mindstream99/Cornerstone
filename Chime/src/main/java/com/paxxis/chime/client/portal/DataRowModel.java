@@ -32,6 +32,7 @@ public class DataRowModel extends BaseTreeModel implements Serializable {
 
 	public static final String NAME = "name";
 	public static final String VALUE = "value";
+	public static final String BLANK = "blank";
 
 	private static final long serialVersionUID = 1L;
 

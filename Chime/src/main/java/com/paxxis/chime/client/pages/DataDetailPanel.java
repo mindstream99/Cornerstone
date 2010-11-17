@@ -31,7 +31,6 @@ import com.extjs.gxt.ui.client.widget.layout.BorderLayoutData;
 import com.extjs.gxt.ui.client.widget.layout.FitLayout;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.DeferredCommand;
-import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.paxxis.chime.client.ChimeAsyncCallback;
 import com.paxxis.chime.client.DataInstanceResponseObject;
 import com.paxxis.chime.client.InstanceUpdateListener;
@@ -54,6 +53,8 @@ import com.paxxis.chime.client.common.FieldDefinition;
 import com.paxxis.chime.client.common.InstanceId;
 import com.paxxis.chime.client.common.LockRequest;
 import com.paxxis.chime.client.common.LockResponse;
+import com.paxxis.chime.client.common.ModifyShapeRequest;
+import com.paxxis.chime.client.common.ModifyShapeResponse;
 import com.paxxis.chime.client.common.MultiRequest;
 import com.paxxis.chime.client.common.MultiResponse;
 import com.paxxis.chime.client.common.NamedSearch;
@@ -498,6 +499,10 @@ public class DataDetailPanel extends ChimeLayoutContainer implements InstanceUpd
             	break;
             case Silent:
             	onSilentChange(instance);
+            	break;
+            case UpdateFieldDefinitions:
+            	updateFieldDefinitions(instance, UpdateReason.FieldChange);
+            	break;
         }
     }
 
@@ -620,6 +625,31 @@ public class DataDetailPanel extends ChimeLayoutContainer implements InstanceUpd
         req.setOperation(Operation.UpdatePrimaryData);
         req.setUser(ServiceManager.getActiveUser());
         ServiceManager.getService().sendEditDataInstanceRequest(req, callback);
+
+    }
+
+    private void updateFieldDefinitions(DataInstance instance, final UpdateReason reason) {
+        final ChimeAsyncCallback<ServiceResponseObject<ModifyShapeResponse>> callback = 
+        			new ChimeAsyncCallback<ServiceResponseObject<ModifyShapeResponse>>() {
+            public void onSuccess(ServiceResponseObject<ModifyShapeResponse> response) {
+                if (response.isResponse()) {
+                    ModifyShapeResponse resp = response.getResponse();
+
+                    DataInstance inst = resp.getShape();
+                    _origDataInstance = inst.copy();
+                    setDataInstance(inst, reason);
+                } else {
+                    ErrorMessage msg = response.getError();
+                    processErrorMessage(msg);
+                }
+            }
+
+        };
+
+        ModifyShapeRequest req = new ModifyShapeRequest();
+        req.setShape((Shape)_dataInstance);
+        req.setUser(ServiceManager.getActiveUser());
+        ServiceManager.getService().sendModifyShapeRequest(req, callback);
 
     }
 

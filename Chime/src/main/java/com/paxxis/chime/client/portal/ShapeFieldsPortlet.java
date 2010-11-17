@@ -23,7 +23,6 @@ import com.extjs.gxt.ui.client.widget.layout.RowLayout;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.DeferredCommand;
 import com.paxxis.chime.client.InstanceUpdateListener;
-import com.paxxis.chime.client.common.DataInstance;
 import com.paxxis.chime.client.common.Shape;
 import com.paxxis.chime.client.common.portal.PortletSpecification;
 import com.paxxis.chime.client.widgets.ShapeFields;
@@ -35,7 +34,7 @@ import com.paxxis.chime.client.widgets.ShapeFields;
 public class ShapeFieldsPortlet  extends PortletContainer {
 
     private InstanceUpdateListener updateListener;
-    private Shape dataType;
+    private Shape shape;
     private ShapeFields fields;
 
     public ShapeFieldsPortlet(PortletSpecification spec, InstanceUpdateListener listener) {
@@ -48,24 +47,24 @@ public class ShapeFieldsPortlet  extends PortletContainer {
     	getBody().setLayout(new RowLayout());
     }
 
-    public void updateDataInstance(final DataInstance instance) {
-        fields.setDataInstance(dataType);
+    public void updateDataInstance() {
+        fields.setDataInstance(shape);
     }
 
-    public void setDataInstance(final Shape type) {
+    public void setDataInstance(final Shape sh) {
     	Runnable r = new Runnable() {
     		public void run() {
-    	    	dataType = type;
+    	    	shape = sh;
 
     	        getBody().removeAll();
 
     	        fields = new ShapeFields(updateListener);
-    	        getBody().add(fields, new RowData(1, -1, new Margins(2)));
+    	        getBody().add(fields, new RowData(1, -1, new Margins(0)));
 
     	        DeferredCommand.addCommand(
     	            new Command() {
     	                public void execute() {
-    	                    updateDataInstance(dataType);
+    	                    updateDataInstance();
     	                    getBody().layout();
     	                }
     	            }

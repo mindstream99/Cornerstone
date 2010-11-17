@@ -31,6 +31,7 @@ import com.paxxis.chime.client.common.EditShapeRequest;
 import com.paxxis.chime.client.common.EditUserRequest;
 import com.paxxis.chime.client.common.FindInstancesRequest;
 import com.paxxis.chime.client.common.LockRequest;
+import com.paxxis.chime.client.common.ModifyShapeRequest;
 import com.paxxis.chime.client.common.MultiRequest;
 import com.paxxis.chime.client.common.PingRequest;
 import com.paxxis.chime.client.common.ReviewsRequest;
@@ -56,6 +57,7 @@ public interface endsliceServiceAsync {
     public void sendPingRequest(PingRequest request, AsyncCallback callback);
     public void sendEditDataInstanceRequest(EditDataInstanceRequest request, AsyncCallback callback);
     public void sendEditDataTypeRequest(EditShapeRequest request, AsyncCallback callback);
+    public void sendModifyShapeRequest(ModifyShapeRequest request, AsyncCallback callback);
     public void sendApplyTagRequest(ApplyTagRequest request, AsyncCallback callback);
     public void sendApplyRatingRequest(ApplyReviewRequest request, AsyncCallback callback);
     public void sendCreateDiscussionRequest(CreateDiscussionRequest request, AsyncCallback callback);

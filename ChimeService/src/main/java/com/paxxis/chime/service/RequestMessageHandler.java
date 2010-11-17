@@ -41,8 +41,7 @@ import com.paxxis.chime.client.common.LockRequest;
 import com.paxxis.chime.client.common.LoginRequest;
 import com.paxxis.chime.client.common.LogoutRequest;
 import com.paxxis.chime.client.common.MessageConstants;
-import com.paxxis.chime.client.common.MessageConstants.MessageType;
-import com.paxxis.chime.client.common.MessageConstants.PayloadType;
+import com.paxxis.chime.client.common.ModifyShapeRequest;
 import com.paxxis.chime.client.common.MultiRequest;
 import com.paxxis.chime.client.common.PingRequest;
 import com.paxxis.chime.client.common.ReviewsRequest;
@@ -51,6 +50,8 @@ import com.paxxis.chime.client.common.ShapeRequest;
 import com.paxxis.chime.client.common.SubscribeRequest;
 import com.paxxis.chime.client.common.UserContextRequest;
 import com.paxxis.chime.client.common.UserMessagesRequest;
+import com.paxxis.chime.client.common.MessageConstants.MessageType;
+import com.paxxis.chime.client.common.MessageConstants.PayloadType;
 import com.paxxis.chime.common.JavaObjectPayload;
 import com.paxxis.chime.common.MessagePayload;
 import com.paxxis.chime.data.CacheManager;
@@ -83,6 +84,7 @@ public class RequestMessageHandler extends ServiceBusMessageHandler {
         _messageTypes.put(ShapeRequest.messageType(), ShapeRequest.messageVersion());
         _messageTypes.put(DataInstanceRequest.messageType(), DataInstanceRequest.messageVersion());
         _messageTypes.put(EditShapeRequest.messageType(), EditShapeRequest.messageVersion());
+        _messageTypes.put(ModifyShapeRequest.messageType(), ModifyShapeRequest.messageVersion());
         _messageTypes.put(EditDataInstanceRequest.messageType(), EditDataInstanceRequest.messageVersion());
         _messageTypes.put(ApplyReviewRequest.messageType(), ApplyReviewRequest.messageVersion());
         _messageTypes.put(AddCommentRequest.messageType(), AddCommentRequest.messageVersion());
@@ -140,6 +142,10 @@ public class RequestMessageHandler extends ServiceBusMessageHandler {
                     else if (mtype == EditShapeRequest.messageType())
                     {
                         return new EditShapeRequestProcessor(mPayload, _databasePool, _topicSender);
+                    }
+                    else if (mtype == ModifyShapeRequest.messageType())
+                    {
+                        return new ModifyShapeRequestProcessor(mPayload, _databasePool, _topicSender);
                     }
                     else if (mtype == EditDataInstanceRequest.messageType())
                     {

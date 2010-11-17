@@ -55,6 +55,7 @@ import com.paxxis.chime.client.LoginResponseHandler;
 import com.paxxis.chime.client.LoginResponseObject;
 import com.paxxis.chime.client.LogoutResponseHandler;
 import com.paxxis.chime.client.LogoutResponseObject;
+import com.paxxis.chime.client.ModifyShapeResponseHandler;
 import com.paxxis.chime.client.MultiResponseHandler;
 import com.paxxis.chime.client.PingResponseHandler;
 import com.paxxis.chime.client.RatingsResponseHandler;
@@ -101,6 +102,8 @@ import com.paxxis.chime.client.common.LoginResponse;
 import com.paxxis.chime.client.common.LogoutRequest;
 import com.paxxis.chime.client.common.LogoutResponse;
 import com.paxxis.chime.client.common.Message;
+import com.paxxis.chime.client.common.ModifyShapeRequest;
+import com.paxxis.chime.client.common.ModifyShapeResponse;
 import com.paxxis.chime.client.common.MultiRequest;
 import com.paxxis.chime.client.common.MultiResponse;
 import com.paxxis.chime.client.common.PingRequest;
@@ -489,6 +492,34 @@ public class endsliceServiceImpl extends RemoteEventServiceServlet implements en
         if (response instanceof EditShapeResponse)
         {
             EditShapeResponse resp = (EditShapeResponse)response;
+            obj.setResponse(resp);
+        }
+        else if (response instanceof ErrorMessage)
+        {
+            ErrorMessage resp = (ErrorMessage)response;
+            obj.setError(resp);
+        }
+        else
+        {
+            obj.setResponse(null);
+        }
+
+        return obj;
+    }
+
+    public ServiceResponseObject<ModifyShapeResponse> sendModifyShapeRequest(ModifyShapeRequest request)
+    {
+        ServiceResponseObject<ModifyShapeResponse> obj = new ServiceResponseObject<ModifyShapeResponse>();
+
+        PoolEntry entry = senderPool.borrowInstance(this);
+        ChimeClient client = new ChimeClient(new JavaObjectPayload(), entry.getSender(), 30000);
+
+        Message response = client.execute(request, new ModifyShapeResponseHandler());
+        senderPool.returnInstance(entry, this);
+
+        if (response instanceof ModifyShapeResponse)
+        {
+            ModifyShapeResponse resp = (ModifyShapeResponse)response;
             obj.setResponse(resp);
         }
         else if (response instanceof ErrorMessage)

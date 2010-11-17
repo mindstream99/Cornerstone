@@ -51,7 +51,7 @@ public class ShapeUtils {
     {}
     
     public static Shape createInstanceColumn(Shape shape, Shape columnType, String name,
-                                                    String desc, int maxValues, DatabaseConnection database) throws Exception
+                                                    String desc, int maxValues, String format, int displayCol, DatabaseConnection database) throws Exception
     {
         database.startTransaction();
         
@@ -73,9 +73,9 @@ public class ShapeUtils {
             // insert schema record
             InstanceId id = Tools.getNewId(Tools.DEFAULT_EXTID);
             sql = "insert into Chime.ChimeSchema " +
-                    "(id,datatype_id, col, fieldName, field_typeid, maxValues, fieldDescription, private) values ('" +
+                    "(id,datatype_id, col, displayCol, fieldName, field_typeid, maxValues, fieldDescription, private) values ('" +
                     id + "', '" + shape.getId() +
-                    "', " + col + ", " + new StringData(name).asSQLValue() +
+                    "', " + col + ", " + displayCol + ", " + new StringData(name).asSQLValue() +
                     ", '" + columnType.getId() + "', " + maxValues +
                     ", " + new StringData(desc).asSQLValue() +
                     ", 'N')";
@@ -232,14 +232,53 @@ public class ShapeUtils {
         return result;
     }
 
+    public static Shape updateFields(Shape shape, User user, DatabaseConnection database) throws Exception {
+    	Shape result = null;
+    	database.startTransaction();
+
+        Shape original = ShapeUtils.getInstanceById(shape.getId(), database, true);
+        try {
+        	// update the existing fields, and add the new ones.  existing fields allow for changes to description,
+        	// format, and position.
+        	int idx = 1;
+        	for (DataField field : shape.getFields()) {
+        		if (field.getId().equals(InstanceId.UNKNOWN.getValue())) {
+        			// this is a new one
+                    checkFieldNameAvailable(original, field.getName());
+                    shape = createInstanceColumn(shape, field.getShape(), field.getName(), 
+                    		field.getDescription(), field.getMaxValues(), field.getFormat(), idx, database);
+        		} else {
+        			String sql = "update Chime.ChimeSchema set " +
+							"fielddescription = " + new StringData(field.getDescription()).asSQLValue() +
+        					", displaycol = " + idx +
+        					", displayformat = " + new StringData(field.getFormat()).asSQLValue() +
+        					" where id = '" + field.getId() + "'";
+        			database.executeStatement(sql);
+        		}
+        		
+        		idx++;
+        	}
+
+            DataInstanceUtils.setUpdated(shape, user, database);
+            database.commitTransaction();
+            result = getInstanceById(shape.getId(), database, false);
+        } catch (Exception e) {
+            database.rollbackTransaction();
+            throw new Exception(e.getMessage());
+        }
+    	
+    	return result;
+    }
+    
     public static Shape addFields(InstanceId shapeId, List<FieldDefinition> fieldDefs, DatabaseConnection database) throws Exception
     {
         Shape shape = getInstanceById(shapeId, database, false);
+        int col = 1;
         for (FieldDefinition def : fieldDefs)
         {
             Shape colType = getInstance(def.typeName, database, true);
             checkFieldNameAvailable(shape, def.name);
-            shape = createInstanceColumn(shape, colType, def.name, def.description, def.maxValues, database);
+            shape = createInstanceColumn(shape, colType, def.name, def.description, def.maxValues, "", col++, database);
         }
         
         return shape;
@@ -427,7 +466,7 @@ public class ShapeUtils {
         cache.put(shape.getId(), shape);
         
         sql = "SELECT A.*, B.id, A.id theId, B.name Bname FROM Chime.ChimeSchema A, Chime.DataInstance B where "
-                + "A.datatype_id = '" + theTypeId + "' and A.field_typeid = B.id order by A.col";
+                + "A.datatype_id = '" + theTypeId + "' and A.field_typeid = B.id order by A.displayCol";
         dataSet = database.getDataSet(sql, true);
         found = dataSet.next();
         while (found)
@@ -482,8 +521,8 @@ public class ShapeUtils {
         HashMap<InstanceId, Shape> cache = new HashMap<InstanceId, Shape>();
         cache.put(shape.getId(), shape);
 
-        String sql = "SELECT A.*, B.id DataTypeid, B.name DataTypename FROM Chime.ChimeSchema A, Chime.DataInstance B where "
-                + "A.datatype_id = '" + shape.getId() + "' and A.field_typeid = B.id order by A.col";
+        String sql = "SELECT A.*, A.id theId, B.name DataTypename FROM Chime.ChimeSchema A, Chime.DataInstance B where "
+                + "A.datatype_id = '" + shape.getId() + "' and A.field_typeid = B.id order by A.displayCol";
         DataSet dataSet = database.getDataSet(sql, true);
         boolean found = dataSet.next();
         while (found)
@@ -491,7 +530,7 @@ public class ShapeUtils {
             DataField field = new DataField();
             field.setName(dataSet.getFieldValue("fieldName").asString());
             field.setDescription(dataSet.getFieldValue("fieldDescription").asString());
-            field.setId(dataSet.getFieldValue("DataTypeid").asString());
+            field.setId(dataSet.getFieldValue("theId").asString());
             field.setPrivate(dataSet.getFieldValue("private").asString().equals("Y"));
             field.setUserEditable(dataSet.getFieldValue("userEditable").asString().equals("Y"));
             field.setMaxValues(dataSet.getFieldValue("maxValues").asInteger());

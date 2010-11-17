@@ -17,15 +17,23 @@
 
 package com.paxxis.chime.client;
 
-import com.paxxis.chime.client.common.DataField;
-import com.extjs.gxt.ui.client.data.BaseTreeModel;
 import java.io.Serializable;
+
+import com.extjs.gxt.ui.client.data.BaseTreeModel;
+import com.paxxis.chime.client.common.DataField;
+import com.paxxis.chime.client.common.Shape;
 
 /**
  *
  * @author Robert Englander
  */
 public class DataFieldModel  extends BaseTreeModel implements Serializable {
+	public static final String NAME = "Name";
+	public static final String DESCRIPTION = "Description";
+	public static final String SHAPE = "Shape";
+	public static final String MAXVALUES = "Max Values";
+	public static final String FORMAT = "Format";
+	
 	private static final long serialVersionUID = 2L;
 	private DataField dataField;
 	private DataField subField;
@@ -37,6 +45,29 @@ public class DataFieldModel  extends BaseTreeModel implements Serializable {
     	this(dataField, null);
     }
     
+	@SuppressWarnings("unchecked")
+	public Object set(String propertyName, Object value) {
+		boolean remove = (value == null);
+		
+		if (NAME.equals(propertyName)) {
+			dataField.setName((String)value);
+		} else if (DESCRIPTION.equals(propertyName)) {
+			dataField.setDescription((String)value);
+		} else if (SHAPE.equals(propertyName)) {
+			dataField.setShape((Shape)value);
+		} else if (MAXVALUES.equals(propertyName)) {
+			dataField.setMaxValues((int)Double.parseDouble(value.toString()));
+		} else if (FORMAT.equals(propertyName)) {
+			dataField.setFormat((String)value); 
+		}
+
+		if (remove) {
+			return super.remove(propertyName);
+		} else {
+			return super.set(propertyName, value);
+		}
+	}
+    
     public DataFieldModel(DataField field, DataField subField) {
         this.dataField = field;
         this.subField = subField;
@@ -45,7 +76,11 @@ public class DataFieldModel  extends BaseTreeModel implements Serializable {
         	name += " : " + subField.getName();
         }
         
-        set("name", name);
+        super.set(NAME, name);
+        super.set(DESCRIPTION, field.getDescription());
+        super.set(SHAPE, field.getShape());
+        super.set(MAXVALUES, field.getMaxValues());
+        super.set(FORMAT, field.getFormat());
     }
 
     public DataField getDataField() {

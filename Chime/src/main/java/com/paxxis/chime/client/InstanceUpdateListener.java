@@ -40,6 +40,7 @@ public interface InstanceUpdateListener {
         Description,
         Type,
         AddFieldDefinition,
+        UpdateFieldDefinitions,
         PageLayout,
         Refresh,
         NamedSearchChange,

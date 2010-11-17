@@ -17,13 +17,15 @@
 
 package com.paxxis.chime.client.widgets;
 
+import java.util.ArrayList;
 import java.util.List;
 
-import com.extjs.gxt.ui.client.util.Margins;
-import com.extjs.gxt.ui.client.widget.Html;
-import com.extjs.gxt.ui.client.widget.LayoutContainer;
+import com.extjs.gxt.ui.client.store.ListStore;
+import com.extjs.gxt.ui.client.widget.grid.ColumnConfig;
+import com.extjs.gxt.ui.client.widget.grid.ColumnModel;
 import com.extjs.gxt.ui.client.widget.layout.RowData;
 import com.extjs.gxt.ui.client.widget.layout.RowLayout;
+import com.paxxis.chime.client.DataFieldModel;
 import com.paxxis.chime.client.InstanceUpdateListener;
 import com.paxxis.chime.client.common.DataField;
 import com.paxxis.chime.client.common.Shape;
@@ -32,65 +34,80 @@ import com.paxxis.chime.client.common.Shape;
  *
  * @author Robert Englander
  */
-public class ShapeFields extends LayoutContainer
+public class ShapeFields extends ChimeLayoutContainer
 {
-    private Shape _type = null;
-    private InstanceUpdateListener _saveListener;
-
-    public ShapeFields(InstanceUpdateListener saveListener)
-    {
-        init(saveListener);
+    private Shape shape = null;
+    private InstanceUpdateListener saveListener;
+    private ChimeGrid<DataFieldModel> grid;
+    private ListStore<DataFieldModel> listStore;
+    
+    public ShapeFields(InstanceUpdateListener saveListener) {
+        this.saveListener = saveListener;
     }
 
-    private void init(InstanceUpdateListener saveListener)
-    {
-        _saveListener = saveListener;
-
+    protected void init() {
         setLayout(new RowLayout());
-        setStyleAttribute("backgroundColor", "white");
         setBorders(false);
-    }
 
-    public void setDataInstance(Shape type) {
-        update(type, _type);
-        _type = type;
-    }
+        listStore = new ListStore<DataFieldModel>();
+        
+        List<ColumnConfig> configs = new ArrayList<ColumnConfig>();
 
-    private void update(Shape newInstance, Shape oldInstance) {
-
-        // we want to keep the fields that were also in the old instance; remove those
-        // that don't exist anymore; and add the new ones.
-
-        boolean startOver = true; //oldInstance == null || newInstance.getId() != oldInstance.getId();
-        if (startOver) {
-            removeAll(); 
-
-            boolean isFirst = true;
-            boolean shade = false;
-            List<DataField> fields = newInstance.getFields();
-            for (DataField field : fields) {
-                if (isFirst) {
-                    isFirst = false;
-                } else {
-                    add(new Html("<hr COLOR=\"#f1f1f1\"/>"), new RowData(1, -1, new Margins(2, 0, 2, 0)));
-                }
-
-                ShapeField f = new ShapeField(newInstance, field, _saveListener);
-                if (shade) {
-                    f.setStyleAttribute("backgroundColor", "#f1f1f1");
-                }
-                
-                add(f, new RowData(1, -1, new Margins(2, 0, 2, 0)));
-                shade = !shade;
-            }
-        } else {
-            //for (Component comp : getItems()) {
-            //    DataInstanceField f = (DataInstanceField)comp;
-            //    f.updateDataInstance(newInstance);
-            //}
+        String[] cols = {
+        	DataFieldModel.NAME,
+        	DataFieldModel.DESCRIPTION,
+        	DataFieldModel.SHAPE,
+        	DataFieldModel.MAXVALUES,
+        	DataFieldModel.FORMAT
+        };
+        
+        for (String col : cols) {
+            ColumnConfig column = new ColumnConfig();
+            column.setId(col);
+            column.setFixed(false);
+            column.setHeader(col);
+            column.setWidth(150);
+            column.setSortable(false);
+            column.setMenuDisabled(true);
+            column.setRenderer(new DataFieldCellRenderer(true));
+            configs.add(column);
         }
 
+        ColumnModel cm = new ColumnModel(configs);
+        grid = new ChimeGrid<DataFieldModel>(listStore, cm, true, false);
+        grid.getView().setAutoFill(false);
+        grid.setSelectionModel(null);
+        grid.getView().setForceFit(false);
+        grid.getView().setShowDirtyCells(false);
+        grid.setHideHeaders(false);
+        grid.setTrackMouseOver(false);
+        grid.setStripeRows(false);
+        grid.setBorders(true);
+        grid.setHeight(300);
+        grid.setAutoExpandColumn(DataFieldModel.FORMAT);
+        add(grid, new RowData(1, -1));
+    }
 
-        layout();
+    public void setDataInstance(Shape sh) {
+        shape = sh;
+        Runnable r = new Runnable() {
+        	public void run() {
+                for (DataField field : shape.getFields()) {
+                	DataFieldModel model = new DataFieldModel(field);
+                	listStore.add(model);
+                }
+        	}
+        };
+        
+        if (isRendered()) {
+        	r.run();
+        } else {
+        	addPostRenderRunnable(r);
+        }
     }
 }
+
+
+
+
+

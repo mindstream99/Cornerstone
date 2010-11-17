@@ -108,6 +108,8 @@ public class MessageConstants
     private final static int USERCONTEXTRESPONSE = 3049;
     private final static int USERMESSAGESREQUEST = 3050;
     private final static int USERMESSAGESRESPONSE = 3051;
+    private final static int MODIFYSHAPEREQUEST = 3052;
+    private final static int MODIFYSHAPERESPONSE = 3053;
 
     private MessageConstants() {
     }
@@ -159,6 +161,8 @@ public class MessageConstants
         EditDataInstanceResponse(EDITDATAINSTANCERESPONSE),
         EditShapeRequest(EDITSHAPEREQUEST),
         EditShapeResponse(EDITSHAPERESPONSE),
+        ModifyShapeRequest(MODIFYSHAPEREQUEST),
+        ModifyShapeResponse(MODIFYSHAPERESPONSE),
         EditNamedSearchRequest(EDITNAMEDSEARCHREQUEST),
         EditPageTemplateRequest(EDITPAGETEMPLATEREQUEST),
         EditPortalTemplateRequest(EDITPORTALTEMPLATEREQUEST),
@@ -323,6 +327,12 @@ public class MessageConstants
                     break;
                 case EDITSHAPERESPONSE:
                     result = EditShapeResponse;
+                    break;
+                case MODIFYSHAPEREQUEST:
+                    result = ModifyShapeRequest;
+                    break;
+                case MODIFYSHAPERESPONSE:
+                    result = ModifyShapeResponse;
                     break;
                 case EDITNAMEDSEARCHREQUEST:
                     result = EditNamedSearchRequest;

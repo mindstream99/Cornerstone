@@ -431,8 +431,6 @@ public class DataInstanceUtils {
                                     }
                                 }
 
-
-
                                 if (cachedInstance instanceof Tag)
                                 {
                                     Tag tag = (Tag)cachedInstance;

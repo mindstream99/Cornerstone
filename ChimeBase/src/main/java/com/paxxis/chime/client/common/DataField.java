@@ -24,15 +24,18 @@ import java.io.Serializable;
  * @author Robert Englander
  */
 public class DataField  implements Serializable {
-    String _id = "-1";
-    String _name = null;
-    String _description = null;
-    boolean _private = false;
-    boolean userEditable = true;
-    Shape shape = null;
-    int _column = -1;
-    int _maxValues = 0;
+	private static final long serialVersionUID = 1L;
 
+	private String _id = "-1";
+	private String _name = null;
+	private String _description = null;
+	private boolean _private = false;
+	private boolean userEditable = true;
+	private Shape shape = null;
+	private int _column = -1;
+	private int _maxValues = 0;
+	private String format = null;
+	
     public DataField()
     {
         
@@ -47,6 +50,7 @@ public class DataField  implements Serializable {
         copy.setMaxValues(getMaxValues());
         copy.setName(getName());
         copy.setUserEditable(isUserEditable());
+        copy.setFormat(getFormat());
         return copy;
     }
     
@@ -75,6 +79,7 @@ public class DataField  implements Serializable {
         boolean equiv = getName().equals(inst.getName()) &&
                         getDescription().equals(inst.getDescription()) &&
                         getShape().getId().equals(inst.getShape().getId()) &&
+                        getFormat().equals(inst.getFormat()) &&
                         getMaxValues() == inst.getMaxValues();
         
         return equiv;
@@ -140,6 +145,14 @@ public class DataField  implements Serializable {
         _name = name;
     }
 
+    public void setFormat(String fmt) {
+    	format = fmt;
+    }
+    
+    public String getFormat() {
+    	return format;
+    }
+    
     public String getDescription() 
     {
         return _description;

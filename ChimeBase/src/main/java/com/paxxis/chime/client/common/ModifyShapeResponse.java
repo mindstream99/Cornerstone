@@ -17,12 +17,12 @@
 
 package com.paxxis.chime.client.common;
 
-
 /**
- *
+ * 
  * @author Robert Englander
+ *
  */
-public class EditShapeResponse extends ResponseMessage<EditShapeRequest> {
+public class ModifyShapeResponse extends ResponseMessage<ModifyShapeRequest> {
 	private static final long serialVersionUID = 1L;
 	private final static int VERSION = 1;
 
@@ -32,7 +32,7 @@ public class EditShapeResponse extends ResponseMessage<EditShapeRequest> {
     }
 
     public static MessageConstants.MessageType messageType() {
-        return MessageConstants.MessageType.EditShapeResponse;
+        return MessageConstants.MessageType.ModifyShapeResponse;
     }
 
     @Override
@@ -43,7 +43,6 @@ public class EditShapeResponse extends ResponseMessage<EditShapeRequest> {
     public static int messageVersion() {
         return VERSION;
     }
-
     
     private Shape shape = null;
     

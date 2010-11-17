@@ -207,7 +207,7 @@ public class ComplexSearchFilterEditor extends ChimeWindow
         _dataFieldStore = new ChimeListStore<DataFieldModel>();
         _dataFieldComboBox.setStore(_dataFieldStore);
         _dataFieldComboBox.setEditable(false);
-        _dataFieldComboBox.setDisplayField("name");
+        _dataFieldComboBox.setDisplayField(DataFieldModel.NAME);
         _dataFieldComboBox.addSelectionChangedListener(
             new SelectionChangedListener<DataFieldModel>()
             {

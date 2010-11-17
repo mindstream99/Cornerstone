@@ -30,8 +30,6 @@ import com.extjs.gxt.ui.client.event.SelectionChangedEvent;
 import com.extjs.gxt.ui.client.event.SelectionChangedListener;
 import com.extjs.gxt.ui.client.event.SelectionListener;
 import com.extjs.gxt.ui.client.store.ListStore;
-import com.extjs.gxt.ui.client.store.StoreEvent;
-import com.extjs.gxt.ui.client.store.StoreListener;
 import com.extjs.gxt.ui.client.util.Margins;
 import com.extjs.gxt.ui.client.widget.Html;
 import com.extjs.gxt.ui.client.widget.button.Button;
@@ -146,26 +144,11 @@ public class FieldDataEditor extends ChimeWindow {
     protected void init() {
     	initialize();
     	listStore.addStoreListener(
-    		new StoreListener<FieldValueModel>() {
-    			  public void storeAdd(StoreEvent<FieldValueModel> se) {
-    				  validate();
-    			  }
-
-    			  public void storeClear(StoreEvent<FieldValueModel> se) {
-    				  validate();
-    			  }
-
-    			  public void storeDataChanged(StoreEvent<FieldValueModel> se) {
-    				  validate();
-    			  }
-
-    			  public void storeRemove(StoreEvent<FieldValueModel> se) {
-    				  validate();
-    			  }
-
-    			  public void storeUpdate(StoreEvent<FieldValueModel> se) {
-    				  validate();
-    			  }
+    		new ListStoreEditChangeHandler<FieldValueModel>() {
+				@Override
+				public void onChange() {
+					validate();
+				}
     		}
     	);
     	setup();

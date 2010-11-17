@@ -46,14 +46,14 @@ public class ReferenceUtils {
      */
     static void updateReferences(DataInstance instance, User user, DatabaseConnection database) throws Exception {
 
-        // the applied data types
+        // the applied shapes
         List<Shape> shapes = ShapeUtils.getInstanceShapes(instance.getId(), database);
         instance.setShapes(shapes, false);
 
-        for (Shape type : shapes) {
-           List<DataField> fields = type.getFields();
+        for (Shape shape : shapes) {
+           List<DataField> fields = shape.getFields();
            for (DataField field : fields) {
-               List<DataFieldValue> values = instance.getFieldValues(type, field);
+               List<DataFieldValue> values = instance.getFieldValues(shape, field);
                for (DataFieldValue value : values) {
                    if (!value.isInternal()) {
                        if (field.getShape().isTabular()) {

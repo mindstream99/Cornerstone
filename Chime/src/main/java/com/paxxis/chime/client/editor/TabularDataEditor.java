@@ -28,8 +28,6 @@ import com.extjs.gxt.ui.client.event.SelectionChangedEvent;
 import com.extjs.gxt.ui.client.event.SelectionChangedListener;
 import com.extjs.gxt.ui.client.event.SelectionListener;
 import com.extjs.gxt.ui.client.store.ListStore;
-import com.extjs.gxt.ui.client.store.StoreEvent;
-import com.extjs.gxt.ui.client.store.StoreListener;
 import com.extjs.gxt.ui.client.util.Margins;
 import com.extjs.gxt.ui.client.widget.Html;
 import com.extjs.gxt.ui.client.widget.button.Button;
@@ -110,26 +108,11 @@ public class TabularDataEditor extends ChimeWindow {
     protected void init() {
     	initialize();
     	listStore.addStoreListener(
-    		new StoreListener<TabularDataFieldValueModel>() {
-    			  public void storeAdd(StoreEvent<TabularDataFieldValueModel> se) {
-    				  validate();
-    			  }
-
-    			  public void storeClear(StoreEvent<TabularDataFieldValueModel> se) {
-    				  validate();
-    			  }
-
-    			  public void storeDataChanged(StoreEvent<TabularDataFieldValueModel> se) {
-    				  validate();
-    			  }
-
-    			  public void storeRemove(StoreEvent<TabularDataFieldValueModel> se) {
-    				  validate();
-    			  }
-
-    			  public void storeUpdate(StoreEvent<TabularDataFieldValueModel> se) {
-    				  validate();
-    			  }
+    		new ListStoreEditChangeHandler<TabularDataFieldValueModel>() {
+				@Override
+				public void onChange() {
+					validate();
+				}
     		}
     	);
     	setup();

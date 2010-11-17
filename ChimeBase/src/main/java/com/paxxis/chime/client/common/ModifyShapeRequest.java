@@ -17,14 +17,19 @@
 
 package com.paxxis.chime.client.common;
 
-
 /**
- *
+ * 
  * @author Robert Englander
+ *
  */
-public class EditShapeResponse extends ResponseMessage<EditShapeRequest> {
+public class ModifyShapeRequest extends RequestMessage {
+	public enum Type {
+		ModifyFields
+	}
+	
 	private static final long serialVersionUID = 1L;
-	private final static int VERSION = 1;
+    
+    private final static int VERSION = 1;
 
     @Override
     public MessageConstants.MessageType getMessageType() {
@@ -32,7 +37,7 @@ public class EditShapeResponse extends ResponseMessage<EditShapeRequest> {
     }
 
     public static MessageConstants.MessageType messageType() {
-        return MessageConstants.MessageType.EditShapeResponse;
+        return MessageConstants.MessageType.ModifyShapeRequest;
     }
 
     @Override
@@ -44,15 +49,31 @@ public class EditShapeResponse extends ResponseMessage<EditShapeRequest> {
         return VERSION;
     }
 
-    
     private Shape shape = null;
+    private User user = null;
+    private Type type = Type.ModifyFields;
+    
+    public void setShape(Shape shape) {
+    	this.shape = shape;
+    }
     
     public Shape getShape() {
-        return shape;
+    	return shape;
     }
     
-    public void setShape(Shape s) {
-        shape = s;
+    public User getUser() {
+        return user;
+    }
+    
+    public void setUser(User user) {
+        this.user = user;
+    }
+
+    public void setType(Type type) {
+    	this.type = type;
+    }
+    
+    public Type getType() {
+    	return type;
     }
 }
-

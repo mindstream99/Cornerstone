@@ -41,6 +41,8 @@ import com.paxxis.chime.client.common.EditUserResponse;
 import com.paxxis.chime.client.common.FindInstancesRequest;
 import com.paxxis.chime.client.common.LockRequest;
 import com.paxxis.chime.client.common.LockResponse;
+import com.paxxis.chime.client.common.ModifyShapeRequest;
+import com.paxxis.chime.client.common.ModifyShapeResponse;
 import com.paxxis.chime.client.common.MultiRequest;
 import com.paxxis.chime.client.common.MultiResponse;
 import com.paxxis.chime.client.common.PingRequest;
@@ -71,6 +73,7 @@ public interface endsliceService extends RemoteService
     public ServiceResponseObject<PingResponse> sendPingRequest(PingRequest request);
     public ServiceResponseObject<EditDataInstanceResponse> sendEditDataInstanceRequest(EditDataInstanceRequest request);
     public ServiceResponseObject<EditShapeResponse> sendEditDataTypeRequest(EditShapeRequest request);
+    public ServiceResponseObject<ModifyShapeResponse> sendModifyShapeRequest(ModifyShapeRequest request);
     public ServiceResponseObject<ApplyTagResponse> sendApplyTagRequest(ApplyTagRequest request);
     public ServiceResponseObject<ApplyReviewResponse> sendApplyRatingRequest(ApplyReviewRequest request);
     public ServiceResponseObject<CreateDiscussionResponse> sendCreateDiscussionRequest(CreateDiscussionRequest request);

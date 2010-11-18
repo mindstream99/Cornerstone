@@ -43,6 +43,7 @@ public class Shape extends DataInstance {
     public static final InstanceId NAMEDSEARCH_ID = InstanceId.create("1300");
     public static final InstanceId IMAGE_ID = InstanceId.create("1400");
     public static final InstanceId FILE_ID = InstanceId.create("1500");
+    public static final InstanceId YESNO_ID = InstanceId.create("1600");
     public static final InstanceId ANALYTIC_ID = InstanceId.create("1900");
     public static final InstanceId REFERENCE_ID = InstanceId.create("2000");
     public static final InstanceId FOLDER_ID = InstanceId.create("2100");
@@ -211,6 +212,10 @@ public class Shape extends DataInstance {
     
     public boolean isNumeric() {
         return getId().equals(Shape.NUMBER_ID);
+    }
+
+    public boolean isBoolean() {
+        return getId().equals(Shape.YESNO_ID);
     }
 
     public boolean isDate() {

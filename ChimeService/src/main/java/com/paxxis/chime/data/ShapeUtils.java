@@ -329,7 +329,7 @@ public class ShapeUtils {
             // remove all of the column data
             String ext = "_Reference";
             if (fieldType.isPrimitive()) {
-                if (fieldType.isNumeric()) {
+                if (fieldType.isNumeric() || fieldType.isBoolean()) {
                     ext = "_Number";
                 } else if (fieldType.isDate()) {
                 	ext = "_Timestamp";

@@ -63,7 +63,9 @@ public class DataInstanceRequest extends RequestMessage {
         OnOrBeforeDate,
         OnDate,
         AfterDate,
-        OnOrAfterDate
+        OnOrAfterDate,
+        IsYes,
+        IsNo
     }
     
     public enum Depth

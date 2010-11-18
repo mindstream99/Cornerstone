@@ -25,21 +25,17 @@ import java.io.Serializable;
  *
  * @author Robert Englander
  */
-public class SearchCriteriaOperatorModel extends BaseTreeModel implements Serializable
-{
-    private Operator _operator;
+public class SearchCriteriaOperatorModel extends BaseTreeModel implements Serializable {
+	private static final long serialVersionUID = 1L;
+	private Operator _operator;
 
-    public SearchCriteriaOperatorModel()
-    {
-
+    public SearchCriteriaOperatorModel() {
     }
 
-    public SearchCriteriaOperatorModel(Operator operator)
-    {
+    public SearchCriteriaOperatorModel(Operator operator) {
         _operator = operator;
 
-        switch (_operator)
-        {
+        switch (_operator) {
             case Contains:
                 setDescription("Contains Word or Phrase");
                 break;
@@ -100,21 +96,24 @@ public class SearchCriteriaOperatorModel extends BaseTreeModel implements Serial
             case OnOrAfterDate:
                 setDescription("On Or After Date");
                 break;
+            case IsYes:
+            	setDescription("Is Yes");
+            	break;
+            case IsNo:
+            	setDescription("Is No");
+            	break;
         }
     }
 
-    public String getDescription()
-    {
+    public String getDescription() {
         return get("description");
     }
 
-    public void setDescription(String text)
-    {
+    public void setDescription(String text) {
         set("description", text);
     }
 
-    public String getOp()
-    {
+    public String getOp() {
         return get("op");
     }
 
@@ -123,8 +122,7 @@ public class SearchCriteriaOperatorModel extends BaseTreeModel implements Serial
         set("op", operator);
     }
 
-    public Operator getOperator()
-    {
+    public Operator getOperator() {
         return _operator;
     }
 }

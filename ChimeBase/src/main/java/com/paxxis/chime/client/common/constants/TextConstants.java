@@ -23,4 +23,8 @@ public class TextConstants {
 
 	/** used for newlines in stored text */
 	public static final String NEWLINE = "###BR###";
+	
+	/** used for rendering YES/NO values */
+	public static final String YES = "Yes";
+	public static final String NO = "No";
 }

@@ -48,7 +48,8 @@ CREATE TABLE  `Chime`.`ChimeSchema` (
 
 /*!40000 ALTER TABLE `ChimeSchema` DISABLE KEYS */;
 LOCK TABLES `ChimeSchema` WRITE;
-INSERT INTO `Chime`.`ChimeSchema` VALUES  ('100','800',NULL,1,1,'Community','900',0,'Community membership','N','N'),
+INSERT INTO `Chime`.`ChimeSchema` VALUES  ('0ad79fa0bc5643cd9bb849e80df34a1000','800',NULL,7,NULL,'Local Authentication','1600',1,'Always use local password.','N','Y'),
+ ('100','800',NULL,1,1,'Community','900',0,'Community membership','N','N'),
  ('1000','1300',NULL,1,1,'Search Criteria','200',1,'The search criteria','Y','N'),
  ('1300','1400',NULL,1,1,'File ID','200',1,'Image File','N','Y'),
  ('1400','1500',NULL,1,1,'File ID','200',1,'File Identifier','N','Y'),
@@ -143,10 +144,10 @@ INSERT INTO `Chime`.`DataInstance` VALUES  ('100','Shape','A Chime Shape definit
  ('1300','Named Search','Saved search criteria that can be subsequently executed directly or used on a dashboard or in a script.','2010-02-23 15:58:52','19900','system','2010-08-08 14:17:58','19800','admin',0,0,0,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,0,0,0,0,0,'NYYYYYYYNNYNN','NONE',NULL,NULL,NULL,NULL,NULL),
  ('1400','Image','An image file.','2010-02-23 16:00:44','19900','system','2010-02-23 16:00:44','19900','system',0,0,0,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,0,0,0,0,0,'NYYYYYYYYNYNN','NONE',NULL,NULL,NULL,NULL,NULL),
  ('1500','File','A document file of any type.','2010-02-23 16:01:16','19900','system','2010-02-23 16:01:16','19900','system',0,0,0,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,0,0,0,0,0,'NYYYYYYYNNYNN','NONE',NULL,NULL,NULL,NULL,NULL),
+ ('1600','Yes/No','A boolean value.','2010-11-16 05:08:06','19900','system','2010-11-16 05:08:06','19900','system',0,0,0,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,0,0,0,0,0,'YYNNNNNNNNNNN','NONE',NULL,NULL,NULL,NULL,NULL),
  ('1900','Analytic','A script used to query and process Chime data','2010-02-25 16:10:38','19900','system','2010-02-25 16:10:38','19900','system',0,0,0,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,0,0,50,0,0,'NYYYYYYYYYYYN','NONE',NULL,NULL,NULL,NULL,NULL),
- ('19500','Local Users','Members of this community are always authenticated locally, regardless of whether or not LDAP is being used.','2010-11-12 11:01:44','19900','system','2010-11-12 11:01:44','19900','system',0,0,0,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,0,0,0,0,0,NULL,'NONE',NULL,NULL,NULL,NULL,NULL),
- ('19800','admin','The Chime administrator','2010-02-26 09:43:20','19900','system','2010-11-12 11:05:20','19900','system',0,0,0,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,0,0,0,0,0,'admin','NONE',NULL,NULL,NULL,NULL,NULL),
- ('19900','system','The Chime System','2010-02-23 15:12:56','19900','system','2010-11-12 11:05:03','19900','system',0,0,0,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,0,0,0,0,0,'xyz123','NONE',NULL,NULL,NULL,NULL,NULL),
+ ('19800','admin','The Chime administrator','2010-02-26 09:43:20','19900','system','2010-11-18 03:22:56','19900','system',0,0,0,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,0,0,0,0,0,'admin','NONE',NULL,NULL,NULL,NULL,NULL),
+ ('19900','system','The Chime System','2010-02-23 15:12:56','19900','system','2010-11-18 03:22:09','19900','system',0,0,0,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,0,0,0,0,0,'xyz123','NONE',NULL,NULL,NULL,NULL,NULL),
  ('200','Text','Raw Text','2010-02-23 15:45:02','19900','system','2010-02-23 15:45:02','19900','system',0,0,0,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,0,0,0,0,0,'YYNNNNNNNNNNN','NONE',NULL,NULL,NULL,NULL,NULL),
  ('2000','Reference','A reference to any chime data instance','2010-02-23 15:45:02','19900','system','2010-02-23 15:45:02','19900','system',0,0,0,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,0,0,0,0,0,'NYNNNNNNNNNNN','NONE',NULL,NULL,NULL,NULL,NULL),
  ('2100','Folder','A folder is a collection of Chime data instance references.','2010-08-07 17:37:04','19900','system','2010-08-07 17:40:07','19900','system',0,0,0,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,0,0,0,0,0,'NYYYYYYYYYYYN','NONE',NULL,NULL,NULL,NULL,NULL),
@@ -215,18 +216,49 @@ CREATE TABLE  `Chime`.`DataInstance_History` (
 
 /*!40000 ALTER TABLE `DataInstance_History` DISABLE KEYS */;
 LOCK TABLES `DataInstance_History` WRITE;
-INSERT INTO `Chime`.`DataInstance_History` VALUES  ('100000200','100000200','19900','system','Create','2010-02-26 10:33:11',''),
+INSERT INTO `Chime`.`DataInstance_History` VALUES  ('0b5fd1da7f4b4afeacf542662de69a9800','19900','19900','system','Modify','2010-11-17 11:53:46','Removed User : Local Authentication data'),
+ ('0fc612ca319b42088955e07aaf7050ec00','19900','19900','system','Modify','2010-11-17 11:31:48','Added User : Local Authentication data'),
+ ('100000200','100000200','19900','system','Create','2010-02-26 10:33:11',''),
  ('100000300','100000300','19800','admin','Create','2010-02-26 14:19:42',''),
  ('100000400','100000400','19800','admin','Create','2010-05-15 12:08:59',''),
  ('100000500','100000500','19800','admin','Create','2010-05-15 12:09:46',''),
  ('100000600','100000600','19800','admin','Create','2010-05-15 12:10:37',''),
- ('381a27d5f4864921ab2608b384f4e5b500','19500','19900','system','Create','2010-11-12 11:01:44',''),
+ ('289ed7176b3d427d826ff7a2c10d2f4200','19900','19900','system','Modify','2010-11-17 11:25:31','Added User : Local Authentication data'),
+ ('305b154753c945ad87796bfd03ecc2e600','19900','19900','system','Modify','2010-11-17 13:15:25','Added User : Local Authentication data'),
+ ('3787e62fdae3492eb5b4a66079d1fa7e00','19900','19900','system','Modify','2010-11-17 11:23:01','Added User : Local Authentication data'),
+ ('3efda7ced8f4401c97f38c2c5f04043600','19900','19900','system','Modify','2010-11-17 11:33:48','Removed User : Local Authentication data'),
+ ('4392d790b06c416b84f1e2f1b11468a300','19900','19900','system','Modify','2010-11-17 04:28:13','Removed User : Local Authentication data'),
+ ('44eef941183b4c19b7ee6af84ef875ed00','19900','19900','system','Modify','2010-11-17 11:53:46','Added User : Local Authentication data'),
+ ('4a68ba296e0e4424900ab6bedf34710200','19900','19900','system','Modify','2010-11-17 06:29:24','Added User : Local Authentication data'),
+ ('4bd6aa03530043d3b8311c3cbd0ed64100','19900','19900','system','Modify','2010-11-17 04:28:13','Added User : Local Authentication data'),
+ ('553c9cc2a1c34e25b073e543bced94fd00','19900','19900','system','Modify','2010-11-17 13:15:25','Removed User : Local Authentication data'),
+ ('641763bbdbcf41b68e84a619c6a6485f00','19900','19900','system','Modify','2010-11-17 11:34:04','Removed User : Local Authentication data'),
+ ('6ba130fd9ee54c7e9330cafa182b87fb00','19800','19900','system','Modify','2010-11-18 03:22:56','Added User : Local Authentication data'),
+ ('72498477ee934f47b74d1abc09b30fac00','1600','19900','system','Create','2010-11-16 05:08:07',''),
  ('7d6292fb8b9c4802ab7a20c253f7a7b000','19900','19900','system','Modify','2010-11-12 11:05:03','Added User : Community data'),
+ ('8c633eb10b5849e6997bc76de59209f000','19900','19900','system','Modify','2010-11-17 13:15:16','Added User : Local Authentication data'),
+ ('9681c4dad71441b6b2533f10918bbd7900','19800','19900','system','Modify','2010-11-18 03:22:42','Added User : Local Authentication data'),
+ ('9f5ac485bce54635995d888e1cb2a48400','19800','19900','system','Modify','2010-11-18 03:22:56','Removed User : Local Authentication data'),
+ ('a11908d84f1348d1b35118378d7232ba00','19900','19900','system','Modify','2010-11-17 04:22:19','Added User : Local Authentication data'),
+ ('a176dd03b64741848dfd7e450e39be9000','19900','19900','system','Modify','2010-11-17 11:34:04','Added User : Local Authentication data'),
  ('a8b23fcdd74a4fd0af7e7c89998601c100','a97381dce3d44e139823679460d2a5f100','19900','system','Create','2010-08-08 11:58:52',''),
+ ('abef7706e1934d38ac9102c108101ccf00','19900','19900','system','Modify','2010-11-17 11:10:31','Added User : Local Authentication data'),
+ ('aeed454c7e674d829d0fad1a27d38ec700','19900','19900','system','Modify','2010-11-17 13:15:16','Removed User : Local Authentication data'),
+ ('b034dd0759a24d59b54adf1f66d2ae6c00','19900','19900','system','Modify','2010-11-17 11:27:06','Added User : Local Authentication data'),
+ ('b2340ab9740d4fdca3c503a1b539b0d500','19900','19900','system','Modify','2010-11-17 11:30:07','Added User : Local Authentication data'),
  ('bbaf778cfe514fc1ac1a2aa4d2a1bf0300','19800','19900','system','Modify','2010-11-12 11:05:20','Removed User : Community data'),
+ ('bd8a3a40a419442ab18888ec7e735eb000','19800','19900','system','Modify','2010-11-18 03:22:31','Removed User : Community data'),
  ('be40a4e9e61b4f76a937db51ac4a8c9500','0a221845f6c9466f978def67cf999b8400','19900','system','Create','2010-08-07 17:37:05',''),
  ('be9194d7079742a9bcf3320a41fb148500','f574d270d05146ba9fe55bbbeacec8e300','19900','system','Create','2010-08-08 11:53:37',''),
- ('f0e7876967894d6b8d91d2e8ced9c83200','19800','19900','system','Modify','2010-11-12 11:05:20','Added User : Community data');
+ ('cd36cb70dc054addac9ed10be451ebbd00','19900','19900','system','Modify','2010-11-17 04:27:16','Removed User : Local Authentication data'),
+ ('ce9e21d5bfa346eda669e1b4f6f7092000','19900','19900','system','Modify','2010-11-17 06:26:22','Added User : Local Authentication data'),
+ ('d53f3e05a96a4cfca3236b3e6a98caa900','19900','19900','system','Modify','2010-11-17 11:31:49','Removed User : Local Authentication data'),
+ ('dce11fd3b2664a3f9d0bbc636285109a00','19900','19900','system','Modify','2010-11-17 11:33:47','Added User : Local Authentication data'),
+ ('dd0a52bbf6ab40639f28b2f367a39dd900','19900','19900','system','Modify','2010-11-18 03:22:09','Removed User : Community data'),
+ ('f0e7876967894d6b8d91d2e8ced9c83200','19800','19900','system','Modify','2010-11-12 11:05:20','Added User : Community data'),
+ ('f3695390d70647069863eb3689b7a1ff00','19900','19900','system','Modify','2010-11-17 11:12:20','Added User : Local Authentication data'),
+ ('fab46f7c406548358c22e3825fd5097300','19800','19900','system','Modify','2010-11-18 03:22:31','Added User : Community data'),
+ ('ff1f3828968e4ddda85b33962d6f271000','19900','19900','system','Modify','2010-11-17 04:27:16','Added User : Local Authentication data');
 UNLOCK TABLES;
 /*!40000 ALTER TABLE `DataInstance_History` ENABLE KEYS */;
 
@@ -256,6 +288,8 @@ CREATE TABLE  `Chime`.`DataInstance_Number` (
 
 /*!40000 ALTER TABLE `DataInstance_Number` DISABLE KEYS */;
 LOCK TABLES `DataInstance_Number` WRITE;
+INSERT INTO `Chime`.`DataInstance_Number` VALUES  ('1afcbc63d2a7474ba5c3ec4b9bd37b7a00','19800','800',7,1,'2010-11-18 03:22:56',1),
+ ('d82fcccb1c4e43df828f0d7ca195069c00','19900','800',7,1,'2010-11-17 13:15:25',1);
 UNLOCK TABLES;
 /*!40000 ALTER TABLE `DataInstance_Number` ENABLE KEYS */;
 
@@ -286,9 +320,7 @@ CREATE TABLE  `Chime`.`DataInstance_Reference` (
 /*!40000 ALTER TABLE `DataInstance_Reference` DISABLE KEYS */;
 LOCK TABLES `DataInstance_Reference` WRITE;
 INSERT INTO `Chime`.`DataInstance_Reference` VALUES  ('100','19800','800',4,'10100','2010-02-26 09:56:40',NULL),
- ('52052d15da1a4cf1ba9e68766c3dcf7100','19800','800',1,'19500','2010-11-12 11:05:20',2),
- ('923a4e7955c545329dd011ce43ee63a400','19800','800',1,'10200','2010-11-12 11:05:20',1),
- ('f265bc74f55b41deb17c298969f56b4e00','19900','800',1,'19500','2010-11-12 11:05:03',1);
+ ('59677c51ac1a4aad9b41cd3bf6ca0a8f00','19800','800',1,'10200','2010-11-18 03:22:31',1);
 UNLOCK TABLES;
 /*!40000 ALTER TABLE `DataInstance_Reference` ENABLE KEYS */;
 
@@ -401,12 +433,12 @@ INSERT INTO `Chime`.`DataInstance_Type` VALUES  ('000','19900','system','800','2
  ('300','300','Number','100','2010-02-24 12:23:57',NULL),
  ('400','400','URL','100','2010-02-24 12:25:19',NULL),
  ('500','500','Review','100','2010-02-24 12:26:19',NULL),
- ('5e755d1edaf54ceebc947f7bb46c099500','19500','Local Users','900',NULL,1),
  ('600','600','Comment','100','2010-02-24 12:26:33',NULL),
  ('700','700','Tag','100','2010-02-24 12:26:47',NULL),
  ('772caaead0074d7d96cb9e345ef95c9900','f574d270d05146ba9fe55bbbeacec8e300','Event Type','100','2010-02-24 12:26:47',NULL),
  ('800','800','User','100','2010-02-24 12:26:59',NULL),
  ('900','900','Community','100','2010-02-24 12:27:10',NULL),
+ ('c3fbe45584614be99cb4d73653e0a2c600','1600','Yes/No','100',NULL,1),
  ('c9e6b95ca0574bb785803595884cfff200','a97381dce3d44e139823679460d2a5f100','Event','100','2010-02-24 12:26:47',NULL);
 UNLOCK TABLES;
 /*!40000 ALTER TABLE `DataInstance_Type` ENABLE KEYS */;
@@ -433,8 +465,7 @@ CREATE TABLE  `Chime`.`DataInstance_community` (
 
 /*!40000 ALTER TABLE `DataInstance_community` DISABLE KEYS */;
 LOCK TABLES `DataInstance_community` WRITE;
-INSERT INTO `Chime`.`DataInstance_community` VALUES  ('0a3657d10f944f19a86606a9ce187acf00','19500','19500','RM'),
- ('100000400','100000300','100','R'),
+INSERT INTO `Chime`.`DataInstance_community` VALUES  ('100000400','100000300','100','R'),
  ('100000500','100000300','10200','RU'),
  ('100000700','100000400','100','R'),
  ('100000800','100000400','10200','RU'),
@@ -446,7 +477,9 @@ INSERT INTO `Chime`.`DataInstance_community` VALUES  ('0a3657d10f944f19a86606a9c
  ('375de15373f84fb89596771123a1465f00','2100','19900','RUC'),
  ('394982873d9144c29977c2bd9c6705c700','a97381dce3d44e139823679460d2a5f100','19900','RUC'),
  ('41a83e42d2784f2eae60bb40511f8f5a00','a97381dce3d44e139823679460d2a5f100','100','R'),
+ ('4c344e4f6004447bab1b01bc3362eced00','1600','19900','RUC'),
  ('9e2dea1fe7c642369ecaa8419032231400','19500','100','R'),
+ ('a44d448ef0e14d4894e4a55dd58a8db700','1600','100','R'),
  ('a9478ee88f6e40baba08ac02f43c1b8d00','f574d270d05146ba9fe55bbbeacec8e300','19900','RUC'),
  ('d8b6772047be42f0819ec7db6c89ee1f00','2100','100','R');
 UNLOCK TABLES;

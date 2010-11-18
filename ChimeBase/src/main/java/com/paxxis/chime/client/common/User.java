@@ -34,6 +34,7 @@ public class User extends DataInstance {
     public static final String HOME_FIELD = "Home";
     public static final String FAVORITES_FIELD = "Favorites";
     public static final String LOGINID = "Login ID";
+    public static final String LOCALAUTH = "Local Authentication";
 
     public static final InstanceId SYSTEM = InstanceId.create("19900");
     public static final InstanceId ADMIN = InstanceId.create("19800");
@@ -163,18 +164,16 @@ public class User extends DataInstance {
         return false;
     }
     
-    public boolean isLocalUser(){
-    	// check if this user is a member of the Chime Local Users community
+    public boolean isLocalUser() {
         Shape type = getShapes().get(0);
-        DataField field = type.getField(User.COMMUNITY_FIELD);
+        DataField field = type.getField(User.LOCALAUTH);
         List<DataFieldValue> values = getFieldValues(type, field);
-        for (DataFieldValue value : values) {
-            if (value.getReferenceId().equals(Community.ChimeLocalUsers.getId())) {
-                return true;
-            }
+        boolean local = false;
+        if (values.size() > 0) {
+            local = (Boolean)values.get(0).getValue();
         }
 
-        return false;
+        return local;
     }
 
     public void setPassword(String password) {

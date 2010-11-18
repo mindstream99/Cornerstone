@@ -157,14 +157,27 @@ public class FieldDataUtils {
 
             if (fieldShape.isNumeric()) {
                 tableName += "_Number";
-
                 if (fieldData.value instanceof String) {
                     value = fieldData.value.toString();
                 } else if (fieldData.value instanceof Number) {
                 	value = (Double)fieldData.value;
                 } else {
                     value = ((DataFieldValue)fieldData.value).getValue();
-                }
+            	}
+            } else if (fieldShape.isBoolean()) {
+                tableName += "_Number";
+                if (fieldData.value instanceof String) {
+                    value = Boolean.parseBoolean(fieldData.value.toString());
+                } else if (fieldData.value instanceof Boolean) {
+                	value = (Boolean)fieldData.value;
+                } else {
+                    boolean bval = (Boolean)((DataFieldValue)fieldData.value).getValue();
+                    value = (Integer)(bval ? 1 : 0);
+            	}
+            } else if (fieldShape.isBackReferencing()) {
+                tableName += "_Number";
+        		boolean b = (Boolean)fieldData.value;
+        		value = (b ? 1 : 0);
             } else if (fieldShape.isDate()) {
                 tableName += "_Timestamp";
 
@@ -265,7 +278,7 @@ public class FieldDataUtils {
         Shape fieldShape = fieldData.field.getShape();
 
         if (fieldShape.isPrimitive()) {
-            if (fieldShape.isNumeric()) {
+            if (fieldShape.isNumeric() || fieldShape.isBoolean()) {
                 tableName += "_Number";
             } else if (fieldShape.isDate()) {
                 tableName += "_Timestamp";
@@ -302,7 +315,12 @@ public class FieldDataUtils {
 
             if (fieldData.field.getShape().isNumeric()) {
                 tableName += "_Number";
-                value = fieldData.value.toString();
+                if (fieldData.field.getShape().getId().equals(Shape.YESNO_ID)) {
+                    boolean yes = (Boolean)fieldData.value;
+                	value = (yes ? "1" : "0");
+                } else {
+                    value = fieldData.value.toString();
+                }
             } else if (fieldData.field.getShape().isDate()) {
                 tableName += "_Timestamp";
                 if (fieldData.value instanceof Date) {
@@ -344,12 +362,12 @@ public class FieldDataUtils {
         database.executeStatement(sql);
     }
 
-    public static List<DataFieldValue> getInternalFieldValues(DatabaseConnection database, Shape shape, int col, Shape type2, InstanceId instanceId) throws Exception
+    public static List<DataFieldValue> getInternalFieldValues(DatabaseConnection database, Shape shape, int col, Shape valueShape, InstanceId instanceId) throws Exception
     {
         String tableName = Tools.getTableSet();
-        if (type2.isNumeric()) {
+        if (valueShape.isNumeric()|| valueShape.isBoolean()) {
             tableName += "_Number";
-        } else if (type2.isDate()) {
+        } else if (valueShape.isDate()) {
             tableName += "_Timestamp";
         } else {
             tableName += "_Text";
@@ -371,14 +389,17 @@ public class FieldDataUtils {
             if (value instanceof DateValue) {
                 sval = value.asDate();
             } else if (value instanceof DoubleData) {
-            	sval = value.asDouble();
+            	double dval = value.asDouble();
+            	if (valueShape.getId().equals(Shape.YESNO_ID)) {
+            		sval = (dval == 1.0 ? true : false);
+            	} else {
+            		sval = dval;
+            	}
             } else {
                 sval = value.asString();
             }
 
-            // we should really support the various internal (primitive) data types.  for
-            // now we just treat everything like a string
-            values.add(new DataFieldValue(sval, type2.getId(), instId.asInstanceId(), timestamp.asDate()));
+            values.add(new DataFieldValue(sval, valueShape.getId(), instId.asInstanceId(), timestamp.asDate()));
             found = dataSet.next();
         }
 

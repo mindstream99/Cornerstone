@@ -43,6 +43,7 @@ import com.paxxis.chime.client.common.DataField;
 import com.paxxis.chime.client.common.DataFieldValue;
 import com.paxxis.chime.client.common.DataInstance;
 import com.paxxis.chime.client.common.Shape;
+import com.paxxis.chime.client.common.constants.TextConstants;
 import com.paxxis.chime.client.portal.DataRowModel;
 
 /**
@@ -97,7 +98,8 @@ public class FieldDataGridCellRenderer implements GridCellRenderer<DataRowModel>
 			lc.setHeight(15);
 			return lc;
 		} else if (property.equals(DataRowModel.NAME)) {
-			return model.get(property);
+			renderHtml(lc, model.get(property).toString());
+			return lc;
 		} else if (model instanceof TabularDataFieldValueModel) {
 			TabularDataFieldValueModel fieldValueModel = (TabularDataFieldValueModel)model;
 			DataInstance inst = fieldValueModel.getDataInstance();
@@ -227,9 +229,14 @@ public class FieldDataGridCellRenderer implements GridCellRenderer<DataRowModel>
             {
                 // TODO when formatting is added to the field definition, we'll
                 // apply whatever is specified
-                Double dval = Double.valueOf(obj.toString());
+                double dval = Double.valueOf(obj.toString());
                 NumberFormat fmt = NumberFormat.getDecimalFormat();
                 stringContent = fmt.format(dval);
+            }
+            else if (dataField.getShape().isBoolean()) 
+            {
+                boolean bval = (Boolean)obj;
+        		stringContent = (bval ? TextConstants.YES : TextConstants.NO);
             }
             else if (dataField.getShape().isDate())
             {
@@ -284,16 +291,21 @@ public class FieldDataGridCellRenderer implements GridCellRenderer<DataRowModel>
                     buffer.append(sep + name);
                     sep = "    ";
                 }
+                else if (dataField.getShape().isBoolean())
+                {
+                    boolean bval = (Boolean)value.getValue();
+            		buffer.append(bval ? TextConstants.YES : TextConstants.NO);
+                }
                 else if (dataField.getShape().isNumeric())
                 {
+                    double dval = Double.valueOf(value.getValue().toString());
                     // TODO when formatting is added to the field definition, we'll
                     // apply whatever is specified
-                    Double dval = Double.valueOf(value.getValue().toString());
                     NumberFormat fmt = NumberFormat.getDecimalFormat();
                     String formatted = fmt.format(dval);
-
                     buffer.append(sep + formatted);
-                    sep = "    ";
+
+                	sep = "    ";
                 }
                 else if (dataField.getShape().isDate())
                 {

@@ -35,7 +35,9 @@ import com.extjs.gxt.ui.client.widget.Html;
 import com.extjs.gxt.ui.client.widget.button.Button;
 import com.extjs.gxt.ui.client.widget.button.ButtonBar;
 import com.extjs.gxt.ui.client.widget.form.AdapterField;
+import com.extjs.gxt.ui.client.widget.form.CheckBox;
 import com.extjs.gxt.ui.client.widget.form.DateField;
+import com.extjs.gxt.ui.client.widget.form.Field;
 import com.extjs.gxt.ui.client.widget.form.NumberField;
 import com.extjs.gxt.ui.client.widget.form.TextField;
 import com.extjs.gxt.ui.client.widget.grid.CellEditor;
@@ -441,12 +443,19 @@ public class FieldDataEditor extends ChimeWindow {
         ServiceManager.addListener(_serviceManagerListener);
     }
 
-    private CellEditor getCellEditor(final Shape shape) {
+    @SuppressWarnings("unchecked")
+	private CellEditor getCellEditor(final Shape shape) {
     	CellEditor editor = null;
     	
     	if (shape.isPrimitive()) {
     		if (shape.isNumeric()) {
     			NumberField f = new NumberField();
+    			f.setAutoValidate(true);
+    	    	editor = new CellEditor(f);
+                f.setAutoWidth(true);
+    		} else if (shape.isBoolean()) {
+    			CheckBox f = new CheckBox();
+    			f.setBoxLabel(dataField.getName());
     			f.setAutoValidate(true);
     	    	editor = new CellEditor(f);
                 f.setAutoWidth(true);
@@ -626,6 +635,8 @@ public class FieldDataEditor extends ChimeWindow {
     		if (shape.isPrimitive()) {
         		if (shape.isNumeric()) {
                     model = new FieldValueModel(dataShape, dataField,  0.0);
+        		} else if (shape.isBoolean()) {
+                    model = new FieldValueModel(dataShape, dataField,  false);
         		} else if (shape.isDate()) {
                     model = new FieldValueModel(dataShape, dataField, new Date());
         		} else {

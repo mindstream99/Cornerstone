@@ -80,6 +80,7 @@ public class ComplexSearchFilterEditor extends ChimeWindow
     private ChimeListStore<SearchCriteriaOperatorModel> _operatorStore;
     private List<SearchCriteriaOperatorModel> _textOperatorList;
     private List<SearchCriteriaOperatorModel> _numericOperatorList;
+    private List<SearchCriteriaOperatorModel> _booleanOperatorList;
     private List<SearchCriteriaOperatorModel> _dateOperatorList;
     private List<SearchCriteriaOperatorModel> _referenceOperatorList;
     private List<SearchCriteriaOperatorModel> _activityOperatorList;
@@ -145,6 +146,7 @@ public class ComplexSearchFilterEditor extends ChimeWindow
         _dateOperatorList = new ArrayList<SearchCriteriaOperatorModel>();
         _referenceOperatorList = new ArrayList<SearchCriteriaOperatorModel>();
         _activityOperatorList = new ArrayList<SearchCriteriaOperatorModel>();
+        _booleanOperatorList = new ArrayList<SearchCriteriaOperatorModel>();
         
         _textOperatorList.add(new SearchCriteriaOperatorModel(Operator.Contains));
         _textOperatorList.add(new SearchCriteriaOperatorModel(Operator.Like));
@@ -180,6 +182,9 @@ public class ComplexSearchFilterEditor extends ChimeWindow
         _activityOperatorList.add(new SearchCriteriaOperatorModel(Operator.Past7Days));
         _activityOperatorList.add(new SearchCriteriaOperatorModel(Operator.Past30Days));
 
+        _booleanOperatorList.add(new SearchCriteriaOperatorModel(Operator.IsYes));
+        _booleanOperatorList.add(new SearchCriteriaOperatorModel(Operator.IsNo));
+        
         Html label = new Html("<div id='endslice-form-label'>Shape:</div>");
         form.add(label);
 
@@ -332,6 +337,14 @@ public class ComplexSearchFilterEditor extends ChimeWindow
                                 dateField.setVisible(false);
                                 timeField.setVisible(false);
                                 numberField.setVisible(true);
+                                numberField.setRawValue("");
+                            } else if (shape.isBoolean()) {
+                                _operatorStore.add(_booleanOperatorList);
+                                _filterInput.setVisible(false);
+                                textField.setVisible(false);
+                                dateField.setVisible(false);
+                                timeField.setVisible(false);
+                                numberField.setVisible(false);
                                 numberField.setRawValue("");
                             } else if (shape.isDate()) {
                                 _operatorStore.add(_dateOperatorList);

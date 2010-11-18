@@ -33,6 +33,7 @@ import com.extjs.gxt.ui.client.widget.Html;
 import com.extjs.gxt.ui.client.widget.button.Button;
 import com.extjs.gxt.ui.client.widget.button.ButtonBar;
 import com.extjs.gxt.ui.client.widget.form.AdapterField;
+import com.extjs.gxt.ui.client.widget.form.CheckBox;
 import com.extjs.gxt.ui.client.widget.form.DateField;
 import com.extjs.gxt.ui.client.widget.form.NumberField;
 import com.extjs.gxt.ui.client.widget.form.TextField;
@@ -61,7 +62,6 @@ import com.paxxis.chime.client.common.Shape;
 import com.paxxis.chime.client.widgets.ChimeGrid;
 import com.paxxis.chime.client.widgets.ChimeWindow;
 import com.paxxis.chime.client.widgets.FieldDataGridCellRenderer;
-import com.paxxis.chime.client.widgets.FieldValueModel;
 import com.paxxis.chime.client.widgets.InstanceCellRenderer;
 import com.paxxis.chime.client.widgets.TabularDataFieldValueModel;
 
@@ -303,6 +303,12 @@ public class TabularDataEditor extends ChimeWindow {
     	if (shape.isPrimitive()) {
     		if (shape.isNumeric()) {
     			NumberField f = new NumberField();
+    			f.setAutoValidate(true);
+    	    	editor = new CellEditor(f);
+                f.setAutoWidth(true);
+    		} else if (shape.isBoolean()) {
+    			CheckBox f = new CheckBox();
+    			f.setBoxLabel(field.getName());
     			f.setAutoValidate(true);
     	    	editor = new CellEditor(f);
                 f.setAutoWidth(true);

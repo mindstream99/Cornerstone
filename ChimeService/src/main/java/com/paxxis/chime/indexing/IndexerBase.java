@@ -373,6 +373,11 @@ abstract public class IndexerBase implements Runnable {
                         if (field.getShape().isNumeric()) {
                             data = Tools.floatToNumeric(Float.parseFloat(value.getValue().toString()));
                             doc.add(new Field(fieldName, data, Field.Store.NO, Field.Index.UN_TOKENIZED));
+                        } else if (field.getShape().isBoolean()) {
+                        	boolean bval = (Boolean)value.getValue();
+                        	float fval = (float)(bval ? 1.0 : 0.0);
+                            data = Tools.floatToNumeric(fval);
+                            doc.add(new Field(fieldName, data, Field.Store.NO, Field.Index.UN_TOKENIZED));
                         } else if (field.getShape().isDate()) {
                         	Date dt = (Date)value.getValue();
                         	data = dt.toLocaleString();

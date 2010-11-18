@@ -327,6 +327,12 @@ public class SearchFilterPanel extends LayoutContainer
 	        		text += " is on or after " + formatted;
 	        	}
 	            break;
+            case IsYes:
+        		text += " is Yes";
+            	break;
+            case IsNo:
+        		text += " is No";
+            	break;
         }
 
         html.setHtml(text + "<br>&nbsp;");

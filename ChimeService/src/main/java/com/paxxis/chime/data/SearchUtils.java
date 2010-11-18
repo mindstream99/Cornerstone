@@ -773,6 +773,12 @@ public class SearchUtils {
                         term += "[" + Tools.longToNumeric(start) + " TO " + Tools.longToNumeric(end) + "]";
                         terms.add("(" + term + typeTerm + ")");
                     }
+                    else if (fieldShape.isBoolean())
+                    {
+                    	float value = (float)(param.operator == Operator.IsYes ? 1.0 : 0.0);
+                        String valString = Tools.floatToNumeric(value);
+                        term += "\"" + valString + "\"";
+                    }
                     else if (fieldShape.isNumeric())
                     {
                         String value = param.fieldValue.toString().trim().toLowerCase();

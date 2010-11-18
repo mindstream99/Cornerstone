@@ -1,5 +1,5 @@
-/*
- * Copyright 2010 the original author or authors.
+<!--
+ * Copyright 2010 Robert Englander
  * Copyright 2009 Paxxis Technology LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,25 +13,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- */
+-->
 
-package com.paxxis.chime.client.common;
-
-
-/**
- *
- * @author Robert Englander
- */
-public class MultiRequest extends MultipleRequest {
-    private User _user = null;
-    
-    public User getUser()
-    {
-        return _user;
-    }
-    
-    public void setUser(User user)
-    {
-        _user = user;
-    }
-}
+<module>
+</module>

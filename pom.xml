@@ -9,6 +9,7 @@
   <name>Chime All</name>
  
   <modules>
+    <module>ChimeMessage</module>
     <module>ChimeBase</module>
     <module>ChimeServiceCommon</module>
     <module>ChimeService</module>

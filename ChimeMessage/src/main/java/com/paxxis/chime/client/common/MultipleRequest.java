@@ -24,8 +24,10 @@ import java.util.List;
  *
  * @author Robert Englander
  */
-public class MultiResponse extends ResponseMessage<MultiRequest> {
-    private final static int VERSION = 1;
+public class MultipleRequest extends RequestMessage {
+	private static final long serialVersionUID = 1L;
+
+	private final static int VERSION = 1;
 
     @Override
     public MessageConstants.MessageType getMessageType() {
@@ -33,7 +35,7 @@ public class MultiResponse extends ResponseMessage<MultiRequest> {
     }
 
     public static MessageConstants.MessageType messageType() {
-        return MessageConstants.MessageType.MultiResponse;
+        return MessageConstants.MessageType.MultiRequest;
     }
 
     @Override
@@ -46,31 +48,15 @@ public class MultiResponse extends ResponseMessage<MultiRequest> {
     }
 
     
-    // the requests/responses
-    //List<RequestResponse> _pairs = new ArrayList<RequestResponse>();
-    ArrayList<RequestMessage> _requests = new ArrayList<RequestMessage>();
-    ArrayList<ResponseMessage> _responses = new ArrayList<ResponseMessage>();
+    private List<RequestMessage> _requests = new ArrayList<RequestMessage>();
     
-    public List<RequestResponse> getPairs()
+    public List<RequestMessage> getRequests()
     {
-        ArrayList<RequestResponse> pairs = new ArrayList<RequestResponse>();
-        int cnt = _requests.size();
-        for (int i = 0; i < cnt; i++)
-        {
-            RequestResponse pair = new RequestResponse();
-            pair.request = _requests.get(i);
-            pair.response = _responses.get(i);
-            pairs.add(pair);
-        }
-        
-        return pairs;
+        return _requests;
     }
-    
-    public void addPair(RequestMessage request, ResponseMessage response)
+
+    public void addRequest(RequestMessage request)
     {
-        RequestResponse pair = new RequestResponse();
         _requests.add(request);
-        _responses.add(response);
     }
 }
-

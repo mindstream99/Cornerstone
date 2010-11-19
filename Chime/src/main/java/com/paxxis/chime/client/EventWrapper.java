@@ -30,7 +30,7 @@ import de.novanic.eventservice.client.event.domain.DomainFactory;
  */
 public class EventWrapper<D extends Message> implements Event, Serializable {
 
-	public transient static final Domain DOMAIN = DomainFactory.getDomain("vibrant");
+	public transient static final Domain DOMAIN = DomainFactory.getDomain("chime");
 	
 	private static final long serialVersionUID = 1L;
 

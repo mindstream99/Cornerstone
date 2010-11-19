@@ -16,4 +16,5 @@
 -->
 
 <module>
+	<inherits name="com.paxxis.chime.ChimeMessage"/>
 </module>

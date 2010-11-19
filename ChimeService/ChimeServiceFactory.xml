@@ -98,7 +98,7 @@ set the bean's chimeConfiguration property.
                 <entry key="chime.database.name" value="ChimeDB"/>
                 <entry key="chime.database.userName" value="chime"/>
                 <entry key="chime.database.password" value="chime"/>
-                <!-- -->
+                <!--  -->
 
                 <!-- MySQL 
                 <entry key="chime.database.urlPrefix" value="jdbc:mysql:"/>
@@ -293,6 +293,10 @@ set the bean's chimeConfiguration property.
         <property name="chimeConfiguration" ref="chimeConfiguration"/>
         <property name="destinations">
             <map>
+	            <entry key="queue.ChimeRequestQueue" value="chimeRequestQueue"/>
+	            <entry key="queue.ChimeEventQueue" value="chimeEventQueue"/>
+	            <entry key="topic.ChimeEventTopic" value="chimeUpdateTopic"/>
+	            <entry key="topic.ChimeUpdateTopic" value="chimeUpdateTopic"/>
             </map>
         </property>
     </bean>

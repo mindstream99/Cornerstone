@@ -58,16 +58,16 @@ public class JndiInitialContextFactory extends ChimeConfigurable
     private static final String SECURITYCREDENTIALS = "com.mindstream.chime.service.common.JndiInitialContextFactory.securityCredentials";
 
     // the JNDI context info for doing lookups
-    String _contextFactory = "";
+    private String _contextFactory = "";
     
     // the provider url for the lookup service
-    String _providerUrl = "";
+    private String _providerUrl = "";
     
     // the security principal
-    String _securityPrincipal = "";
+    private String _securityPrincipal = "";
     
     // simple authentication credentials
-    String _securityCredentials = "";
+    private String _securityCredentials = "";
 
     // the destination name mappings
     private Hashtable<String, String> destinationMap = new Hashtable<String, String>();
@@ -119,7 +119,7 @@ public class JndiInitialContextFactory extends ChimeConfigurable
 
         try
         {
-            Hashtable env = new Hashtable();
+            Hashtable<String, Object> env = new Hashtable<String, Object>();
             env.put(Context.INITIAL_CONTEXT_FACTORY, _contextFactory);
             env.put(Context.PROVIDER_URL, _providerUrl);
             env.put(Context.SECURITY_PRINCIPAL, _securityPrincipal);
@@ -132,10 +132,12 @@ public class JndiInitialContextFactory extends ChimeConfigurable
                 env.put(key, destinationMap.get(key));
             }
 
+            /*
             env.put("queue.ChimeRequestQueue", "chimeRequestQueue");
             env.put("queue.ChimeEventQueue", "chimeEventQueue");
             env.put("topic.ChimeEventTopic", "chimeEventTopic");
             env.put("topic.ChimeUpdateTopic", "chimeUpdateTopic");
+            */
             ctx = new InitialContext(env);
         }
         catch (Exception e)

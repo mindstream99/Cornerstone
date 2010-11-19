@@ -16,6 +16,8 @@
  */
 
 package com.paxxis.chime.server;
+import java.util.HashMap;
+
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -199,6 +201,13 @@ public class endsliceServiceImpl extends RemoteEventServiceServlet implements en
 			        _contextFactory.setContextFactory("org.apache.activemq.jndi.ActiveMQInitialContextFactory");
 			        _contextFactory.setProviderUrl("tcp://localhost:61616");      //"discovery://(multicast://default)");
 
+			        HashMap<String, String> destMap = new HashMap<String, String>();
+			        destMap.put("queue.ChimeRequestQueue", "chimeRequestQueue");
+			        destMap.put("queue.ChimeEventQueue", "chimeEventQueue");
+			        destMap.put("topic.ChimeEventTopic", "chimeUpdateTopic");
+			        destMap.put("topic.ChimeUpdateTopic", "chimeUpdateTopic");
+			        _contextFactory.setDestinations(destMap);
+			        
 			        senderPool = new ServiceBusSenderPool(10, _contextFactory, "chimeFactory", "ChimeRequestQueue");
 
 			        connector = new ServiceBusConnector();

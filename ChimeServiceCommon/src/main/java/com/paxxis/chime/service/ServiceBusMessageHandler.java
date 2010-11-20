@@ -32,6 +32,8 @@ public abstract class ServiceBusMessageHandler extends SimpleServiceBusMessageHa
     // the thread pool size to use when creating
     // request processor instances
     private int _poolSize = 1;
+    
+    private int maxMessagesInFlight = 0;
 
     public ServiceBusMessageHandler() {
     }
@@ -40,6 +42,17 @@ public abstract class ServiceBusMessageHandler extends SimpleServiceBusMessageHa
         return _poolSize;
     }
 
+    /**
+     * Sets the maximum number of messages that can be in flight at any given time.
+     */
+    public void setMaxMessagesInFlight(int max) throws IllegalArgumentException {
+        if (max < 1) {
+            throw new IllegalArgumentException("ServiceBusMessageHandler.maxMessagesInFlight must be >= 1.");
+        }
+
+        maxMessagesInFlight = max;
+    }
+    
     /**
      * Sets the value of the poolSize attribute.  The pool size
      * is the number of concurrent threads that will be used by
@@ -81,7 +94,7 @@ public abstract class ServiceBusMessageHandler extends SimpleServiceBusMessageHa
                 _messageProcessor.restart();
             }
         } else {
-            _messageProcessor = new ServiceBusMessageProcessor(_poolSize);
+            _messageProcessor = new ServiceBusMessageProcessor(_poolSize, maxMessagesInFlight);
         }
     }
 

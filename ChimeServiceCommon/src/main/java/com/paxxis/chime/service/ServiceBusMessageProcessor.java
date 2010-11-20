@@ -18,9 +18,10 @@
 package com.paxxis.chime.service;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.RejectedExecutionException;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Processes messages using a thread pool.  The size of the
@@ -29,60 +30,54 @@ import java.util.concurrent.RejectedExecutionException;
  *
  * @author Robert Englander  
  */
-public class ServiceBusMessageProcessor
-{
+public class ServiceBusMessageProcessor {
     // the thread pool executor
-    ExecutorService _executor = null;
+    private ThreadPoolExecutor executor = null;
 
     // halted (pending work from a halted _executor)
-    ArrayList<Runnable> _halted = new ArrayList<Runnable>();
-    boolean _isHalted = false;
+    private ArrayList<Runnable> halted = new ArrayList<Runnable>();
+    private boolean isHalted = false;
     
-    int _poolSize;
+    private int poolSize;
+    private int maxMessages;
+    
     
     /**
      * Monitors the ExecutorService until it is terminated, at
      * which point it informs the registered listener and then
      * terminates itself.
      */
-    class ShutdownMonitor extends Thread
-    {
+    class ShutdownMonitor extends Thread {
         // the registered listener
-        ShutdownListener _listener;
+        private ShutdownListener listener;
         
         /**
          * Constructor
          *
          * @param listener the shutdown listener
          */
-        ShutdownMonitor(ShutdownListener listener)
-        {
-            _listener = listener;
+        ShutdownMonitor(ShutdownListener listener) {
+            this.listener = listener;
         }
         
         /**
-         * Checks the state of the ExecutorService instance on a 1 second tick.  This
+         * Checks the state of the executor instance on a 1 second tick.  This
          * is probably equivalent to using the _executor.awaitTermination(...) method,
          * but this gives us more opportunity for control if we need it.
          */
-        public void run()
-        {
-            while (true)
-            {
-                try
-                {
+        public void run() {
+            while (true) {
+                try {
                     Thread.sleep(1000);
+                } catch (InterruptedException ie) {
                 }
-                catch (InterruptedException ie)
-                {}
                 
-                if (_executor.isTerminated())
-                {
+                if (executor.isTerminated()) {
                     break;
                 }
             }
             
-            _listener.onShutdownComplete();
+            listener.onShutdownComplete();
         }
     }
     
@@ -90,13 +85,16 @@ public class ServiceBusMessageProcessor
      * Constructor.
      *
      * @param poolSize the size of the thread pool.  
-     * 
-     * @throws IllegalArgumentException if the poolSize is less than 1.
      */
-    public ServiceBusMessageProcessor(int poolSize) throws IllegalArgumentException
-    {
-        _poolSize = poolSize;
-        _executor = Executors.newFixedThreadPool(poolSize);
+    public ServiceBusMessageProcessor(int poolSize, int max) {
+        this.poolSize = poolSize;
+        maxMessages = max;
+        if (maxMessages == 0) {
+        	maxMessages = poolSize;
+        }
+        
+        executor = new ThreadPoolExecutor(poolSize, poolSize, 0, TimeUnit.MILLISECONDS, 
+        						new ArrayBlockingQueue<Runnable>(maxMessages));
     }
 
     /**
@@ -104,35 +102,30 @@ public class ServiceBusMessageProcessor
      *
      * @param message 
      */
-    public void submit(Runnable message) throws RejectedExecutionException
-    {
-        _executor.execute(message);
+    public void submit(Runnable message) {
+        executor.execute(message);
     }
     
-    public void halt()
-    {
-        _isHalted = true;
-        List<Runnable> unprocessed = _executor.shutdownNow();
-        _halted.addAll(unprocessed);
+    public void halt() {
+        isHalted = true;
+        List<Runnable> unprocessed = executor.shutdownNow();
+        halted.addAll(unprocessed);
     }
     
-    public boolean isHalted()
-    {
-        return _isHalted;
+    public boolean isHalted() {
+        return isHalted;
     }
     
-    public void restart()
-    {
-        if (_isHalted)
-        {
-            _executor = Executors.newFixedThreadPool(_poolSize);
+    public void restart() {
+        if (isHalted) {
+            executor = new ThreadPoolExecutor(poolSize, poolSize, 0, TimeUnit.MILLISECONDS, 
+					new ArrayBlockingQueue<Runnable>(maxMessages));
             
-            for (Runnable work : _halted)
-            {
+            for (Runnable work : halted) {
                 submit(work);
             }
             
-            _halted.clear();
+            halted.clear();
         }
     }
     
@@ -142,14 +135,13 @@ public class ServiceBusMessageProcessor
      * @param listener the listener that gets informed when the
      * shutdown is complete.
      */
-    public void shutdown(ShutdownListener listener)
-    {
-        // get a shutdown monitor started before we aske the
-        // _executor instance to shut down
+    public void shutdown(ShutdownListener listener) {
+        // get a shutdown monitor started before we ask the
+        // executor instance to shut down
         ShutdownMonitor mon = new ShutdownMonitor(listener);
         mon.start();
         
-        _executor.shutdown();
+        executor.shutdown();
     }
     
     /**
@@ -157,9 +149,8 @@ public class ServiceBusMessageProcessor
      *
      * @return true if shutdown, false otherwise.
      */
-    public boolean isShutdown()
-    {
-        return _executor.isTerminated();
+    public boolean isShutdown() {
+        return executor.isTerminated();
     }
 }
 

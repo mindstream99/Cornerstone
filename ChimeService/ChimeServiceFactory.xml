@@ -100,7 +100,7 @@ set the bean's chimeConfiguration property.
                 <entry key="chime.database.password" value="chime"/>
                 <!--  -->
 
-                <!-- MySQL 
+                <!-- MySQL
                 <entry key="chime.database.urlPrefix" value="jdbc:mysql:"/>
                 <entry key="chime.database.driver" value="com.mysql.jdbc.Driver"/>
                 <entry key="chime.database.hostName" value="localhost"/>
@@ -267,6 +267,7 @@ set the bean's chimeConfiguration property.
 
         <!-- override configuration values -->
         <property name="poolSize" value="5"/>
+        <property name="maxMessagesInFlight" value="10"/>
     </bean>
 
     <bean id="eventQueueHandler" class="com.paxxis.chime.service.EventQueueMessageHandler">

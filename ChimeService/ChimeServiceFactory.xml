@@ -129,7 +129,7 @@ set the bean's chimeConfiguration property.
                 <!--
                 <entry key="chime.service.JndiInitialContextFactory.providerUrl" value="discovery://(multicast://default)"/>
                 -->
-                <entry key="chime.service.JndiInitialContextFactory.providerUrl" value="vm://localhost"/>
+                <entry key="chime.service.JndiInitialContextFactory.providerUrl" value="tcp://localhost:61616"/>
                 
                 <!-- entry key="chime.service.ldap.contextFactory" value="com.sun.jndi.ldap.LdapCtxFactory"/>
                 <entry key="chime.service.ldap.url" value="ldap://nycdc01.vibrant.corp:389"/>
@@ -501,8 +501,6 @@ set the bean's chimeConfiguration property.
         </property>
     </bean>
 
-    <!-- the bootstrapper gets the supplied service bus connectors started.  NOT SURE
-         THIS IS NEEDED.  DOESN'T THE CALL TO initialize SUFFICE? -->
     <bean id="bootstrapper" class="com.paxxis.chime.service.ServiceBusBootstrapper">
         <property name="serviceBusConnectors">
             <list>

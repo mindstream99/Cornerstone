@@ -17,9 +17,9 @@
 
 package com.paxxis.chime.service;
 
-import com.paxxis.chime.common.DataLatch;
 import java.util.ArrayList;
 import java.util.List;
+
 import javax.jms.Connection;
 import javax.jms.ConnectionFactory;
 import javax.jms.Destination;
@@ -30,6 +30,8 @@ import javax.jms.MessageProducer;
 import javax.jms.Session;
 import javax.jms.TemporaryQueue;
 import javax.naming.Context;
+
+import com.paxxis.chime.common.DataLatch;
 
 /**
  * ServiceBusConnector manages connections to the service bus.
@@ -262,16 +264,8 @@ public class ServiceBusConnector extends ChimeConfigurable
         return _connectOnStartup;
     }
     
-    /**
-     * Initializes the connector.  If the connectOnStartup property is
-     * set to true a connection to the service bus will be established.
-     */
     public void initialize()
     {
-        if (_connectOnStartup)
-        {
-            //connect();
-        }
     }
     
     /**

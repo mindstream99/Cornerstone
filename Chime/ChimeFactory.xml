@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+ * Copyright 2010 Robert Englander
+ * Copyright 2009 Paxxis Technology LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+-->
+
+
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
+
+<!--
+Root application context for the Chime Web Application.
+-->
+
+<beans default-init-method="initialize" default-destroy-method="destroy">
+
+    <!-- NOTE:  this is first so that it's setup before the service objects need it -->
+    <!-- an instance of the chime configuration object -->
+    <bean id="chimeConfiguration" class="com.paxxis.chime.service.ChimeConfiguration">
+        <property name="parameters">
+            <map>
+                <entry key="chime.service.connectionFactory" value="chimeFactory"/>
+                <entry key="chime.service.requestQueueName" value="ChimeRequestQueue"/>
+                <entry key="chime.service.updateTopic" value="ChimeUpdateTopic"/>
+                <entry key="chime.service.JndiInitialContextFactory.contextFactory" value="org.apache.activemq.jndi.ActiveMQInitialContextFactory"/>
+                <entry key="chime.service.JndiInitialContextFactory.providerUrl" value="tcp://localhost:61616"/>
+                
+                <entry key="chime.client.brandingFile" value="ChimeBranding.xml"/>
+            </map>
+        </property>
+    </bean>
+
+    <bean id="contextFactory" class="com.paxxis.chime.service.JndiInitialContextFactory">
+        <property name="chimeConfiguration" ref="chimeConfiguration"/>
+        <property name="destinations">
+            <map>
+	            <entry key="queue.ChimeRequestQueue" value="chimeRequestQueue"/>
+	            <entry key="topic.ChimeUpdateTopic" value="chimeUpdateTopic"/>
+            </map>
+        </property>
+    </bean>
+
+    <bean id="senderPool" class="com.paxxis.chime.server.ServiceBusSenderPool">
+        <property name="chimeConfiguration" ref="chimeConfiguration"/>
+        <property name="contextFactory" ref="contextFactory"/>
+        <property name="poolSize" value="10"/>
+    </bean>
+
+    <bean id="updateTopicReceiver" class="com.paxxis.chime.service.ServiceBusMessageReceiver">
+        <property name="chimeConfiguration" ref="chimeConfiguration"/>
+        <property name="destinationName" value="ChimeUpdateTopic"/>
+    </bean>
+
+    <bean id="serviceBusConnector" class="com.paxxis.chime.service.ServiceBusConnector">
+        <property name="configurationPropertyMap">
+            <map>
+                <entry key="connectionFactoryName" value="chime.service.connectionFactory"/>
+                <entry key="connectOnStartup" value="chime.service.connectOnStartup"/>
+            </map>
+        </property>
+        <property name="chimeConfiguration" ref="chimeConfiguration"/>
+        <property name="initialContextFactory" ref="contextFactory"/>
+
+        <property name="serviceBusConnectorClients">
+            <list>
+                <ref bean="updateTopicReceiver"/>
+            </list>
+        </property>
+    </bean>
+</beans>
+

@@ -26,6 +26,9 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
 import org.apache.log4j.Logger;
+import org.springframework.beans.factory.xml.XmlBeanDefinitionReader;
+import org.springframework.context.support.GenericApplicationContext;
+import org.springframework.core.io.FileSystemResource;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -126,6 +129,7 @@ import com.paxxis.chime.server.ServiceBusSenderPool.PoolEntry;
 import com.paxxis.chime.service.JndiInitialContextFactory;
 import com.paxxis.chime.service.ServiceBusConnector;
 import com.paxxis.chime.service.ServiceBusMessageReceiver;
+import com.paxxis.chime.service.ChimeConfiguration;
 
 import de.novanic.eventservice.service.RemoteEventServiceServlet;
 
@@ -134,11 +138,12 @@ import de.novanic.eventservice.service.RemoteEventServiceServlet;
  * @author Robert Englander
  */
 public class endsliceServiceImpl extends RemoteEventServiceServlet implements endsliceService {
-    JndiInitialContextFactory _contextFactory;
-    ServiceBusSenderPool senderPool;
+    private JndiInitialContextFactory _contextFactory;
+    private ServiceBusSenderPool senderPool;
     private ServiceBusMessageReceiver receiver;
     private ServiceBusConnector connector;
-    private UpdateEventHandler handler; 
+    private UpdateEventHandler handler;
+    
     private Object lock = new Object();
     private boolean initialized = false;
     private BrandingData brandingData = new BrandingData();
@@ -176,14 +181,23 @@ public class endsliceServiceImpl extends RemoteEventServiceServlet implements en
 	
 	@Override
 	public void initialize() {
+        GenericApplicationContext ctx = new GenericApplicationContext();
+        ctx.registerShutdownHook();
+        ctx.refresh();
+        XmlBeanDefinitionReader xmlReader = new XmlBeanDefinitionReader(ctx);
+        xmlReader.loadBeanDefinitions(new FileSystemResource("ChimeFactory.xml"));
+        ctx.getBeanFactory().preInstantiateSingletons();
         
 		try {
 			synchronized (lock) {
 				if (!initialized) {
+					_contextFactory = (JndiInitialContextFactory)ctx.getBean("contextFactory");
+			        
 					try {
+						ChimeConfiguration cfg = (ChimeConfiguration)ctx.getBean("chimeConfiguration");
 				        DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
 			            DocumentBuilder db = dbf.newDocumentBuilder();
-			            Document doc = db.parse("./ChimeBranding.xml");
+			            Document doc = db.parse(cfg.getStringValue("chime.client.brandingFile", "./ChimeBranding.xml"));
 			            Element root = doc.getDocumentElement();
 			            NodeList list = root.getElementsByTagName("heading");
 			            if (list.getLength() > 0) {
@@ -196,26 +210,9 @@ public class endsliceServiceImpl extends RemoteEventServiceServlet implements en
 						Logger.getLogger(endsliceServiceImpl.class).error(e.getCause().getLocalizedMessage());
 					}
 
-					_contextFactory = new JndiInitialContextFactory();
-
-			        _contextFactory.setContextFactory("org.apache.activemq.jndi.ActiveMQInitialContextFactory");
-			        _contextFactory.setProviderUrl("tcp://localhost:61616");      //"discovery://(multicast://default)");
-
-			        HashMap<String, String> destMap = new HashMap<String, String>();
-			        destMap.put("queue.ChimeRequestQueue", "chimeRequestQueue");
-			        destMap.put("queue.ChimeEventQueue", "chimeEventQueue");
-			        destMap.put("topic.ChimeEventTopic", "chimeUpdateTopic");
-			        destMap.put("topic.ChimeUpdateTopic", "chimeUpdateTopic");
-			        _contextFactory.setDestinations(destMap);
-			        
-			        senderPool = new ServiceBusSenderPool(10, _contextFactory, "chimeFactory", "ChimeRequestQueue");
-
-			        connector = new ServiceBusConnector();
-			        receiver = new ServiceBusMessageReceiver();
-			        connector.addServiceBusConnectorClient(receiver);
-			        connector.setInitialContextFactory(_contextFactory);
-			        connector.setConnectionFactoryName("chimeFactory");
-			        receiver.setDestinationName("ChimeUpdateTopic");
+			        senderPool = (ServiceBusSenderPool)ctx.getBean("senderPool");
+			        receiver = (ServiceBusMessageReceiver)ctx.getBean("updateTopicReceiver");
+			        connector = (ServiceBusConnector)ctx.getBean("serviceBusConnector");
 			        handler = new UpdateEventHandler(
 			        	new UpdateEventListener() {
 
@@ -227,6 +224,7 @@ public class endsliceServiceImpl extends RemoteEventServiceServlet implements en
 
 			        	}
 			        );
+
 			        receiver.setMessageHandler(handler);
 			        connector.connect();
 			        initialized = true;

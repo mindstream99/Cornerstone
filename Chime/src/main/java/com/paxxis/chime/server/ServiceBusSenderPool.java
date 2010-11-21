@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.Hashtable;
 
 import com.paxxis.chime.common.DataLatch;
+import com.paxxis.chime.service.ChimeConfiguration;
 import com.paxxis.chime.service.JndiInitialContextFactory;
 import com.paxxis.chime.service.RequestQueueSender;
 import com.paxxis.chime.service.ServiceBusConnector;
@@ -60,12 +61,25 @@ public class ServiceBusSenderPool
     final private Object _semaphore = new Object();
 
     private int poolSize;
-
-    public ServiceBusSenderPool(int poolSize, JndiInitialContextFactory contextFactory, String factoryName, String requestQueueName) {
-        this.poolSize = poolSize;
-        initialize(contextFactory, factoryName, requestQueueName);
+    private ChimeConfiguration config;
+    private JndiInitialContextFactory contextFactory;
+    
+    public ServiceBusSenderPool() {
+    	
     }
 
+    public void setPoolSize(int size) {
+    	poolSize = size;
+    }
+
+    public void setChimeConfiguration(ChimeConfiguration cfg) {
+    	config = cfg;
+    }
+    
+    public void setContextFactory(JndiInitialContextFactory factory) {
+    	contextFactory = factory;
+    }
+    
     /**
      * TODO make sure the connection is still open before returning
      * it to the caller.  it may have been closed.  if so, it needs to
@@ -134,8 +148,10 @@ public class ServiceBusSenderPool
         }
     }
 
-    public void initialize(JndiInitialContextFactory contextFactory, String factoryName, String requestQueueName)
-    {
+    public void initialize() {
+    	String factoryName = config.getStringValue("chime.service.connectionFactory", "");
+    	String requestQueueName = config.getStringValue("chime.service.requestQueueName", "");
+    	
         for (int i = 0; i < poolSize; i++)
         {
             ServiceBusConnector connector = new ServiceBusConnector();

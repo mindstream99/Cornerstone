@@ -31,6 +31,31 @@ import java.util.concurrent.TimeUnit;
  * @author Robert Englander  
  */
 public class ServiceBusMessageProcessor {
+	
+	/**
+	 * This is a blocking queue that blocks on the offer method.  Normally the offer method will
+	 * return false if the element can't be added.  The ThreadPoolExecutor calls offer, and we want to block,
+	 * so offer is overridden so that it calls put instead.
+	 * 
+	 */
+	private static class MessageBlockingQueue<M> extends ArrayBlockingQueue<M> {
+		private static final long serialVersionUID = 1L;
+
+		public MessageBlockingQueue(int capacity) {
+			super(capacity);
+		}
+
+		public boolean offer(M element) {
+			try {
+				put(element);
+			} catch (InterruptedException ie) {
+				throw new RejectedExecutionException();
+			}
+			
+			return true;
+		}
+	}
+	
     // the thread pool executor
     private ThreadPoolExecutor executor = null;
 
@@ -94,7 +119,7 @@ public class ServiceBusMessageProcessor {
         }
         
         executor = new ThreadPoolExecutor(poolSize, poolSize, 0, TimeUnit.MILLISECONDS, 
-        						new ArrayBlockingQueue<Runnable>(maxMessages));
+        						new MessageBlockingQueue<Runnable>(maxMessages));
     }
 
     /**
@@ -119,7 +144,7 @@ public class ServiceBusMessageProcessor {
     public void restart() {
         if (isHalted) {
             executor = new ThreadPoolExecutor(poolSize, poolSize, 0, TimeUnit.MILLISECONDS, 
-					new ArrayBlockingQueue<Runnable>(maxMessages));
+					new MessageBlockingQueue<Runnable>(maxMessages));
             
             for (Runnable work : halted) {
                 submit(work);

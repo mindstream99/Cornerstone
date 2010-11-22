@@ -299,7 +299,7 @@ set the bean's chimeConfiguration property.
             <map>
 	            <entry key="queue.ChimeRequestQueue" value="chimeRequestQueue"/>
 	            <entry key="queue.ChimeEventQueue" value="chimeEventQueue"/>
-	            <entry key="topic.ChimeEventTopic" value="chimeUpdateTopic"/>
+	            <entry key="topic.ChimeEventTopic" value="chimeEventTopic"/>
 	            <entry key="topic.ChimeUpdateTopic" value="chimeUpdateTopic"/>
             </map>
         </property>

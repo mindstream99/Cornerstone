@@ -20,11 +20,12 @@ package com.paxxis.chime.client.common;
 
 /**
  * All Response messages should extend ResponseMessage.
- * @author renglander
+ * @author Robert Englander
  */
 public abstract class ResponseMessage<D extends RequestMessage> extends Message
 {
-    // the associated request message
+	private static final long serialVersionUID = 1L;
+	// the associated request message
     private D request = null;
 
     public void setRequest(D request)

@@ -25,6 +25,7 @@ import java.util.Date;
  * @author Robert Englander
  */
 public class UserMessage implements Serializable {
+	private static final long serialVersionUID = 1L;
 
     private InstanceId id;
     private String subject;

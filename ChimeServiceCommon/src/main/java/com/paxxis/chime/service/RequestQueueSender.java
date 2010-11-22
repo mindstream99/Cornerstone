@@ -17,7 +17,7 @@
 
 package com.paxxis.chime.service;
 
-import com.paxxis.chime.client.common.MessageConstants;
+import com.paxxis.chime.client.common.MessagingConstants;
 import com.paxxis.chime.client.common.ErrorMessage;
 import com.paxxis.chime.common.DataLatch;
 import com.paxxis.chime.common.JavaObjectPayload;
@@ -32,6 +32,7 @@ import javax.jms.MessageListener;
 import javax.jms.MessageProducer;
 import javax.jms.ObjectMessage;
 import javax.jms.Queue;
+import javax.jms.Session;
 import javax.jms.TemporaryQueue;
 
 /**
@@ -244,7 +245,7 @@ public class RequestQueueSender extends ChimeConfigurable implements IServiceBus
                     throw new RequestTimeoutException();
                 }
 
-                mon.getMessageHandler().init(connector.getSession());
+                mon.getMessageHandler().init(connector.getSession(), connector.getAcknowledgeMode() == Session.CLIENT_ACKNOWLEDGE);
                 return mon.getMessageHandler().processMessage(response);
             } catch (JMSException je) {
                 throw new RuntimeException(je);
@@ -296,9 +297,9 @@ public class RequestQueueSender extends ChimeConfigurable implements IServiceBus
 
         com.paxxis.chime.client.common.Message msg = requester.getMessage();
 
-        message.setIntProperty(MessageConstants.HeaderConstant.MessageType.name(), msg.getMessageType().getValue());
-        message.setIntProperty(MessageConstants.HeaderConstant.MessageVersion.name(), msg.getMessageVersion());
-        message.setIntProperty(MessageConstants.HeaderConstant.PayloadType.name(), payloadType.getType().getValue());
+        message.setIntProperty(MessagingConstants.HeaderConstant.MessageType.name(), msg.getMessageType());
+        message.setIntProperty(MessagingConstants.HeaderConstant.MessageVersion.name(), msg.getMessageVersion());
+        message.setIntProperty(MessagingConstants.HeaderConstant.PayloadType.name(), payloadType.getType().getValue());
 
         Object payload = msg.getAsPayload(payloadType.getType());
         if (payloadType instanceof JavaObjectPayload) {

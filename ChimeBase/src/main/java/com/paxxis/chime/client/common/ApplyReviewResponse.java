@@ -22,15 +22,16 @@ package com.paxxis.chime.client.common;
  * @author Robert Englander
  */
 public class ApplyReviewResponse extends ResponseMessage<ApplyReviewRequest> {
-    private final static int VERSION = 1;
+	private static final long serialVersionUID = 1L;
+	private final static int VERSION = 1;
 
     @Override
-    public MessageConstants.MessageType getMessageType() {
+    public int getMessageType() {
         return messageType();
     }
 
-    public static MessageConstants.MessageType messageType() {
-        return MessageConstants.MessageType.ApplyReviewResponse;
+    public static int messageType() {
+        return MessageConstants.APPLYREVIEWRESPONSE;
     }
 
     @Override

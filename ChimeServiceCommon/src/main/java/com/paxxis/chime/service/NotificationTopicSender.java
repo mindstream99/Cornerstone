@@ -17,15 +17,17 @@
 
 package com.paxxis.chime.service;
 
-import com.paxxis.chime.client.common.MessageConstants;
-import com.paxxis.chime.common.MessagePayload;
 import java.io.Serializable;
+
 import javax.jms.DeliveryMode;
-import javax.jms.JMSException; 
+import javax.jms.JMSException;
 import javax.jms.Message;
 import javax.jms.MessageProducer;
 import javax.jms.ObjectMessage;
 import javax.jms.Topic;
+
+import com.paxxis.chime.client.common.MessagingConstants;
+import com.paxxis.chime.common.MessagePayload;
 
 /**
  * Manages a connection to a service notification topic as a message
@@ -188,9 +190,9 @@ public class NotificationTopicSender extends ChimeConfigurable implements IServi
         javax.jms.Message message = payloadType.createMessage(_connector.getSession());
 
         com.paxxis.chime.client.common.Message msg = notifier.getMessage();
-        message.setIntProperty(MessageConstants.HeaderConstant.MessageType.name(), msg.getMessageType().getValue());
-        message.setIntProperty(MessageConstants.HeaderConstant.MessageVersion.name(), msg.getMessageVersion());
-        message.setIntProperty(MessageConstants.HeaderConstant.PayloadType.name(), payloadType.getType().getValue());
+        message.setIntProperty(MessagingConstants.HeaderConstant.MessageType.name(), msg.getMessageType());
+        message.setIntProperty(MessagingConstants.HeaderConstant.MessageVersion.name(), msg.getMessageVersion());
+        message.setIntProperty(MessagingConstants.HeaderConstant.PayloadType.name(), payloadType.getType().getValue());
 
         // only supporting java objects right now
         Object payload = msg.getAsPayload(payloadType.getType());

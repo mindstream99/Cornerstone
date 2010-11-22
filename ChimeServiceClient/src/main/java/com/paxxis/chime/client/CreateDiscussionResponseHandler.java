@@ -18,7 +18,6 @@
 package com.paxxis.chime.client;
 
 import com.paxxis.chime.client.common.CreateDiscussionResponse;
-import com.paxxis.chime.client.common.MessageConstants.MessageType;
 import com.paxxis.chime.common.JavaObjectPayload;
 import com.paxxis.chime.service.ResponseHandler;
 import com.paxxis.chime.service.SimpleMessageProcessor;
@@ -29,14 +28,13 @@ import com.paxxis.chime.service.SimpleMessageProcessor;
  */
 public class CreateDiscussionResponseHandler extends ResponseHandler<CreateDiscussionResponse>
 {
-    private static MessageType _supportedType = CreateDiscussionResponse.messageType();
+    private static int _supportedType = CreateDiscussionResponse.messageType();
     private static int _supportedVersion = CreateDiscussionResponse.messageVersion();
 
     @Override
     protected SimpleMessageProcessor getProcessor(int type, int version, int payloadType)
     {
-        MessageType mtype = MessageType.valueOf(type);
-        if (mtype == _supportedType && version == _supportedVersion)
+        if (type == _supportedType && version == _supportedVersion)
         {
             return new CreateDiscussionResponseProcessor(new JavaObjectPayload(), getResponseListener());
         }

@@ -80,14 +80,14 @@ public abstract class ServiceBusMessageHandler extends SimpleServiceBusMessageHa
      * @throws RuntimeException if the message handler was previously
      * initialized and has not been shut down.
      */
-    public void init(Session session) {
+    public void init(Session session, boolean clientAck) {
         if (_messageProcessor != null) {
             if (!_messageProcessor.isShutdown()) {
                 throw new RuntimeException("Attempt to init active message handler");
             }
         }
 
-        super.init(session);
+        super.init(session, clientAck);
 
         if (_messageProcessor != null) {
             if (_messageProcessor.isHalted()) {

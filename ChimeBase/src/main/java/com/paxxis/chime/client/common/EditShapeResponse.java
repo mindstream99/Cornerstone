@@ -27,12 +27,12 @@ public class EditShapeResponse extends ResponseMessage<EditShapeRequest> {
 	private final static int VERSION = 1;
 
     @Override
-    public MessageConstants.MessageType getMessageType() {
+    public int getMessageType() {
         return messageType();
     }
 
-    public static MessageConstants.MessageType messageType() {
-        return MessageConstants.MessageType.EditShapeResponse;
+    public static int messageType() {
+        return MessageConstants.EDITSHAPERESPONSE;
     }
 
     @Override

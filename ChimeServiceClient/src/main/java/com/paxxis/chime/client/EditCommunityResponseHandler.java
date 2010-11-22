@@ -18,7 +18,6 @@
 package com.paxxis.chime.client;
 
 import com.paxxis.chime.client.common.EditCommunityResponse;
-import com.paxxis.chime.client.common.MessageConstants.MessageType;
 import com.paxxis.chime.common.JavaObjectPayload;
 import com.paxxis.chime.service.ResponseHandler;
 import com.paxxis.chime.service.SimpleMessageProcessor;
@@ -29,14 +28,13 @@ import com.paxxis.chime.service.SimpleMessageProcessor;
  */
 public class EditCommunityResponseHandler extends ResponseHandler<EditCommunityResponse>
 {
-    private static MessageType _supportedType = EditCommunityResponse.messageType();
+    private static int _supportedType = EditCommunityResponse.messageType();
     private static int _supportedVersion = EditCommunityResponse.messageVersion();
 
     @Override
     protected SimpleMessageProcessor getProcessor(int type, int version, int payloadType)
     {
-        MessageType mtype = MessageType.valueOf(type);
-        if (mtype == _supportedType && version == _supportedVersion)
+        if (type == _supportedType && version == _supportedVersion)
         {
             return new EditCommunityResponseProcessor(new JavaObjectPayload(), getResponseListener());
         }

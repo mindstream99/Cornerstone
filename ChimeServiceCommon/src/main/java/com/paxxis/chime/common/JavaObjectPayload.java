@@ -17,8 +17,8 @@
 
 package com.paxxis.chime.common;
 
-import com.paxxis.chime.client.common.MessageConstants;
-import com.paxxis.chime.client.common.MessageConstants.PayloadType;
+import com.paxxis.chime.client.common.MessagingConstants;
+import com.paxxis.chime.client.common.MessagingConstants.PayloadType;
 import java.io.Serializable;
 import javax.jms.JMSException;
 import javax.jms.ObjectMessage;
@@ -48,7 +48,7 @@ public class JavaObjectPayload implements MessagePayload {
     public javax.jms.Message createMessage(Session session) {
         try {
             ObjectMessage msg = session.createObjectMessage();
-            msg.setIntProperty(MessageConstants.HeaderConstant.PayloadType.name(),
+            msg.setIntProperty(MessagingConstants.HeaderConstant.PayloadType.name(),
                     getType().getValue());
             return msg;
         } catch (JMSException e) {

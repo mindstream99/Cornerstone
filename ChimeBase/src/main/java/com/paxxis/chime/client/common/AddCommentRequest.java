@@ -18,20 +18,22 @@
 package com.paxxis.chime.client.common;
 
 
+
 /**
  *
- * @author Robert Englander
+ * @author Robert Englander 
  */
 public class AddCommentRequest extends RequestMessage {
-    private final static int VERSION = 1;
+	private static final long serialVersionUID = 1L;
+	private final static int VERSION = 1;
 
     @Override
-    public MessageConstants.MessageType getMessageType() {
+    public int getMessageType() {
         return messageType();
     }
 
-    public static MessageConstants.MessageType messageType() {
-        return MessageConstants.MessageType.AddCommentRequest;
+    public static int messageType() {
+        return MessageConstants.ADDCOMMENTREQUEST;
     }
 
     @Override

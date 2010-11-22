@@ -40,7 +40,7 @@ import com.paxxis.chime.client.common.FindTagsRequest;
 import com.paxxis.chime.client.common.LockRequest;
 import com.paxxis.chime.client.common.LoginRequest;
 import com.paxxis.chime.client.common.LogoutRequest;
-import com.paxxis.chime.client.common.MessageConstants;
+import com.paxxis.chime.client.common.MessagingConstants;
 import com.paxxis.chime.client.common.ModifyShapeRequest;
 import com.paxxis.chime.client.common.MultiRequest;
 import com.paxxis.chime.client.common.PingRequest;
@@ -50,8 +50,7 @@ import com.paxxis.chime.client.common.ShapeRequest;
 import com.paxxis.chime.client.common.SubscribeRequest;
 import com.paxxis.chime.client.common.UserContextRequest;
 import com.paxxis.chime.client.common.UserMessagesRequest;
-import com.paxxis.chime.client.common.MessageConstants.MessageType;
-import com.paxxis.chime.client.common.MessageConstants.PayloadType;
+import com.paxxis.chime.client.common.MessagingConstants.PayloadType;
 import com.paxxis.chime.common.JavaObjectPayload;
 import com.paxxis.chime.common.MessagePayload;
 import com.paxxis.chime.data.CacheManager;
@@ -73,11 +72,11 @@ public class RequestMessageHandler extends ServiceBusMessageHandler {
     NotificationTopicSender _topicSender = null;
     
     private static final HashMap<PayloadType, MessagePayload> _payloadTypes = new HashMap<PayloadType, MessagePayload>();
-    private static final HashMap<MessageType, Integer> _messageTypes = new HashMap<MessageType, Integer>();
+    private static final HashMap<Integer, Integer> _messageTypes = new HashMap<Integer, Integer>();
 
     static
     {
-        _payloadTypes.put(MessageConstants.PayloadType.JavaObjectPayload, new JavaObjectPayload());
+        _payloadTypes.put(MessagingConstants.PayloadType.JavaObjectPayload, new JavaObjectPayload());
 
         _messageTypes.put(LoginRequest.messageType(), LoginRequest.messageVersion());
         _messageTypes.put(LogoutRequest.messageType(), LogoutRequest.messageVersion());
@@ -117,123 +116,122 @@ public class RequestMessageHandler extends ServiceBusMessageHandler {
         MessagePayload mPayload = _payloadTypes.get(ptype);
         if (_payloadTypes.containsKey(ptype))
         {
-            MessageType mtype = MessageType.valueOf(type);
-            if (_messageTypes.containsKey(mtype))
+            if (_messageTypes.containsKey(type))
             {
-                int ver = _messageTypes.get(mtype);
+                int ver = _messageTypes.get(type);
                 if (version == ver)
                 {
-                    if (mtype == LoginRequest.messageType())
+                    if (type == LoginRequest.messageType())
                     {
                         return new LoginRequestProcessor(mPayload, _databasePool, _ldapContextFactory, _topicSender);
                     }
-                    else if (mtype == LogoutRequest.messageType())
+                    else if (type == LogoutRequest.messageType())
                     {
                         return new LogoutRequestProcessor(mPayload, _databasePool);
                     }
-                    else if (mtype == ShapeRequest.messageType())
+                    else if (type == ShapeRequest.messageType())
                     {
                         return new ShapeRequestProcessor(mPayload, _databasePool);
                     }
-                    else if (mtype == DataInstanceRequest.messageType())
+                    else if (type == DataInstanceRequest.messageType())
                     {
                         return new DataInstanceRequestProcessor(mPayload, _databasePool);
                     }
-                    else if (mtype == EditShapeRequest.messageType())
+                    else if (type == EditShapeRequest.messageType())
                     {
                         return new EditShapeRequestProcessor(mPayload, _databasePool, _topicSender);
                     }
-                    else if (mtype == ModifyShapeRequest.messageType())
+                    else if (type == ModifyShapeRequest.messageType())
                     {
                         return new ModifyShapeRequestProcessor(mPayload, _databasePool, _topicSender);
                     }
-                    else if (mtype == EditDataInstanceRequest.messageType())
+                    else if (type == EditDataInstanceRequest.messageType())
                     {
                         return new EditDataRequestProcessor(mPayload, _databasePool, _topicSender);
                     }
-                    else if (mtype == ApplyVoteRequest.messageType())
+                    else if (type == ApplyVoteRequest.messageType())
                     {
                         return new ApplyVoteRequestProcessor(mPayload, _databasePool, _topicSender);
                     }
-                    else if (mtype == ApplyReviewRequest.messageType())
+                    else if (type == ApplyReviewRequest.messageType())
                     {
                         return new ApplyReviewRequestProcessor(mPayload, _databasePool, _topicSender);
                     }
-                    else if (mtype == AddCommentRequest.messageType())
+                    else if (type == AddCommentRequest.messageType())
                     {
                         return new AddCommentRequestProcessor(mPayload, _databasePool, _topicSender);
                     }
-                    else if (mtype == ApplyTagRequest.messageType())
+                    else if (type == ApplyTagRequest.messageType())
                     {
                         return new ApplyTagRequestProcessor(mPayload, _databasePool, _topicSender);
                     }
-                    else if (mtype == UserContextRequest.messageType())
+                    else if (type == UserContextRequest.messageType())
                     {
                         return new UserContextRequestProcessor(mPayload, _databasePool);
                     }
-                    else if (mtype == FindTagsRequest.messageType())
+                    else if (type == FindTagsRequest.messageType())
                     {
                         return new FindTagsRequestProcessor(mPayload, _databasePool);
                     }
-                    else if (mtype == FindShapesRequest.messageType())
+                    else if (type == FindShapesRequest.messageType())
                     {
                         return new FindShapesRequestProcessor(mPayload, _databasePool);
                     }
-                    else if (mtype == FindInstancesRequest.messageType())
+                    else if (type == FindInstancesRequest.messageType())
                     {
                         return new FindInstancesRequestProcessor(mPayload, _databasePool);
                     }
-                    else if (mtype == ReviewsRequest.messageType())
+                    else if (type == ReviewsRequest.messageType())
                     {
                         return new ReviewsRequestProcessor(mPayload, _databasePool);
                     }
-                    else if (mtype == CommentsRequest.messageType())
+                    else if (type == CommentsRequest.messageType())
                     {
                         return new CommentsRequestProcessor(mPayload, _databasePool);
                     }
-                    else if (mtype == DiscussionsRequest.messageType())
+                    else if (type == DiscussionsRequest.messageType())
                     {
                         return new DiscussionsRequestProcessor(mPayload, _databasePool);
                     }
-                    else if (mtype == CreateDiscussionRequest.messageType())
+                    else if (type == CreateDiscussionRequest.messageType())
                     {
                         return new CreateDiscussionRequestProcessor(mPayload, _databasePool, _topicSender);
                     }
-                    else if (mtype == MultiRequest.messageType())
+                    else if (type == MultiRequest.messageType())
                     {
                         MultiRequestProcessor proc = new MultiRequestProcessor(mPayload, _databasePool);
                         proc.setMessageHandler(this);
                         return proc;
                     }
-                    else if (mtype == PingRequest.messageType())
+                    else if (type == PingRequest.messageType())
                     {
                         return new PingRequestProcessor(mPayload, _databasePool);
                     }
-                    else if (mtype == LockRequest.messageType())
+                    else if (type == LockRequest.messageType())
                     {
                         return new LockRequestProcessor(mPayload, _databasePool, _topicSender);
                     }
-                    else if (mtype == SubscribeRequest.messageType())
+                    else if (type == SubscribeRequest.messageType())
                     {
                         return new SubscribeRequestProcessor(mPayload, _databasePool, _topicSender);
                     }
-                    else if (mtype == RunCALScriptRequest.messageType())
+                    else if (type == RunCALScriptRequest.messageType())
                     {
                         return new RunCALScriptRequestProcessor(mPayload, _databasePool);
                     }
-                    else if (mtype == BuildIndexRequestMessage.messageType())
+                    else if (type == BuildIndexRequestMessage.messageType())
                     {
                         return new BuildIndexRequestProcessor(mPayload, _databasePool, _topicSender);
                     }
-                    else if (mtype == EditUserRequest.messageType())
+                    else if (type == EditUserRequest.messageType())
                     {
                         return new EditUserRequestProcessor(mPayload, _databasePool, _topicSender);
                     }
-                    else if (mtype == EditCommunityRequest.messageType())
+                    else if (type == EditCommunityRequest.messageType())
                     {
                         return new EditCommunityRequestProcessor(mPayload, _databasePool, _topicSender);
                     }
-                    else if (mtype == UserMessagesRequest.messageType())
+                    else if (type == UserMessagesRequest.messageType())
                     {
                         return new UserMessagesRequestProcessor(mPayload, _databasePool);
                     }

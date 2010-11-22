@@ -138,6 +138,9 @@ import de.novanic.eventservice.service.RemoteEventServiceServlet;
  * @author Robert Englander
  */
 public class endsliceServiceImpl extends RemoteEventServiceServlet implements endsliceService {
+	private static final long serialVersionUID = 1L;
+    private static final JavaObjectPayload PAYLOADTYPE = new JavaObjectPayload();
+
     private JndiInitialContextFactory _contextFactory;
     private ServiceBusSenderPool senderPool;
     private ServiceBusMessageReceiver receiver;
@@ -146,8 +149,8 @@ public class endsliceServiceImpl extends RemoteEventServiceServlet implements en
     
     private Object lock = new Object();
     private boolean initialized = false;
+    private int timeout = 30000;
     private BrandingData brandingData = new BrandingData();
-    
     
     @Override
     public void destroy() {
@@ -155,7 +158,6 @@ public class endsliceServiceImpl extends RemoteEventServiceServlet implements en
         super.destroy();
     }
 
-	private static final long serialVersionUID = 1L;
 
 	public BrandingData getBrandingData() {
 		synchronized (lock) {
@@ -192,9 +194,10 @@ public class endsliceServiceImpl extends RemoteEventServiceServlet implements en
 			synchronized (lock) {
 				if (!initialized) {
 					_contextFactory = (JndiInitialContextFactory)ctx.getBean("contextFactory");
-			        
+					ChimeConfiguration cfg = (ChimeConfiguration)ctx.getBean("chimeConfiguration");
+					timeout = cfg.getIntValue("chime.service.responseTimeout", timeout);
+					
 					try {
-						ChimeConfiguration cfg = (ChimeConfiguration)ctx.getBean("chimeConfiguration");
 				        DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
 			            DocumentBuilder db = dbf.newDocumentBuilder();
 			            Document doc = db.parse(cfg.getStringValue("chime.client.brandingFile", "./ChimeBranding.xml"));
@@ -240,7 +243,7 @@ public class endsliceServiceImpl extends RemoteEventServiceServlet implements en
         ShapeResponseObject obj = new ShapeResponseObject();
 
         PoolEntry entry = senderPool.borrowInstance(this);
-        ChimeClient client = new ChimeClient(new JavaObjectPayload(), entry.getSender(), 30000);
+        ChimeClient client = new ChimeClient(PAYLOADTYPE, entry.getSender(), timeout);
         Message response = client.execute(request, new ShapeResponseHandler());
         senderPool.returnInstance(entry, this);
 
@@ -267,7 +270,7 @@ public class endsliceServiceImpl extends RemoteEventServiceServlet implements en
         ServiceResponseObject<PingResponse> obj = new ServiceResponseObject<PingResponse>();
 
         PoolEntry entry = senderPool.borrowInstance(this);
-        ChimeClient client = new ChimeClient(new JavaObjectPayload(), entry.getSender(), 30000);
+        ChimeClient client = new ChimeClient(PAYLOADTYPE, entry.getSender(), timeout);
 
         Message response = client.execute(request, new PingResponseHandler());
         senderPool.returnInstance(entry, this);
@@ -295,7 +298,7 @@ public class endsliceServiceImpl extends RemoteEventServiceServlet implements en
         ServiceResponseObject<LockResponse> obj = new ServiceResponseObject<LockResponse>();
 
         PoolEntry entry = senderPool.borrowInstance(this);
-        ChimeClient client = new ChimeClient(new JavaObjectPayload(), entry.getSender(), 30000);
+        ChimeClient client = new ChimeClient(PAYLOADTYPE, entry.getSender(), timeout);
 
         Message response = client.execute(request, new LockResponseHandler());
         senderPool.returnInstance(entry, this);
@@ -323,7 +326,7 @@ public class endsliceServiceImpl extends RemoteEventServiceServlet implements en
         ServiceResponseObject<SubscribeResponse> obj = new ServiceResponseObject<SubscribeResponse>();
 
         PoolEntry entry = senderPool.borrowInstance(this);
-        ChimeClient client = new ChimeClient(new JavaObjectPayload(), entry.getSender(), 30000);
+        ChimeClient client = new ChimeClient(PAYLOADTYPE, entry.getSender(), timeout);
 
         Message response = client.execute(request, new SubscribeResponseHandler());
         senderPool.returnInstance(entry, this);
@@ -351,7 +354,7 @@ public class endsliceServiceImpl extends RemoteEventServiceServlet implements en
         ServiceResponseObject<RunCALScriptResponse> obj = new ServiceResponseObject<RunCALScriptResponse>();
 
         PoolEntry entry = senderPool.borrowInstance(this);
-        ChimeClient client = new ChimeClient(new JavaObjectPayload(), entry.getSender(), 30000);
+        ChimeClient client = new ChimeClient(PAYLOADTYPE, entry.getSender(), timeout);
 
         Message response = client.execute(request, new RunCALScriptResponseHandler());
         senderPool.returnInstance(entry, this);
@@ -379,7 +382,7 @@ public class endsliceServiceImpl extends RemoteEventServiceServlet implements en
         ServiceResponseObject<EditCommunityResponse> obj = new ServiceResponseObject<EditCommunityResponse>();
 
         PoolEntry entry = senderPool.borrowInstance(this);
-        ChimeClient client = new ChimeClient(new JavaObjectPayload(), entry.getSender(), 30000);
+        ChimeClient client = new ChimeClient(PAYLOADTYPE, entry.getSender(), timeout);
 
         Message response = client.execute(request, new EditCommunityResponseHandler());
         senderPool.returnInstance(entry, this);
@@ -407,7 +410,7 @@ public class endsliceServiceImpl extends RemoteEventServiceServlet implements en
         ServiceResponseObject<EditUserResponse> obj = new ServiceResponseObject<EditUserResponse>();
 
         PoolEntry entry = senderPool.borrowInstance(this);
-        ChimeClient client = new ChimeClient(new JavaObjectPayload(), entry.getSender(), 30000);
+        ChimeClient client = new ChimeClient(PAYLOADTYPE, entry.getSender(), timeout);
 
         Message response = client.execute(request, new EditUserResponseHandler());
         senderPool.returnInstance(entry, this);
@@ -435,7 +438,7 @@ public class endsliceServiceImpl extends RemoteEventServiceServlet implements en
         ServiceResponseObject<MultiResponse> obj = new ServiceResponseObject<MultiResponse>();
         
         PoolEntry entry = senderPool.borrowInstance(this);
-        ChimeClient client = new ChimeClient(new JavaObjectPayload(), entry.getSender(), 30000);
+        ChimeClient client = new ChimeClient(PAYLOADTYPE, entry.getSender(), timeout);
 
         Message response = client.execute(request, new MultiResponseHandler());
         senderPool.returnInstance(entry, this);
@@ -463,7 +466,7 @@ public class endsliceServiceImpl extends RemoteEventServiceServlet implements en
         ServiceResponseObject<EditDataInstanceResponse> obj = new ServiceResponseObject<EditDataInstanceResponse>();
 
         PoolEntry entry = senderPool.borrowInstance(this);
-        ChimeClient client = new ChimeClient(new JavaObjectPayload(), entry.getSender(), 30000);
+        ChimeClient client = new ChimeClient(PAYLOADTYPE, entry.getSender(), timeout);
 
         Message response = client.execute(request, new EditInstanceResponseHandler());
         senderPool.returnInstance(entry, this);
@@ -491,7 +494,7 @@ public class endsliceServiceImpl extends RemoteEventServiceServlet implements en
         ServiceResponseObject<EditShapeResponse> obj = new ServiceResponseObject<EditShapeResponse>();
 
         PoolEntry entry = senderPool.borrowInstance(this);
-        ChimeClient client = new ChimeClient(new JavaObjectPayload(), entry.getSender(), 30000);
+        ChimeClient client = new ChimeClient(PAYLOADTYPE, entry.getSender(), timeout);
 
         Message response = client.execute(request, new EditShapeResponseHandler());
         senderPool.returnInstance(entry, this);
@@ -519,7 +522,7 @@ public class endsliceServiceImpl extends RemoteEventServiceServlet implements en
         ServiceResponseObject<ModifyShapeResponse> obj = new ServiceResponseObject<ModifyShapeResponse>();
 
         PoolEntry entry = senderPool.borrowInstance(this);
-        ChimeClient client = new ChimeClient(new JavaObjectPayload(), entry.getSender(), 30000);
+        ChimeClient client = new ChimeClient(PAYLOADTYPE, entry.getSender(), timeout);
 
         Message response = client.execute(request, new ModifyShapeResponseHandler());
         senderPool.returnInstance(entry, this);
@@ -547,7 +550,7 @@ public class endsliceServiceImpl extends RemoteEventServiceServlet implements en
         ServiceResponseObject<ApplyTagResponse> obj = new ServiceResponseObject<ApplyTagResponse>();
         
         PoolEntry entry = senderPool.borrowInstance(this);
-        ChimeClient client = new ChimeClient(new JavaObjectPayload(), entry.getSender(), 30000);
+        ChimeClient client = new ChimeClient(PAYLOADTYPE, entry.getSender(), timeout);
 
         Message response = client.execute(request, new ApplyTagResponseHandler());
         senderPool.returnInstance(entry, this);
@@ -575,7 +578,7 @@ public class endsliceServiceImpl extends RemoteEventServiceServlet implements en
         ServiceResponseObject<ApplyReviewResponse> obj = new ServiceResponseObject<ApplyReviewResponse>();
 
         PoolEntry entry = senderPool.borrowInstance(this);
-        ChimeClient client = new ChimeClient(new JavaObjectPayload(), entry.getSender(), 30000);
+        ChimeClient client = new ChimeClient(PAYLOADTYPE, entry.getSender(), timeout);
 
         Message response = client.execute(request, new ApplyRatingResponseHandler());
         senderPool.returnInstance(entry, this);
@@ -602,7 +605,7 @@ public class endsliceServiceImpl extends RemoteEventServiceServlet implements en
         ServiceResponseObject<CreateDiscussionResponse> obj = new ServiceResponseObject<CreateDiscussionResponse>();
 
         PoolEntry entry = senderPool.borrowInstance(this);
-        ChimeClient client = new ChimeClient(new JavaObjectPayload(), entry.getSender(), 30000);
+        ChimeClient client = new ChimeClient(PAYLOADTYPE, entry.getSender(), timeout);
 
         Message response = client.execute(request, new CreateDiscussionResponseHandler());
         senderPool.returnInstance(entry, this);
@@ -630,7 +633,7 @@ public class endsliceServiceImpl extends RemoteEventServiceServlet implements en
         ServiceResponseObject<ApplyVoteResponse> obj = new ServiceResponseObject<ApplyVoteResponse>();
 
         PoolEntry entry = senderPool.borrowInstance(this);
-        ChimeClient client = new ChimeClient(new JavaObjectPayload(), entry.getSender(), 30000);
+        ChimeClient client = new ChimeClient(PAYLOADTYPE, entry.getSender(), timeout);
 
         Message response = client.execute(request, new ApplyVoteResponseHandler());
         senderPool.returnInstance(entry, this);
@@ -658,7 +661,7 @@ public class endsliceServiceImpl extends RemoteEventServiceServlet implements en
         ServiceResponseObject<AddCommentResponse> obj = new ServiceResponseObject<AddCommentResponse>();
         
         PoolEntry entry = senderPool.borrowInstance(this);
-        ChimeClient client = new ChimeClient(new JavaObjectPayload(), entry.getSender(), 30000);
+        ChimeClient client = new ChimeClient(PAYLOADTYPE, entry.getSender(), timeout);
 
         Message response = client.execute(request, new AddCommentResponseHandler());
         senderPool.returnInstance(entry, this);
@@ -685,7 +688,7 @@ public class endsliceServiceImpl extends RemoteEventServiceServlet implements en
         ServiceResponseObject<UserMessagesResponse> obj = new ServiceResponseObject<UserMessagesResponse>();
         
         PoolEntry entry = senderPool.borrowInstance(this);
-        ChimeClient client = new ChimeClient(new JavaObjectPayload(), entry.getSender(), 30000);
+        ChimeClient client = new ChimeClient(PAYLOADTYPE, entry.getSender(), timeout);
 
         Message response = client.execute(request, new UserMessagesResponseHandler());
         senderPool.returnInstance(entry, this);
@@ -713,7 +716,7 @@ public class endsliceServiceImpl extends RemoteEventServiceServlet implements en
         RatingsResponseObject obj = new RatingsResponseObject();
         
         PoolEntry entry = senderPool.borrowInstance(this);
-        ChimeClient client = new ChimeClient(new JavaObjectPayload(), entry.getSender(), 30000);
+        ChimeClient client = new ChimeClient(PAYLOADTYPE, entry.getSender(), timeout);
 
         Message response = client.execute(request, new RatingsResponseHandler());
         senderPool.returnInstance(entry, this);
@@ -741,7 +744,7 @@ public class endsliceServiceImpl extends RemoteEventServiceServlet implements en
         CommentsResponseObject obj = new CommentsResponseObject();
 
         PoolEntry entry = senderPool.borrowInstance(this);
-        ChimeClient client = new ChimeClient(new JavaObjectPayload(), entry.getSender(), 30000);
+        ChimeClient client = new ChimeClient(PAYLOADTYPE, entry.getSender(), timeout);
 
         Message response = client.execute(request, new CommentsResponseHandler());
         senderPool.returnInstance(entry, this);
@@ -769,7 +772,7 @@ public class endsliceServiceImpl extends RemoteEventServiceServlet implements en
         DiscussionsResponseObject obj = new DiscussionsResponseObject();
 
         PoolEntry entry = senderPool.borrowInstance(this);
-        ChimeClient client = new ChimeClient(new JavaObjectPayload(), entry.getSender(), 30000);
+        ChimeClient client = new ChimeClient(PAYLOADTYPE, entry.getSender(), timeout);
 
         Message response = client.execute(request, new DiscussionsResponseHandler());
         senderPool.returnInstance(entry, this);
@@ -800,7 +803,7 @@ public class endsliceServiceImpl extends RemoteEventServiceServlet implements en
         DataInstanceResponseObject obj = new DataInstanceResponseObject();
 
         PoolEntry entry = senderPool.borrowInstance(this);
-        ChimeClient client = new ChimeClient(new JavaObjectPayload(), entry.getSender(), 30000);
+        ChimeClient client = new ChimeClient(PAYLOADTYPE, entry.getSender(), timeout);
 
         Message response = client.execute(request, new DataInstanceResponseHandler());
         senderPool.returnInstance(entry, this);
@@ -828,7 +831,7 @@ public class endsliceServiceImpl extends RemoteEventServiceServlet implements en
         FindInstancesResponseObject obj = new FindInstancesResponseObject();
         
         PoolEntry entry = senderPool.borrowInstance(this);
-        ChimeClient client = new ChimeClient(new JavaObjectPayload(), entry.getSender(), 30000);
+        ChimeClient client = new ChimeClient(PAYLOADTYPE, entry.getSender(), timeout);
 
         Message response = client.execute(request, new FindInstancesResponseHandler());
         senderPool.returnInstance(entry, this);
@@ -854,7 +857,7 @@ public class endsliceServiceImpl extends RemoteEventServiceServlet implements en
     public LoginResponseObject login(String name, String password)
     {
         PoolEntry entry = senderPool.borrowInstance(this);
-        ChimeClient client = new ChimeClient(new JavaObjectPayload(), entry.getSender(), 30000);
+        ChimeClient client = new ChimeClient(PAYLOADTYPE, entry.getSender(), timeout);
 
         LoginRequest request = new LoginRequest();
         request.setUserName(name);
@@ -882,7 +885,7 @@ public class endsliceServiceImpl extends RemoteEventServiceServlet implements en
     public LoginResponseObject login(User user)
     {
         PoolEntry entry = senderPool.borrowInstance(this);
-        ChimeClient client = new ChimeClient(new JavaObjectPayload(), entry.getSender(), 30000);
+        ChimeClient client = new ChimeClient(PAYLOADTYPE, entry.getSender(), timeout);
 
         LoginRequest request = new LoginRequest();
         request.setUser(user);
@@ -909,7 +912,7 @@ public class endsliceServiceImpl extends RemoteEventServiceServlet implements en
     public LogoutResponseObject logout(User user)
     {
         PoolEntry entry = senderPool.borrowInstance(this);
-        ChimeClient client = new ChimeClient(new JavaObjectPayload(), entry.getSender(), 30000);
+        ChimeClient client = new ChimeClient(PAYLOADTYPE, entry.getSender(), timeout);
         LogoutRequest request = new LogoutRequest();
         request.setUser(user);
      

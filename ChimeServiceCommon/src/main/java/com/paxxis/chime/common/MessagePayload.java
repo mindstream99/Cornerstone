@@ -17,7 +17,7 @@
 
 package com.paxxis.chime.common;
 
-import com.paxxis.chime.client.common.MessageConstants.PayloadType;
+import com.paxxis.chime.client.common.MessagingConstants.PayloadType;
 import javax.jms.Message;
 import javax.jms.Session;
 

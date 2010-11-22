@@ -29,13 +29,13 @@ import java.util.Set;
  */
 public abstract class ChimeConfigurable implements IManagedBean
 {
-    // the cornerstone configuration object to use to populate
+    // the configuration object to use to populate
     // property values. 
     private ChimeConfiguration _configuration = null;
     
     // contains a mapping of property names to configuration
     // value names 
-    private HashMap _propertyMap = new HashMap();
+    private HashMap<String, Object> _propertyMap = new HashMap<String, Object>();
     
     /** 
      * Constructor 
@@ -44,7 +44,8 @@ public abstract class ChimeConfigurable implements IManagedBean
     {
     }
     
-    public void setConfigurationPropertyMap(Map localMap)
+    @SuppressWarnings("unchecked")
+	public void setConfigurationPropertyMap(Map localMap)
     {
         _propertyMap.putAll(localMap);
     }
@@ -54,7 +55,7 @@ public abstract class ChimeConfigurable implements IManagedBean
      */
     public void loadConfigurationPropertyValues()
     {
-        ChimeConfiguration config = getEndsliceConfiguration();
+        ChimeConfiguration config = getChimeConfiguration();
         
         if (config != null)
         {
@@ -126,11 +127,10 @@ public abstract class ChimeConfigurable implements IManagedBean
 
     
     /**
-     * Set the endsliceConfiguration property.  Setting this property
+     * Set the chimeConfiguration property.  Setting this property
      * causes the initialization process to use the configuration object
      * to retrieve property values immediately.
      *
-     * @param configuration the endslice configuration object
      */
     public void setChimeConfiguration(ChimeConfiguration configuration)
     {
@@ -139,11 +139,10 @@ public abstract class ChimeConfigurable implements IManagedBean
     }
     
     /**
-     * Get the endsliceConfiguration object
+     * Get the Configuration object
      *
-     * @return the endsliceConfiguration object
      */
-    public ChimeConfiguration getEndsliceConfiguration()
+    public ChimeConfiguration getChimeConfiguration()
     {
         return _configuration;
     }

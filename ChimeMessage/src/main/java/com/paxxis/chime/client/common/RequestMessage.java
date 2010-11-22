@@ -23,7 +23,8 @@ package com.paxxis.chime.client.common;
  */
 public abstract class RequestMessage extends Message
 {
-    private long _correlator = -1;
+	private static final long serialVersionUID = 1L;
+	private long _correlator = -1;
     
     public RequestMessage()
     {

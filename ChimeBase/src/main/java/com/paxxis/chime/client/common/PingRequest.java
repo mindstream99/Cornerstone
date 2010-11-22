@@ -26,12 +26,12 @@ public class PingRequest extends RequestMessage {
 	private final static int VERSION = 1;
 
     @Override
-    public MessageConstants.MessageType getMessageType() {
+    public int getMessageType() {
         return messageType();
     }
 
-    public static MessageConstants.MessageType messageType() {
-        return MessageConstants.MessageType.PingRequest;
+    public static int messageType() {
+        return MessageConstants.PINGREQUEST;
     }
 
     @Override
@@ -44,7 +44,7 @@ public class PingRequest extends RequestMessage {
     }
 
     private User _user = null;
-    private InstanceId activeId = InstanceId.create("-1");
+    private InstanceId activeId = InstanceId.UNKNOWN;
     private boolean sessionPing = true;
     private boolean userActivity = false;
 

@@ -22,6 +22,7 @@ package com.paxxis.chime.client.common;
  * @author Robert Englander
  */
 public class DataInstanceEvent extends RequestMessage {
+	private static final long serialVersionUID = 1L;
     public enum EventType
     {
         NewType,
@@ -40,12 +41,12 @@ public class DataInstanceEvent extends RequestMessage {
     private final static int VERSION = 1;
 
     @Override
-    public MessageConstants.MessageType getMessageType() {
+    public int getMessageType() {
         return messageType();
     }
 
-    public static MessageConstants.MessageType messageType() {
-        return MessageConstants.MessageType.DataInstanceEvent;
+    public static int messageType() {
+        return MessageConstants.DATAINSTANCEEVENT;
     }
 
     @Override

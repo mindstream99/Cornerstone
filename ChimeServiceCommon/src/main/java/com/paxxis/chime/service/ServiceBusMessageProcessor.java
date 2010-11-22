@@ -24,9 +24,7 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 /**
- * Processes messages using a thread pool.  The size of the
- * thread pool indicates the number of messages that can be
- * processed concurrently.
+ * Processes messages using a thread pool.
  *
  * @author Robert Englander  
  */
@@ -110,6 +108,7 @@ public class ServiceBusMessageProcessor {
      * Constructor.
      *
      * @param poolSize the size of the thread pool.  
+     * @param max the maximum number of messages in flight.
      */
     public ServiceBusMessageProcessor(int poolSize, int max) {
         this.poolSize = poolSize;
@@ -120,10 +119,12 @@ public class ServiceBusMessageProcessor {
         
         executor = new ThreadPoolExecutor(poolSize, poolSize, 0, TimeUnit.MILLISECONDS, 
         						new MessageBlockingQueue<Runnable>(maxMessages));
+        executor.prestartAllCoreThreads();
     }
 
     /**
-     * Submit a message for processing
+     * Submit a message for processing.  Since the executor is constructed with a MessageBlockingQueue,
+     * this method will block if the waiting queue is full, returning only when the message can be accepted.
      *
      * @param message 
      */

@@ -91,23 +91,23 @@ set the bean's chimeConfiguration property.
                 <entry key="chime.database.dateFormat" value="yyyy-MM-dd"/>
                 <entry key="chime.database.dateTimeFormat" value="yyyy-MM-dd HH:mm:ss"/>
 
-                <!-- Embedded Derby -->
+                <!-- Embedded Derby 
                 <entry key="chime.database.urlPrefix" value="jdbc:derby:"/>
                 <entry key="chime.database.driver" value="org.apache.derby.jdbc.EmbeddedDriver"/>
                 <entry key="chime.database.hostName" value="embedded"/>
                 <entry key="chime.database.name" value="ChimeDB"/>
                 <entry key="chime.database.userName" value="chime"/>
                 <entry key="chime.database.password" value="chime"/>
-                <!--  -->
+                -->
 
-                <!-- MySQL
+                <!-- MySQL -->
                 <entry key="chime.database.urlPrefix" value="jdbc:mysql:"/>
                 <entry key="chime.database.driver" value="com.mysql.jdbc.Driver"/>
                 <entry key="chime.database.hostName" value="localhost"/>
                 <entry key="chime.database.name" value="Chime"/>
                 <entry key="chime.database.userName" value="chime"/>
                 <entry key="chime.database.password" value="chime"/>
-                -->
+                <!--  -->
 
                 <entry key="chime.database.idleThreshold" value="5"/>
                 <entry key="chime.database.maxPoolSize" value="25"/>
@@ -121,6 +121,7 @@ set the bean's chimeConfiguration property.
                 <entry key="chime.service.poolSize" value="1"/>
                 <entry key="chime.service.requestQueueName" value="ChimeRequestQueue"/>
                 <entry key="chime.service.eventQueueName" value="chimeEventQueue"/>
+                <entry key="chime.service.ackMode" value="auto"/>
 
                 <entry key="chime.service.JndiInitialContextFactory.contextFactory" value="org.apache.activemq.jndi.ActiveMQInitialContextFactory"/>
                 <!--
@@ -196,8 +197,10 @@ set the bean's chimeConfiguration property.
     <bean id="serviceVersion" class="com.paxxis.chime.service.Version">
     </bean>
 
+<!-- 
     <bean id="messageBroker" class="com.paxxis.chime.service.MessageBroker">
     </bean>
+-->
 
     <bean id="appServer" class="com.paxxis.chime.service.AppServer">
         <property name="port" value="8080"/>
@@ -348,10 +351,12 @@ set the bean's chimeConfiguration property.
             <map>
                 <entry key="connectionFactoryName" value="chime.service.connectionFactory"/>
                 <entry key="connectOnStartup" value="chime.service.connectOnStartup"/>
+                <entry key="ackMode" value="chime.service.ackMode"/>
             </map>
         </property>
         <property name="chimeConfiguration" ref="chimeConfiguration"/>
         <property name="initialContextFactory" ref="contextFactory"/>
+        <property name="ackMode" value="client"/>
 
         <property name="serviceBusConnectorClients">
             <list>
@@ -400,6 +405,7 @@ set the bean's chimeConfiguration property.
             <map>
                 <entry key="connectionFactoryName" value="chime.service.connectionFactory"/>
                 <entry key="connectOnStartup" value="chime.service.connectOnStartup"/>
+                <entry key="acknowledgeMode" value="client"/>
             </map>
         </property>
         <property name="chimeConfiguration" ref="chimeConfiguration"/>

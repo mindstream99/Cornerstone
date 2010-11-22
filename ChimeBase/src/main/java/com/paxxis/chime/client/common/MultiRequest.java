@@ -23,7 +23,8 @@ package com.paxxis.chime.client.common;
  * @author Robert Englander
  */
 public class MultiRequest extends MultipleRequest {
-    private User _user = null;
+	private static final long serialVersionUID = 1L;
+	private User _user = null;
     
     public User getUser()
     {

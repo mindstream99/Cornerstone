@@ -35,12 +35,22 @@ public abstract class SimpleMessageProcessor implements Runnable {
 
     private MessagePayload payloadType;
 
-    Object _payload = null;
+    private Object _payload = null;
+
+    private boolean clientAck = false;
 
     public SimpleMessageProcessor(MessagePayload type) {
         payloadType = type;
     }
 
+    public void setClientAck(boolean ack) {
+        clientAck = ack;
+    }
+
+    public boolean isClientAck() {
+        return clientAck;
+    }
+    
     public Session getSession() {
         return session;
     }

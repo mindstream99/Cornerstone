@@ -17,7 +17,7 @@
 
 package com.paxxis.chime.service;
 
-import com.paxxis.chime.client.common.MessageConstants;
+import com.paxxis.chime.client.common.MessagingConstants;
 import com.paxxis.chime.common.MessagePayload;
 import javax.jms.Message;
 import javax.jms.MessageProducer;
@@ -34,16 +34,16 @@ public abstract class MessageProcessor extends SimpleMessageProcessor {
 
     public void run() {
         try {
+            Message message = getMessage();
             com.paxxis.chime.client.common.Message resp = process(false);
             if (resp != null) {
                 Object response = resp.getAsPayload(getPayloadType().getType());
                 Message responseMsg = getPayloadType().createMessage(getSession(), response);
 
-                responseMsg.setIntProperty(MessageConstants.HeaderConstant.MessageType.name(), resp.getMessageType().getValue());
-                responseMsg.setIntProperty(MessageConstants.HeaderConstant.MessageVersion.name(), resp.getMessageVersion());
+                responseMsg.setIntProperty(MessagingConstants.HeaderConstant.MessageType.name(), resp.getMessageType());
+                responseMsg.setIntProperty(MessagingConstants.HeaderConstant.MessageVersion.name(), resp.getMessageVersion());
 
                 // copy the correlation id from the incoming message
-                Message message = getMessage();
                 responseMsg.setJMSCorrelationID(message.getJMSCorrelationID());
 
                 // create a sender for the replyTo queue
@@ -56,6 +56,10 @@ public abstract class MessageProcessor extends SimpleMessageProcessor {
                     qsender.send(responseMsg);
                     qsender.close();
                 }
+            }
+
+            if (isClientAck()) {
+                message.acknowledge();
             }
         } catch (Exception e) {
             // throw exception?

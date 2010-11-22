@@ -26,12 +26,12 @@ public class PingResponse extends ResponseMessage<PingRequest> {
 	private final static int VERSION = 1;
 
     @Override
-    public MessageConstants.MessageType getMessageType() {
+    public int getMessageType() {
         return messageType();
     }
 
-    public static MessageConstants.MessageType messageType() {
-        return MessageConstants.MessageType.PingResponse;
+    public static int messageType() {
+        return MessageConstants.PINGRESPONSE;
     }
 
     @Override

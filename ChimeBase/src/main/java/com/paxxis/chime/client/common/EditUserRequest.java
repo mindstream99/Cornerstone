@@ -26,12 +26,12 @@ public class EditUserRequest extends RequestMessage {
 	private final static int VERSION = 1;
 
     @Override
-    public MessageConstants.MessageType getMessageType() {
+    public int getMessageType() {
         return messageType();
     }
 
-    public static MessageConstants.MessageType messageType() {
-        return MessageConstants.MessageType.EditUserRequest;
+    public static int messageType() {
+        return MessageConstants.EDITUSERREQUEST;
     }
 
     @Override

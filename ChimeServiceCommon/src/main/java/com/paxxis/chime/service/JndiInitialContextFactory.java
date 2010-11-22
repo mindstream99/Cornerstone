@@ -84,7 +84,7 @@ public class JndiInitialContextFactory extends ChimeConfigurable
      */
     public void loadConfigurationPropertyValues()
     {
-        ChimeConfiguration config = getEndsliceConfiguration();
+        ChimeConfiguration config = getChimeConfiguration();
         
         if (config != null)
         {

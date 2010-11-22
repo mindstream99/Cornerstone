@@ -17,22 +17,22 @@
 
 package com.paxxis.chime.client.common;
 
-import java.util.List;
 
 /**
  *
  * @author Robert Englander
  */
 public class UserMessagesResponse extends ResponseMessage<UserMessagesRequest> {
+	private static final long serialVersionUID = 1L;
     private final static int VERSION = 1;
 
     @Override
-    public MessageConstants.MessageType getMessageType() {
+    public int getMessageType() {
         return messageType();
     }
 
-    public static MessageConstants.MessageType messageType() {
-        return MessageConstants.MessageType.UserMessagesResponse;
+    public static int messageType() {
+        return MessageConstants.USERMESSAGESRESPONSE;
     }
 
     @Override

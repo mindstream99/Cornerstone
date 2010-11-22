@@ -35,11 +35,11 @@ import com.paxxis.chime.service.ServiceBusMessageHandler;
 public class UpdateEventHandler extends ServiceBusMessageHandler {
     private static Hashtable<Integer, MessagePayload> _payloadTypes = new Hashtable<Integer, MessagePayload>();
     private static Hashtable<Integer, Integer> _messageTypes = new Hashtable<Integer, Integer>();
-
+ 
     static {
         _payloadTypes.put(MessageConstants.PayloadType.JavaObjectPayload.getValue(), new JavaObjectPayload());
 
-        _messageTypes.put(DataInstanceEvent.messageType().getValue(), DataInstanceEvent.messageVersion());
+        _messageTypes.put(DataInstanceEvent.messageType(), DataInstanceEvent.messageVersion());
     }
     
     private UpdateEventListener listener;
@@ -54,7 +54,7 @@ public class UpdateEventHandler extends ServiceBusMessageHandler {
             if (_messageTypes.containsKey(type)) {
                 int ver = _messageTypes.get(type);
                 if (version == ver) {
-                    if (type == DataInstanceEvent.messageType().getValue()) {
+                    if (type == DataInstanceEvent.messageType()) {
                         return new DataInstanceEventProcessor(_payloadTypes.get(payloadType), listener);
 	                }
                 }

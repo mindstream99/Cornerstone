@@ -28,7 +28,8 @@ import com.paxxis.chime.client.common.ErrorMessage;
  */
 public class MultiRequestError extends ErrorMessage
 {
-    private long _correlator = -1;
+	private static final long serialVersionUID = 1L;
+	private long _correlator = -1;
 
     public MultiRequestError() {
     }

@@ -18,7 +18,6 @@
 package com.paxxis.chime.client;
 
 import com.paxxis.chime.client.common.ModifyShapeResponse;
-import com.paxxis.chime.client.common.MessageConstants.MessageType;
 import com.paxxis.chime.common.JavaObjectPayload;
 import com.paxxis.chime.service.ResponseHandler;
 import com.paxxis.chime.service.SimpleMessageProcessor;
@@ -30,14 +29,13 @@ import com.paxxis.chime.service.SimpleMessageProcessor;
  */
 public class ModifyShapeResponseHandler  extends ResponseHandler<ModifyShapeResponse>
 {
-    private static MessageType _supportedType = ModifyShapeResponse.messageType();
+    private static int _supportedType = ModifyShapeResponse.messageType();
     private static int _supportedVersion = ModifyShapeResponse.messageVersion();
 
     @Override
     protected SimpleMessageProcessor getProcessor(int type, int version, int payloadType)
     {
-        MessageType mtype = MessageType.valueOf(type);
-        if (mtype == _supportedType && version == _supportedVersion)
+        if (type == _supportedType && version == _supportedVersion)
         {
             return new ModifyShapeResponseProcessor(new JavaObjectPayload(), getResponseListener());
         }

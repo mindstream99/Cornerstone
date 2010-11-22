@@ -17,7 +17,6 @@
 
 package com.paxxis.chime.client;
 
-import com.paxxis.chime.client.common.MessageConstants.MessageType;
 import com.paxxis.chime.client.common.UserContextResponse;
 import com.paxxis.chime.common.JavaObjectPayload;
 import com.paxxis.chime.service.ResponseHandler;
@@ -29,14 +28,13 @@ import com.paxxis.chime.service.SimpleMessageProcessor;
  */
 public class UserContextResponseHandler extends ResponseHandler<UserContextResponse>
 {
-    private static MessageType _supportedType = UserContextResponse.messageType();
+    private static int _supportedType = UserContextResponse.messageType();
     private static int _supportedVersion = UserContextResponse.messageVersion();
 
     @Override
     protected SimpleMessageProcessor getProcessor(int type, int version, int payloadType)
     {
-        MessageType mtype = MessageType.valueOf(type);
-        if (mtype == _supportedType && version == _supportedVersion)
+        if (type == _supportedType && version == _supportedVersion)
         {
             return new UserContextResponseProcessor(new JavaObjectPayload(), getResponseListener());
         }

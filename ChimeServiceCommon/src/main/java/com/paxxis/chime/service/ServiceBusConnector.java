@@ -43,6 +43,10 @@ public class ServiceBusConnector extends ChimeConfigurable
 {
     //private static Logger _logger = Logger.getLogger(ServiceBusConnector.class.getName());
 
+	private static final String ACK_AUTO = "auto";
+	private static final String ACK_CLIENT = "client";
+	private static final String ACK_DUPS = "dups";
+	
     // JMS objects
     private Connection _connection = null;
     private Session _session = null;
@@ -52,6 +56,9 @@ public class ServiceBusConnector extends ChimeConfigurable
     
     // the connection factory name
     private String _connectionFactoryName = "";
+    
+    // the JMS message acknowledge mode
+    private int ackMode = Session.AUTO_ACKNOWLEDGE;
     
     // indicates whether or not the connection should be established at startup
     private boolean _connectOnStartup = false;
@@ -67,7 +74,7 @@ public class ServiceBusConnector extends ChimeConfigurable
     private IServiceBusController _mgmtController = null;
     
     // the registered connector clients
-    ArrayList<IServiceBusConnectorClient> _connectorClients = new ArrayList<IServiceBusConnectorClient>();
+    private ArrayList<IServiceBusConnectorClient> _connectorClients = new ArrayList<IServiceBusConnectorClient>();
 
     private ArrayList<ServiceBusConnectionListener> _listeners = new ArrayList<ServiceBusConnectionListener>();
     
@@ -403,10 +410,6 @@ public class ServiceBusConnector extends ChimeConfigurable
 
                 // create a connection
                 _connection = factory.createConnection();
-
-                // TODO set the exception listener so that we know if we drop
-                // our connection.  Also need to implement a reconnect mechanism,
-                // and make sure we prevent message sending when we're not connected.
                 _connection.setExceptionListener(
                     new ExceptionListener()
                     {
@@ -419,7 +422,7 @@ public class ServiceBusConnector extends ChimeConfigurable
                 );
                 
                 // create a session
-                _session = _connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
+                _session = _connection.createSession(false, ackMode);
                 
                 if (_isAutoReconnectPending)
                 {
@@ -555,6 +558,33 @@ public class ServiceBusConnector extends ChimeConfigurable
     protected JndiInitialContextFactory getInitialContextFactory()
     {
         return _contextFactory;
+    }
+    
+    public void setAckMode(String mode) {
+    	if (ACK_CLIENT.equalsIgnoreCase(mode)) {
+    		ackMode = Session.CLIENT_ACKNOWLEDGE;
+    	} else if (ACK_DUPS.equalsIgnoreCase(mode)) {
+    		ackMode = Session.DUPS_OK_ACKNOWLEDGE;
+    	} else {
+    		ackMode = Session.AUTO_ACKNOWLEDGE;
+    	}
+    }
+    
+    public String getAckMode() {
+    	String result = "???";
+    	if (ackMode == Session.AUTO_ACKNOWLEDGE) {
+    		result = ACK_AUTO;
+    	} else if (ackMode == Session.CLIENT_ACKNOWLEDGE) {
+    		result = ACK_CLIENT;
+    	} else if (ackMode == Session.DUPS_OK_ACKNOWLEDGE) {
+    		result = ACK_DUPS;
+    	}
+    	
+    	return result;
+    }
+    
+    public int getAcknowledgeMode() {
+    	return ackMode;
     }
     
     /**

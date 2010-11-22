@@ -25,7 +25,9 @@ import java.util.List;
  * @author Robert Englander
  */
 public class ApplyTagRequest extends RequestMessage {
-    public enum ApplyType
+	private static final long serialVersionUID = 1L;
+
+	public enum ApplyType
     {
         Add,
         Remove
@@ -34,12 +36,12 @@ public class ApplyTagRequest extends RequestMessage {
     private final static int VERSION = 1;
 
     @Override
-    public MessageConstants.MessageType getMessageType() {
+    public int getMessageType() {
         return messageType();
     }
 
-    public static MessageConstants.MessageType messageType() {
-        return MessageConstants.MessageType.ApplyTagRequest;
+    public static int messageType() {
+        return MessageConstants.APPLYTAGREQUEST;
     }
 
     @Override

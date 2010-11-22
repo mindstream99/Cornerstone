@@ -24,15 +24,16 @@ import com.paxxis.chime.client.common.cal.IValue;
  * @author Robert Englander
  */
 public class RunCALScriptResponse extends ResponseMessage<RunCALScriptRequest> {
+	private static final long serialVersionUID = 1L;
     private final static int VERSION = 1;
 
     @Override
-    public MessageConstants.MessageType getMessageType() {
+    public int getMessageType() {
         return messageType();
     }
 
-    public static MessageConstants.MessageType messageType() {
-        return MessageConstants.MessageType.RunCALScriptResponse;
+    public static int messageType() {
+        return MessageConstants.RUNCALSCRIPTRESPONSE;
     }
 
     @Override

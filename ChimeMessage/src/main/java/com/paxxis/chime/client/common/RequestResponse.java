@@ -25,7 +25,8 @@ import java.io.Serializable;
  */
 public class RequestResponse implements Serializable
 {
-    public RequestMessage request;
+	private static final long serialVersionUID = 1L;
+	public RequestMessage request;
     public ResponseMessage response;
 
     public RequestResponse()

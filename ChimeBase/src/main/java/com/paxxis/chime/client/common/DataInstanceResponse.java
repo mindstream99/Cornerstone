@@ -25,6 +25,7 @@ import java.util.List;
  * @author Robert Englander
  */
 public class DataInstanceResponse extends ResponseMessage<DataInstanceRequest> {
+	private static final long serialVersionUID = 1L;
     public enum Reason {
         NoSuchData,
         NotVisible,
@@ -34,12 +35,12 @@ public class DataInstanceResponse extends ResponseMessage<DataInstanceRequest> {
     private final static int VERSION = 1;
 
     @Override
-    public MessageConstants.MessageType getMessageType() {
+    public int getMessageType() {
         return messageType();
     }
 
-    public static MessageConstants.MessageType messageType() {
-        return MessageConstants.MessageType.DataInstanceResponse;
+    public static int messageType() {
+        return MessageConstants.DATAINSTANCERESPONSE;
     }
 
     @Override

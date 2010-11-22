@@ -32,12 +32,12 @@ public class ModifyShapeRequest extends RequestMessage {
     private final static int VERSION = 1;
 
     @Override
-    public MessageConstants.MessageType getMessageType() {
+    public int getMessageType() {
         return messageType();
     }
 
-    public static MessageConstants.MessageType messageType() {
-        return MessageConstants.MessageType.ModifyShapeRequest;
+    public static int messageType() {
+        return MessageConstants.MODIFYSHAPEREQUEST;
     }
 
     @Override

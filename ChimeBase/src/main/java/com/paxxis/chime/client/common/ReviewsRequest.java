@@ -24,15 +24,16 @@ import com.paxxis.chime.client.common.DataInstanceRequest.SortOrder;
  * @author Robert Englander
  */
 public class ReviewsRequest extends RequestMessage {
+	private static final long serialVersionUID = 1L;
     private final static int VERSION = 1;
 
     @Override
-    public MessageConstants.MessageType getMessageType() {
+    public int getMessageType() {
         return messageType();
     }
 
-    public static MessageConstants.MessageType messageType() {
-        return MessageConstants.MessageType.ReviewsRequest;
+    public static int messageType() {
+        return MessageConstants.REVIEWSREQUEST;
     }
 
     @Override

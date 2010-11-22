@@ -18,12 +18,13 @@
 
 package com.paxxis.chime.service;
 
-import com.paxxis.chime.client.common.MessageConstants;
+import java.util.Hashtable;
+
 import com.paxxis.chime.client.common.Message;
-import com.paxxis.chime.client.common.MessageConstants.PayloadType;
+import com.paxxis.chime.client.common.MessagingConstants;
+import com.paxxis.chime.client.common.MessagingConstants.PayloadType;
 import com.paxxis.chime.common.JavaObjectPayload;
 import com.paxxis.chime.common.MessagePayload;
-import java.util.Hashtable;
 
 /**
  *
@@ -32,11 +33,11 @@ import java.util.Hashtable;
 public class ResponseHandler<T extends Message> extends SimpleServiceBusMessageHandler
 {
 
-    private static Hashtable<MessageConstants.PayloadType, MessagePayload> _payloadTypes =
-            new Hashtable<MessageConstants.PayloadType, MessagePayload>();
+    private static Hashtable<MessagingConstants.PayloadType, MessagePayload> _payloadTypes =
+            new Hashtable<MessagingConstants.PayloadType, MessagePayload>();
 
     static {
-        _payloadTypes.put(MessageConstants.PayloadType.JavaObjectPayload, new JavaObjectPayload());
+        _payloadTypes.put(MessagingConstants.PayloadType.JavaObjectPayload, new JavaObjectPayload());
     }
 
     private ResponseListener _listener = null;
@@ -57,7 +58,7 @@ public class ResponseHandler<T extends Message> extends SimpleServiceBusMessageH
     }
 
     protected SimpleMessageProcessor getProcessor(int type, int version, int payloadType) {
-        if (type == MessageConstants.MessageType.ErrorMessage.getValue() &&
+        if (type == MessagingConstants.ERRORMESSAGE &&
                 version == 1) { // TODO need to work on versioning
             return new ErrorResponseProcessor(getMessagePayloadType(PayloadType.valueOf(payloadType)), _listener);
         }

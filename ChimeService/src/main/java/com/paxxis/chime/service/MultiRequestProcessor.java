@@ -17,21 +17,21 @@
 
 package com.paxxis.chime.service;
 
-import com.paxxis.chime.client.common.ErrorMessage;
+import java.util.List;
+
 import com.mysql.jdbc.CommunicationsException;
+import com.paxxis.chime.client.common.ErrorMessage;
+import com.paxxis.chime.client.common.Message;
+import com.paxxis.chime.client.common.MessagingConstants;
 import com.paxxis.chime.client.common.MultiRequest;
 import com.paxxis.chime.client.common.MultiRequestError;
 import com.paxxis.chime.client.common.MultiResponse;
 import com.paxxis.chime.client.common.RequestMessage;
 import com.paxxis.chime.client.common.ResponseMessage;
+import com.paxxis.chime.common.MessagePayload;
 import com.paxxis.chime.database.DatabaseConnection;
 import com.paxxis.chime.database.DatabaseConnectionPool;
 import com.paxxis.chime.database.DatabaseException;
-import com.paxxis.chime.client.common.Message;
-import com.paxxis.chime.service.MessageProcessor;
-import com.paxxis.chime.client.common.MessageConstants;
-import com.paxxis.chime.common.MessagePayload;
-import java.util.List;
 
 /** 
  *
@@ -40,7 +40,8 @@ import java.util.List;
 public class MultiRequestProcessor extends MessageProcessor
 {
     class ErrorMessageException extends Exception {
-        private ErrorMessage error;
+		private static final long serialVersionUID = 1L;
+		private ErrorMessage error;
         public ErrorMessageException(ErrorMessage msg) {
             error = msg;
         }
@@ -100,8 +101,8 @@ public class MultiRequestProcessor extends MessageProcessor
                 for (RequestMessage request : requests)
                 {
                     correlator = request.getCorrelator();
-                    MessageProcessor proc = _messageHandler.getProcessor(request.getMessageType().getValue(), request.getMessageVersion(),
-                            MessageConstants.PayloadType.JavaObjectPayload.getValue());
+                    MessageProcessor proc = _messageHandler.getProcessor(request.getMessageType(), request.getMessageVersion(),
+                            MessagingConstants.PayloadType.JavaObjectPayload.getValue());
                     Message resp = proc.execute(request, ignoreChange);
                     ignoreChange = true;
 

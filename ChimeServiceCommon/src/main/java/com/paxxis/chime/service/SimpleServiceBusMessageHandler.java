@@ -18,21 +18,28 @@
 
 package com.paxxis.chime.service;
 
-import com.paxxis.chime.client.common.MessageConstants;
 import java.util.concurrent.RejectedExecutionException;
+
 import javax.jms.JMSException;
+import javax.jms.Message;
 import javax.jms.MessageListener;
 import javax.jms.Session;
-import javax.jms.Message;
+
+import org.apache.log4j.Logger;
+
+import com.paxxis.chime.client.common.MessagingConstants;
 
 /**
  *
  * @author Robert Englander
  */
 public abstract class SimpleServiceBusMessageHandler extends ChimeConfigurable implements MessageListener {
+	private static final Logger LOGGER = Logger.getLogger(SimpleServiceBusMessageHandler.class);
+	
     // the session to use for publishing responses
     private Session _session = null;
-
+    private boolean clientAck = false;
+    
     public SimpleServiceBusMessageHandler() {
     }
 
@@ -45,6 +52,7 @@ public abstract class SimpleServiceBusMessageHandler extends ChimeConfigurable i
      */
     public void onMessage(Message msg) {
         SimpleMessageProcessor processor = buildProcessor(msg);
+        processor.setClientAck(isClientAck());
         processor.init(_session, msg);
         submit(processor);
     }
@@ -52,7 +60,21 @@ public abstract class SimpleServiceBusMessageHandler extends ChimeConfigurable i
     public com.paxxis.chime.client.common.Message processMessage(Message msg) {
         SimpleMessageProcessor processor = buildProcessor(msg);
         processor.init(_session, msg);
-        return processor.execute(false);
+        com.paxxis.chime.client.common.Message result = processor.execute(false);
+
+        if (isClientAck()) {
+        	try {
+            	msg.acknowledge();
+        	} catch (JMSException e) {
+        		LOGGER.error(e);
+        	}
+        }
+        
+        return result;
+    }
+
+    public boolean isClientAck() {
+        return clientAck;
     }
 
     private SimpleMessageProcessor buildProcessor(Message msg) {
@@ -60,9 +82,9 @@ public abstract class SimpleServiceBusMessageHandler extends ChimeConfigurable i
         int version = -1;
         int payloadType = -1;
         try {
-            type = msg.getIntProperty(MessageConstants.HeaderConstant.MessageType.name());
-            version = msg.getIntProperty(MessageConstants.HeaderConstant.MessageVersion.name());
-            payloadType = msg.getIntProperty(MessageConstants.HeaderConstant.PayloadType.name());
+            type = msg.getIntProperty(MessagingConstants.HeaderConstant.MessageType.name());
+            version = msg.getIntProperty(MessagingConstants.HeaderConstant.MessageVersion.name());
+            payloadType = msg.getIntProperty(MessagingConstants.HeaderConstant.PayloadType.name());
         }
         catch (JMSException ex)
         {}
@@ -77,8 +99,9 @@ public abstract class SimpleServiceBusMessageHandler extends ChimeConfigurable i
      * @param session the JMS session to use for publishing responses.
      *
      */
-    public void init(Session session) {
+    public void init(Session session, boolean clientAck) {
         _session = session;
+        this.clientAck = clientAck;
     }
 
     public void halt() {

@@ -22,13 +22,15 @@ package com.paxxis.chime.client.common;
 import java.io.Serializable;
 
 public abstract class Message implements Serializable {
-    public abstract MessageConstants.MessageType getMessageType();
+	private static final long serialVersionUID = 1L;
+
+	public abstract int getMessageType();
     public abstract int getMessageVersion();
 
     public Message() {
     }
 
-    public final Object getAsPayload(MessageConstants.PayloadType type) {
+    public final Object getAsPayload(MessagingConstants.PayloadType type) {
 
         Object result;
 

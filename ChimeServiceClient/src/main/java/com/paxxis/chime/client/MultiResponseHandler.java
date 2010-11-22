@@ -17,7 +17,6 @@
 
 package com.paxxis.chime.client;
 
-import com.paxxis.chime.client.common.MessageConstants.MessageType;
 import com.paxxis.chime.client.common.MultiResponse;
 import com.paxxis.chime.common.JavaObjectPayload;
 import com.paxxis.chime.service.ResponseHandler;
@@ -29,14 +28,13 @@ import com.paxxis.chime.service.SimpleMessageProcessor;
  */
 public class MultiResponseHandler extends ResponseHandler<MultiResponse>
 {
-    private static MessageType _supportedType = MultiResponse.messageType();
+    private static int _supportedType = MultiResponse.messageType();
     private static int _supportedVersion = MultiResponse.messageVersion();
 
     @Override
     protected SimpleMessageProcessor getProcessor(int type, int version, int payloadType)
     {
-        MessageType mtype = MessageType.valueOf(type);
-        if (mtype == _supportedType && version == _supportedVersion)
+        if (type == _supportedType && version == _supportedVersion)
         {
             return new MultiResponseProcessor(new JavaObjectPayload(), getResponseListener());
         }

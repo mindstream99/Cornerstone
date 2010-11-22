@@ -17,9 +17,7 @@
 
 package com.paxxis.chime.client;
 
-import com.paxxis.chime.client.common.AddCommentResponse;
 import com.paxxis.chime.client.common.ApplyReviewResponse;
-import com.paxxis.chime.client.common.MessageConstants.MessageType;
 import com.paxxis.chime.common.JavaObjectPayload;
 import com.paxxis.chime.service.ResponseHandler;
 import com.paxxis.chime.service.SimpleMessageProcessor;
@@ -30,14 +28,13 @@ import com.paxxis.chime.service.SimpleMessageProcessor;
  */
 public class ApplyRatingResponseHandler extends ResponseHandler<ApplyReviewResponse>
 {
-    private static MessageType _supportedType = ApplyReviewResponse.messageType();
+    private static int _supportedType = ApplyReviewResponse.messageType();
     private static int _supportedVersion = ApplyReviewResponse.messageVersion();
     
     @Override
     protected SimpleMessageProcessor getProcessor(int type, int version, int payloadType)
     {
-        MessageType mtype = MessageType.valueOf(type);
-        if (mtype == _supportedType && version == _supportedVersion)
+        if (type == _supportedType && version == _supportedVersion)
         {
             return new ApplyRatingResponseProcessor(new JavaObjectPayload(), getResponseListener());
         }

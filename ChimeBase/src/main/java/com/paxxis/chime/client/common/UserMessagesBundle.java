@@ -27,6 +27,7 @@ import java.util.List;
  * @author Robert Englander
  */
 public class UserMessagesBundle implements Serializable {
+	private static final long serialVersionUID = 1L;
 
     private List<UserMessage> messages = null;
     private Cursor _cursor = null;

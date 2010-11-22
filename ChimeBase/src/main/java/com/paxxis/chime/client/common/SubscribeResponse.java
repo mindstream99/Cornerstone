@@ -22,15 +22,16 @@ package com.paxxis.chime.client.common;
  * @author Robert Englander
  */
 public class SubscribeResponse extends ResponseMessage<SubscribeRequest> {
+	private static final long serialVersionUID = 1L;
     private final static int VERSION = 1;
 
     @Override
-    public MessageConstants.MessageType getMessageType() {
+    public int getMessageType() {
         return messageType();
     }
 
-    public static MessageConstants.MessageType messageType() {
-        return MessageConstants.MessageType.SubscribeResponse;
+    public static int messageType() {
+        return MessageConstants.SUBSCRIBERESPONSE;
     }
 
     @Override

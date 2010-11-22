@@ -17,21 +17,18 @@
 
 package com.paxxis.chime.service;
 
+import java.util.HashMap;
+
+import org.apache.log4j.Logger;
+
 import com.paxxis.chime.client.common.BuildIndexRequestMessage;
 import com.paxxis.chime.client.common.DataInstanceEvent;
-import com.paxxis.chime.database.DatabaseConnectionPool;
-import com.paxxis.chime.service.ErrorProcessor;
-import com.paxxis.chime.service.MessageProcessor;
-import com.paxxis.chime.client.common.MessageConstants;
-import com.paxxis.chime.client.common.MessageConstants.MessageType;
-import com.paxxis.chime.client.common.MessageConstants.PayloadType;
+import com.paxxis.chime.client.common.MessagingConstants;
+import com.paxxis.chime.client.common.MessagingConstants.PayloadType;
 import com.paxxis.chime.common.JavaObjectPayload;
 import com.paxxis.chime.common.MessagePayload;
-import com.paxxis.chime.service.ServiceBusMessageHandler;
+import com.paxxis.chime.database.DatabaseConnectionPool;
 import com.paxxis.chime.indexing.BuildIndexRequestProcessor;
-import com.paxxis.chime.service.NotificationTopicSender;
-import java.util.HashMap;
-import org.apache.log4j.Logger;
 
 /**
  *
@@ -41,7 +38,7 @@ public class EventMessageHandler extends ServiceBusMessageHandler {
     private static final Logger _logger = Logger.getLogger(EventMessageHandler.class);
 
     private static final HashMap<PayloadType, MessagePayload> payloadTypes = new HashMap<PayloadType, MessagePayload>();
-    private static final HashMap<MessageType, Integer> messageTypes = new HashMap<MessageType, Integer>();
+    private static final HashMap<Integer, Integer> messageTypes = new HashMap<Integer, Integer>();
 
     // the topic sender to use to send events
     private NotificationTopicSender topicSender = null;
@@ -50,7 +47,7 @@ public class EventMessageHandler extends ServiceBusMessageHandler {
     private DatabaseConnectionPool databasePool;
 
     static {
-        payloadTypes.put(MessageConstants.PayloadType.JavaObjectPayload, new JavaObjectPayload());
+        payloadTypes.put(MessagingConstants.PayloadType.JavaObjectPayload, new JavaObjectPayload());
 
         messageTypes.put(DataInstanceEvent.messageType(), DataInstanceEvent.messageVersion());
         messageTypes.put(BuildIndexRequestMessage.messageType(), BuildIndexRequestMessage.messageVersion());
@@ -60,13 +57,12 @@ public class EventMessageHandler extends ServiceBusMessageHandler {
         PayloadType ptype = PayloadType.valueOf(payloadType);
         MessagePayload mPayload = payloadTypes.get(ptype);
         if (payloadTypes.containsKey(ptype)) {
-            MessageType mtype = MessageType.valueOf(type);
-            if (messageTypes.containsKey(mtype)) {
-                int ver = messageTypes.get(mtype);
+            if (messageTypes.containsKey(type)) {
+                int ver = messageTypes.get(type);
                 if (version == ver) {
-                    if (mtype == DataInstanceEvent.messageType()) {
+                    if (type == DataInstanceEvent.messageType()) {
                         return new DataInstanceEventProcessor(mPayload, databasePool);
-                    } else if (mtype == BuildIndexRequestMessage.messageType()) {
+                    } else if (type == BuildIndexRequestMessage.messageType()) {
                         return new BuildIndexRequestProcessor(mPayload, databasePool, topicSender);
                     }
                 }

@@ -26,6 +26,7 @@ import java.util.List;
  * @author Robert Englander
  */
 public class EditDataInstanceRequest extends RequestMessage {
+	private static final long serialVersionUID = 1L;
     public enum Operation
     {
         Create,
@@ -42,12 +43,12 @@ public class EditDataInstanceRequest extends RequestMessage {
     private final static int VERSION = 1;
 
     @Override
-    public MessageConstants.MessageType getMessageType() {
+    public int getMessageType() {
         return messageType();
     }
 
-    public static MessageConstants.MessageType messageType() {
-        return MessageConstants.MessageType.EditDataInstanceRequest;
+    public static int messageType() {
+        return MessageConstants.EDITDATAINSTANCEREQUEST;
     }
 
     @Override
@@ -183,8 +184,6 @@ public class EditDataInstanceRequest extends RequestMessage {
             data.field = field;
             data.value = value;
             _fieldData.add(data);
-        } else {
-            int x = 1;
         }
     }
 }

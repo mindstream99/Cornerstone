@@ -30,15 +30,16 @@ public class UserMessagesRequest extends RequestMessage {
         Delete
     }
 
+	private static final long serialVersionUID = 1L;
     private final static int VERSION = 1;
 
     @Override
-    public MessageConstants.MessageType getMessageType() {
+    public int getMessageType() {
         return messageType();
     }
 
-    public static MessageConstants.MessageType messageType() {
-        return MessageConstants.MessageType.UserMessagesRequest;
+    public static int messageType() {
+        return MessageConstants.USERMESSAGESREQUEST;
     }
 
     @Override

@@ -20,6 +20,8 @@ package com.paxxis.chime.service;
 import javax.jms.Destination;
 import javax.jms.JMSException;
 import javax.jms.MessageConsumer;
+import javax.jms.Session;
+
 import org.apache.activemq.command.ActiveMQQueue;
 
 
@@ -38,16 +40,16 @@ public class ServiceBusMessageReceiver extends ChimeConfigurable implements ISer
     private String _destinationName = "";
     
     // the message handler
-    ServiceBusMessageHandler _messageHandler = null;
+    private ServiceBusMessageHandler _messageHandler = null;
     
     // the message selector
-    String _selector = null;
+    private String _selector = null;
 
     // exclusive flag
-    boolean exclusive = false;
+    private boolean exclusive = false;
 
     // the request queue connector
-    ServiceBusConnector _connector = null;
+    private ServiceBusConnector _connector = null;
 
     // teardown pending flag
     boolean _teardownPending = false;
@@ -184,7 +186,7 @@ public class ServiceBusMessageReceiver extends ChimeConfigurable implements ISer
         try
         {
             // initialize the message handler
-            _messageHandler.init(_connector.getSession());
+            _messageHandler.init(_connector.getSession(), _connector.getAcknowledgeMode() == Session.CLIENT_ACKNOWLEDGE);
 
             // create a message consumer and start the connection so that messages
             // can be delivered

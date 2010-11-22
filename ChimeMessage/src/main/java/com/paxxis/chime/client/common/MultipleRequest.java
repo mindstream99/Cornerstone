@@ -30,12 +30,12 @@ public class MultipleRequest extends RequestMessage {
 	private final static int VERSION = 1;
 
     @Override
-    public MessageConstants.MessageType getMessageType() {
+    public int getMessageType() {
         return messageType();
     }
 
-    public static MessageConstants.MessageType messageType() {
-        return MessageConstants.MessageType.MultiRequest;
+    public static int messageType() {
+        return MessagingConstants.MULTIREQUEST;
     }
 
     @Override

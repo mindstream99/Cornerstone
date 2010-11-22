@@ -24,15 +24,16 @@ import java.util.List;
  * @author Robert Englander
  */
 public class FindShapesResponse extends ResponseMessage<FindShapesRequest> {
+	private static final long serialVersionUID = 1L;
     private final static int VERSION = 1;
 
     @Override
-    public MessageConstants.MessageType getMessageType() {
+    public int getMessageType() {
         return messageType();
     }
 
-    public static MessageConstants.MessageType messageType() {
-        return MessageConstants.MessageType.FindTypesRequest;
+    public static int messageType() {
+        return MessageConstants.FINDTYPESRESPONSE;
     }
 
     @Override

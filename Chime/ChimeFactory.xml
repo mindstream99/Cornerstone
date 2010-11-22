@@ -36,6 +36,7 @@ Root application context for the Chime Web Application.
                 <entry key="chime.service.updateTopic" value="ChimeUpdateTopic"/>
                 <entry key="chime.service.JndiInitialContextFactory.contextFactory" value="org.apache.activemq.jndi.ActiveMQInitialContextFactory"/>
                 <entry key="chime.service.JndiInitialContextFactory.providerUrl" value="tcp://localhost:61616"/>
+                <entry key="chime.service.responseTimeout" value="30000"/>
                 
                 <entry key="chime.client.brandingFile" value="ChimeBranding.xml"/>
             </map>

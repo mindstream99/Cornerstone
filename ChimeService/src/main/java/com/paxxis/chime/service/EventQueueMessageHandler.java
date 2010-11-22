@@ -17,19 +17,17 @@
 
 package com.paxxis.chime.service;
 
-import com.paxxis.chime.data.CacheManager;
+import java.util.HashMap;
+
+import org.apache.log4j.Logger;
+
 import com.paxxis.chime.client.common.DataInstanceEvent;
-import com.paxxis.chime.client.common.MessageConstants;
-import com.paxxis.chime.client.common.MessageConstants.MessageType;
-import com.paxxis.chime.client.common.MessageConstants.PayloadType;
+import com.paxxis.chime.client.common.MessagingConstants;
+import com.paxxis.chime.client.common.MessagingConstants.PayloadType;
 import com.paxxis.chime.common.JavaObjectPayload;
 import com.paxxis.chime.common.MessagePayload;
+import com.paxxis.chime.data.CacheManager;
 import com.paxxis.chime.database.DatabaseConnectionPool;
-import com.paxxis.chime.service.ErrorProcessor;
-import com.paxxis.chime.service.MessageProcessor;
-import com.paxxis.chime.service.ServiceBusMessageHandler;
-import java.util.HashMap;
-import org.apache.log4j.Logger;
 
 /**
  *
@@ -42,10 +40,10 @@ public class EventQueueMessageHandler extends ServiceBusMessageHandler {
     private DatabaseConnectionPool databasePool;
 
     private final static HashMap<PayloadType, MessagePayload> payloadTypes = new HashMap<PayloadType, MessagePayload>();
-    private final static HashMap<MessageType, Integer> messageTypes = new HashMap<MessageType, Integer>();
+    private final static HashMap<Integer, Integer> messageTypes = new HashMap<Integer, Integer>();
 
     static {
-        payloadTypes.put(MessageConstants.PayloadType.JavaObjectPayload, new JavaObjectPayload());
+        payloadTypes.put(MessagingConstants.PayloadType.JavaObjectPayload, new JavaObjectPayload());
         messageTypes.put(DataInstanceEvent.messageType(), DataInstanceEvent.messageVersion());
 
         CacheManager.instance();
@@ -55,11 +53,10 @@ public class EventQueueMessageHandler extends ServiceBusMessageHandler {
         PayloadType ptype = PayloadType.valueOf(payloadType);
         MessagePayload mPayload = payloadTypes.get(ptype);
         if (payloadTypes.containsKey(ptype)) {
-            MessageType mtype = MessageType.valueOf(type);
-            if (messageTypes.containsKey(mtype)) {
-                int ver = messageTypes.get(mtype);
+            if (messageTypes.containsKey(type)) {
+                int ver = messageTypes.get(type);
                 if (version == ver) {
-                    if (mtype == DataInstanceEvent.messageType()) {
+                    if (type == DataInstanceEvent.messageType()) {
                         return new DataInstanceEventProcessor(mPayload, databasePool);
                     }
                 }

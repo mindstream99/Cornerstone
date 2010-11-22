@@ -22,15 +22,16 @@ package com.paxxis.chime.client.common;
  * @author Robert Englander
  */
 public class BuildIndexResponseMessage extends ResponseMessage<BuildIndexRequestMessage> {
+	private static final long serialVersionUID = 1L;
     private final static int VERSION = 1;
 
     @Override
-    public MessageConstants.MessageType getMessageType() {
+    public int getMessageType() {
         return messageType();
     }
 
-    public static MessageConstants.MessageType messageType() {
-        return MessageConstants.MessageType.BuildIndexResponse;
+    public static int messageType() {
+        return MessageConstants.BUILDINDEXRESPONSE;
     }
 
     @Override

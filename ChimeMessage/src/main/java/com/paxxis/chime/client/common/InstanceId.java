@@ -20,19 +20,18 @@ package com.paxxis.chime.client.common;
 import java.io.Serializable;
 
 /**
- * This is a simple wrapper around a string value that represents an instance id.
+ * This is a simple wrapper around a string value that represents an id.
  * This is meant to provide compile time type checking for APIs where there are
  * methods that take an ID, and others that take a name, both being strings.  This
  * is a potential source of bugs, so it's best to let the compiler help us out.
  *
- * TBD use of this class is a work in progress.  It should be considered a medium
- * priority refactoring task.
  *
  * @author Robert Englander
  */
 public class InstanceId implements Serializable {
+	private static final long serialVersionUID = 1L;
 
-    public static final InstanceId UNKNOWN = InstanceId.create("-1");
+	public static final InstanceId UNKNOWN = InstanceId.create("-1");
     
     private String id;
 

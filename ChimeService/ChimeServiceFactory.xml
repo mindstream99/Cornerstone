@@ -188,7 +188,6 @@ set the bean's chimeConfiguration property.
         <property name="templateFiles">
             <list>
                 <value>ChimeTemplates.xml</value>
-                <value>MozartTemplates.xml</value>
             </list>
         </property>
     </bean>

@@ -37,7 +37,7 @@ import com.paxxis.chime.database.DatabaseConnection;
 import com.paxxis.chime.database.IDataValue;
 import com.paxxis.chime.database.StringData;
 import com.paxxis.chime.service.InstancesResponse;
-import com.paxxis.chime.service.LdapContextFactory;
+import com.paxxis.chime.ldap.LdapContextFactory;
 import com.paxxis.chime.service.Tools;
 /**
  *

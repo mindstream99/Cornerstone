@@ -32,6 +32,7 @@ import com.paxxis.chime.data.CacheManager;
 import com.paxxis.chime.data.UserUtils;
 import com.paxxis.chime.database.DatabaseConnection;
 import com.paxxis.chime.database.DatabaseConnectionPool;
+import com.paxxis.chime.ldap.LdapContextFactory;
 /**
  *
  * @author Robert Englander

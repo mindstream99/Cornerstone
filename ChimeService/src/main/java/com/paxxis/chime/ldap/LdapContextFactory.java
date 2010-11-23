@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package com.paxxis.chime.service;
+package com.paxxis.chime.ldap;
 
 import java.util.Hashtable;
 
@@ -29,6 +29,7 @@ import javax.naming.directory.SearchResult;
 
 import com.paxxis.chime.client.common.Shape;
 import com.paxxis.chime.client.common.User;
+import com.paxxis.chime.service.ChimeConfigurable;
 /**
 *
 * @author Robert Englander

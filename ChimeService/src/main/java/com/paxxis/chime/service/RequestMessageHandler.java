@@ -56,6 +56,8 @@ import com.paxxis.chime.common.MessagePayload;
 import com.paxxis.chime.data.CacheManager;
 import com.paxxis.chime.database.DatabaseConnectionPool;
 import com.paxxis.chime.indexing.BuildIndexRequestProcessor;
+import com.paxxis.chime.ldap.LdapContextFactory;
+
 
 /**
  * 

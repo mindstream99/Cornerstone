@@ -165,7 +165,7 @@ set the bean's chimeConfiguration property.
         <property name="sweepCycle" value="0.5"/>
     </bean>
 
-	<bean id="ldapContextFactory" class="com.paxxis.chime.service.LdapContextFactory">
+	<bean id="ldapContextFactory" class="com.paxxis.chime.ldap.LdapContextFactory">
         <property name="configurationPropertyMap">
             <map>
                <entry key="contextFactory" value="chime.service.ldap.contextFactory"/>

@@ -31,10 +31,10 @@ import org.apache.lucene.store.RAMDirectory;
 import com.paxxis.chime.client.common.DataInstance;
 import com.paxxis.chime.client.common.User;
 import com.paxxis.chime.client.common.extension.MemoryIndexer;
-import com.paxxis.chime.database.DatabaseConnection;
-import com.paxxis.chime.database.DatabaseConnectionPool;
 import com.paxxis.chime.indexing.ChimeAnalyzer;
 import com.paxxis.chime.indexing.IndexerBase;
+import com.paxxis.cornerstone.database.DatabaseConnection;
+import com.paxxis.cornerstone.database.DatabaseConnectionPool;
 
 /**
  *

@@ -21,6 +21,8 @@ import com.paxxis.chime.client.common.DataInstanceRequest.ClauseOperator;
 import com.paxxis.chime.client.common.DataInstanceRequest.Depth;
 import com.paxxis.chime.client.common.DataInstanceRequest.Operator;
 import com.paxxis.chime.client.common.DataInstanceRequest.SortOrder;
+import com.paxxis.cornerstone.base.Cursor;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;

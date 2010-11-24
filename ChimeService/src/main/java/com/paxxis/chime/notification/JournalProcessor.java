@@ -20,14 +20,15 @@ package com.paxxis.chime.notification;
 import com.paxxis.chime.client.common.DataField;
 import com.paxxis.chime.client.common.DataFieldValue;
 import com.paxxis.chime.client.common.DataInstance;
-import com.paxxis.chime.client.common.InstanceId;
 import com.paxxis.chime.client.common.Shape;
 import com.paxxis.chime.client.common.User;
-import com.paxxis.chime.database.DatabaseConnection;
-import com.paxxis.chime.database.DatabaseConnectionPool;
 import com.paxxis.chime.data.DataInstanceUtils;
-import com.paxxis.chime.service.ChimeConfiguration;
 import com.paxxis.chime.service.Tools;
+import com.paxxis.cornerstone.base.InstanceId;
+import com.paxxis.cornerstone.database.DatabaseConnection;
+import com.paxxis.cornerstone.database.DatabaseConnectionPool;
+import com.paxxis.cornerstone.service.CornerstoneConfiguration;
+
 import java.util.List;
 import org.apache.log4j.Logger;
 
@@ -42,9 +43,9 @@ class JournalProcessor implements Runnable {
     private DataInstance instance;
     private User user;
     private DatabaseConnectionPool dbPool;
-    private ChimeConfiguration config;
+    private CornerstoneConfiguration config;
 
-    JournalProcessor(DataInstance inst, User user, DatabaseConnectionPool pool, ChimeConfiguration cfg) {
+    JournalProcessor(DataInstance inst, User user, DatabaseConnectionPool pool, CornerstoneConfiguration cfg) {
         instance = inst;
         this.user = user;
         dbPool = pool;

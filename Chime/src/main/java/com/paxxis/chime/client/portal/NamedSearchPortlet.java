@@ -35,7 +35,6 @@ import com.paxxis.chime.client.ServiceManagerListener;
 import com.paxxis.chime.client.common.DataInstance;
 import com.paxxis.chime.client.common.DataInstanceRequest;
 import com.paxxis.chime.client.common.DataInstanceResponse;
-import com.paxxis.chime.client.common.InstanceId;
 import com.paxxis.chime.client.common.NamedSearch;
 import com.paxxis.chime.client.common.Shape;
 import com.paxxis.chime.client.common.DataInstanceRequest.Depth;
@@ -43,6 +42,7 @@ import com.paxxis.chime.client.common.portal.PortletSpecification;
 import com.paxxis.chime.client.editor.DataInstanceSelectionListener;
 import com.paxxis.chime.client.editor.DataInstanceSelectionWindow;
 import com.paxxis.chime.client.widgets.InterceptedHtml;
+import com.paxxis.cornerstone.base.InstanceId;
 
 /**
  *

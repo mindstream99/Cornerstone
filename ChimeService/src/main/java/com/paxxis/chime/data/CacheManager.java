@@ -19,11 +19,12 @@ package com.paxxis.chime.data;
 
 import com.paxxis.chime.client.common.DataInstance;
 import com.paxxis.chime.client.common.DataSocialContext;
-import com.paxxis.chime.client.common.InstanceId;
 import com.paxxis.chime.client.common.Shape;
 import com.paxxis.chime.client.common.Tag;
 import com.paxxis.chime.client.common.User;
 import com.paxxis.chime.client.common.portal.PortalTemplate;
+import com.paxxis.cornerstone.base.InstanceId;
+
 import java.util.List;
 import javax.transaction.RollbackException;
 import javax.transaction.TransactionManager;

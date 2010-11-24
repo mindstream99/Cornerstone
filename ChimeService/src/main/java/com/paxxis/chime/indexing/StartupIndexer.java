@@ -18,7 +18,7 @@
 package com.paxxis.chime.indexing;
 
 import com.paxxis.chime.client.common.User;
-import com.paxxis.chime.database.DatabaseConnectionPool;
+import com.paxxis.cornerstone.database.DatabaseConnectionPool;
 
 /**
  *

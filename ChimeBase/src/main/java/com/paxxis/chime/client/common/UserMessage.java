@@ -20,6 +20,8 @@ package com.paxxis.chime.client.common;
 import java.io.Serializable;
 import java.util.Date;
 
+import com.paxxis.cornerstone.base.InstanceId;
+
 /**
  *
  * @author Robert Englander

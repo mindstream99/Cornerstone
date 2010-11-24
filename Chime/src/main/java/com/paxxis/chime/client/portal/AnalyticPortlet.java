@@ -35,8 +35,6 @@ import com.paxxis.chime.client.common.DataInstance;
 import com.paxxis.chime.client.common.DataInstanceRequest;
 import com.paxxis.chime.client.common.DataInstanceRequest.Depth;
 import com.paxxis.chime.client.common.DataInstanceResponse;
-import com.paxxis.chime.client.common.ErrorMessage;
-import com.paxxis.chime.client.common.InstanceId;
 import com.paxxis.chime.client.common.RunCALScriptRequest;
 import com.paxxis.chime.client.common.RunCALScriptResponse;
 import com.paxxis.chime.client.common.Shape;
@@ -50,6 +48,8 @@ import com.paxxis.chime.client.widgets.ChimeMessageBox;
 import com.paxxis.chime.client.widgets.InterceptedHtml;
 import com.paxxis.chime.client.widgets.charts.ChimeChartFactory;
 import com.paxxis.chime.client.widgets.charts.ChimeChartFactory.ChartType;
+import com.paxxis.cornerstone.base.ErrorMessage;
+import com.paxxis.cornerstone.base.InstanceId;
 
 /**
  *

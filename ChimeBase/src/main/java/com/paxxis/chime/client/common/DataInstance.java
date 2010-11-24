@@ -18,6 +18,8 @@
 package com.paxxis.chime.client.common;
 
 import com.paxxis.chime.client.common.portal.PortalTemplate;
+import com.paxxis.cornerstone.base.InstanceId;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;

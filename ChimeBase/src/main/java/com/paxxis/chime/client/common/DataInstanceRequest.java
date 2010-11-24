@@ -21,6 +21,10 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.paxxis.cornerstone.base.Cursor;
+import com.paxxis.cornerstone.base.InstanceId;
+import com.paxxis.cornerstone.base.RequestMessage;
+
 /**
  *
  * @author Robert Englander

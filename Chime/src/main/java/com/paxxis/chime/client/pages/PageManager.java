@@ -40,14 +40,14 @@ import com.paxxis.chime.client.ServiceManagerAdapter;
 import com.paxxis.chime.client.StateManager;
 import com.paxxis.chime.client.common.DataInstance;
 import com.paxxis.chime.client.common.DataInstanceRequest;
-import com.paxxis.chime.client.common.ErrorMessage;
-import com.paxxis.chime.client.common.InstanceId;
 import com.paxxis.chime.client.common.NamedSearch;
 import com.paxxis.chime.client.common.SearchCriteria;
 import com.paxxis.chime.client.common.Shape;
 import com.paxxis.chime.client.common.DataInstanceRequest.Depth;
 import com.paxxis.chime.client.common.DataInstanceResponse.Reason;
 import com.paxxis.chime.client.widgets.LoginWindow;
+import com.paxxis.cornerstone.base.ErrorMessage;
+import com.paxxis.cornerstone.base.InstanceId;
 
 /**
  *

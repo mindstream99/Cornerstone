@@ -18,9 +18,9 @@
 package com.paxxis.chime.client;
 
 import com.paxxis.chime.client.common.UserContextResponse;
-import com.paxxis.chime.common.JavaObjectPayload;
-import com.paxxis.chime.service.ResponseHandler;
-import com.paxxis.chime.service.SimpleMessageProcessor;
+import com.paxxis.cornerstone.common.JavaObjectPayload;
+import com.paxxis.cornerstone.service.ResponseHandler;
+import com.paxxis.cornerstone.service.SimpleMessageProcessor;
 
 /**
  *

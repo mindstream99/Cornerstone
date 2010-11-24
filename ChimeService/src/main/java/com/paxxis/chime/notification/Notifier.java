@@ -19,8 +19,9 @@ package com.paxxis.chime.notification;
 
 import com.paxxis.chime.client.common.DataInstance;
 import com.paxxis.chime.client.common.User;
-import com.paxxis.chime.database.DatabaseConnectionPool;
-import com.paxxis.chime.service.ChimeConfiguration;
+import com.paxxis.cornerstone.database.DatabaseConnectionPool;
+import com.paxxis.cornerstone.service.CornerstoneConfiguration;
+
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -44,7 +45,7 @@ public class Notifier {
 
     private ExecutorService notificationExecutor = null;
     private ScheduledExecutorService scheduledExecutor = null;
-    private ChimeConfiguration config = null;
+    private CornerstoneConfiguration config = null;
     private DatabaseConnectionPool dbPool;
     private int purgeFreq = 1440; // defaults to 1 day
     private int periodicEventNotificationFreq = 120; // defaults to 2 hours
@@ -75,7 +76,7 @@ public class Notifier {
         scheduledExecutor.shutdown();
     }
 
-    public void setChimeConfiguration(ChimeConfiguration config) {
+    public void setCornerstoneConfiguration(CornerstoneConfiguration config) {
         this.config = config;
     }
 

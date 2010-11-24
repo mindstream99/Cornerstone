@@ -22,13 +22,14 @@ import com.paxxis.chime.client.common.User;
 import com.paxxis.chime.client.common.UserContextRequest;
 import com.paxxis.chime.client.common.UserContextResponse;
 import com.paxxis.chime.client.common.UserSocialContext;
-import com.paxxis.chime.database.DatabaseConnection;
-import com.paxxis.chime.database.DatabaseConnectionPool;
-import com.paxxis.chime.client.common.ErrorMessage;
-import com.paxxis.chime.client.common.Message;
-import com.paxxis.chime.service.MessageProcessor;
 import com.mysql.jdbc.CommunicationsException;
-import com.paxxis.chime.common.MessagePayload;
+import com.paxxis.cornerstone.base.ErrorMessage;
+import com.paxxis.cornerstone.base.Message;
+import com.paxxis.cornerstone.common.MessagePayload;
+import com.paxxis.cornerstone.database.DatabaseConnection;
+import com.paxxis.cornerstone.database.DatabaseConnectionPool;
+import com.paxxis.cornerstone.service.MessageProcessor;
+
 import org.apache.log4j.Logger;
 
 

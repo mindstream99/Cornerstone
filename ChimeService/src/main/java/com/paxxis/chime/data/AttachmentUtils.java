@@ -18,10 +18,11 @@
 package com.paxxis.chime.data;
 
 import com.paxxis.chime.client.common.DataInstance;
-import com.paxxis.chime.client.common.InstanceId;
-import com.paxxis.chime.database.DataSet;
-import com.paxxis.chime.database.DatabaseConnection;
 import com.paxxis.chime.service.Tools;
+import com.paxxis.cornerstone.base.InstanceId;
+import com.paxxis.cornerstone.database.DataSet;
+import com.paxxis.cornerstone.database.DatabaseConnection;
+
 import java.util.ArrayList;
 import java.util.List;
 

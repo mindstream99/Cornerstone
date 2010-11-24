@@ -17,11 +17,11 @@
 
 package com.paxxis.chime.client;
 
-import com.paxxis.chime.client.common.Message;
-import com.paxxis.chime.common.MessagePayload;
-import com.paxxis.chime.service.RequestQueueSender;
-import com.paxxis.chime.service.ResponseHandler;
-import com.paxxis.chime.service.ServiceBusMessageProducer;
+import com.paxxis.cornerstone.base.Message;
+import com.paxxis.cornerstone.common.MessagePayload;
+import com.paxxis.cornerstone.service.RequestQueueSender;
+import com.paxxis.cornerstone.service.ResponseHandler;
+import com.paxxis.cornerstone.service.ServiceBusMessageProducer;
 
 /**
  * 

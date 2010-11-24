@@ -17,8 +17,9 @@
 
 package com.paxxis.chime.client.common.cal;
 
-import com.paxxis.chime.client.common.InstanceId;
 import com.paxxis.chime.client.common.Shape;
+import com.paxxis.cornerstone.base.InstanceId;
+
 import java.util.List;
 
 /**

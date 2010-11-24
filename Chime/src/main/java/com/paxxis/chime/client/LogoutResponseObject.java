@@ -17,8 +17,9 @@
 
 package com.paxxis.chime.client;
 
-import com.paxxis.chime.client.common.ErrorMessage;
 import com.paxxis.chime.client.common.LogoutResponse;
+import com.paxxis.cornerstone.base.ErrorMessage;
+
 import java.io.Serializable;
 
 /**

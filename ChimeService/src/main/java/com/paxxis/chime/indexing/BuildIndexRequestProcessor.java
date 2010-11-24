@@ -19,15 +19,16 @@ package com.paxxis.chime.indexing;
 
 import com.paxxis.chime.client.common.BuildIndexRequestMessage;
 import com.paxxis.chime.client.common.BuildIndexResponseMessage;
-import com.paxxis.chime.database.DatabaseConnection;
-import com.paxxis.chime.database.DatabaseConnectionPool;
-import com.paxxis.chime.client.common.ErrorMessage;
-import com.paxxis.chime.client.common.Message;
-import com.paxxis.chime.service.MessageProcessor;
-import com.paxxis.chime.service.NotificationTopicSender;
 import com.mysql.jdbc.CommunicationsException;
-import com.paxxis.chime.common.MessagePayload;
-import com.paxxis.chime.service.ServiceBusMessageProducer;
+import com.paxxis.cornerstone.base.ErrorMessage;
+import com.paxxis.cornerstone.base.Message;
+import com.paxxis.cornerstone.common.MessagePayload;
+import com.paxxis.cornerstone.database.DatabaseConnection;
+import com.paxxis.cornerstone.database.DatabaseConnectionPool;
+import com.paxxis.cornerstone.service.MessageProcessor;
+import com.paxxis.cornerstone.service.NotificationTopicSender;
+import com.paxxis.cornerstone.service.ServiceBusMessageProducer;
+
 import javax.jms.JMSException;
 import org.apache.log4j.Logger;
 

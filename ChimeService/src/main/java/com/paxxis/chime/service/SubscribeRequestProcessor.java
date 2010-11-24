@@ -19,18 +19,19 @@ package com.paxxis.chime.service;
 
 import com.paxxis.chime.data.DataInstanceUtils;
 import com.paxxis.chime.client.common.DataInstance;
-import com.paxxis.chime.client.common.ErrorMessage;
-import com.paxxis.chime.client.common.Message;
 import com.paxxis.chime.client.common.SubscribeRequest;
 import com.paxxis.chime.client.common.SubscribeResponse;
 import com.paxxis.chime.client.common.User;
-import com.paxxis.chime.database.DatabaseConnection;
-import com.paxxis.chime.database.DatabaseConnectionPool;
-import com.paxxis.chime.service.MessageProcessor;
-import com.paxxis.chime.service.NotificationTopicSender;
 import com.mysql.jdbc.CommunicationsException;
-import com.paxxis.chime.common.MessagePayload;
 import com.paxxis.chime.data.RegisteredInterestUtils;
+import com.paxxis.cornerstone.base.ErrorMessage;
+import com.paxxis.cornerstone.base.Message;
+import com.paxxis.cornerstone.common.MessagePayload;
+import com.paxxis.cornerstone.database.DatabaseConnection;
+import com.paxxis.cornerstone.database.DatabaseConnectionPool;
+import com.paxxis.cornerstone.service.MessageProcessor;
+import com.paxxis.cornerstone.service.NotificationTopicSender;
+
 import org.apache.log4j.Logger;
 
 /**

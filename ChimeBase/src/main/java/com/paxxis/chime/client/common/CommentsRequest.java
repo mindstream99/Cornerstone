@@ -18,6 +18,8 @@
 package com.paxxis.chime.client.common;
 
 import com.paxxis.chime.client.common.DataInstanceRequest.SortOrder;
+import com.paxxis.cornerstone.base.Cursor;
+import com.paxxis.cornerstone.base.RequestMessage;
 
 /**
  *

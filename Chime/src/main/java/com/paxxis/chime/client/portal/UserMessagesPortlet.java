@@ -51,7 +51,6 @@ import com.paxxis.chime.client.PagingListener;
 import com.paxxis.chime.client.ServiceManager;
 import com.paxxis.chime.client.ServiceResponseObject;
 import com.paxxis.chime.client.UserMessageModel;
-import com.paxxis.chime.client.common.Cursor;
 import com.paxxis.chime.client.common.User;
 import com.paxxis.chime.client.common.UserMessage;
 import com.paxxis.chime.client.common.UserMessagesBundle;
@@ -62,6 +61,7 @@ import com.paxxis.chime.client.pages.PageManager;
 import com.paxxis.chime.client.pages.PortalViewPage;
 import com.paxxis.chime.client.widgets.ChimeMessageBox;
 import com.paxxis.chime.client.widgets.ChimeMessageBoxEvent;
+import com.paxxis.cornerstone.base.Cursor;
 
 /**
  * 

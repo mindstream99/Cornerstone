@@ -40,7 +40,6 @@ import com.paxxis.chime.client.common.FindTagsRequest;
 import com.paxxis.chime.client.common.LockRequest;
 import com.paxxis.chime.client.common.LoginRequest;
 import com.paxxis.chime.client.common.LogoutRequest;
-import com.paxxis.chime.client.common.MessagingConstants;
 import com.paxxis.chime.client.common.ModifyShapeRequest;
 import com.paxxis.chime.client.common.MultiRequest;
 import com.paxxis.chime.client.common.PingRequest;
@@ -50,13 +49,18 @@ import com.paxxis.chime.client.common.ShapeRequest;
 import com.paxxis.chime.client.common.SubscribeRequest;
 import com.paxxis.chime.client.common.UserContextRequest;
 import com.paxxis.chime.client.common.UserMessagesRequest;
-import com.paxxis.chime.client.common.MessagingConstants.PayloadType;
-import com.paxxis.chime.common.JavaObjectPayload;
-import com.paxxis.chime.common.MessagePayload;
 import com.paxxis.chime.data.CacheManager;
-import com.paxxis.chime.database.DatabaseConnectionPool;
 import com.paxxis.chime.indexing.BuildIndexRequestProcessor;
 import com.paxxis.chime.ldap.LdapContextFactory;
+import com.paxxis.cornerstone.base.MessagingConstants;
+import com.paxxis.cornerstone.base.MessagingConstants.PayloadType;
+import com.paxxis.cornerstone.common.JavaObjectPayload;
+import com.paxxis.cornerstone.common.MessagePayload;
+import com.paxxis.cornerstone.database.DatabaseConnectionPool;
+import com.paxxis.cornerstone.service.ErrorProcessor;
+import com.paxxis.cornerstone.service.MessageProcessor;
+import com.paxxis.cornerstone.service.NotificationTopicSender;
+import com.paxxis.cornerstone.service.ServiceBusMessageHandler;
 
 
 /**

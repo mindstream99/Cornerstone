@@ -57,12 +57,12 @@ import com.paxxis.chime.client.InstanceUpdateListener.Type;
 import com.paxxis.chime.client.common.DataField;
 import com.paxxis.chime.client.common.DataFieldValue;
 import com.paxxis.chime.client.common.DataInstance;
-import com.paxxis.chime.client.common.InstanceId;
 import com.paxxis.chime.client.common.Shape;
 import com.paxxis.chime.client.widgets.ChimeGrid;
 import com.paxxis.chime.client.widgets.ChimeWindow;
 import com.paxxis.chime.client.widgets.DataFieldCellRenderer;
 import com.paxxis.chime.client.widgets.FieldValueModel;
+import com.paxxis.cornerstone.base.InstanceId;
 
 /**
  * 

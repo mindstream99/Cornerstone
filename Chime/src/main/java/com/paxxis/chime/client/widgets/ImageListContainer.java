@@ -39,7 +39,6 @@ import com.paxxis.chime.client.PagingListener;
 import com.paxxis.chime.client.StateManager;
 import com.paxxis.chime.client.Utils;
 import com.paxxis.chime.client.InstanceUpdateListener.Type;
-import com.paxxis.chime.client.common.Cursor;
 import com.paxxis.chime.client.common.DataField;
 import com.paxxis.chime.client.common.DataFieldValue;
 import com.paxxis.chime.client.common.DataInstance;
@@ -47,6 +46,7 @@ import com.paxxis.chime.client.common.Shape;
 import com.paxxis.chime.client.editor.FieldDataEditor;
 import com.paxxis.chime.client.editor.FieldEditListener;
 import com.paxxis.chime.client.pages.PageManager;
+import com.paxxis.cornerstone.base.Cursor;
 
 /**
  *

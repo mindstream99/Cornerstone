@@ -19,9 +19,9 @@ package com.paxxis.chime.data;
 
 import com.paxxis.chime.client.common.DataInstanceRequest.Operator;
 import com.paxxis.chime.client.common.Shape;
-import com.paxxis.chime.database.DatabaseConnection;
 import com.paxxis.chime.service.InstancesResponse;
 import com.paxxis.chime.service.Tools;
+import com.paxxis.cornerstone.database.DatabaseConnection;
 
 /**
  *

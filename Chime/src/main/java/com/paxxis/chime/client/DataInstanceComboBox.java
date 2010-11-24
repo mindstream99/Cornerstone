@@ -56,7 +56,6 @@ import com.google.gwt.user.client.Event;
 import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.ui.KeyboardListener;
 import com.google.gwt.user.client.ui.RootPanel;
-import com.paxxis.chime.client.common.Cursor;
 import com.paxxis.chime.client.common.DataInstance;
 import com.paxxis.chime.client.common.DataInstanceRequest;
 import com.paxxis.chime.client.common.DataInstanceRequest.ClauseOperator;
@@ -64,11 +63,12 @@ import com.paxxis.chime.client.common.DataInstanceRequest.Depth;
 import com.paxxis.chime.client.common.DataInstanceRequest.Operator;
 import com.paxxis.chime.client.common.DataInstanceResponse;
 import com.paxxis.chime.client.common.FindInstancesRequest;
-import com.paxxis.chime.client.common.InstanceId;
 import com.paxxis.chime.client.common.Shape;
 import com.paxxis.chime.client.common.ShapeRequest;
 import com.paxxis.chime.client.common.constants.SearchFieldConstants;
 import com.paxxis.chime.client.widgets.InstancePreviewPopup;
+import com.paxxis.cornerstone.base.Cursor;
+import com.paxxis.cornerstone.base.InstanceId;
 
 /**
  * 

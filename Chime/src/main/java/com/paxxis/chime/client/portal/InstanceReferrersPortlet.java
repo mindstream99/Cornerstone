@@ -25,11 +25,11 @@ import com.extjs.gxt.ui.client.widget.layout.RowData;
 import com.extjs.gxt.ui.client.widget.layout.RowLayout;
 import com.paxxis.chime.client.PaginatedResultsPanel;
 import com.paxxis.chime.client.ServiceManager;
-import com.paxxis.chime.client.common.Cursor;
 import com.paxxis.chime.client.common.DataInstance;
 import com.paxxis.chime.client.common.DataInstanceRequest;
 import com.paxxis.chime.client.common.DataInstanceResponse;
 import com.paxxis.chime.client.common.portal.PortletSpecification;
+import com.paxxis.cornerstone.base.Cursor;
 
 /**
  *

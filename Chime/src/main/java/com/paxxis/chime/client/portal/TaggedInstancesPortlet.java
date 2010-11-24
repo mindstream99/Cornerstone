@@ -22,7 +22,6 @@ import com.extjs.gxt.ui.client.widget.TabPanel;
 import com.extjs.gxt.ui.client.widget.layout.FitLayout;
 import com.paxxis.chime.client.PaginatedResultsPanel;
 import com.paxxis.chime.client.ServiceManager;
-import com.paxxis.chime.client.common.Cursor;
 import com.paxxis.chime.client.common.DataInstance;
 import com.paxxis.chime.client.common.DataInstanceRequest;
 import com.paxxis.chime.client.common.DataInstanceRequest.Depth;
@@ -32,6 +31,7 @@ import com.paxxis.chime.client.common.Tag;
 import com.paxxis.chime.client.common.constants.SearchFieldConstants;
 import com.paxxis.chime.client.common.portal.PortletSpecification;
 import com.paxxis.chime.client.common.portal.PortletSpecification.PortletType;
+import com.paxxis.cornerstone.base.Cursor;
 
 /**
  * @author Robert Englander

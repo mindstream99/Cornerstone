@@ -37,7 +37,6 @@ import com.paxxis.chime.client.ServiceManager;
 import com.paxxis.chime.client.common.Comment;
 import com.paxxis.chime.client.common.CommentsBundle;
 import com.paxxis.chime.client.common.CommentsRequest;
-import com.paxxis.chime.client.common.Cursor;
 import com.paxxis.chime.client.common.DataInstance;
 import com.paxxis.chime.client.common.DataSocialContext;
 import com.paxxis.chime.client.common.SearchFilter;
@@ -45,6 +44,7 @@ import com.paxxis.chime.client.common.DataInstanceRequest.SortOrder;
 import com.paxxis.chime.client.portal.UpdateReason;
 import com.paxxis.chime.client.widgets.CommentPanel.VoteChangeListener;
 import com.paxxis.chime.client.widgets.CommentsHeader.CommentsChangedListener;
+import com.paxxis.cornerstone.base.Cursor;
 
 /**
  *

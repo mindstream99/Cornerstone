@@ -24,11 +24,11 @@ import com.extjs.gxt.ui.client.store.ListStore;
 import com.paxxis.chime.client.common.DataInstance;
 import com.paxxis.chime.client.common.DataInstanceRequest;
 import com.paxxis.chime.client.common.DataInstanceResponse;
-import com.paxxis.chime.client.common.ErrorMessage;
 import com.paxxis.chime.client.common.FindInstancesRequest;
 import com.paxxis.chime.client.common.FindInstancesResponse;
-import com.paxxis.chime.client.common.RequestMessage;
 import com.paxxis.chime.client.widgets.ChimeMessageBox;
+import com.paxxis.cornerstone.base.ErrorMessage;
+import com.paxxis.cornerstone.base.RequestMessage;
 
 /**
  * 

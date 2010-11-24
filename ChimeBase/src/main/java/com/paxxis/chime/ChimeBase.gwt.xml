@@ -16,5 +16,5 @@
 -->
 
 <module>
-	<inherits name="com.paxxis.chime.ChimeMessage"/>
+	<inherits name="com.paxxis.cornerstone.CornerstoneBase"/>
 </module>

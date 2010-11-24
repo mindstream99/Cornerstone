@@ -28,7 +28,6 @@ import org.apache.log4j.Logger;
 import com.paxxis.chime.client.common.Comment;
 import com.paxxis.chime.client.common.CommentsBundle;
 import com.paxxis.chime.client.common.Community;
-import com.paxxis.chime.client.common.Cursor;
 import com.paxxis.chime.client.common.DataField;
 import com.paxxis.chime.client.common.DataFieldValue;
 import com.paxxis.chime.client.common.DataInstance;
@@ -37,7 +36,6 @@ import com.paxxis.chime.client.common.Discussion;
 import com.paxxis.chime.client.common.DiscussionsBundle;
 import com.paxxis.chime.client.common.FieldData;
 import com.paxxis.chime.client.common.Folder;
-import com.paxxis.chime.client.common.InstanceId;
 import com.paxxis.chime.client.common.Review;
 import com.paxxis.chime.client.common.ReviewsBundle;
 import com.paxxis.chime.client.common.Scope;
@@ -54,13 +52,15 @@ import com.paxxis.chime.client.common.DataInstanceRequest.Operator;
 import com.paxxis.chime.client.common.DataInstanceRequest.SortOrder;
 import com.paxxis.chime.client.common.portal.PortalTemplate;
 import com.paxxis.chime.data.VoteUtils.UserVote;
-import com.paxxis.chime.database.DataSet;
-import com.paxxis.chime.database.DatabaseConnection;
-import com.paxxis.chime.database.IDataValue;
-import com.paxxis.chime.database.StringData;
 import com.paxxis.chime.extension.ChimeExtensionManager;
 import com.paxxis.chime.service.DataInstanceHelperFactory;
 import com.paxxis.chime.service.Tools;
+import com.paxxis.cornerstone.base.Cursor;
+import com.paxxis.cornerstone.base.InstanceId;
+import com.paxxis.cornerstone.database.DataSet;
+import com.paxxis.cornerstone.database.DatabaseConnection;
+import com.paxxis.cornerstone.database.IDataValue;
+import com.paxxis.cornerstone.database.StringData;
 
 
 /**

@@ -34,8 +34,6 @@ import com.google.gwt.user.client.DeferredCommand;
 import com.google.gwt.user.client.ui.RootPanel;
 import com.paxxis.chime.client.common.DataInstance;
 import com.paxxis.chime.client.common.DataInstanceRequest;
-import com.paxxis.chime.client.common.ErrorMessage;
-import com.paxxis.chime.client.common.InstanceId;
 import com.paxxis.chime.client.common.NamedSearch;
 import com.paxxis.chime.client.common.DataInstanceRequest.Depth;
 import com.paxxis.chime.client.common.DataInstanceResponse.Reason;
@@ -43,6 +41,8 @@ import com.paxxis.chime.client.pages.PageManager;
 import com.paxxis.chime.client.pages.PageManager.StaticPageType;
 import com.paxxis.chime.client.widgets.LoginPanel;
 import com.paxxis.chime.client.widgets.LoginWindow;
+import com.paxxis.cornerstone.base.ErrorMessage;
+import com.paxxis.cornerstone.base.InstanceId;
 
 /**
  * 

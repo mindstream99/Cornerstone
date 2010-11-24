@@ -97,7 +97,6 @@ import com.paxxis.chime.client.common.EditShapeRequest;
 import com.paxxis.chime.client.common.EditShapeResponse;
 import com.paxxis.chime.client.common.EditUserRequest;
 import com.paxxis.chime.client.common.EditUserResponse;
-import com.paxxis.chime.client.common.ErrorMessage;
 import com.paxxis.chime.client.common.FindInstancesRequest;
 import com.paxxis.chime.client.common.FindInstancesResponse;
 import com.paxxis.chime.client.common.LockRequest;
@@ -106,11 +105,9 @@ import com.paxxis.chime.client.common.LoginRequest;
 import com.paxxis.chime.client.common.LoginResponse;
 import com.paxxis.chime.client.common.LogoutRequest;
 import com.paxxis.chime.client.common.LogoutResponse;
-import com.paxxis.chime.client.common.Message;
 import com.paxxis.chime.client.common.ModifyShapeRequest;
 import com.paxxis.chime.client.common.ModifyShapeResponse;
 import com.paxxis.chime.client.common.MultiRequest;
-import com.paxxis.chime.client.common.MultiResponse;
 import com.paxxis.chime.client.common.PingRequest;
 import com.paxxis.chime.client.common.PingResponse;
 import com.paxxis.chime.client.common.ReviewsRequest;
@@ -124,12 +121,15 @@ import com.paxxis.chime.client.common.SubscribeResponse;
 import com.paxxis.chime.client.common.User;
 import com.paxxis.chime.client.common.UserMessagesRequest;
 import com.paxxis.chime.client.common.UserMessagesResponse;
-import com.paxxis.chime.common.JavaObjectPayload;
 import com.paxxis.chime.server.ServiceBusSenderPool.PoolEntry;
-import com.paxxis.chime.service.JndiInitialContextFactory;
-import com.paxxis.chime.service.ServiceBusConnector;
-import com.paxxis.chime.service.ServiceBusMessageReceiver;
-import com.paxxis.chime.service.ChimeConfiguration;
+import com.paxxis.cornerstone.base.ErrorMessage;
+import com.paxxis.cornerstone.base.Message;
+import com.paxxis.cornerstone.base.MultiResponse;
+import com.paxxis.cornerstone.common.JavaObjectPayload;
+import com.paxxis.cornerstone.service.CornerstoneConfiguration;
+import com.paxxis.cornerstone.service.JndiInitialContextFactory;
+import com.paxxis.cornerstone.service.ServiceBusConnector;
+import com.paxxis.cornerstone.service.ServiceBusMessageReceiver;
 
 import de.novanic.eventservice.service.RemoteEventServiceServlet;
 
@@ -194,7 +194,7 @@ public class endsliceServiceImpl extends RemoteEventServiceServlet implements en
 			synchronized (lock) {
 				if (!initialized) {
 					_contextFactory = (JndiInitialContextFactory)ctx.getBean("contextFactory");
-					ChimeConfiguration cfg = (ChimeConfiguration)ctx.getBean("chimeConfiguration");
+					CornerstoneConfiguration cfg = (CornerstoneConfiguration)ctx.getBean("chimeConfiguration");
 					timeout = cfg.getIntValue("chime.service.responseTimeout", timeout);
 					
 					try {

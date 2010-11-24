@@ -38,7 +38,6 @@ import com.paxxis.chime.client.common.DataFieldValue;
 import com.paxxis.chime.client.common.DataInstance;
 import com.paxxis.chime.client.common.DataSocialContext;
 import com.paxxis.chime.client.common.Discussion;
-import com.paxxis.chime.client.common.InstanceId;
 import com.paxxis.chime.client.common.Scope;
 import com.paxxis.chime.client.common.Shape;
 import com.paxxis.chime.client.common.Tag;
@@ -54,9 +53,10 @@ import com.paxxis.chime.data.CommentUtils;
 import com.paxxis.chime.data.DataInstanceUtils;
 import com.paxxis.chime.data.ShapeUtils;
 import com.paxxis.chime.data.TagUtils;
-import com.paxxis.chime.database.DatabaseConnection;
-import com.paxxis.chime.database.DatabaseConnectionPool;
 import com.paxxis.chime.service.Tools;
+import com.paxxis.cornerstone.base.InstanceId;
+import com.paxxis.cornerstone.database.DatabaseConnection;
+import com.paxxis.cornerstone.database.DatabaseConnectionPool;
 
 /**
  * This is the base class for all Indexers.  

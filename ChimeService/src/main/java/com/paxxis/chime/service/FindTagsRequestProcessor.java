@@ -23,12 +23,13 @@ import com.paxxis.chime.client.common.Shape;
 import com.paxxis.chime.client.common.FindTagsRequest;
 import com.paxxis.chime.client.common.FindTagsResponse;
 import com.paxxis.chime.client.common.Tag;
-import com.paxxis.chime.database.DatabaseConnection;
-import com.paxxis.chime.database.DatabaseConnectionPool;
-import com.paxxis.chime.client.common.ErrorMessage;
-import com.paxxis.chime.client.common.Message;
-import com.paxxis.chime.common.MessagePayload;
-import com.paxxis.chime.service.MessageProcessor;
+import com.paxxis.cornerstone.base.ErrorMessage;
+import com.paxxis.cornerstone.base.Message;
+import com.paxxis.cornerstone.common.MessagePayload;
+import com.paxxis.cornerstone.database.DatabaseConnection;
+import com.paxxis.cornerstone.database.DatabaseConnectionPool;
+import com.paxxis.cornerstone.service.MessageProcessor;
+
 import java.util.List;
 
 /**

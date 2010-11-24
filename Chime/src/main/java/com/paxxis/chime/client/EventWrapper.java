@@ -17,7 +17,7 @@
 
 package com.paxxis.chime.client;
 
-import com.paxxis.chime.client.common.Message;
+import com.paxxis.cornerstone.base.Message;
 
 import java.io.Serializable;
 import de.novanic.eventservice.client.event.Event;

@@ -37,12 +37,12 @@ import com.extjs.gxt.ui.client.widget.layout.HBoxLayout.HBoxLayoutAlign;
 import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.user.client.Element;
 import com.paxxis.chime.client.common.DataField;
-import com.paxxis.chime.client.common.InstanceId;
 import com.paxxis.chime.client.common.SearchFilter;
 import com.paxxis.chime.client.common.Shape;
 import com.paxxis.chime.client.common.DataInstanceRequest.Operator;
 import com.paxxis.chime.client.common.constants.SearchFieldConstants;
 import com.paxxis.chime.client.widgets.InterceptedHtml;
+import com.paxxis.cornerstone.base.InstanceId;
 
 /**
  *

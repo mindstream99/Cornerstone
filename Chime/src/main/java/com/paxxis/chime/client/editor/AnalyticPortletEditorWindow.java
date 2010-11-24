@@ -48,7 +48,6 @@ import com.paxxis.chime.client.ServiceManager;
 import com.paxxis.chime.client.common.DataInstance;
 import com.paxxis.chime.client.common.DataInstanceRequest;
 import com.paxxis.chime.client.common.DataInstanceResponse;
-import com.paxxis.chime.client.common.InstanceId;
 import com.paxxis.chime.client.common.Shape;
 import com.paxxis.chime.client.common.DataInstanceRequest.Depth;
 import com.paxxis.chime.client.common.portal.PortletSpecification;
@@ -56,6 +55,7 @@ import com.paxxis.chime.client.widgets.ChimeWindow;
 import com.paxxis.chime.client.widgets.charts.ChimeChartFactory;
 import com.paxxis.chime.client.widgets.charts.ChimeChartFactory.ChartType;
 import com.paxxis.chime.client.widgets.charts.ChimeChartFactory.ChartTypeModel;
+import com.paxxis.cornerstone.base.InstanceId;
 
 /**
  * 

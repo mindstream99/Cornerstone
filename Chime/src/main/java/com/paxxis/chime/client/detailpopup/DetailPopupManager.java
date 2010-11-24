@@ -49,12 +49,12 @@ import com.paxxis.chime.client.common.DataFieldValue;
 import com.paxxis.chime.client.common.DataInstance;
 import com.paxxis.chime.client.common.DataInstanceRequest;
 import com.paxxis.chime.client.common.DataInstanceRequest.Depth;
-import com.paxxis.chime.client.common.InstanceId;
 import com.paxxis.chime.client.common.Shape;
 import com.paxxis.chime.client.common.User;
 import com.paxxis.chime.client.common.UserProfile;
 import com.paxxis.chime.client.widgets.ImageContainer;
 import com.paxxis.chime.client.widgets.InterceptedHtml;
+import com.paxxis.cornerstone.base.InstanceId;
 
 /**
  *

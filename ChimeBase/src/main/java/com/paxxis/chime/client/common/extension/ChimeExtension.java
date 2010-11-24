@@ -22,8 +22,8 @@ import java.util.List;
 
 import com.paxxis.chime.client.common.Community;
 import com.paxxis.chime.client.common.DataInstance;
-import com.paxxis.chime.client.common.InstanceId;
 import com.paxxis.chime.client.common.User;
+import com.paxxis.cornerstone.base.InstanceId;
 
 /**
  *

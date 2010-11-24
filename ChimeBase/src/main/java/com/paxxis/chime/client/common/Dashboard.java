@@ -18,6 +18,7 @@
 package com.paxxis.chime.client.common;
 
 import com.paxxis.chime.client.common.portal.PortalTemplate;
+import com.paxxis.cornerstone.base.InstanceId;
 
 /**
  *

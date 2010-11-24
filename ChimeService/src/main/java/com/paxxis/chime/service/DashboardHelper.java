@@ -11,8 +11,9 @@ import com.paxxis.chime.client.common.Shape;
 import com.paxxis.chime.client.common.EditDataInstanceRequest.Operation;
 import com.paxxis.chime.client.common.EditPageTemplateRequest;
 import com.paxxis.chime.client.common.Dashboard;
-import com.paxxis.chime.client.common.RequestMessage;
 import com.paxxis.chime.client.common.portal.PortalTemplate;
+import com.paxxis.cornerstone.base.RequestMessage;
+
 import java.util.List;
 
 /**

@@ -20,11 +20,11 @@ package com.paxxis.chime.server;
 import java.util.ArrayList;
 import java.util.Hashtable;
 
-import com.paxxis.chime.common.DataLatch;
-import com.paxxis.chime.service.ChimeConfiguration;
-import com.paxxis.chime.service.JndiInitialContextFactory;
-import com.paxxis.chime.service.RequestQueueSender;
-import com.paxxis.chime.service.ServiceBusConnector;
+import com.paxxis.cornerstone.common.DataLatch;
+import com.paxxis.cornerstone.service.CornerstoneConfiguration;
+import com.paxxis.cornerstone.service.JndiInitialContextFactory;
+import com.paxxis.cornerstone.service.RequestQueueSender;
+import com.paxxis.cornerstone.service.ServiceBusConnector;
 
 /**
  *
@@ -61,7 +61,7 @@ public class ServiceBusSenderPool
     final private Object _semaphore = new Object();
 
     private int poolSize;
-    private ChimeConfiguration config;
+    private CornerstoneConfiguration config;
     private JndiInitialContextFactory contextFactory;
     
     public ServiceBusSenderPool() {
@@ -72,7 +72,7 @@ public class ServiceBusSenderPool
     	poolSize = size;
     }
 
-    public void setChimeConfiguration(ChimeConfiguration cfg) {
+    public void setCornerstoneConfiguration(CornerstoneConfiguration cfg) {
     	config = cfg;
     }
     
@@ -149,7 +149,7 @@ public class ServiceBusSenderPool
     }
 
     public void initialize() {
-    	String factoryName = config.getStringValue("chime.service.connectionFactory", "");
+    	String factoryName = config.getStringValue("chime.service.connectionFactoryName", "");
     	String requestQueueName = config.getStringValue("chime.service.requestQueueName", "");
     	
         for (int i = 0; i < poolSize; i++)

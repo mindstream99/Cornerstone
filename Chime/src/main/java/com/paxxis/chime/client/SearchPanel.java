@@ -24,12 +24,12 @@ import com.extjs.gxt.ui.client.widget.layout.BorderLayout;
 import com.extjs.gxt.ui.client.widget.layout.BorderLayoutData;
 import com.extjs.gxt.ui.client.widget.layout.FitLayout;
 import com.google.gwt.user.client.Element;
-import com.paxxis.chime.client.common.Cursor;
 import com.paxxis.chime.client.common.DataInstanceRequest;
 import com.paxxis.chime.client.common.NamedSearch;
 import com.paxxis.chime.client.common.SearchCriteria;
 import com.paxxis.chime.client.common.User;
 import com.paxxis.chime.client.common.DataInstanceRequest.SortOrder;
+import com.paxxis.cornerstone.base.Cursor;
 
 
 /**

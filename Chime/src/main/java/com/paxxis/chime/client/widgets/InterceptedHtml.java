@@ -25,8 +25,8 @@ import com.google.gwt.user.client.Event;
 import com.google.gwt.user.client.History;
 import com.google.gwt.user.client.Timer;
 import com.paxxis.chime.client.Utils;
-import com.paxxis.chime.client.common.InstanceId;
 import com.paxxis.chime.client.detailpopup.DetailPopupManager;
+import com.paxxis.cornerstone.base.InstanceId;
 
 /**
  *

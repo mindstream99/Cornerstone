@@ -29,13 +29,13 @@ import com.paxxis.chime.client.InstanceUpdateListener.Type;
 import com.paxxis.chime.client.common.DataField;
 import com.paxxis.chime.client.common.DataFieldValue;
 import com.paxxis.chime.client.common.DataInstance;
-import com.paxxis.chime.client.common.InstanceId;
 import com.paxxis.chime.client.common.Shape;
 import com.paxxis.chime.client.common.portal.PortletSpecification;
 import com.paxxis.chime.client.editor.FileEditorListener;
 import com.paxxis.chime.client.widgets.FileUploader;
 import com.paxxis.chime.client.widgets.ImageContainer;
 import com.paxxis.chime.client.widgets.FileUploader.FileType;
+import com.paxxis.cornerstone.base.InstanceId;
 
 /**
  *

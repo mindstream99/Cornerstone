@@ -37,14 +37,14 @@ import com.extjs.gxt.ui.client.widget.layout.CenterLayout;
 import com.extjs.gxt.ui.client.widget.layout.RowData;
 import com.extjs.gxt.ui.client.widget.layout.RowLayout;
 import com.google.gwt.user.client.Element;
-import com.paxxis.chime.client.common.Cursor;
 import com.paxxis.chime.client.common.DataInstance;
 import com.paxxis.chime.client.common.DataInstanceRequest;
 import com.paxxis.chime.client.common.DataInstanceResponse;
 import com.paxxis.chime.client.common.FindInstancesRequest;
 import com.paxxis.chime.client.common.FindInstancesResponse;
-import com.paxxis.chime.client.common.RequestMessage;
 import com.paxxis.chime.client.widgets.InterceptedHtml;
+import com.paxxis.cornerstone.base.Cursor;
+import com.paxxis.cornerstone.base.RequestMessage;
 
 
 /**

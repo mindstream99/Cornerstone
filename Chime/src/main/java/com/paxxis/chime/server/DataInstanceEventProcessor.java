@@ -18,11 +18,11 @@
 package com.paxxis.chime.server;
 
 import com.paxxis.chime.client.common.DataInstanceEvent;
-import com.paxxis.chime.client.common.ErrorMessage;
-import com.paxxis.chime.client.common.Message;
 import com.paxxis.chime.client.common.DataInstanceEvent.EventType;
-import com.paxxis.chime.common.MessagePayload;
-import com.paxxis.chime.service.MessageProcessor;
+import com.paxxis.cornerstone.base.ErrorMessage;
+import com.paxxis.cornerstone.base.Message;
+import com.paxxis.cornerstone.common.MessagePayload;
+import com.paxxis.cornerstone.service.MessageProcessor;
 
 /**
  * 

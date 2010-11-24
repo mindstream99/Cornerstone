@@ -71,7 +71,7 @@
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
-      <artifactId>ChimeServiceCommon</artifactId>
+      <artifactId>CornerstoneCommon</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>

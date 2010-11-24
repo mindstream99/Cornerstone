@@ -18,21 +18,22 @@
 package com.paxxis.chime.service;
 
 import com.paxxis.chime.data.ReviewUtils;
-import com.paxxis.chime.client.common.Cursor;
 import com.paxxis.chime.client.common.DataInstance;
 import com.paxxis.chime.client.common.DataInstanceRequest.SortOrder;
 import com.paxxis.chime.client.common.ReviewsBundle;
-import com.paxxis.chime.database.DatabaseConnection;
-import com.paxxis.chime.database.DatabaseConnectionPool;
-import com.paxxis.chime.client.common.ErrorMessage;
-import com.paxxis.chime.client.common.Message;
 import com.paxxis.chime.client.common.ReviewsRequest;
 import com.paxxis.chime.client.common.ReviewsResponse;
 import com.paxxis.chime.client.common.SearchFilter;
 import com.paxxis.chime.client.common.User;
-import com.paxxis.chime.service.MessageProcessor;
 import com.mysql.jdbc.CommunicationsException;
-import com.paxxis.chime.common.MessagePayload;
+import com.paxxis.cornerstone.base.Cursor;
+import com.paxxis.cornerstone.base.ErrorMessage;
+import com.paxxis.cornerstone.base.Message;
+import com.paxxis.cornerstone.common.MessagePayload;
+import com.paxxis.cornerstone.database.DatabaseConnection;
+import com.paxxis.cornerstone.database.DatabaseConnectionPool;
+import com.paxxis.cornerstone.service.MessageProcessor;
+
 import org.apache.log4j.Logger;
 
 /**

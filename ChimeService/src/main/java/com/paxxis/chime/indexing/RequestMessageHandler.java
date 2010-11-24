@@ -22,15 +22,15 @@ import java.util.HashMap;
 import org.apache.log4j.Logger;
 
 import com.paxxis.chime.client.common.BuildIndexRequestMessage;
-import com.paxxis.chime.client.common.MessagingConstants;
-import com.paxxis.chime.client.common.MessagingConstants.PayloadType;
-import com.paxxis.chime.common.JavaObjectPayload;
-import com.paxxis.chime.common.MessagePayload;
-import com.paxxis.chime.database.DatabaseConnectionPool;
-import com.paxxis.chime.service.ErrorProcessor;
-import com.paxxis.chime.service.MessageProcessor;
-import com.paxxis.chime.service.NotificationTopicSender;
-import com.paxxis.chime.service.ServiceBusMessageHandler;
+import com.paxxis.cornerstone.base.MessagingConstants;
+import com.paxxis.cornerstone.base.MessagingConstants.PayloadType;
+import com.paxxis.cornerstone.common.JavaObjectPayload;
+import com.paxxis.cornerstone.common.MessagePayload;
+import com.paxxis.cornerstone.database.DatabaseConnectionPool;
+import com.paxxis.cornerstone.service.ErrorProcessor;
+import com.paxxis.cornerstone.service.MessageProcessor;
+import com.paxxis.cornerstone.service.NotificationTopicSender;
+import com.paxxis.cornerstone.service.ServiceBusMessageHandler;
 
 /**
  *

@@ -20,18 +20,19 @@ package com.paxxis.chime.service;
 import java.util.List;
 
 import com.mysql.jdbc.CommunicationsException;
-import com.paxxis.chime.client.common.ErrorMessage;
-import com.paxxis.chime.client.common.Message;
-import com.paxxis.chime.client.common.MessagingConstants;
 import com.paxxis.chime.client.common.MultiRequest;
-import com.paxxis.chime.client.common.MultiRequestError;
-import com.paxxis.chime.client.common.MultiResponse;
-import com.paxxis.chime.client.common.RequestMessage;
-import com.paxxis.chime.client.common.ResponseMessage;
-import com.paxxis.chime.common.MessagePayload;
-import com.paxxis.chime.database.DatabaseConnection;
-import com.paxxis.chime.database.DatabaseConnectionPool;
-import com.paxxis.chime.database.DatabaseException;
+import com.paxxis.cornerstone.base.ErrorMessage;
+import com.paxxis.cornerstone.base.Message;
+import com.paxxis.cornerstone.base.MessagingConstants;
+import com.paxxis.cornerstone.base.MultiRequestError;
+import com.paxxis.cornerstone.base.MultiResponse;
+import com.paxxis.cornerstone.base.RequestMessage;
+import com.paxxis.cornerstone.base.ResponseMessage;
+import com.paxxis.cornerstone.common.MessagePayload;
+import com.paxxis.cornerstone.database.DatabaseConnection;
+import com.paxxis.cornerstone.database.DatabaseConnectionPool;
+import com.paxxis.cornerstone.database.DatabaseException;
+import com.paxxis.cornerstone.service.MessageProcessor;
 
 /** 
  *

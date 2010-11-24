@@ -36,8 +36,6 @@ import com.paxxis.chime.client.common.DataInstanceRequest;
 import com.paxxis.chime.client.common.DataSocialContext;
 import com.paxxis.chime.client.common.DiscussionsBundle;
 import com.paxxis.chime.client.common.FieldData;
-import com.paxxis.chime.client.common.InstanceId;
-import com.paxxis.chime.client.common.Message;
 import com.paxxis.chime.client.common.ReviewsBundle;
 import com.paxxis.chime.client.common.Scope;
 import com.paxxis.chime.client.common.Scope.Permission;
@@ -48,19 +46,21 @@ import com.paxxis.chime.client.common.extension.ChimeExtension;
 import com.paxxis.chime.client.common.extension.ExtensionContext;
 import com.paxxis.chime.client.common.extension.MemoryIndexer;
 import com.paxxis.chime.client.common.portal.PortalTemplate;
-import com.paxxis.chime.common.JavaObjectPayload;
 import com.paxxis.chime.data.DataInstanceUtils;
 import com.paxxis.chime.data.PortalTemplateUtils;
 import com.paxxis.chime.data.ShapeUtils;
 import com.paxxis.chime.data.UserUtils;
-import com.paxxis.chime.database.DatabaseConnection;
-import com.paxxis.chime.database.DatabaseConnectionPool;
 import com.paxxis.chime.license.LicenseProcessor;
 import com.paxxis.chime.service.DataInstanceRequestProcessor;
-import com.paxxis.chime.service.NotificationTopicSender;
-import com.paxxis.chime.service.RequestQueueSender;
-import com.paxxis.chime.service.ServiceBusMessageProducer;
 import com.paxxis.chime.service.Tools;
+import com.paxxis.cornerstone.base.InstanceId;
+import com.paxxis.cornerstone.base.Message;
+import com.paxxis.cornerstone.common.JavaObjectPayload;
+import com.paxxis.cornerstone.database.DatabaseConnection;
+import com.paxxis.cornerstone.database.DatabaseConnectionPool;
+import com.paxxis.cornerstone.service.NotificationTopicSender;
+import com.paxxis.cornerstone.service.RequestQueueSender;
+import com.paxxis.cornerstone.service.ServiceBusMessageProducer;
 
 /**
  *

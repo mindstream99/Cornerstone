@@ -26,7 +26,7 @@ import org.apache.log4j.Logger;
 
 import com.paxxis.chime.client.common.extension.ChimeExtension;
 import com.paxxis.chime.extension.ChimeExtensionManager;
-import com.paxxis.chime.service.ChimeConfiguration;
+import com.paxxis.cornerstone.service.CornerstoneConfiguration;
 
 /**
  * 
@@ -52,7 +52,7 @@ public class LicenseProcessor {
     }
 
     private ScheduledExecutorService scheduledExecutor = null;
-    private ChimeConfiguration config = null;
+    private CornerstoneConfiguration config = null;
     private int validationFreq = 1440; // 1 day
 
     public void initialize() {
@@ -64,7 +64,7 @@ public class LicenseProcessor {
         scheduledExecutor.shutdown();
     }
 
-    public void setChimeConfiguration(ChimeConfiguration config) {
+    public void setCornerstoneConfiguration(CornerstoneConfiguration config) {
         this.config = config;
     }
 

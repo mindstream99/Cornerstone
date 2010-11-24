@@ -17,6 +17,9 @@
 
 package com.paxxis.chime.client.common;
 
+import com.paxxis.cornerstone.base.InstanceId;
+import com.paxxis.cornerstone.base.RequestMessage;
+
 /**
  *
  * @author Robert Englander

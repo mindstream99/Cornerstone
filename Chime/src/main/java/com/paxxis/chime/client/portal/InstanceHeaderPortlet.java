@@ -53,7 +53,6 @@ import com.paxxis.chime.client.common.Dashboard;
 import com.paxxis.chime.client.common.DataField;
 import com.paxxis.chime.client.common.DataFieldValue;
 import com.paxxis.chime.client.common.DataInstance;
-import com.paxxis.chime.client.common.InstanceId;
 import com.paxxis.chime.client.common.Shape;
 import com.paxxis.chime.client.common.Tag;
 import com.paxxis.chime.client.common.User;
@@ -73,6 +72,7 @@ import com.paxxis.chime.client.widgets.LockPanel;
 import com.paxxis.chime.client.widgets.PasswordWindow;
 import com.paxxis.chime.client.widgets.SubscribePanel;
 import com.paxxis.chime.client.widgets.PasswordWindow.PasswordChangeListener;
+import com.paxxis.cornerstone.base.InstanceId;
 
 /**
  *

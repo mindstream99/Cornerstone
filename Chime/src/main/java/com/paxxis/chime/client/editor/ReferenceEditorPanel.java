@@ -29,8 +29,8 @@ import com.google.gwt.user.client.Element;
 import com.paxxis.chime.client.DataInputListener;
 import com.paxxis.chime.client.DataInstanceComboBox;
 import com.paxxis.chime.client.common.DataInstance;
-import com.paxxis.chime.client.common.InstanceId;
 import com.paxxis.chime.client.common.Shape;
+import com.paxxis.cornerstone.base.InstanceId;
 
 /**
  *

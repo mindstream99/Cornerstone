@@ -28,14 +28,14 @@ Root application context for the Chime Web Application.
 
     <!-- NOTE:  this is first so that it's setup before the service objects need it -->
     <!-- an instance of the chime configuration object -->
-    <bean id="chimeConfiguration" class="com.paxxis.chime.service.ChimeConfiguration">
+    <bean id="chimeConfiguration" class="com.paxxis.cornerstone.service.CornerstoneConfiguration">
         <property name="parameters">
             <map>
-                <entry key="chime.service.connectionFactory" value="chimeFactory"/>
+                <entry key="chime.service.connectionFactoryName" value="chimeFactory"/>
                 <entry key="chime.service.requestQueueName" value="ChimeRequestQueue"/>
                 <entry key="chime.service.updateTopic" value="ChimeUpdateTopic"/>
-                <entry key="chime.service.JndiInitialContextFactory.contextFactory" value="org.apache.activemq.jndi.ActiveMQInitialContextFactory"/>
-                <entry key="chime.service.JndiInitialContextFactory.providerUrl" value="tcp://localhost:61616"/>
+                <entry key="chime.service.contextFactory" value="org.apache.activemq.jndi.ActiveMQInitialContextFactory"/>
+                <entry key="chime.service.providerUrl" value="tcp://localhost:61616"/>
                 <entry key="chime.service.responseTimeout" value="30000"/>
                 
                 <entry key="chime.client.brandingFile" value="ChimeBranding.xml"/>
@@ -43,8 +43,15 @@ Root application context for the Chime Web Application.
         </property>
     </bean>
 
-    <bean id="contextFactory" class="com.paxxis.chime.service.JndiInitialContextFactory">
-        <property name="chimeConfiguration" ref="chimeConfiguration"/>
+    <bean id="contextFactory" class="com.paxxis.cornerstone.service.JndiInitialContextFactory">
+        <property name="configurationPropertyMap">
+            <map>
+                <entry key="connectionFactoryName" value="chime.service.connectionFactoryName"/>
+                <entry key="providerUrl" value="chime.service.providerUrl"/>
+                <entry key="contextFactory" value="chime.service.contextFactory"/>
+            </map>
+        </property>
+        <property name="cornerstoneConfiguration" ref="chimeConfiguration"/>
         <property name="destinations">
             <map>
 	            <entry key="queue.ChimeRequestQueue" value="chimeRequestQueue"/>
@@ -54,24 +61,24 @@ Root application context for the Chime Web Application.
     </bean>
 
     <bean id="senderPool" class="com.paxxis.chime.server.ServiceBusSenderPool">
-        <property name="chimeConfiguration" ref="chimeConfiguration"/>
+        <property name="cornerstoneConfiguration" ref="chimeConfiguration"/>
         <property name="contextFactory" ref="contextFactory"/>
         <property name="poolSize" value="10"/>
     </bean>
 
-    <bean id="updateTopicReceiver" class="com.paxxis.chime.service.ServiceBusMessageReceiver">
-        <property name="chimeConfiguration" ref="chimeConfiguration"/>
+    <bean id="updateTopicReceiver" class="com.paxxis.cornerstone.service.ServiceBusMessageReceiver">
+        <property name="cornerstoneConfiguration" ref="chimeConfiguration"/>
         <property name="destinationName" value="ChimeUpdateTopic"/>
     </bean>
 
-    <bean id="serviceBusConnector" class="com.paxxis.chime.service.ServiceBusConnector">
+    <bean id="serviceBusConnector" class="com.paxxis.cornerstone.service.ServiceBusConnector">
         <property name="configurationPropertyMap">
             <map>
-                <entry key="connectionFactoryName" value="chime.service.connectionFactory"/>
+                <entry key="connectionFactoryName" value="chime.service.connectionFactoryName"/>
                 <entry key="connectOnStartup" value="chime.service.connectOnStartup"/>
             </map>
         </property>
-        <property name="chimeConfiguration" ref="chimeConfiguration"/>
+        <property name="cornerstoneConfiguration" ref="chimeConfiguration"/>
         <property name="initialContextFactory" ref="contextFactory"/>
 
         <property name="serviceBusConnectorClients">

@@ -13,3 +13,4 @@ ChimeService/ChimeDB/**
 ChimeService/webapps/
 ChimeService/logs/
 .externalToolBuilders
+tags

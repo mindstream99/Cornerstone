@@ -25,7 +25,7 @@ import com.extjs.gxt.ui.client.widget.form.LabelField;
 import com.extjs.gxt.ui.client.widget.toolbar.FillToolItem;
 import com.extjs.gxt.ui.client.widget.toolbar.ToolBar;
 import com.google.gwt.user.client.Element;
-import com.paxxis.chime.client.common.Cursor;
+import com.paxxis.cornerstone.base.Cursor;
 
 /**
  *

@@ -20,15 +20,16 @@ package com.paxxis.chime.notification;
 import com.paxxis.chime.client.common.DataField;
 import com.paxxis.chime.client.common.DataFieldValue;
 import com.paxxis.chime.client.common.DataInstance;
-import com.paxxis.chime.client.common.InstanceId;
 import com.paxxis.chime.client.common.Shape;
 import com.paxxis.chime.client.common.User;
-import com.paxxis.chime.database.DatabaseConnection;
-import com.paxxis.chime.database.DatabaseConnectionPool;
 import com.paxxis.chime.data.CommunityUtils;
 import com.paxxis.chime.data.DataInstanceUtils;
 import com.paxxis.chime.data.UserUtils;
-import com.paxxis.chime.service.ChimeConfiguration;
+import com.paxxis.cornerstone.base.InstanceId;
+import com.paxxis.cornerstone.database.DatabaseConnection;
+import com.paxxis.cornerstone.database.DatabaseConnectionPool;
+import com.paxxis.cornerstone.service.CornerstoneConfiguration;
+
 import java.util.ArrayList;
 import java.util.List;
 import org.apache.log4j.Logger;
@@ -45,7 +46,7 @@ class ImmediateNotificationProcessor extends MessageNotifier {
     private User user;
     private DatabaseConnectionPool dbPool;
 
-    ImmediateNotificationProcessor(DataInstance inst, User user, DatabaseConnectionPool pool, ChimeConfiguration cfg) {
+    ImmediateNotificationProcessor(DataInstance inst, User user, DatabaseConnectionPool pool, CornerstoneConfiguration cfg) {
         super(cfg);
         instance = inst;
         this.user = user;

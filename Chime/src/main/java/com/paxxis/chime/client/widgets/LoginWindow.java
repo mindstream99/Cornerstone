@@ -35,8 +35,8 @@ import com.paxxis.chime.client.ServiceManager;
 import com.paxxis.chime.client.ServiceManagerAdapter;
 import com.paxxis.chime.client.ServiceManagerListener;
 import com.paxxis.chime.client.Utils;
-import com.paxxis.chime.client.common.InstanceId;
 import com.paxxis.chime.client.widgets.InterceptedHtml.InterceptedLinkListener;
+import com.paxxis.cornerstone.base.InstanceId;
 
 /**
  *

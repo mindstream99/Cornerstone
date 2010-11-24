@@ -18,7 +18,6 @@
 package com.paxxis.chime.data;
 
 import com.paxxis.chime.client.common.Community;
-import com.paxxis.chime.client.common.Cursor;
 import com.paxxis.chime.client.common.DataField;
 import com.paxxis.chime.client.common.DataFieldValue;
 import com.paxxis.chime.client.common.DataInstance;
@@ -26,16 +25,18 @@ import com.paxxis.chime.client.common.DataInstanceRequest.Operator;
 import com.paxxis.chime.client.common.DataInstanceRequest.SortOrder;
 import com.paxxis.chime.client.common.Shape;
 import com.paxxis.chime.client.common.FieldData;
-import com.paxxis.chime.client.common.InstanceId;
 import com.paxxis.chime.client.common.ReviewsBundle;
 import com.paxxis.chime.client.common.Review;
 import com.paxxis.chime.client.common.Scope;
 import com.paxxis.chime.client.common.SearchFilter;
 import com.paxxis.chime.client.common.User;
-import com.paxxis.chime.database.DataSet;
-import com.paxxis.chime.database.DatabaseConnection;
-import com.paxxis.chime.database.StringData;
 import com.paxxis.chime.service.Tools;
+import com.paxxis.cornerstone.base.Cursor;
+import com.paxxis.cornerstone.base.InstanceId;
+import com.paxxis.cornerstone.database.DataSet;
+import com.paxxis.cornerstone.database.DatabaseConnection;
+import com.paxxis.cornerstone.database.StringData;
+
 import java.util.ArrayList;
 import java.util.List;
 

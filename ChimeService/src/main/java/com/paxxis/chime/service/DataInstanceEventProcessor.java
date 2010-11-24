@@ -18,13 +18,14 @@
 package com.paxxis.chime.service;
 
 import com.paxxis.chime.client.common.DataInstanceEvent;
-import com.paxxis.chime.database.DatabaseConnectionPool;
 import com.paxxis.chime.indexing.Indexer;
-import com.paxxis.chime.client.common.ErrorMessage;
-import com.paxxis.chime.client.common.Message;
-import com.paxxis.chime.common.MessagePayload;
 import com.paxxis.chime.notification.Notifier;
-import com.paxxis.chime.service.MessageProcessor;
+import com.paxxis.cornerstone.base.ErrorMessage;
+import com.paxxis.cornerstone.base.Message;
+import com.paxxis.cornerstone.common.MessagePayload;
+import com.paxxis.cornerstone.database.DatabaseConnectionPool;
+import com.paxxis.cornerstone.service.MessageProcessor;
+
 import org.apache.log4j.Logger;
 
 

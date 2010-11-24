@@ -19,6 +19,8 @@ package com.paxxis.chime.client.common;
 
 import java.util.List;
 
+import com.paxxis.cornerstone.base.ResponseMessage;
+
 /**
  *
  * @author Robert Englander

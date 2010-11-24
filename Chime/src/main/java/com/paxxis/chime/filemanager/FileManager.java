@@ -37,7 +37,7 @@ import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 
-import com.paxxis.chime.json.JSONObject;
+import com.paxxis.cornerstone.json.JSONObject;
 
 import eu.medsea.mimeutil.MimeUtil;
 

@@ -48,17 +48,13 @@ import com.paxxis.chime.client.common.EditNamedSearchRequest;
 import com.paxxis.chime.client.common.EditPageTemplateRequest;
 import com.paxxis.chime.client.common.EditShapeRequest;
 import com.paxxis.chime.client.common.EditShapeResponse;
-import com.paxxis.chime.client.common.ErrorMessage;
 import com.paxxis.chime.client.common.FieldDefinition;
-import com.paxxis.chime.client.common.InstanceId;
 import com.paxxis.chime.client.common.LockRequest;
 import com.paxxis.chime.client.common.LockResponse;
 import com.paxxis.chime.client.common.ModifyShapeRequest;
 import com.paxxis.chime.client.common.ModifyShapeResponse;
 import com.paxxis.chime.client.common.MultiRequest;
-import com.paxxis.chime.client.common.MultiResponse;
 import com.paxxis.chime.client.common.NamedSearch;
-import com.paxxis.chime.client.common.ResponseMessage;
 import com.paxxis.chime.client.common.SearchCriteria;
 import com.paxxis.chime.client.common.Shape;
 import com.paxxis.chime.client.common.SubscribeRequest;
@@ -77,6 +73,10 @@ import com.paxxis.chime.client.portal.UserMessagesPortlet;
 import com.paxxis.chime.client.widgets.ChimeLayoutContainer;
 import com.paxxis.chime.client.widgets.ChimeMessageBox;
 import com.paxxis.chime.client.widgets.ChimeMessageBoxEvent;
+import com.paxxis.cornerstone.base.ErrorMessage;
+import com.paxxis.cornerstone.base.InstanceId;
+import com.paxxis.cornerstone.base.MultiResponse;
+import com.paxxis.cornerstone.base.ResponseMessage;
 
 /**
  *

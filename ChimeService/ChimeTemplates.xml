@@ -50,7 +50,7 @@
 
     <mappings>
         <!-- shape mappings -->
-        <mapping shape="800" specification="userDetail"/>
+        <!-- mapping shape="800" specification="userDetail"/ -->
 
         <!-- instance mappings -->
         <mapping instance="100" specification="shapeless"/>

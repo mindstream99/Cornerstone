@@ -20,8 +20,8 @@ package com.paxxis.chime.client;
 import java.io.Serializable;
 
 import com.extjs.gxt.ui.client.data.BaseTreeModel;
-import com.paxxis.chime.client.common.InstanceId;
 import com.paxxis.chime.client.common.UserMessage;
+import com.paxxis.cornerstone.base.InstanceId;
 
 /**
  * A data model wrapper around a Chime UserMessage.

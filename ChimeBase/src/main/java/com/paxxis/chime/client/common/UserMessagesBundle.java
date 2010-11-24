@@ -22,6 +22,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import com.paxxis.cornerstone.base.Cursor;
+
 /**
  *
  * @author Robert Englander

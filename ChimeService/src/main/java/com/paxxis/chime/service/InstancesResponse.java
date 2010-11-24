@@ -17,7 +17,8 @@
 
 package com.paxxis.chime.service;
 
-import com.paxxis.chime.client.common.Cursor;
+import com.paxxis.cornerstone.base.Cursor;
+
 import java.util.List;
 
 /**

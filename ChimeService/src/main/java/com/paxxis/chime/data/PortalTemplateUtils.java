@@ -18,13 +18,14 @@
 package com.paxxis.chime.data;
 
 import com.paxxis.chime.client.common.DataInstance;
-import com.paxxis.chime.client.common.InstanceId;
 import com.paxxis.chime.client.common.Shape;
 import com.paxxis.chime.client.common.portal.PortalTemplate;
-import com.paxxis.chime.database.DataSet;
-import com.paxxis.chime.database.DatabaseConnection;
-import com.paxxis.chime.database.IDataValue;
 import com.paxxis.chime.service.PortalTemplateHelper;
+import com.paxxis.cornerstone.base.InstanceId;
+import com.paxxis.cornerstone.database.DataSet;
+import com.paxxis.cornerstone.database.DatabaseConnection;
+import com.paxxis.cornerstone.database.IDataValue;
+
 import java.util.HashMap;
 
 /**

@@ -20,7 +20,7 @@ package com.paxxis.chime.client;
 import java.io.Serializable;
 
 import com.paxxis.chime.client.common.CommentsResponse;
-import com.paxxis.chime.client.common.ErrorMessage;
+import com.paxxis.cornerstone.base.ErrorMessage;
 
 /**
  *

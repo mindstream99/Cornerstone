@@ -35,7 +35,6 @@ import com.paxxis.chime.client.PaginatorContainer;
 import com.paxxis.chime.client.PagingListener;
 import com.paxxis.chime.client.RatingsResponseObject;
 import com.paxxis.chime.client.ServiceManager;
-import com.paxxis.chime.client.common.Cursor;
 import com.paxxis.chime.client.common.DataInstance;
 import com.paxxis.chime.client.common.DataSocialContext;
 import com.paxxis.chime.client.common.Review;
@@ -46,6 +45,7 @@ import com.paxxis.chime.client.common.DataInstanceRequest.SortOrder;
 import com.paxxis.chime.client.portal.UpdateReason;
 import com.paxxis.chime.client.widgets.ReviewPanel.VoteChangeListener;
 import com.paxxis.chime.client.widgets.ReviewsHeader.ReviewsChangedListener;
+import com.paxxis.cornerstone.base.Cursor;
 
 /**
  *

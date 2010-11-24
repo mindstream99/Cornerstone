@@ -23,14 +23,14 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 
-import com.paxxis.chime.client.common.InstanceId;
 import com.paxxis.chime.client.common.User;
 import com.paxxis.chime.data.UserUtils;
-import com.paxxis.chime.database.DataSet;
-import com.paxxis.chime.database.DatabaseConnection;
-import com.paxxis.chime.database.DatabaseConnectionPool;
-import com.paxxis.chime.service.ChimeConfiguration;
 import com.paxxis.chime.service.Tools;
+import com.paxxis.cornerstone.base.InstanceId;
+import com.paxxis.cornerstone.database.DataSet;
+import com.paxxis.cornerstone.database.DatabaseConnection;
+import com.paxxis.cornerstone.database.DatabaseConnectionPool;
+import com.paxxis.cornerstone.service.CornerstoneConfiguration;
 
 /**
  * 
@@ -46,10 +46,10 @@ class WatchNotificationProcessor extends MessageNotifier {
     private static final String CHUNKSIZE_PROPERTY = "chime.notification.watchChunkSize";
     
     private DatabaseConnectionPool dbPool;
-    private ChimeConfiguration config;
+    private CornerstoneConfiguration config;
     
     
-    WatchNotificationProcessor(DatabaseConnectionPool pool, ChimeConfiguration cfg) {
+    WatchNotificationProcessor(DatabaseConnectionPool pool, CornerstoneConfiguration cfg) {
         super(cfg);
         dbPool = pool;
         config = cfg;

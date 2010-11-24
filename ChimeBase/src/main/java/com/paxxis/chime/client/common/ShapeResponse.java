@@ -18,6 +18,8 @@
 
 package com.paxxis.chime.client.common;
 
+import com.paxxis.cornerstone.base.ResponseMessage;
+
 
 /**
  *

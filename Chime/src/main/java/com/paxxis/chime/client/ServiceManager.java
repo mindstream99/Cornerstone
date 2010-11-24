@@ -34,11 +34,11 @@ import com.paxxis.chime.client.common.ApplyTagResponse;
 import com.paxxis.chime.client.common.DataInstance;
 import com.paxxis.chime.client.common.EditDataInstanceRequest;
 import com.paxxis.chime.client.common.EditDataInstanceResponse;
-import com.paxxis.chime.client.common.InstanceId;
 import com.paxxis.chime.client.common.User;
 import com.paxxis.chime.client.widgets.ChimeMessageBox;
 import com.paxxis.chime.client.widgets.ChimeMessageBoxEvent;
 import com.paxxis.chime.client.widgets.LoginWindow;
+import com.paxxis.cornerstone.base.InstanceId;
 
 /**
  *

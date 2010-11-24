@@ -39,7 +39,6 @@ import com.paxxis.chime.client.common.DataFieldValue;
 import com.paxxis.chime.client.common.DataInstance;
 import com.paxxis.chime.client.common.DataInstanceRequest.ClauseOperator;
 import com.paxxis.chime.client.common.DataInstanceRequest.Operator;
-import com.paxxis.chime.client.common.InstanceId;
 import com.paxxis.chime.client.common.Parameter;
 import com.paxxis.chime.client.common.Shape;
 import com.paxxis.chime.client.common.User;
@@ -53,9 +52,10 @@ import com.paxxis.chime.client.common.cal.Runtime;
 import com.paxxis.chime.client.common.constants.TextConstants;
 import com.paxxis.chime.client.common.extension.ChimeExtension;
 import com.paxxis.chime.data.DataInstanceUtils.FetchType;
-import com.paxxis.chime.database.DatabaseConnection;
 import com.paxxis.chime.extension.CALExtensionHelper;
 import com.paxxis.chime.extension.ChimeExtensionManager;
+import com.paxxis.cornerstone.base.InstanceId;
+import com.paxxis.cornerstone.database.DatabaseConnection;
 
 /**
  *

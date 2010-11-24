@@ -21,11 +21,11 @@ import java.util.Hashtable;
 
 import com.paxxis.chime.client.common.DataInstanceEvent;
 import com.paxxis.chime.client.common.MessageConstants;
-import com.paxxis.chime.common.JavaObjectPayload;
-import com.paxxis.chime.common.MessagePayload;
-import com.paxxis.chime.service.ErrorProcessor;
-import com.paxxis.chime.service.MessageProcessor;
-import com.paxxis.chime.service.ServiceBusMessageHandler;
+import com.paxxis.cornerstone.common.JavaObjectPayload;
+import com.paxxis.cornerstone.common.MessagePayload;
+import com.paxxis.cornerstone.service.ErrorProcessor;
+import com.paxxis.cornerstone.service.MessageProcessor;
+import com.paxxis.cornerstone.service.ServiceBusMessageHandler;
 
 /**
  * 

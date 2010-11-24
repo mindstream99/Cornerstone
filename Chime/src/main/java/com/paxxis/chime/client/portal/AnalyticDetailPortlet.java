@@ -33,7 +33,6 @@ import com.paxxis.chime.client.ServiceResponseObject;
 import com.paxxis.chime.client.common.DataField;
 import com.paxxis.chime.client.common.DataFieldValue;
 import com.paxxis.chime.client.common.DataInstance;
-import com.paxxis.chime.client.common.ErrorMessage;
 import com.paxxis.chime.client.common.RunCALScriptRequest;
 import com.paxxis.chime.client.common.RunCALScriptResponse;
 import com.paxxis.chime.client.common.Shape;
@@ -45,6 +44,7 @@ import com.paxxis.chime.client.editor.CALScriptEditor;
 import com.paxxis.chime.client.editor.CALScriptEditor.TextEditorListener;
 import com.paxxis.chime.client.widgets.AnalyticDetailPanel;
 import com.paxxis.chime.client.widgets.ChimeMessageBox;
+import com.paxxis.cornerstone.base.ErrorMessage;
 
 /**
  *

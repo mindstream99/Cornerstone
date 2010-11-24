@@ -5,11 +5,12 @@
 
 package com.paxxis.chime.notification;
 
-import com.paxxis.chime.client.common.InstanceId;
-import com.paxxis.chime.database.DatabaseConnection;
-import com.paxxis.chime.database.StringData;
-import com.paxxis.chime.service.ChimeConfiguration;
 import com.paxxis.chime.service.Tools;
+import com.paxxis.cornerstone.base.InstanceId;
+import com.paxxis.cornerstone.database.DatabaseConnection;
+import com.paxxis.cornerstone.database.StringData;
+import com.paxxis.cornerstone.service.CornerstoneConfiguration;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
@@ -57,9 +58,9 @@ public abstract class MessageNotifier implements Runnable {
     }
 
     /** the chime config that contains email notification properties */
-    private ChimeConfiguration config;
+    private CornerstoneConfiguration config;
 
-    protected MessageNotifier(ChimeConfiguration config) {
+    protected MessageNotifier(CornerstoneConfiguration config) {
         this.config = config;
     }
 

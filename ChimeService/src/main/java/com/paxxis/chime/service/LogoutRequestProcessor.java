@@ -18,16 +18,16 @@
 package com.paxxis.chime.service;
 
 import com.paxxis.chime.data.CacheManager;
-import com.paxxis.chime.client.common.ErrorMessage;
 import com.paxxis.chime.client.common.LogoutRequest;
 import com.paxxis.chime.client.common.LogoutResponse;
-import com.paxxis.chime.client.common.Message;
 import com.paxxis.chime.client.common.User;
-import com.paxxis.chime.database.DatabaseConnection;
-import com.paxxis.chime.database.DatabaseConnectionPool;
-import com.paxxis.chime.service.MessageProcessor;
 import com.mysql.jdbc.CommunicationsException;
-import com.paxxis.chime.common.MessagePayload;
+import com.paxxis.cornerstone.base.ErrorMessage;
+import com.paxxis.cornerstone.base.Message;
+import com.paxxis.cornerstone.common.MessagePayload;
+import com.paxxis.cornerstone.database.DatabaseConnection;
+import com.paxxis.cornerstone.database.DatabaseConnectionPool;
+import com.paxxis.cornerstone.service.MessageProcessor;
 
 /**
  *

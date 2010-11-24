@@ -25,14 +25,15 @@ import com.paxxis.chime.client.common.DataInstanceRequest.Operator;
 import com.paxxis.chime.client.common.DataInstanceRequest.SortOrder;
 import com.paxxis.chime.client.common.Shape;
 import com.paxxis.chime.client.common.FieldData;
-import com.paxxis.chime.client.common.InstanceId;
 import com.paxxis.chime.client.common.Parameter;
 import com.paxxis.chime.client.common.Scope;
 import com.paxxis.chime.client.common.SearchCriteria;
 import com.paxxis.chime.client.common.SearchFilter;
 import com.paxxis.chime.client.common.User;
-import com.paxxis.chime.database.DatabaseConnection;
 import com.paxxis.chime.service.InstancesResponse;
+import com.paxxis.cornerstone.base.InstanceId;
+import com.paxxis.cornerstone.database.DatabaseConnection;
+
 import java.util.ArrayList;
 import java.util.List;
 

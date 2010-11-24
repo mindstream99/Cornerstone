@@ -18,9 +18,9 @@
 package com.paxxis.chime.client;
 
 import com.paxxis.chime.client.common.ApplyReviewResponse;
-import com.paxxis.chime.common.MessagePayload;
-import com.paxxis.chime.service.ResponseListener;
-import com.paxxis.chime.service.ResponseProcessor;
+import com.paxxis.cornerstone.common.MessagePayload;
+import com.paxxis.cornerstone.service.ResponseListener;
+import com.paxxis.cornerstone.service.ResponseProcessor;
 
 /**
  * 

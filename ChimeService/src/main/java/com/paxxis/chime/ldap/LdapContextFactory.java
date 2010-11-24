@@ -29,12 +29,12 @@ import javax.naming.directory.SearchResult;
 
 import com.paxxis.chime.client.common.Shape;
 import com.paxxis.chime.client.common.User;
-import com.paxxis.chime.service.ChimeConfigurable;
+import com.paxxis.cornerstone.service.CornerstoneConfigurable;
 /**
 *
 * @author Robert Englander
 */
-public class LdapContextFactory extends ChimeConfigurable {
+public class LdapContextFactory extends CornerstoneConfigurable {
 
 	private String contextFactory = null;
 	private String url = null;

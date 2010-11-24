@@ -37,7 +37,6 @@ import org.apache.lucene.search.TopFieldDocs;
 import org.apache.lucene.store.RAMDirectory;
 
 import com.paxxis.chime.client.common.Community;
-import com.paxxis.chime.client.common.Cursor;
 import com.paxxis.chime.client.common.DataField;
 import com.paxxis.chime.client.common.DataInstance;
 import com.paxxis.chime.client.common.DataInstance.ReviewAction;
@@ -45,22 +44,23 @@ import com.paxxis.chime.client.common.DataInstance.TagAction;
 import com.paxxis.chime.client.common.DataInstanceRequest.ClauseOperator;
 import com.paxxis.chime.client.common.DataInstanceRequest.Operator;
 import com.paxxis.chime.client.common.DataInstanceRequest.SortOrder;
-import com.paxxis.chime.client.common.InstanceId;
 import com.paxxis.chime.client.common.Parameter;
 import com.paxxis.chime.client.common.Shape;
 import com.paxxis.chime.client.common.User;
 import com.paxxis.chime.client.common.constants.SearchFieldConstants;
 import com.paxxis.chime.client.common.extension.ChimeExtension;
 import com.paxxis.chime.client.common.extension.MemoryIndexer;
-import com.paxxis.chime.database.DataSet;
-import com.paxxis.chime.database.DatabaseConnection;
-import com.paxxis.chime.database.StringData;
 import com.paxxis.chime.extension.ChimeExtensionManager;
 import com.paxxis.chime.extension.ChimeMemoryIndexer;
 import com.paxxis.chime.indexing.ChimeAnalyzer;
 import com.paxxis.chime.indexing.Indexer;
 import com.paxxis.chime.service.InstancesResponse;
 import com.paxxis.chime.service.Tools;
+import com.paxxis.cornerstone.base.Cursor;
+import com.paxxis.cornerstone.base.InstanceId;
+import com.paxxis.cornerstone.database.DataSet;
+import com.paxxis.cornerstone.database.DatabaseConnection;
+import com.paxxis.cornerstone.database.StringData;
 
 /**
  *

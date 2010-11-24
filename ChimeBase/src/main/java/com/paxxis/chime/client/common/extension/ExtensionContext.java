@@ -20,10 +20,11 @@ package com.paxxis.chime.client.common.extension;
 import com.paxxis.chime.client.common.Community;
 import com.paxxis.chime.client.common.DataInstance;
 import com.paxxis.chime.client.common.DataInstanceRequest;
-import com.paxxis.chime.client.common.InstanceId;
-import com.paxxis.chime.client.common.Message;
 import com.paxxis.chime.client.common.Shape;
 import com.paxxis.chime.client.common.User;
+import com.paxxis.cornerstone.base.InstanceId;
+import com.paxxis.cornerstone.base.Message;
+
 import java.util.List;
 
 /**

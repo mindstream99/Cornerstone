@@ -1,7 +1,7 @@
 
 package com.paxxis.chime.notification;
 
-import com.paxxis.chime.client.common.InstanceId;
+import com.paxxis.cornerstone.base.InstanceId;
 
 /**
  *

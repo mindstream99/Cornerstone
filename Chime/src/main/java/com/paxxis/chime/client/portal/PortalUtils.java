@@ -29,7 +29,6 @@ import com.google.gwt.user.client.Timer;
 import com.paxxis.chime.client.InstanceUpdateListener;
 import com.paxxis.chime.client.ServiceManager;
 import com.paxxis.chime.client.common.DataInstance;
-import com.paxxis.chime.client.common.InstanceId;
 import com.paxxis.chime.client.common.NamedSearch;
 import com.paxxis.chime.client.common.SearchCriteria;
 import com.paxxis.chime.client.common.Shape;
@@ -39,6 +38,7 @@ import com.paxxis.chime.client.common.portal.PortalTemplate;
 import com.paxxis.chime.client.common.portal.PortletSpecification;
 import com.paxxis.chime.client.common.portal.PortletSpecification.PortletType;
 import com.paxxis.chime.client.portal.PortletContainer.HeaderType;
+import com.paxxis.cornerstone.base.InstanceId;
 
 
 

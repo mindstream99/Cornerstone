@@ -21,6 +21,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import com.paxxis.cornerstone.base.InstanceId;
+
 /**
  *
  * @author Robert Englander

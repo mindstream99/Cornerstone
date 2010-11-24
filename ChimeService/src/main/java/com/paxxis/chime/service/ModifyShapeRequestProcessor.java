@@ -22,17 +22,20 @@ import org.apache.log4j.Logger;
 import com.mysql.jdbc.CommunicationsException;
 import com.paxxis.chime.client.common.DataInstance;
 import com.paxxis.chime.client.common.DataInstanceEvent;
-import com.paxxis.chime.client.common.ErrorMessage;
-import com.paxxis.chime.client.common.Message;
 import com.paxxis.chime.client.common.ModifyShapeRequest;
 import com.paxxis.chime.client.common.ModifyShapeResponse;
 import com.paxxis.chime.client.common.Shape;
 import com.paxxis.chime.client.common.DataInstanceEvent.EventType;
-import com.paxxis.chime.common.MessagePayload;
 import com.paxxis.chime.data.DataInstanceUtils;
 import com.paxxis.chime.data.ShapeUtils;
-import com.paxxis.chime.database.DatabaseConnection;
-import com.paxxis.chime.database.DatabaseConnectionPool;
+import com.paxxis.cornerstone.base.ErrorMessage;
+import com.paxxis.cornerstone.base.Message;
+import com.paxxis.cornerstone.common.MessagePayload;
+import com.paxxis.cornerstone.database.DatabaseConnection;
+import com.paxxis.cornerstone.database.DatabaseConnectionPool;
+import com.paxxis.cornerstone.service.MessageProcessor;
+import com.paxxis.cornerstone.service.NotificationTopicSender;
+import com.paxxis.cornerstone.service.ServiceBusMessageProducer;
 
 /**
  * 

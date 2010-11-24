@@ -22,7 +22,6 @@ import com.google.gwt.user.client.DeferredCommand;
 import com.google.gwt.user.client.Timer;
 import com.paxxis.chime.client.common.DataInstance;
 import com.paxxis.chime.client.common.DataInstanceEvent;
-import com.paxxis.chime.client.common.Message;
 import com.paxxis.chime.client.common.PingRequest;
 import com.paxxis.chime.client.common.PingResponse;
 import com.paxxis.chime.client.common.User;
@@ -30,6 +29,7 @@ import com.paxxis.chime.client.pages.PageManager;
 import com.paxxis.chime.client.pages.PortalViewPage;
 import com.paxxis.chime.client.widgets.SessionTimeoutPendingWindow;
 import com.paxxis.chime.client.widgets.SessionTimeoutPendingWindow.TimeoutPendingListener;
+import com.paxxis.cornerstone.base.Message;
 
 import de.novanic.eventservice.client.event.Event;
 import de.novanic.eventservice.client.event.RemoteEventService;

@@ -44,7 +44,6 @@ import com.paxxis.chime.client.common.LockResponse;
 import com.paxxis.chime.client.common.ModifyShapeRequest;
 import com.paxxis.chime.client.common.ModifyShapeResponse;
 import com.paxxis.chime.client.common.MultiRequest;
-import com.paxxis.chime.client.common.MultiResponse;
 import com.paxxis.chime.client.common.PingRequest;
 import com.paxxis.chime.client.common.PingResponse;
 import com.paxxis.chime.client.common.ReviewsRequest;
@@ -56,6 +55,7 @@ import com.paxxis.chime.client.common.SubscribeResponse;
 import com.paxxis.chime.client.common.User;
 import com.paxxis.chime.client.common.UserMessagesRequest;
 import com.paxxis.chime.client.common.UserMessagesResponse;
+import com.paxxis.cornerstone.base.MultiResponse;
 
 /**
  *

@@ -19,14 +19,15 @@ package com.paxxis.chime.service;
 
 import com.paxxis.chime.client.common.DataInstance;
 import com.paxxis.chime.client.common.DataInstanceHelper;
-import com.paxxis.chime.client.common.RequestMessage; 
 import com.paxxis.chime.client.common.portal.PortalColumn;
 import com.paxxis.chime.client.common.portal.PortalTemplate;
 import com.paxxis.chime.client.common.portal.PortletSpecification;
 import com.paxxis.chime.client.common.portal.PortletSpecification.PortletType;
-import com.paxxis.chime.json.JSONArray;
-import com.paxxis.chime.json.JSONObject;
-import com.paxxis.chime.json.parser.JSONParser;
+import com.paxxis.cornerstone.base.RequestMessage;
+import com.paxxis.cornerstone.json.JSONArray;
+import com.paxxis.cornerstone.json.JSONObject;
+import com.paxxis.cornerstone.json.parser.JSONParser;
+
 import java.util.List;
 import java.util.Set;
 

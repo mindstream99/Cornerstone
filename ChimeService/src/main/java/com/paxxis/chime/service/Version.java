@@ -17,7 +17,7 @@
 
 package com.paxxis.chime.service;
 
-import com.paxxis.chime.service.ServiceVersion;
+import com.paxxis.cornerstone.service.ServiceVersion;
 
 /**
  *

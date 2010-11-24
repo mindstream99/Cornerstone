@@ -27,11 +27,15 @@ import com.mysql.jdbc.CommunicationsException;
 import com.paxxis.chime.client.common.EditShapeRequest;
 import com.paxxis.chime.client.common.EditShapeResponse;
 import com.paxxis.chime.client.common.Shape;
-import com.paxxis.chime.database.DatabaseConnection;
-import com.paxxis.chime.database.DatabaseConnectionPool;
-import com.paxxis.chime.client.common.ErrorMessage;
-import com.paxxis.chime.client.common.Message;
-import com.paxxis.chime.common.MessagePayload;
+import com.paxxis.cornerstone.base.ErrorMessage;
+import com.paxxis.cornerstone.base.Message;
+import com.paxxis.cornerstone.common.MessagePayload;
+import com.paxxis.cornerstone.database.DatabaseConnection;
+import com.paxxis.cornerstone.database.DatabaseConnectionPool;
+import com.paxxis.cornerstone.service.MessageProcessor;
+import com.paxxis.cornerstone.service.NotificationTopicSender;
+import com.paxxis.cornerstone.service.ServiceBusMessageProducer;
+
 import java.util.List;
 import org.apache.log4j.Logger;
 

@@ -17,6 +17,8 @@
 
 package com.paxxis.chime.client.common;
 
+import com.paxxis.cornerstone.base.MessagingConstants;
+
 /**
  *
  * @author Robert Englander

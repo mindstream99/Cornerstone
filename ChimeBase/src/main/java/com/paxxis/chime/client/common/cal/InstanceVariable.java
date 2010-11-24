@@ -25,8 +25,8 @@ import java.util.List;
 import com.paxxis.chime.client.common.DataField;
 import com.paxxis.chime.client.common.DataFieldValue;
 import com.paxxis.chime.client.common.DataInstance;
-import com.paxxis.chime.client.common.InstanceId;
 import com.paxxis.chime.client.common.Shape;
+import com.paxxis.cornerstone.base.InstanceId;
 
 /**
  * A CAL wrapper around a DataInstance

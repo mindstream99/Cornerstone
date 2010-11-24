@@ -20,16 +20,17 @@ package com.paxxis.chime.notification;
 import com.paxxis.chime.client.common.DataField;
 import com.paxxis.chime.client.common.DataFieldValue;
 import com.paxxis.chime.client.common.DataInstance;
-import com.paxxis.chime.client.common.InstanceId;
 import com.paxxis.chime.client.common.Shape;
 import com.paxxis.chime.client.common.User;
-import com.paxxis.chime.database.DataSet;
-import com.paxxis.chime.database.DatabaseConnection;
-import com.paxxis.chime.database.DatabaseConnectionPool;
 import com.paxxis.chime.data.CommunityUtils;
 import com.paxxis.chime.data.DataInstanceUtils;
 import com.paxxis.chime.data.UserUtils;
-import com.paxxis.chime.service.ChimeConfiguration;
+import com.paxxis.cornerstone.base.InstanceId;
+import com.paxxis.cornerstone.database.DataSet;
+import com.paxxis.cornerstone.database.DatabaseConnection;
+import com.paxxis.cornerstone.database.DatabaseConnectionPool;
+import com.paxxis.cornerstone.service.CornerstoneConfiguration;
+
 import java.util.ArrayList;
 import java.util.List;
 import org.apache.log4j.Logger;
@@ -43,9 +44,9 @@ class JournalNotificationProcessor extends MessageNotifier {
     private static final Logger _logger = Logger.getLogger(JournalNotificationProcessor.class);
 
     private DatabaseConnectionPool dbPool;
-    private ChimeConfiguration config;
+    private CornerstoneConfiguration config;
 
-    JournalNotificationProcessor(DatabaseConnectionPool pool, ChimeConfiguration cfg) {
+    JournalNotificationProcessor(DatabaseConnectionPool pool, CornerstoneConfiguration cfg) {
         super(cfg);
         dbPool = pool;
         config = cfg; 

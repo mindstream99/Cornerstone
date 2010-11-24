@@ -17,7 +17,6 @@
 
 package com.paxxis.chime.notification;
 
-import com.paxxis.chime.client.common.Cursor;
 import com.paxxis.chime.client.common.DataField;
 import com.paxxis.chime.client.common.DataInstance;
 import com.paxxis.chime.client.common.DataInstanceRequest;
@@ -30,13 +29,15 @@ import com.paxxis.chime.client.common.SearchCriteria;
 import com.paxxis.chime.client.common.SearchFilter;
 import com.paxxis.chime.client.common.Shape;
 import com.paxxis.chime.client.common.User;
-import com.paxxis.chime.database.DatabaseConnection;
-import com.paxxis.chime.database.DatabaseConnectionPool;
 import com.paxxis.chime.data.DataInstanceUtils;
 import com.paxxis.chime.service.InstancesResponse;
 import com.paxxis.chime.data.ShapeUtils;
 import com.paxxis.chime.indexing.Indexer;
 import com.paxxis.chime.data.SearchUtils;
+import com.paxxis.cornerstone.base.Cursor;
+import com.paxxis.cornerstone.database.DatabaseConnection;
+import com.paxxis.cornerstone.database.DatabaseConnectionPool;
+
 import java.util.List;
 import org.apache.log4j.Logger;
 

@@ -36,12 +36,12 @@ import com.extjs.gxt.ui.client.widget.layout.RowLayout;
 import com.extjs.gxt.ui.client.widget.layout.TableData;
 import com.extjs.gxt.ui.client.widget.layout.TableRowLayout;
 import com.paxxis.chime.client.Utils;
-import com.paxxis.chime.client.common.InstanceId;
 import com.paxxis.chime.client.common.portal.PortletSpecification;
 import com.paxxis.chime.client.widgets.ChimeLayoutContainer;
 import com.paxxis.chime.client.widgets.ChimeTabItem;
 import com.paxxis.chime.client.widgets.ChimeTabPanel;
 import com.paxxis.chime.client.widgets.InterceptedHtml;
+import com.paxxis.cornerstone.base.InstanceId;
 
 /**
  *

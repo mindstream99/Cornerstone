@@ -29,15 +29,16 @@ import com.paxxis.chime.client.common.DataInstanceRequest.SortOrder;
 import com.paxxis.chime.client.common.Shape;
 import com.paxxis.chime.client.common.EditDataInstanceRequest.Operation;
 import com.paxxis.chime.client.common.EditNamedSearchRequest;
-import com.paxxis.chime.client.common.InstanceId;
 import com.paxxis.chime.client.common.NamedSearch;
-import com.paxxis.chime.client.common.RequestMessage;
 import com.paxxis.chime.client.common.SearchCriteria;
 import com.paxxis.chime.client.common.SearchFilter;
-import com.paxxis.chime.database.DatabaseConnection;
-import com.paxxis.chime.json.JSONArray;
-import com.paxxis.chime.json.JSONObject;
-import com.paxxis.chime.json.parser.JSONParser;
+import com.paxxis.cornerstone.base.InstanceId;
+import com.paxxis.cornerstone.base.RequestMessage;
+import com.paxxis.cornerstone.database.DatabaseConnection;
+import com.paxxis.cornerstone.json.JSONArray;
+import com.paxxis.cornerstone.json.JSONObject;
+import com.paxxis.cornerstone.json.parser.JSONParser;
+
 import java.io.Serializable;
 import java.util.List;
 

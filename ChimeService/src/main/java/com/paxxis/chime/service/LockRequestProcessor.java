@@ -21,19 +21,20 @@ import com.paxxis.chime.data.DataInstanceUtils;
 import com.paxxis.chime.client.common.DataInstance;
 import com.paxxis.chime.client.common.DataInstanceEvent;
 import com.paxxis.chime.client.common.DataInstanceEvent.EventType;
-import com.paxxis.chime.client.common.ErrorMessage;
 import com.paxxis.chime.client.common.LockRequest;
 import com.paxxis.chime.client.common.LockResponse;
-import com.paxxis.chime.client.common.Message;
 import com.paxxis.chime.client.common.User;
-import com.paxxis.chime.database.DatabaseConnection;
-import com.paxxis.chime.database.DatabaseConnectionPool;
-import com.paxxis.chime.service.MessageProcessor;
-import com.paxxis.chime.service.NotificationTopicSender;
 import com.mysql.jdbc.CommunicationsException;
-import com.paxxis.chime.common.MessagePayload;
-import com.paxxis.chime.service.ServiceBusMessageProducer;
 import com.paxxis.chime.data.LockUtils;
+import com.paxxis.cornerstone.base.ErrorMessage;
+import com.paxxis.cornerstone.base.Message;
+import com.paxxis.cornerstone.common.MessagePayload;
+import com.paxxis.cornerstone.database.DatabaseConnection;
+import com.paxxis.cornerstone.database.DatabaseConnectionPool;
+import com.paxxis.cornerstone.service.MessageProcessor;
+import com.paxxis.cornerstone.service.NotificationTopicSender;
+import com.paxxis.cornerstone.service.ServiceBusMessageProducer;
+
 import org.apache.log4j.Logger;
 
 /**

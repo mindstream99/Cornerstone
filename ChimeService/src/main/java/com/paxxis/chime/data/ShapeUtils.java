@@ -26,17 +26,17 @@ import com.paxxis.chime.client.common.DataInstance;
 import com.paxxis.chime.client.common.DataSocialContext;
 import com.paxxis.chime.client.common.FieldData;
 import com.paxxis.chime.client.common.FieldDefinition;
-import com.paxxis.chime.client.common.InstanceId;
 import com.paxxis.chime.client.common.Scope;
 import com.paxxis.chime.client.common.Shape;
 import com.paxxis.chime.client.common.ShapeTagContext;
 import com.paxxis.chime.client.common.Tag;
 import com.paxxis.chime.client.common.User;
-import com.paxxis.chime.database.DataSet;
-import com.paxxis.chime.database.DatabaseConnection;
-import com.paxxis.chime.database.IDataValue;
-import com.paxxis.chime.database.StringData;
 import com.paxxis.chime.service.Tools;
+import com.paxxis.cornerstone.base.InstanceId;
+import com.paxxis.cornerstone.database.DataSet;
+import com.paxxis.cornerstone.database.DatabaseConnection;
+import com.paxxis.cornerstone.database.IDataValue;
+import com.paxxis.cornerstone.database.StringData;
 
  
 /** 

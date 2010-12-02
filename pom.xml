@@ -3,18 +3,14 @@
 
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.paxxis</groupId>
-  <artifactId>ChimeAll</artifactId>
+  <artifactId>CornerstoneAll</artifactId>
   <packaging>pom</packaging>
   <version>1.0-SNAPSHOT</version>
-  <name>Chime All</name>
+  <name>Cornerstone All</name>
  
   <modules>
     <module>CornerstoneBase</module>
     <module>CornerstoneCommon</module>
-    <module>ChimeBase</module>
-    <module>ChimeService</module>
-    <module>ChimeServiceClient</module>
-    <module>Chime</module>
   </modules>
 
 </project>

@@ -78,19 +78,22 @@ public abstract class SimpleServiceBusMessageHandler extends CornerstoneConfigur
     }
 
     private SimpleMessageProcessor buildProcessor(Message msg) {
-        int type = -1;
-        int version = -1;
-        int payloadType = -1;
-        try {
-            type = msg.getIntProperty(MessagingConstants.HeaderConstant.MessageType.name());
-            version = msg.getIntProperty(MessagingConstants.HeaderConstant.MessageVersion.name());
-            payloadType = msg.getIntProperty(MessagingConstants.HeaderConstant.PayloadType.name());
-        }
-        catch (JMSException ex)
-        {}
+        int type = getMessageIntProperty(msg, MessagingConstants.HeaderConstant.MessageType.name());
+        int version = getMessageIntProperty(msg, MessagingConstants.HeaderConstant.MessageVersion.name());
+        int payloadType = getMessageIntProperty(msg, MessagingConstants.HeaderConstant.PayloadType.name());
 
         SimpleMessageProcessor processor = getProcessor(type, version, payloadType);
         return processor;
+    }
+    
+    private int getMessageIntProperty(Message message, String propertyName) {
+        int propertyValue = -1;
+        try {
+            propertyValue = message.getIntProperty(propertyName);
+        } catch (JMSException ex) {
+            LOGGER.error("Invalid or missing integer property " + propertyName, ex);
+        }
+        return propertyValue;
     }
 
     /**

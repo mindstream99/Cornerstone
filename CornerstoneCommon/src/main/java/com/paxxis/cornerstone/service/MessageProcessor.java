@@ -18,17 +18,24 @@
 package com.paxxis.cornerstone.service;
 
 import com.paxxis.cornerstone.base.MessagingConstants;
+
 import com.paxxis.cornerstone.common.MessagePayload;
 
 import javax.jms.Message;
 import javax.jms.MessageProducer;
 import javax.jms.TemporaryQueue;
 
+import org.apache.log4j.Logger;
+
+
+
 /**
  *
  * @author Robert Englander
  */
 public abstract class MessageProcessor extends SimpleMessageProcessor {
+    private static final Logger logger = Logger.getLogger(MessageProcessor.class);
+    
     public MessageProcessor(MessagePayload type) {
         super(type);
     }
@@ -63,7 +70,7 @@ public abstract class MessageProcessor extends SimpleMessageProcessor {
                 message.acknowledge();
             }
         } catch (Exception e) {
-            // throw exception?
+            logger.error(e);
         }
     }
 }

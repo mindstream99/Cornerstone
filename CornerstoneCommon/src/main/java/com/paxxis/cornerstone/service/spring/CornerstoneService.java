@@ -18,23 +18,24 @@
 
 package com.paxxis.cornerstone.service.spring;
 
-import com.paxxis.cornerstone.service.IManagedBean;
-import com.paxxis.cornerstone.service.IServiceBusManager;
-import com.paxxis.cornerstone.service.IServiceController;
-import com.paxxis.cornerstone.service.LogManager;
-import com.paxxis.cornerstone.service.ServiceVersion;
-
 import java.util.ArrayList;
+
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.xml.XmlBeanDefinitionReader;
 import org.springframework.context.support.GenericApplicationContext;
 import org.springframework.core.io.FileSystemResource;
 
+import com.paxxis.cornerstone.service.CornerstoneConfigurable;
+import com.paxxis.cornerstone.service.IServiceBusManager;
+import com.paxxis.cornerstone.service.IServiceController;
+import com.paxxis.cornerstone.service.LogManager;
+import com.paxxis.cornerstone.service.ServiceVersion;
+
 /**
  *
  * @author Robert Englander
  */
-public final class CornerstoneService implements IServiceController, IManagedBean {
+public class CornerstoneService extends CornerstoneConfigurable implements IServiceController {
     private static final Logger _logger = Logger.getLogger(CornerstoneService.class);
 
     // the service display name

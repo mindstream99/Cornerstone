@@ -19,6 +19,8 @@
 package com.paxxis.cornerstone.database;
 
 import com.paxxis.cornerstone.common.DataLatch;
+import com.paxxis.cornerstone.common.HashUtils;
+import com.paxxis.cornerstone.database.DatabaseConnection.Type;
 import com.paxxis.cornerstone.service.CornerstoneConfigurable;
 
 import java.util.ArrayList;
@@ -29,20 +31,26 @@ import java.util.HashMap;
  *    
  * @author Robert Englander
  */ 
-public class DatabaseConnectionPool extends CornerstoneConfigurable
-{
+public class DatabaseConnectionPool extends CornerstoneConfigurable {
+	private static final String DERBY = "derby";
+	private static final String MYSQL = "mysql";
+	private static final String ORACLE = "oracle";
     private static final long ONEMINUTE = 60000L;
     private static final long DEFAULTIDLETHRESHOLD = 5L * ONEMINUTE;
     private static final long DEFAULTSWEEPCYCLE = ONEMINUTE;
     
     // the database parameters
-    String _dbHostname = null;
-    String _dbUsername = null;
-    String _dbPassword = null;
-    String _dbName = null;
-    String _dbDriver = null;
-    String _dbUrlPrefix = null;
-
+    private String dbType = null;
+    private String dbSid = null;
+    private String _dbHostname = null;
+    private String _dbUsername = null;
+    private String _dbPassword = null;
+    private String _dbName = null;
+    private String _dbDriver = null;
+    private String _dbUrlPrefix = null;
+    private String timestampFormat = null;
+    private String catalog = "Chime";
+    
     // the maximum number of instances in the pool
     private int _maximum = 1;
     
@@ -274,18 +282,50 @@ public class DatabaseConnectionPool extends CornerstoneConfigurable
         _sweeper.start();
     }
     
+    public void setCatalog(String cat) {
+    	catalog = cat;
+    }
+
+    public String getCatalog() {
+    	return catalog;
+    }
+    
+    public boolean isDerby() {
+    	return DERBY.equalsIgnoreCase(dbType);
+    }
+    
+    public boolean isMySQL() {
+    	return MYSQL.equalsIgnoreCase(dbType);
+    }
+    
+    public boolean isOracle() {
+    	return ORACLE.equalsIgnoreCase(dbType);
+    }
+    
     public void connect(DatabaseConnection database)
     {
         try
         {
             database.setDriverName(_dbDriver);
-
-            if (_dbHostname.equals("embedded")) {
+            database.setCatalog(catalog);
+            
+            if (isDerby()) {
                 String url = _dbUrlPrefix + _dbName;
                 database.connect(url, _dbUsername, _dbPassword);
-            } else {
+                database.setDatabaseType(Type.Derby);
+            } else if (isOracle()) {
+                String url = _dbUrlPrefix + _dbUsername + "/" + _dbPassword + "@//" +
+                					_dbHostname + "/" + dbSid;
+                database.connect(url, _dbUsername, _dbPassword);
+                database.setDatabaseType(Type.Oracle);
+                database.executeStatement("alter session set nls_timestamp_format='" + timestampFormat + "'");
+                
+            } else if (isMySQL()){
                 String url = _dbUrlPrefix + "//" + _dbHostname + "/" + _dbName;
                 database.connect(url, _dbUsername, _dbPassword);
+                database.setDatabaseType(Type.MySQL);
+            } else {
+            	throw new RuntimeException("Unsupport Database Type: " + dbType);
             }
         }
         catch (DatabaseException e)
@@ -299,6 +339,30 @@ public class DatabaseConnectionPool extends CornerstoneConfigurable
         DatabaseConnection database = new DatabaseConnection();
         connect(database);
         return database;
+    }
+    
+    public void setTimestampFormat(String fmt) {
+    	timestampFormat = fmt;
+    }
+    
+    public String getTimestampFormat() {
+    	return timestampFormat;
+    }
+    
+    public void setDbType(String type) {
+    	dbType = type;
+    }
+    
+    public String getDbType() {
+    	return dbType;
+    }
+    
+    public void setDbSid(String sid) {
+    	dbSid = sid;
+    }
+    
+    public String getDbSid() {
+    	return dbSid;
     }
     
     public void setDbDriver(String driver)
@@ -357,7 +421,7 @@ public class DatabaseConnectionPool extends CornerstoneConfigurable
      */
     public void setDbPassword(String pw)
     {
-        _dbPassword = pw;
+    	_dbPassword = HashUtils.hashSaltInput(pw, "A1B2C3").substring(0, 10);
     }
     
     public String getDbPassword()

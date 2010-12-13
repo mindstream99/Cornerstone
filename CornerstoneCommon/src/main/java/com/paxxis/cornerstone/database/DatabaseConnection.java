@@ -30,15 +30,47 @@ import java.sql.Statement;
  *
  * @author Robert Englander
  */
-public class DatabaseConnection implements IDatabaseConnection 
-{
-    String dbUrl;
-    String dbUser;
-    boolean driverInitialized = false;
-    String driverName = null;
-    Connection connection;
+public class DatabaseConnection implements IDatabaseConnection {
+	public enum Type {
+		Oracle,
+		MySQL,
+		Derby,
+		Unknown
+	}
+	
+	private Type type = Type.Unknown;
+	private String catalog = "Chime";
+    private String dbUrl;
+    private String dbUser;
+    private boolean driverInitialized = false;
+    private String driverName = null;
+    private Connection connection;
     private int transactionCount;
+
+    public void setCatalog(String cat) {
+    	catalog = cat;
+    }
+
+    public String getCatalog() {
+    	return catalog;
+    }
     
+    public void setDatabaseType(Type type) {
+    	this.type = type;
+    }
+    
+    public boolean isDerby() {
+    	return type == Type.Derby;
+    }
+    
+    public boolean isMySQL() {
+    	return type == Type.MySQL;
+    }
+    
+    public boolean isOracle() {
+    	return type == Type.Oracle;
+    }
+
     public void setDriverName(String name)
     {
         driverName = name;

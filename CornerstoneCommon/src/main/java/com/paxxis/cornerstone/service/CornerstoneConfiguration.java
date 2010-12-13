@@ -30,13 +30,13 @@ import java.util.Map;
 public class CornerstoneConfiguration implements IManagedBean
 {
     // a map of locally defined properties
-    private HashMap _localPropertyMap = new HashMap();
+    private HashMap<String, Object> _localPropertyMap = new HashMap<String, Object>();
     
     private String _dbQuery = null;
     private String _keyColumn = null;
     private String _valueColumn = null;
     
-    private Map _localMap = null;
+    private HashMap<String, Object> _localMap = null;
     
     // indicates if the database should be used (if not only the local
     // map is used)
@@ -55,7 +55,7 @@ public class CornerstoneConfiguration implements IManagedBean
      *
      * @param localMap the parameter map
      */
-    public void setParameters(Map localMap)
+    public void setParameters(HashMap<String, Object> localMap)
     {
         // just keep these until we initialize
         _localMap = localMap;

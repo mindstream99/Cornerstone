@@ -271,18 +271,6 @@ public class ServiceBusConnector extends CornerstoneConfigurable
         return _connectOnStartup;
     }
     
-    public void initialize()
-    {
-    }
-    
-    /**
-     * Tear down the connector.
-     */
-    public void destroy()
-    {
-        disconnect();
-    }
-    
     class Disconnector extends DataLatch implements ShutdownListener
     {
         int _count;

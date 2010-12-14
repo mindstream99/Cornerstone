@@ -18,13 +18,13 @@
 
 package com.paxxis.cornerstone.database;
 
-import com.paxxis.cornerstone.common.DataLatch;
-import com.paxxis.cornerstone.common.HashUtils;
-import com.paxxis.cornerstone.database.DatabaseConnection.Type;
-import com.paxxis.cornerstone.service.CornerstoneConfigurable;
-
 import java.util.ArrayList;
 import java.util.HashMap;
+
+import com.paxxis.cornerstone.common.DataLatch;
+import com.paxxis.cornerstone.common.PasswordGenerator;
+import com.paxxis.cornerstone.database.DatabaseConnection.Type;
+import com.paxxis.cornerstone.service.CornerstoneConfigurable;
 
 /**
  * Manages a pool of DatabaseConnection connections.
@@ -60,6 +60,8 @@ public class DatabaseConnectionPool extends CornerstoneConfigurable {
     private long _idleThreshold = DEFAULTIDLETHRESHOLD;
     
     private long _sweepCycle = DEFAULTSWEEPCYCLE;
+    
+    private PasswordGenerator passwordGenerator = null;
     
     class PoolEntry
     {
@@ -272,6 +274,8 @@ public class DatabaseConnectionPool extends CornerstoneConfigurable {
     @Override
     public void initialize()
     {
+    	_dbPassword = passwordGenerator.encryptPassword(_dbPassword);
+    	
         for (int i = 0; i < _minimum; i++)
         {
             DatabaseConnection database = create();
@@ -280,6 +284,10 @@ public class DatabaseConnectionPool extends CornerstoneConfigurable {
         }
         
         _sweeper.start();
+    }
+    
+    public void setPasswordGenerator(PasswordGenerator generator) {
+    	passwordGenerator = generator;
     }
     
     public void setCatalog(String cat) {
@@ -421,7 +429,7 @@ public class DatabaseConnectionPool extends CornerstoneConfigurable {
      */
     public void setDbPassword(String pw)
     {
-    	_dbPassword = HashUtils.hashSaltInput(pw, "A1B2C3").substring(0, 10);
+    	_dbPassword = pw;
     }
     
     public String getDbPassword()

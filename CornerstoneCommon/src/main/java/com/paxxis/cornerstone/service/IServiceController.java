@@ -28,11 +28,8 @@ public interface IServiceController
     /**
      * Shut down the service.
      *
-     * @return A message indicating the reason that the service can not
-     * be shut down, or a message indicating that a shutdown is being
-     * initiated.
      */
-    public String shutdown();
+    public void shutdown();
     
     /**
      * Determine if the service can currently be shut down.

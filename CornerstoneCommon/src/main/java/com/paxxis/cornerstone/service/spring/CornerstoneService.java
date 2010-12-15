@@ -144,18 +144,11 @@ public class CornerstoneService extends CornerstoneConfigurable implements IServ
     /**
      * Shut down the service.
      *
-     * @return a string indicating that the service is shutting down, or indicating
-     * why it can't shut down.
      */
-    public String shutdown()
-    {
-        if (!canShutdown())
-        {
-            return "Can't shutdown service while service bus connections are active.";
+    public void shutdown() {
+        if (canShutdown()) {
+            System.exit(0);
         }
-        
-        System.exit(0);
-        return "Shutting Down";
     }
 
     public String getVersion()

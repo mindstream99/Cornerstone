@@ -32,6 +32,7 @@ import javax.management.remote.JMXServiceURL;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
+import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.OptionGroup;
 import org.apache.commons.cli.Options;
@@ -50,9 +51,10 @@ import com.paxxis.cornerstone.service.IServiceController;
 public class ServiceShell {
 
 	private CommandLine commandLine = null;
+	private Options options = null;
 	
 	public ServiceShell(String[] args) throws Exception {
-		Options options = initialize(args);
+		options = initialize(args);
 
 		CommandLineParser parser = new PosixParser();
 		commandLine = parser.parse(options, args, false);
@@ -67,6 +69,11 @@ public class ServiceShell {
 	
 	private Options initialize(String[] args) {
 		OptionGroup group = new OptionGroup();
+
+		Option helpOpt = new Option(null, "help", false, "this message");
+		helpOpt.setArgs(2);
+		helpOpt.setValueSeparator(',');
+		group.addOption(helpOpt);
 
 		Option opt = new Option("sh", "shutdown", true, "the service to shut down");
 		opt.setArgs(2);
@@ -84,27 +91,50 @@ public class ServiceShell {
 		return commandLine;
 	}
 	
+	protected Options getOptions() {
+	    return options;
+	}
+	
 	/**
 	 * Sub classes override this method in order to process their specific commands.
 	 */
-	protected void process() throws Exception {
+	protected boolean process() throws Exception {
+	    return false;
 	}
 
 	protected final void execute() throws Exception {
-		processShutdown(commandLine);
-		process();
+		if (processHelp(commandLine) || processShutdown(commandLine) || process()) {
+		    //currently we are assuming once something it is processed it is finished...
+		    return;
+		}
+	    printHelp();
 	}
 	
-	private void processShutdown(CommandLine cmd) throws Exception {
+	private boolean processShutdown(CommandLine cmd) throws Exception {
 		String[] vals = cmd.getOptionValues("sh");
 		if (vals != null) {
 			if (vals.length != 2) {
 				throw new ParseException("Invalid argument for shutdown option");
 			}
 			doShutdown(vals);
+			return true;
 		}
+		return false; 
 	}
 	
+	private boolean processHelp(CommandLine cmd) throws Exception {
+	    if (cmd.hasOption("help")) {
+	        printHelp();
+	        return true;
+	    }
+	    return false;
+	}
+	
+    public void printHelp() {
+        HelpFormatter formatter = new HelpFormatter();
+        formatter.printHelp("java " + this.getClass().getName(), options);
+    }
+    
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public void doShutdown(String[] vals) throws Exception {
 		StringBuilder buf = new StringBuilder("service:jmx:rmi://localhost/jndi/rmi://localhost:");

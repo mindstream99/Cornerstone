@@ -58,11 +58,6 @@ public class ResponseHandler<T extends Message> extends SimpleServiceBusMessageH
     }
 
     protected SimpleMessageProcessor getProcessor(int type, int version, int payloadType) {
-        if (type == MessagingConstants.ERRORMESSAGE &&
-                version == 1) { // TODO need to work on versioning
-            return new ErrorResponseProcessor(getMessagePayloadType(PayloadType.valueOf(payloadType)), _listener);
-        }
-
         // this is an unknown message type.  the subclass doesn't recognize it and neither do I.
         throw new RuntimeException("Unknown response message type: " + type + " version " + version);
     }

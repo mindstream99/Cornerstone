@@ -18,6 +18,8 @@
 package com.paxxis.cornerstone.service;
 
 import com.paxxis.cornerstone.base.MessagingConstants;
+import com.paxxis.cornerstone.base.RequestMessage;
+import com.paxxis.cornerstone.base.ResponseMessage;
 
 import com.paxxis.cornerstone.common.MessagePayload;
 
@@ -33,7 +35,8 @@ import org.apache.log4j.Logger;
  *
  * @author Robert Englander
  */
-public abstract class MessageProcessor extends SimpleMessageProcessor {
+public abstract class MessageProcessor<REQ extends RequestMessage, RESP extends ResponseMessage<REQ>> 
+							extends SimpleMessageProcessor<REQ, RESP> {
     private static final Logger logger = Logger.getLogger(MessageProcessor.class);
     
     public MessageProcessor(MessagePayload type) {
@@ -42,8 +45,8 @@ public abstract class MessageProcessor extends SimpleMessageProcessor {
 
     public void run() {
         try {
-            Message message = getMessage();
-            com.paxxis.cornerstone.base.Message resp = process(false);
+            Message message = getJMSMessage();
+            RESP resp = process(false);
             if (resp != null) {
                 Object response = resp.getAsPayload(getPayloadType().getType());
                 Message responseMsg = getPayloadType().createMessage(getSession(), response);

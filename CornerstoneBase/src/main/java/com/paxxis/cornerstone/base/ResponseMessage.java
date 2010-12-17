@@ -22,19 +22,31 @@ package com.paxxis.cornerstone.base;
  * All Response messages should extend ResponseMessage.
  * @author Robert Englander
  */
-public abstract class ResponseMessage<D extends RequestMessage> extends Message
-{
-	private static final long serialVersionUID = 1L;
+public abstract class ResponseMessage<D extends RequestMessage> extends Message {
+	private static final long serialVersionUID = 2L;
+	
 	// the associated request message
     private D request = null;
 
-    public void setRequest(D request)
-    {
+    private ErrorMessage error = null;
+    
+    public void setRequest(D request) {
         this.request = request;
     }
 
-    public D getRequest()
-    {
+    public D getRequest() {
         return request;
+    }
+
+    public boolean isError() {
+    	return error != null;
+    }
+    
+    public void setError(ErrorMessage em) {
+    	error = em;
+    }
+    
+    public ErrorMessage getError() {
+    	return error;
     }
 }

@@ -22,7 +22,7 @@ package com.paxxis.cornerstone.base;
  *
  * @author Robert Englander
  */
-public class ErrorMessage extends Message {
+public class ErrorMessage extends RequestMessage {
 	private static final long serialVersionUID = 1L;
 
 	public enum Type

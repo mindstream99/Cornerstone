@@ -18,21 +18,20 @@
 
 package com.paxxis.cornerstone.service;
 
+import com.paxxis.cornerstone.base.RequestMessage;
+import com.paxxis.cornerstone.base.ResponseMessage;
 import com.paxxis.cornerstone.common.MessagePayload;
-
-import javax.jms.Session;
-import javax.jms.Message;
 
 /**
  *
  * @author Robert Englander
  */
-public abstract class SimpleMessageProcessor implements Runnable {
+public abstract class SimpleMessageProcessor<REQ extends RequestMessage, RESP extends ResponseMessage<REQ>> implements Runnable {
     // the session to use for sending responses
-    private Session session;
+    private javax.jms.Session session;
 
-    // the request message
-    private Message message;
+    // the JMS request message
+    private javax.jms.Message message;
 
     private MessagePayload payloadType;
 
@@ -52,11 +51,11 @@ public abstract class SimpleMessageProcessor implements Runnable {
         return clientAck;
     }
     
-    public Session getSession() {
+    public javax.jms.Session getSession() {
         return session;
     }
 
-    public Message getMessage() {
+    public javax.jms.Message getJMSMessage() {
         return message;
     }
 
@@ -64,12 +63,12 @@ public abstract class SimpleMessageProcessor implements Runnable {
         return payloadType;
     }
 
-    public void init(Session session, Message message) {
+    public void init(javax.jms.Session session, javax.jms.Message message) {
         this.session = session;
         this.message = message;
     }
 
-    protected abstract com.paxxis.cornerstone.base.Message process(boolean ignorePreviousChanges) ;
+    protected abstract RESP process(boolean ignorePreviousChanges) ;
 
     protected Object getPayload() {
         if (_payload != null) {
@@ -84,7 +83,7 @@ public abstract class SimpleMessageProcessor implements Runnable {
         }
     }
 
-    public com.paxxis.cornerstone.base.Message execute(Object payload, boolean ignorePreviousChanges) {
+    public RESP execute(Object payload, boolean ignorePreviousChanges) {
         _payload = payload;
         return process(ignorePreviousChanges);
     }

@@ -17,33 +17,30 @@
 
 package com.paxxis.cornerstone.service;
 
-import com.paxxis.cornerstone.base.ErrorMessage;
-import com.paxxis.cornerstone.base.Message;
+import com.paxxis.cornerstone.base.RequestMessage;
+import com.paxxis.cornerstone.base.ResponseMessage;
 import com.paxxis.cornerstone.common.MessagePayload;
 
 /**
  *
  * @author Robert Englander
  */
-public abstract class ResponseProcessor<T extends Message> extends SimpleMessageProcessor {
-    private ResponseListener<T> _listener;
+public abstract class ResponseProcessor<REQ extends RequestMessage, RESP extends ResponseMessage<REQ>> 
+									extends SimpleMessageProcessor<REQ, RESP> {
+    private ResponseListener<RESP> _listener;
 
-    public ResponseProcessor(MessagePayload type, ResponseListener<T> listener) {
+    public ResponseProcessor(MessagePayload type, ResponseListener<RESP> listener) {
         super(type);
         _listener = listener;
     }
 
-    protected abstract T renderMessage(Object payload);
+    protected abstract RESP renderMessage(Object payload);
 
-    protected Message process(boolean ignorePreviousChanges) {
-        T responseMessage = renderMessage(getPayload());
+    protected RESP process(boolean ignorePreviousChanges) {
+    	RESP responseMessage = renderMessage(getPayload());
 
         if (_listener != null) {
-            if (responseMessage instanceof ErrorMessage) {
-                _listener.onError((ErrorMessage)responseMessage);
-            } else {
-                _listener.onComplete(responseMessage);
-            }
+            _listener.onComplete(responseMessage);
         }
 
         return responseMessage;

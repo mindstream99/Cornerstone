@@ -31,6 +31,8 @@ import javax.jms.Session;
 import javax.jms.TemporaryQueue;
 import javax.naming.Context;
 
+import org.apache.log4j.Logger;
+
 import com.paxxis.cornerstone.common.DataLatch;
 
 /**
@@ -41,7 +43,7 @@ import com.paxxis.cornerstone.common.DataLatch;
  */
 public class ServiceBusConnector extends CornerstoneConfigurable
 {
-    //private static Logger _logger = Logger.getLogger(ServiceBusConnector.class.getName());
+    private static Logger _logger = Logger.getLogger(ServiceBusConnector.class.getName());
 
 	private static final String ACK_AUTO = "auto";
 	private static final String ACK_CLIENT = "client";
@@ -109,7 +111,9 @@ public class ServiceBusConnector extends CornerstoneConfigurable
                     break;
                 }
                 catch (Exception ee)
-                {}
+                {
+                    _logger.error("Unexpected error in JMS reconnector", ee);
+                }
             }
         }
     }
@@ -449,6 +453,8 @@ public class ServiceBusConnector extends CornerstoneConfigurable
     
     protected void onConnectionFailed(Throwable t)
     {
+        _logger.warn("JMS connection failure", t);
+
         // ask all the connector clients to perform their setup steps
         for (IServiceBusConnectorClient client : _connectorClients)
         {

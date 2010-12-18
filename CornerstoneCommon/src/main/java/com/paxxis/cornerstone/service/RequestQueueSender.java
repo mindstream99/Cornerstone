@@ -17,14 +17,9 @@
 
 package com.paxxis.cornerstone.service;
 
-import com.paxxis.cornerstone.base.ErrorMessage;
-import com.paxxis.cornerstone.base.MessagingConstants;
-import com.paxxis.cornerstone.common.DataLatch;
-import com.paxxis.cornerstone.common.JavaObjectPayload;
-import com.paxxis.cornerstone.common.MessagePayload;
-
 import java.io.Serializable;
 import java.util.HashMap;
+
 import javax.jms.DeliveryMode;
 import javax.jms.JMSException;
 import javax.jms.Message;
@@ -35,6 +30,14 @@ import javax.jms.ObjectMessage;
 import javax.jms.Queue;
 import javax.jms.Session;
 import javax.jms.TemporaryQueue;
+
+import com.paxxis.cornerstone.base.ErrorMessage;
+import com.paxxis.cornerstone.base.MessagingConstants;
+import com.paxxis.cornerstone.base.RequestMessage;
+import com.paxxis.cornerstone.base.ResponseMessage;
+import com.paxxis.cornerstone.common.DataLatch;
+import com.paxxis.cornerstone.common.JavaObjectPayload;
+import com.paxxis.cornerstone.common.MessagePayload;
 
 /**
  *
@@ -221,12 +224,20 @@ public class RequestQueueSender extends CornerstoneConfigurable implements IServ
      *
      * @return the response, or null if the response timed out.
      */
-    public synchronized com.paxxis.cornerstone.base.Message send(ServiceBusMessageProducer requester, SimpleServiceBusMessageHandler handler,
-            long timeout, MessagePayload payloadType) {
+    public synchronized <REQ extends RequestMessage, RESP extends ResponseMessage<REQ>> RESP 
+    					send(Class<RESP> clazz, ServiceBusMessageProducer requester, SimpleServiceBusMessageHandler handler,
+    								long timeout, MessagePayload payloadType) {
         if (!connector.isConnected()) {
             ErrorMessage errorMsg = new ErrorMessage();
             errorMsg.setMessage("Unable to send request.  Not connected to service bus.");
-            return errorMsg;
+            RESP resp;
+			try {
+				resp = clazz.newInstance();
+			} catch (Exception e) {
+				throw new RuntimeException(e);
+			}
+            resp.setError(errorMsg);
+            return resp;
         } else {
             try {
                 Message message = prepareMessage(requester, payloadType);
@@ -247,7 +258,7 @@ public class RequestQueueSender extends CornerstoneConfigurable implements IServ
                 }
 
                 mon.getMessageHandler().init(connector.getSession(), connector.getAcknowledgeMode() == Session.CLIENT_ACKNOWLEDGE);
-                return mon.getMessageHandler().processMessage(response);
+                return (RESP)mon.getMessageHandler().processMessage(response);
             } catch (JMSException je) {
                 throw new RuntimeException(je);
             }

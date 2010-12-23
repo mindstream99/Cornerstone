@@ -38,6 +38,10 @@ public class CornerstoneClient {
         this.timeout = timeout;
     }
     
+	public CornerstoneClient(MessagePayload payloadType, RequestQueueSender sender){
+		this(payloadType, sender, 0L);
+    }
+
 	public <REQ extends RequestMessage, RESP extends ResponseMessage<REQ>> RESP 
     						execute(Class<RESP> clazz, REQ request, ResponseHandler<RESP> handler) {
         
@@ -45,5 +49,11 @@ public class CornerstoneClient {
         RESP response = sender.send(clazz, prod, handler, timeout, payloadType);
         return response;
     }
+
+	public <REQ extends RequestMessage, RESP extends ResponseMessage<REQ>> void executeAsync(REQ request,
+			AsyncDataResponseHandler<RESP> listener) {
+		ServiceBusMessageProducer<REQ> prod = new ServiceBusMessageProducer<REQ>(request);
+		sender.send(prod, listener, payloadType);
+	}
 }
 

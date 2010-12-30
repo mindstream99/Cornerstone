@@ -31,19 +31,23 @@ import javax.jms.Queue;
 import javax.jms.Session;
 import javax.jms.TemporaryQueue;
 
+import org.apache.log4j.Logger;
+
 import com.paxxis.cornerstone.base.ErrorMessage;
 import com.paxxis.cornerstone.base.MessagingConstants;
 import com.paxxis.cornerstone.base.RequestMessage;
 import com.paxxis.cornerstone.base.ResponseMessage;
-import com.paxxis.cornerstone.common.DataLatch;
 import com.paxxis.cornerstone.common.JavaObjectPayload;
 import com.paxxis.cornerstone.common.MessagePayload;
+import com.paxxis.cornerstone.common.ResponsePromise;
 
 /**
  *
  * @author Robert Englander
  */
 public class RequestQueueSender extends CornerstoneConfigurable implements IServiceBusConnectorClient {
+    private static final Logger logger = Logger.getLogger(RequestQueueSender.class);
+
     // the temporary queue used for getting responses
     private TemporaryQueue responseQueue = null;
 
@@ -64,21 +68,6 @@ public class RequestQueueSender extends CornerstoneConfigurable implements IServ
 
     // teardown pending flag
     private boolean teardownPending = false;
-
-    class RequestLatch extends DataLatch {
-        private SimpleServiceBusMessageHandler handler;
-
-        public RequestLatch(SimpleServiceBusMessageHandler handler) {
-            this.handler = handler;
-        }
-
-        public SimpleServiceBusMessageHandler getMessageHandler() {
-            return handler;
-        }
-    }
-
-    // mapping of correlation ids to RequestLatch instances
-    private HashMap<Long, RequestLatch> _monitorMap = new HashMap<Long, RequestLatch>();
 
     // mapping of correlation ids to message listeners
     private HashMap<Long, MessageListener> _listenerMap = new HashMap<Long, MessageListener>();
@@ -137,7 +126,6 @@ public class RequestQueueSender extends CornerstoneConfigurable implements IServ
      * @throws RuntimeException if the setup could not be completed
      */
     public void setup() {
-        boolean success = false;
 
         try {
             // lookup the request queue
@@ -157,31 +145,13 @@ public class RequestQueueSender extends CornerstoneConfigurable implements IServ
                         try
                         {
                             long cid = Long.parseLong(msg.getJMSCorrelationID());
-
-                            // if there's a latch for this message in the map
-                            // we just pass the message to it.
-                            DataLatch mon = null;
-                            synchronized (_monitorMap) {
-                                mon = _monitorMap.get(cid);
-                            }
-
-                            if (mon != null) {
-                                synchronized (_monitorMap) {
-                                    // take the monitor out of the map
-                                    _monitorMap.remove(cid);
-                                }
-
-                                //mon.setObject(payload);
-                                mon.setObject(msg);
-                            } else {
-                                MessageListener listener = _listenerMap.get(cid);
-                                if (listener != null) {
-                                    _listenerMap.remove(cid);
-                                    listener.onMessage(msg);
-                                }
+                            MessageListener listener = _listenerMap.remove(cid);
+                            if (listener != null) {
+                                listener.onMessage(msg);
                             }
                         } catch (Exception e) {
                             // this needs to be logged (and reported through mgmt interface?)
+                            logger.error(e);
                         }
                     }
                 }
@@ -218,85 +188,159 @@ public class RequestQueueSender extends CornerstoneConfigurable implements IServ
     /**
      * Send a request message and return the response.
      *
+     * @param clazz the response class
      * @param requester the service requester
+     * @param handler the message handler
      * @param timeout the number of milliseconds to wait for the response.  A timeout of
      * 0 means there is no timeout - i.e. wait forever.
+     * @param payloadType the message payload type
      *
-     * @return the response, or null if the response timed out.
+     * @return the response
+     * @throws a RequestTimeoutException if response timed out
      */
-    public synchronized <REQ extends RequestMessage, RESP extends ResponseMessage<REQ>> RESP 
-    					send(Class<RESP> clazz, ServiceBusMessageProducer requester, SimpleServiceBusMessageHandler handler,
-    								long timeout, MessagePayload payloadType) {
-        if (!connector.isConnected()) {
-            ErrorMessage errorMsg = new ErrorMessage();
-            errorMsg.setMessage("Unable to send request.  Not connected to service bus.");
-            RESP resp;
+    @SuppressWarnings("unchecked")
+    public synchronized <REQ extends RequestMessage, RESP extends ResponseMessage<REQ>> RESP send(
+            Class<RESP> clazz, 
+            ServiceBusMessageProducer<REQ> requester, 
+            final SimpleServiceBusMessageHandler handler,
+			long timeout, 
+			MessagePayload payloadType) {
+
+
+        final ResponsePromise<RESP> promise = new ResponsePromise<RESP>(); 
+        MessageListener listener = new MessageListener() {
+            public void onMessage(Message msg) {
+                handler.init(
+                        connector.getSession(), 
+                        connector.getAcknowledgeMode() == Session.CLIENT_ACKNOWLEDGE);
+                promise.setObject(handler.processMessage(msg));
+            }
+        };
+
+        RESP response = null;
+        ResponsePromise<RESP> p = null;
+        try {
+            p = send(requester, promise, listener, payloadType); 
+        } catch (SendException se) {
 			try {
-				resp = clazz.newInstance();
+				response = clazz.newInstance();
 			} catch (Exception e) {
 				throw new RuntimeException(e);
 			}
-            resp.setError(errorMsg);
-            return resp;
-        } else {
-            try {
-                Message message = prepareMessage(requester, payloadType);
-
-                RequestLatch mon = new RequestLatch(handler);
-
-                synchronized (_monitorMap) {
-                    _monitorMap.put(requester.getCorrelationId(), mon);
-                }
-
-                // send the message to the service request queue
-                requestSender.send(message);
-
-                // wait for the response
-                Message response = (Message)mon.waitForObject(timeout);
-                if (response == null) {
-                    throw new RequestTimeoutException();
-                }
-
-                mon.getMessageHandler().init(connector.getSession(), connector.getAcknowledgeMode() == Session.CLIENT_ACKNOWLEDGE);
-                return (RESP)mon.getMessageHandler().processMessage(response);
-            } catch (JMSException je) {
-                throw new RuntimeException(je);
-            }
+            response.setError(se.getErrorMessage());
+            return response;
         }
+
+        response = (RESP) p.waitForObject(timeout);
+        if (response == null) {
+            throw new RequestTimeoutException();
+        }
+        return response;
     }
 
     /**
-     * Send a request message and return without waiting for a response.
+     * Send a request message and return without waiting for a response but
+     * with a promise for one
      *
      * @param requester the service requester
+     * @param payloadType the message payload type
+     *
+     * @return a response promise
      */
-    public synchronized void send(ServiceBusMessageProducer requester, MessagePayload payloadType) {
-        send(requester, null, payloadType);
+    public synchronized <RESP> ResponsePromise<RESP> send(
+            ServiceBusMessageProducer<?> requester, 
+            MessagePayload payloadType) {
+        return send(requester, null, null, payloadType);
+    }
+
+
+    /**
+     * Send a request message and return without waiting for a response but
+     * with a promise for one
+     *
+     * @param requester the service requester
+     * @param promise the response promise to populate
+     * @param payloadType the message payload type
+     *
+     * @return a response promise
+     */
+    public synchronized <RESP> ResponsePromise<RESP> send(
+            ServiceBusMessageProducer<?> requester, 
+            final ResponsePromise<RESP> promise, 
+            final MessagePayload payloadType) {
+        return send(requester, promise, null, payloadType);
     }
 
     /**
-     * Send a request message and return without waiting for a response.
+     * Send a request message and return without waiting for a response but
+     * with a promise for one
      *
      * @param requester the service requester
-     * @param listener the listener for a response to this request
+     * @param promise the response promise to populate
+     * @param listener the message listener to invoke on receiving a response
+     * but before populating the promise
+     * @param payloadType the message payload type
+     *
+     * @return a response promise
      */
-    public synchronized void send(ServiceBusMessageProducer requester, MessageListener listener, MessagePayload payloadType) {
+    public synchronized <RESP> ResponsePromise<RESP> send(
+            ServiceBusMessageProducer<?> requester, 
+            final ResponsePromise<RESP> promise, 
+            final MessageListener listener,
+            final MessagePayload payloadType) {
+
         if (!connector.isConnected()) {
             ErrorMessage errorMsg = new ErrorMessage();
             errorMsg.setMessage("Unable to send request.  Not connected to service bus.");
             throw new SendException(errorMsg);
-        } else {
-            try {
-                com.paxxis.cornerstone.base.Message msg = requester.getMessage();
-                Message message = prepareMessage(requester, payloadType);
-                _listenerMap.put(requester.getCorrelationId(), listener);
-                requestSender.send(message);
-            } catch (JMSException je) {
-                ErrorMessage errorMsg = new ErrorMessage();
-                errorMsg.setMessage("Unable to send request. " + je.getMessage());
-                throw new SendException(errorMsg);
-            }
         }
+
+        final ResponsePromise<RESP> p = promise == null 
+            ? new ResponsePromise<RESP>() : promise;
+
+        MessageListener promiseListener = new MessageListener() {
+            public void onMessage(Message message) {
+                    if (listener != null) {
+                        listener.onMessage(message);
+                    }
+
+                    //we do not want to overwrite the response on the off-chance
+                    //the listener has already populated the promise...
+                    if (!p.hasResponse()) {
+                        p.setObject(payloadType.getPayload(message));
+                    }
+            }
+        };
+
+        try {
+            Message message = prepareMessage(requester, payloadType);
+            _listenerMap.put(requester.getCorrelationId(), promiseListener);
+            requestSender.send(message);
+        } catch (JMSException je) {
+            ErrorMessage errorMsg = new ErrorMessage();
+            errorMsg.setMessage("Unable to send request. " + je.getMessage());
+            throw new SendException(errorMsg);
+        }
+
+        return p;
+    }
+
+    /**
+     * Send a request message and return without waiting for a response but
+     * with a promise for one
+     *
+     * @param requester the service requester
+     * @param listener the message listener to invoke on receiving a response
+     * but before populating the promise
+     * @param payloadType the message payload type
+     *
+     * @return a response promise
+     */
+    public synchronized <RESP> ResponsePromise<RESP> send(
+            ServiceBusMessageProducer<?> requester, 
+            MessageListener listener, 
+            MessagePayload payloadType) {
+        return send(requester, null, listener, payloadType);
     }
 
     /**
@@ -304,7 +348,7 @@ public class RequestQueueSender extends CornerstoneConfigurable implements IServ
      *
      * @param requester the service requester
      */
-    private Message prepareMessage(ServiceBusMessageProducer requester, MessagePayload payloadType) throws JMSException {
+    private Message prepareMessage(ServiceBusMessageProducer<?> requester, MessagePayload payloadType) throws JMSException {
         Message message = payloadType.createMessage(connector.getSession());
 
         com.paxxis.cornerstone.base.Message msg = requester.getMessage();

@@ -20,6 +20,7 @@ package com.paxxis.cornerstone.service;
 import com.paxxis.cornerstone.base.RequestMessage;
 import com.paxxis.cornerstone.base.ResponseMessage;
 import com.paxxis.cornerstone.common.MessagePayload;
+import com.paxxis.cornerstone.common.ResponsePromise;
 
 /**
  * 
@@ -55,5 +56,10 @@ public class CornerstoneClient {
 		ServiceBusMessageProducer<REQ> prod = new ServiceBusMessageProducer<REQ>(request);
 		sender.send(prod, listener, payloadType);
 	}
+
+    public <REQ extends RequestMessage, RESP extends ResponseMessage<REQ>> ResponsePromise<RESP> executePromise(REQ request) {
+        ServiceBusMessageProducer<REQ> prod = new ServiceBusMessageProducer<REQ>(request);
+        return sender.<RESP>send(prod, payloadType);
+    }
 }
 

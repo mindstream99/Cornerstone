@@ -19,6 +19,8 @@ package com.paxxis.cornerstone.service;
 
 import java.io.Serializable;
 import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.atomic.AtomicLong;
 
 import javax.jms.DeliveryMode;
 import javax.jms.JMSException;
@@ -70,7 +72,10 @@ public class RequestQueueSender extends CornerstoneConfigurable implements IServ
     private boolean teardownPending = false;
 
     // mapping of correlation ids to message listeners
-    private HashMap<Long, MessageListener> _listenerMap = new HashMap<Long, MessageListener>();
+    private Map<String, MessageListener> listenerMap = 
+        new HashMap<String, MessageListener>();
+
+    private AtomicLong correlationId = new AtomicLong(0);
 
     public RequestQueueSender() {
     }
@@ -101,6 +106,7 @@ public class RequestQueueSender extends CornerstoneConfigurable implements IServ
      * Close the JMS session objects
      */
     protected void closeDown() throws JMSException {
+        
         requestSender.close();
         requestSender = null;
 
@@ -119,9 +125,7 @@ public class RequestQueueSender extends CornerstoneConfigurable implements IServ
     /**
      * Setup the JMS specific objects.<br><br>
      * This method is called by the ServiceBusConnector as part of its
-     * connection process.  It should not be called directly by users
-     * of RequestQueueReceiver instances.
-     *
+     * connection process.  It should not be called directly by users...
      *
      * @throws RuntimeException if the setup could not be completed
      */
@@ -144,8 +148,8 @@ public class RequestQueueSender extends CornerstoneConfigurable implements IServ
                     public void onMessage(Message msg) {
                         try
                         {
-                            long cid = Long.parseLong(msg.getJMSCorrelationID());
-                            MessageListener listener = _listenerMap.remove(cid);
+                            MessageListener listener = 
+                                listenerMap.remove(msg.getJMSCorrelationID());
                             if (listener != null) {
                                 listener.onMessage(msg);
                             }
@@ -160,7 +164,7 @@ public class RequestQueueSender extends CornerstoneConfigurable implements IServ
             try {
                 closeDown();
             } catch (JMSException e) {
-                // TODO is there any need to include this in the runtime exception below?
+                // is there any need to include this in the runtime exception below?
             }
 
             throw new RuntimeException(t);
@@ -189,7 +193,7 @@ public class RequestQueueSender extends CornerstoneConfigurable implements IServ
      * Send a request message and return the response.
      *
      * @param clazz the response class
-     * @param requester the service requester
+     * @param msg the message 
      * @param handler the message handler
      * @param timeout the number of milliseconds to wait for the response.  A timeout of
      * 0 means there is no timeout - i.e. wait forever.
@@ -201,7 +205,7 @@ public class RequestQueueSender extends CornerstoneConfigurable implements IServ
     @SuppressWarnings("unchecked")
     public synchronized <REQ extends RequestMessage, RESP extends ResponseMessage<REQ>> RESP send(
             Class<RESP> clazz, 
-            ServiceBusMessageProducer<REQ> requester, 
+            com.paxxis.cornerstone.base.Message msg,
             final SimpleServiceBusMessageHandler handler,
 			long timeout, 
 			MessagePayload payloadType) {
@@ -220,7 +224,7 @@ public class RequestQueueSender extends CornerstoneConfigurable implements IServ
         RESP response = null;
         ResponsePromise<RESP> p = null;
         try {
-            p = send(requester, promise, listener, payloadType); 
+            p = send(msg, promise, listener, payloadType); 
         } catch (SendException se) {
 			try {
 				response = clazz.newInstance();
@@ -242,15 +246,15 @@ public class RequestQueueSender extends CornerstoneConfigurable implements IServ
      * Send a request message and return without waiting for a response but
      * with a promise for one
      *
-     * @param requester the service requester
+     * @param msg the message 
      * @param payloadType the message payload type
      *
      * @return a response promise
      */
     public synchronized <RESP> ResponsePromise<RESP> send(
-            ServiceBusMessageProducer<?> requester, 
+            com.paxxis.cornerstone.base.Message msg,
             MessagePayload payloadType) {
-        return send(requester, null, null, payloadType);
+        return send(msg, null, null, payloadType);
     }
 
 
@@ -258,24 +262,24 @@ public class RequestQueueSender extends CornerstoneConfigurable implements IServ
      * Send a request message and return without waiting for a response but
      * with a promise for one
      *
-     * @param requester the service requester
+     * @param msg the message 
      * @param promise the response promise to populate
      * @param payloadType the message payload type
      *
      * @return a response promise
      */
     public synchronized <RESP> ResponsePromise<RESP> send(
-            ServiceBusMessageProducer<?> requester, 
+            com.paxxis.cornerstone.base.Message msg,
             final ResponsePromise<RESP> promise, 
             final MessagePayload payloadType) {
-        return send(requester, promise, null, payloadType);
+        return send(msg, promise, null, payloadType);
     }
 
     /**
      * Send a request message and return without waiting for a response but
      * with a promise for one
      *
-     * @param requester the service requester
+     * @param msg the message 
      * @param promise the response promise to populate
      * @param listener the message listener to invoke on receiving a response
      * but before populating the promise
@@ -284,7 +288,7 @@ public class RequestQueueSender extends CornerstoneConfigurable implements IServ
      * @return a response promise
      */
     public synchronized <RESP> ResponsePromise<RESP> send(
-            ServiceBusMessageProducer<?> requester, 
+            com.paxxis.cornerstone.base.Message msg,
             final ResponsePromise<RESP> promise, 
             final MessageListener listener,
             final MessagePayload payloadType) {
@@ -313,8 +317,8 @@ public class RequestQueueSender extends CornerstoneConfigurable implements IServ
         };
 
         try {
-            Message message = prepareMessage(requester, payloadType);
-            _listenerMap.put(requester.getCorrelationId(), promiseListener);
+            Message message = prepareMessage(msg, payloadType);
+            listenerMap.put(message.getJMSCorrelationID(), promiseListener);
             requestSender.send(message);
         } catch (JMSException je) {
             ErrorMessage errorMsg = new ErrorMessage();
@@ -329,7 +333,7 @@ public class RequestQueueSender extends CornerstoneConfigurable implements IServ
      * Send a request message and return without waiting for a response but
      * with a promise for one
      *
-     * @param requester the service requester
+     * @param msg the message 
      * @param listener the message listener to invoke on receiving a response
      * but before populating the promise
      * @param payloadType the message payload type
@@ -337,10 +341,10 @@ public class RequestQueueSender extends CornerstoneConfigurable implements IServ
      * @return a response promise
      */
     public synchronized <RESP> ResponsePromise<RESP> send(
-            ServiceBusMessageProducer<?> requester, 
+            com.paxxis.cornerstone.base.Message msg,
             MessageListener listener, 
             MessagePayload payloadType) {
-        return send(requester, null, listener, payloadType);
+        return send(msg, null, listener, payloadType);
     }
 
     /**
@@ -348,10 +352,12 @@ public class RequestQueueSender extends CornerstoneConfigurable implements IServ
      *
      * @param requester the service requester
      */
-    private Message prepareMessage(ServiceBusMessageProducer<?> requester, MessagePayload payloadType) throws JMSException {
-        Message message = payloadType.createMessage(connector.getSession());
+    private Message prepareMessage(
+            com.paxxis.cornerstone.base.Message msg,
+            MessagePayload payloadType) 
+            throws JMSException {
 
-        com.paxxis.cornerstone.base.Message msg = requester.getMessage();
+        Message message = payloadType.createMessage(connector.getSession());
 
         message.setIntProperty(MessagingConstants.HeaderConstant.MessageType.name(), msg.getMessageType());
         message.setIntProperty(MessagingConstants.HeaderConstant.MessageVersion.name(), msg.getMessageVersion());
@@ -363,10 +369,11 @@ public class RequestQueueSender extends CornerstoneConfigurable implements IServ
         }
 
         message.setJMSReplyTo(responseQueue);
-
-        long cid = requester.getNewCorrelationId();
-        message.setJMSCorrelationID(String.valueOf(cid));
-
+        message.setJMSCorrelationID(generateCorrelationId());
         return message;
+    }
+
+    private String generateCorrelationId() {
+        return String.valueOf(correlationId.incrementAndGet());
     }
 }

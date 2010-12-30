@@ -176,20 +176,33 @@ public class NotificationTopicSender extends CornerstoneConfigurable implements 
         }
     }
 
-    public synchronized void send(ServiceBusMessageProducer notifier, MessagePayload payloadType) throws JMSException {
-        send(notifier, payloadType, 0);
+    /**
+     * Send a notification message
+     *
+     * @param msg the message
+     * @param payloadType the payload
+     */
+    public synchronized void send(
+            com.paxxis.cornerstone.base.Message msg,
+            MessagePayload payloadType) throws JMSException {
+        send(msg, payloadType, 0);
     }
 
     /**
      * Send a notification message
      *
-     * @param notifier the service notifier
+     * @param msg the message
+     * @param payloadType the payload
+     * @param ttl time to live
      *
      */
-    public synchronized void send(ServiceBusMessageProducer notifier, MessagePayload payloadType, long ttl) throws JMSException {
+    public synchronized void send(
+            com.paxxis.cornerstone.base.Message msg,
+            MessagePayload payloadType, 
+            long ttl) throws JMSException {
+
         javax.jms.Message message = payloadType.createMessage(_connector.getSession());
 
-        com.paxxis.cornerstone.base.Message msg = notifier.getMessage();
         message.setIntProperty(MessagingConstants.HeaderConstant.MessageType.name(), msg.getMessageType());
         message.setIntProperty(MessagingConstants.HeaderConstant.MessageVersion.name(), msg.getMessageVersion());
         message.setIntProperty(MessagingConstants.HeaderConstant.PayloadType.name(), payloadType.getType().getValue());
@@ -197,9 +210,6 @@ public class NotificationTopicSender extends CornerstoneConfigurable implements 
         // only supporting java objects right now
         Object payload = msg.getAsPayload(payloadType.getType());
         ((ObjectMessage)message).setObject((Serializable)payload);
-
-        long cid = notifier.getNewCorrelationId();
-        message.setJMSCorrelationID(String.valueOf(cid));
 
         // send the message to the service notification topic
         _notificationSender.send(message, Message.DEFAULT_DELIVERY_MODE, Message.DEFAULT_PRIORITY, ttl);

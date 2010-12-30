@@ -45,21 +45,16 @@ public class CornerstoneClient {
 
 	public <REQ extends RequestMessage, RESP extends ResponseMessage<REQ>> RESP 
     						execute(Class<RESP> clazz, REQ request, ResponseHandler<RESP> handler) {
-        
-    	ServiceBusMessageProducer<REQ> prod = new ServiceBusMessageProducer<REQ>(request);
-        RESP response = sender.send(clazz, prod, handler, timeout, payloadType);
-        return response;
+        return sender.send(clazz, request, handler, timeout, payloadType);
     }
 
 	public <REQ extends RequestMessage, RESP extends ResponseMessage<REQ>> void executeAsync(REQ request,
 			AsyncDataResponseHandler<RESP> listener) {
-		ServiceBusMessageProducer<REQ> prod = new ServiceBusMessageProducer<REQ>(request);
-		sender.send(prod, listener, payloadType);
+		sender.send(request, null, listener, payloadType);
 	}
 
     public <REQ extends RequestMessage, RESP extends ResponseMessage<REQ>> ResponsePromise<RESP> executePromise(REQ request) {
-        ServiceBusMessageProducer<REQ> prod = new ServiceBusMessageProducer<REQ>(request);
-        return sender.<RESP>send(prod, payloadType);
+        return sender.<RESP>send(request, payloadType);
     }
 }
 

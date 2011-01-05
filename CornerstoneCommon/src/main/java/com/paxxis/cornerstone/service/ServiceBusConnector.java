@@ -19,6 +19,7 @@ package com.paxxis.cornerstone.service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CountDownLatch;
 
 import javax.jms.Connection;
 import javax.jms.ConnectionFactory;
@@ -147,6 +148,7 @@ public class ServiceBusConnector extends CornerstoneConfigurable
         }
     }
     
+    @SuppressWarnings("unchecked")
     private void notifyConnectionChange(boolean connected)
     {
         List<ServiceBusConnectionListener> listeners = null;
@@ -275,20 +277,24 @@ public class ServiceBusConnector extends CornerstoneConfigurable
         return _connectOnStartup;
     }
     
-    class Disconnector extends DataLatch implements ShutdownListener
+    class Disconnector implements ShutdownListener
     {
-        int _count;
+        private CountDownLatch latch;
         public Disconnector(int count)
         {
-            _count = count;
+            this.latch = new CountDownLatch(count);
         }
         
         public void onShutdownComplete()
         {
-            _count--;
-            if (_count == 0)
-            {
-                setObject(new Object());
+            this.latch.countDown(); 
+        }
+        
+        public void await() {
+            try {
+	            this.latch.await();
+            } catch (InterruptedException ie) {
+                //doing nothing is the correct behavior
             }
         }
     }
@@ -309,7 +315,7 @@ public class ServiceBusConnector extends CornerstoneConfigurable
         
         notifyConnectionStatusChange();
 
-        Object obj = disc.waitForObject();
+        disc.await();
         
         // now that the clients are torn down we can close
         try

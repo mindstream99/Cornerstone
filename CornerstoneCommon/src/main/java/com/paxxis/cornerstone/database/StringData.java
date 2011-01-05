@@ -26,13 +26,46 @@ import java.util.Date;
  *
  * @author Robert Englander
  */
-public class StringData implements IDataValue
-{
-    String _data = null;
-    boolean _addQuotes = true;
+public class StringData implements IDataValue {
+	private static final long serialVersionUID = 1L;
+
+	private String _data = null;
+    private boolean _addQuotes = true;
     
-    public StringData(String data)
-    {
+    public static String toSQLValue(String str) {
+    	return toSQLValue(str, true);
+    }
+    
+    public static String toSQLValue(String str, boolean addQuotes) {
+        if (str == null) {
+            return "null";
+        }
+        
+        StringBuilder buffer = new StringBuilder();
+        
+        if (addQuotes) {
+            buffer.append("'");
+        }
+        
+        for (int i = 0; i < str.length(); i++) {
+            char c = str.charAt(i);
+            if (c == '\'') {
+                buffer.append("\'\'");
+            } else if (c < ' ') {
+                buffer.append(" ");
+            } else {
+                buffer.append(c);
+            }
+        }
+        
+        if (addQuotes) {
+            buffer.append("'");
+        }
+        
+        return buffer.toString();
+    }
+    
+    public StringData(String data) {
         if (false || data == null) {
             _data = data;
         } else {
@@ -40,102 +73,40 @@ public class StringData implements IDataValue
         }
     }
 
-    public StringData(String data, boolean addQuotes)
-    {
+    public StringData(String data, boolean addQuotes) {
         this(data);
         _addQuotes = addQuotes;
     }
     
-    public String asSQLValue()
-    {
-        if (_data == null) {
-            return "null";
-        }
-        
-        String result = null;
-        
-        //if (-1 != _data.indexOf("\'"))
-        {
-            StringBuffer buffer = new StringBuffer();
-            
-            if (_addQuotes)
-            {
-                buffer.append("'");
-            }
-            
-            for (int i = 0; i < _data.length(); i++) 
-            {
-                char c = _data.charAt(i);
-                if (c == '\'') 
-                {
-                    buffer.append("\'\'");
-                }
-                //else if (c == '%')
-                //{
-                //    buffer.append("\\%");
-                //}
-                //else if (c == '_')
-                //{
-                //    buffer.append("\\_");
-                //}
-                else if (c < ' ')
-                {
-                    buffer.append(" ");
-                    //buffer.append("CHAR(" + Character.getNumericValue(c) + ")");
-                }
-                else
-                {
-                    buffer.append(c);
-                }
-            }
-            
-            if (_addQuotes)
-            {
-                buffer.append("'");
-            }
-            
-            result = buffer.toString();
-        }
-        //else
-        //{
-        //    result = "'" + _data + "'";
-        //}
-        
-        return result;
+    public String asSQLValue() {
+    	return toSQLValue(_data, _addQuotes);
     }
     
-    public String asString() 
-    {
+    public String asString() {
         return _data;
     }
 
-    public Float asFloat() 
-    {
+    public Float asFloat() {
         return Float.parseFloat(_data);
     }
 
-    public Double asDouble() 
-    {
+    public Double asDouble() {
         return Double.parseDouble(_data);
     }
 
-    public Integer asInteger() 
-    {
+    public Integer asInteger() {
         return Integer.parseInt(_data);
     }
 
-    public Long asLong() 
-    {
+    public Long asLong() {
         return Long.parseLong(_data);
     }
 
-    public Date asDate()
-    {
+    public Date asDate() {
         return null;
     }
 
-    public boolean isNull()
-    {
+    public boolean isNull() {
         return _data == null;
     }
 

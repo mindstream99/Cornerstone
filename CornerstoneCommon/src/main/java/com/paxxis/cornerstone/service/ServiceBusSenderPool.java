@@ -17,7 +17,9 @@
 
 package com.paxxis.cornerstone.service;
 
+import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.Deque;
 import java.util.Hashtable;
 
 import com.paxxis.cornerstone.common.DataLatch;
@@ -47,6 +49,18 @@ public class ServiceBusSenderPool extends CornerstoneConfigurable
         }
     }
 
+    private class WaitingBorrower
+    {
+        public DataLatch latch;
+        public Object borrower;
+        
+        public WaitingBorrower(DataLatch latch, Object borrower)
+        {
+            this.latch = latch;
+            this.borrower = borrower;
+        }
+    }
+    
     // free pool
     private ArrayList<PoolEntry> _freePool = new ArrayList<PoolEntry>();
 
@@ -54,7 +68,7 @@ public class ServiceBusSenderPool extends CornerstoneConfigurable
     private Hashtable<PoolEntry, Object> _activePool = new Hashtable<PoolEntry, Object>();
 
     // borrowers waiting for instances to free up
-    private ArrayList<DataLatch> _borrowersInWaiting = new ArrayList<DataLatch>();
+    private Deque<WaitingBorrower> _borrowersInWaiting = new ArrayDeque<WaitingBorrower>();
 
     // the semaphore for protected the pools
     final private Object _semaphore = new Object();
@@ -140,8 +154,8 @@ public class ServiceBusSenderPool extends CornerstoneConfigurable
             // the borrower will have to wait until an instance
             // is returned by another borrower
             DataLatch latch = new DataLatch();
-            _borrowersInWaiting.add(latch);
-            entry = (PoolEntry)latch.waitForObject();
+            _borrowersInWaiting.add(new WaitingBorrower(latch, borrower));
+            entry = (PoolEntry) latch.waitForObject();
         }
 
         return entry;
@@ -153,9 +167,14 @@ public class ServiceBusSenderPool extends CornerstoneConfigurable
         }
     }
 
+    /**
+     * Return a borrowed pool entry
+     * @param entry the entry to return
+     * @param borrower NOT NEEDED???
+     */
     public void returnInstance(PoolEntry entry, Object borrower)
     {
-        DataLatch notifyMonitor = null;
+        WaitingBorrower waiting = null;
 
         synchronized (_semaphore)
         {
@@ -165,8 +184,8 @@ public class ServiceBusSenderPool extends CornerstoneConfigurable
             if (_borrowersInWaiting.size() > 0)
             {
                 // give this one to the next borrower
-                notifyMonitor = _borrowersInWaiting.remove(0);
-                _activePool.put(entry, borrower);
+                waiting = _borrowersInWaiting.removeFirst();
+                _activePool.put(entry, waiting.borrower);
             }
             else
             {
@@ -175,9 +194,9 @@ public class ServiceBusSenderPool extends CornerstoneConfigurable
             }
         }
 
-        if (notifyMonitor != null)
+        if (waiting != null)
         {
-            notifyMonitor.setObject(entry);
+            waiting.latch.setObject(entry);
         }
     }
 

@@ -20,50 +20,62 @@ package com.paxxis.cornerstone.common;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
+import org.apache.log4j.Logger;
+
+
 /**
  * Used to wait for an object to be supplied
  * by another thread.  It's used to synchronize a producer and
- * consumer thread and deliver the data to the consumer.
+ * consumer thread and deliver the data to exactly one consumer.
  *
  * @author Robert Englander
  */
-public class DataLatch extends CountDownLatch
+public class DataLatch
 {
-    // the object that is being synchronized on
-    private Object _obj = null;
+    private static final Logger logger = Logger.getLogger(DataLatch.class);
 
-    public DataLatch() {
-        this(1);
-    }
+    // the object that is being waited for
+    private Object obj;
+    private CountDownLatch latch = new CountDownLatch(1);
+    private boolean interrupted = false;
+    private boolean timedout = false;
+    private Thread waiting;
 
-    public DataLatch(int seed) {
-        super(seed);
-    }
 
     /**
      * Block until the object is available.  This is called
-     * by the consumer side of the interaction.
+     * by the consumer side of the interaction. It is illegal to
+     * call this method from multiple threads.  It is also illegal to
+     * call this method more than once.
      *
      * @return the object
      */
     public Object waitForObject(long timeout) {
+        synchronized (this) {
+            if (!isWaitable()) {
+                IllegalStateException e = new IllegalStateException("Illegal state for consumption"); 
+                logger.error(e);
+                throw e;
+            }
+            this.waiting = Thread.currentThread();
+        }
+
         try {
-            await(timeout, TimeUnit.MILLISECONDS);
+            this.timedout = !this.latch.await(timeout, TimeUnit.MILLISECONDS);
         } catch (InterruptedException ex) {
             // no-op is correct behavior
+            this.interrupted = true;
         }
 
-        // grab the object for return to the caller
-        Object result = null;
         synchronized (this) {
-            result = _obj;
+            // grab the object for return to the caller
+            Object result = obj;
+            // set internals to null so data latch cannot be reused
+            obj = null;
+            this.latch = null;
+            this.waiting = null;
+            return result;
         }
-
-        // set the object variable to null so that this
-        // monitor can be used again
-        _obj = null;
-
-        return result;
     }
 
     /**
@@ -78,17 +90,67 @@ public class DataLatch extends CountDownLatch
 
     /**
      * Set the object that the threads are synchronizing on.  This
-     * is called by the producer side of the interaction.
+     * is called by the producer side of the interaction. Calling this
+     * method more than once or after the consumer has already attempted to
+     * retrieve the data has no effect.  
      *
      * @param obj the object
      */
-    public void setObject(Object obj)
-    {
-        synchronized (this) {
-            _obj = obj;
+    public synchronized void setObject(Object obj) {
+        if (!isSettable()) {
+            //no point to setting the object, the waiting thread is long gone...
+            logger.warn("Trying to set data on latch that is not settable");
+            return;
         }
-
-        countDown();
+        this.obj = obj;
+        this.latch.countDown();
     }
+
+    /**
+     * Pool if the data has been set (no waiting).  To get the data call
+     * waitForObject.
+     */
+    public synchronized boolean hasObject() {
+        return this.obj != null;
+    }
+
+    /**
+     * Will return true if the waiting thread was interrupted.
+     */
+    public synchronized boolean isInterrupted() {
+        return this.interrupted;
+    }
+
+    /**
+     * Will return true if the waiting thread timed-out.
+     */
+    public synchronized boolean hasTimedout() {
+        return this.timedout;
+    }
+
+    /**
+     * Will return true if this data latch is in a valid state for consumers
+     */
+    public synchronized boolean isWaitable() {
+        return this.waiting == null && isSettable();
+    }
+
+    /**
+     * Will return true if this data latch is in a valid state for producers
+     */
+    public synchronized boolean isSettable() {
+        return this.latch != null;
+    }
+
+    /**
+     * Convenience method to determine if data latch was successfully used
+     * without time-out or interruption of consumer. This is in the case that
+     * waitForObject returns null and you need to know if that is because
+     * the a timeout or interrupt occurred.
+     */
+    public synchronized boolean isSuccessful() {
+        return this.latch == null && !this.timedout && !this.interrupted;
+    }
+
 }
 

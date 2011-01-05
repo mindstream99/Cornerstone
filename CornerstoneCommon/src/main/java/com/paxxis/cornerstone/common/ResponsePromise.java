@@ -23,18 +23,13 @@ package com.paxxis.cornerstone.common;
  */
 public class ResponsePromise<RESP> extends DataLatch {
 
-    public ResponsePromise() {
-        //a promise is only ever meant to have one item (the response)...
-        super(1);
-    }
-
     @SuppressWarnings("unchecked")
     public RESP getResponse() {
         return (RESP) waitForObject(0);
     }
 
     public boolean hasResponse() {
-        return getCount() < 1;
+        return hasObject();
     }
 }
 

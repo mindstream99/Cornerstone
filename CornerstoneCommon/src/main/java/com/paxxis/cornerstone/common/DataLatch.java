@@ -61,6 +61,11 @@ public class DataLatch
         }
 
         try {
+            if (timeout < 1) {
+                //this effectively waits forever - normally zero or less means
+                //wait forever but in CountDownLatch it means don't wait...
+                timeout = Long.MAX_VALUE;
+            }
             this.timedout = !this.latch.await(timeout, TimeUnit.MILLISECONDS);
         } catch (InterruptedException ex) {
             // no-op is correct behavior

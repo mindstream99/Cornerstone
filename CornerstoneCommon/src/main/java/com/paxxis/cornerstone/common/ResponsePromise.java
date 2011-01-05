@@ -16,20 +16,47 @@
  */
 package com.paxxis.cornerstone.common;
 
+import com.paxxis.cornerstone.base.ResponseMessage;
+
 
 
 /**
- * A response promise
+ * A response promise which is an abstraction over a DataLatch that enforces type safety
+ * and provides the ability for clients of services to set reasonable timeouts for a response...
  */
-public class ResponsePromise<RESP> extends DataLatch {
+public class ResponsePromise<RESP extends ResponseMessage<?>> 
+        extends DataLatch {
 
+    private long timeout;
+    
+    public ResponsePromise() {
+        this(0);
+    }
+    
+    public ResponsePromise(long timeout) {
+        this.timeout = timeout;
+    }
+    
     @SuppressWarnings("unchecked")
+    public RESP getResponse(long timeout) {
+        return (RESP) waitForObject(timeout);
+    }
+    
     public RESP getResponse() {
-        return (RESP) waitForObject(0);
+        return getResponse(this.timeout);
+    }
+
+    /**
+     * Enforce the timeout value provided at construct time
+     */
+    @Override
+    public RESP waitForObject() {
+        return getResponse(this.timeout);
     }
 
     public boolean hasResponse() {
         return hasObject();
     }
+
 }
 

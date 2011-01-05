@@ -50,11 +50,11 @@ public class CornerstoneClient {
 
 	public <REQ extends RequestMessage, RESP extends ResponseMessage<REQ>> void executeAsync(REQ request,
 			AsyncDataResponseHandler<RESP> listener) {
-		sender.send(request, null, listener, payloadType);
+		sender.send(request, listener, payloadType);
 	}
 
     public <REQ extends RequestMessage, RESP extends ResponseMessage<REQ>> ResponsePromise<RESP> executePromise(REQ request) {
-        return sender.<RESP>send(request, payloadType);
+        return sender.send(request, payloadType);
     }
 }
 

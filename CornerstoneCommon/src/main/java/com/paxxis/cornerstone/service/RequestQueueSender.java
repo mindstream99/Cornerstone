@@ -196,22 +196,21 @@ public class RequestQueueSender extends CornerstoneConfigurable implements IServ
      * @param msg the message 
      * @param handler the message handler
      * @param timeout the number of milliseconds to wait for the response.  A timeout of
-     * 0 means there is no timeout - i.e. wait forever.
+     * 0 or less is an error
      * @param payloadType the message payload type
      *
      * @return the response
      * @throws a RequestTimeoutException if response timed out
      */
-    @SuppressWarnings("unchecked")
     public synchronized <REQ extends RequestMessage, RESP extends ResponseMessage<REQ>> RESP send(
             Class<RESP> clazz, 
-            com.paxxis.cornerstone.base.Message msg,
+            REQ msg,
             final SimpleServiceBusMessageHandler handler,
 			long timeout, 
 			MessagePayload payloadType) {
 
 
-        final ResponsePromise<RESP> promise = new ResponsePromise<RESP>(); 
+        final ResponsePromise<RESP> promise = new ResponsePromise<RESP>(timeout); 
         MessageListener listener = new MessageListener() {
             public void onMessage(Message msg) {
                 handler.init(
@@ -222,9 +221,8 @@ public class RequestQueueSender extends CornerstoneConfigurable implements IServ
         };
 
         RESP response = null;
-        ResponsePromise<RESP> p = null;
         try {
-            p = send(msg, promise, listener, payloadType); 
+            send(msg, promise, listener, payloadType); 
         } catch (SendException se) {
 			try {
 				response = clazz.newInstance();
@@ -235,7 +233,7 @@ public class RequestQueueSender extends CornerstoneConfigurable implements IServ
             return response;
         }
 
-        response = (RESP) p.waitForObject(timeout);
+        response = promise.getResponse();
         if (response == null) {
             throw new RequestTimeoutException();
         }
@@ -251,10 +249,13 @@ public class RequestQueueSender extends CornerstoneConfigurable implements IServ
      *
      * @return a response promise
      */
-    public synchronized <RESP> ResponsePromise<RESP> send(
-            com.paxxis.cornerstone.base.Message msg,
+    public synchronized <REQ extends RequestMessage, 
+                        RESP extends ResponseMessage<REQ>> ResponsePromise<RESP> send(
+            REQ msg,
             MessagePayload payloadType) {
-        return send(msg, null, null, payloadType);
+        ResponsePromise<RESP> promise = new ResponsePromise<RESP>();
+        send(msg, promise, null, payloadType);
+        return promise;
     }
 
 
@@ -268,11 +269,13 @@ public class RequestQueueSender extends CornerstoneConfigurable implements IServ
      *
      * @return a response promise
      */
-    public synchronized <RESP> ResponsePromise<RESP> send(
-            com.paxxis.cornerstone.base.Message msg,
-            final ResponsePromise<RESP> promise, 
+    public synchronized <REQ extends RequestMessage,
+                        RESP extends ResponseMessage<REQ>, 
+                        P extends ResponsePromise<RESP>> void send(
+            REQ msg,
+            final P promise, 
             final MessagePayload payloadType) {
-        return send(msg, promise, null, payloadType);
+        send(msg, promise, null, payloadType);
     }
 
     /**
@@ -287,11 +290,17 @@ public class RequestQueueSender extends CornerstoneConfigurable implements IServ
      *
      * @return a response promise
      */
-    public synchronized <RESP> ResponsePromise<RESP> send(
-            com.paxxis.cornerstone.base.Message msg,
-            final ResponsePromise<RESP> promise, 
+    public synchronized <REQ extends RequestMessage, 
+                        RESP extends ResponseMessage<REQ>, 
+                        P extends ResponsePromise<RESP>> void send(
+            REQ msg,
+            final P promise, 
             final MessageListener listener,
             final MessagePayload payloadType) {
+
+        if (promise == null) {
+            throw new NullPointerException("promise is null");
+        }
 
         if (!connector.isConnected()) {
             ErrorMessage errorMsg = new ErrorMessage();
@@ -299,20 +308,12 @@ public class RequestQueueSender extends CornerstoneConfigurable implements IServ
             throw new SendException(errorMsg);
         }
 
-        final ResponsePromise<RESP> p = promise == null 
-            ? new ResponsePromise<RESP>() : promise;
-
         MessageListener promiseListener = new MessageListener() {
             public void onMessage(Message message) {
                     if (listener != null) {
                         listener.onMessage(message);
                     }
-
-                    //we do not want to overwrite the response on the off-chance
-                    //the listener has already populated the promise...
-                    if (!p.hasResponse()) {
-                        p.setObject(payloadType.getPayload(message));
-                    }
+                    promise.setObject(payloadType.getPayload(message));
             }
         };
 
@@ -325,8 +326,6 @@ public class RequestQueueSender extends CornerstoneConfigurable implements IServ
             errorMsg.setMessage("Unable to send request. " + je.getMessage());
             throw new SendException(errorMsg);
         }
-
-        return p;
     }
 
     /**
@@ -340,11 +339,14 @@ public class RequestQueueSender extends CornerstoneConfigurable implements IServ
      *
      * @return a response promise
      */
-    public synchronized <RESP> ResponsePromise<RESP> send(
-            com.paxxis.cornerstone.base.Message msg,
+    public synchronized <REQ extends RequestMessage,
+                        RESP extends ResponseMessage<REQ>> ResponsePromise<RESP> send(
+            REQ msg,
             MessageListener listener, 
             MessagePayload payloadType) {
-        return send(msg, null, listener, payloadType);
+        ResponsePromise<RESP> promise = new ResponsePromise<RESP>();
+        send(msg, promise, listener, payloadType);
+        return promise;
     }
 
     /**

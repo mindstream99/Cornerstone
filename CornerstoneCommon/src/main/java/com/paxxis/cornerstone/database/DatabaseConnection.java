@@ -21,6 +21,7 @@ package com.paxxis.cornerstone.database;
 import java.util.*;
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.SQLWarning;
@@ -404,6 +405,10 @@ public class DatabaseConnection implements IDatabaseConnection {
         catch (SQLException ex) {
             throw new DatabaseException(ex);
         }
+    }
+    
+    public PreparedStatement getPreparedStatement(String query) throws SQLException {
+        return connection.prepareStatement(query);       
     }
 
     protected void finalize() throws Throwable {

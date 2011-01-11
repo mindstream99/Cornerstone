@@ -26,6 +26,7 @@ import org.springframework.context.support.GenericApplicationContext;
 import org.springframework.core.io.FileSystemResource;
 
 import com.paxxis.cornerstone.service.CornerstoneConfigurable;
+import com.paxxis.cornerstone.service.ICornerstoneService;
 import com.paxxis.cornerstone.service.IServiceBusManager;
 import com.paxxis.cornerstone.service.IServiceController;
 import com.paxxis.cornerstone.service.LogManager;
@@ -35,7 +36,7 @@ import com.paxxis.cornerstone.service.ServiceVersion;
  *
  * @author Robert Englander
  */
-public class CornerstoneService extends CornerstoneConfigurable implements IServiceController {
+public class CornerstoneService extends CornerstoneConfigurable implements IServiceController, ICornerstoneService {
     private static final Logger _logger = Logger.getLogger(CornerstoneService.class);
 
     // the service display name

@@ -51,6 +51,18 @@ public class CornerstoneConfiguration implements IManagedBean
     }
     
     /**
+     * Use another configuration instance to set parameter values.  this is useful
+     * for creating an override configuration instance that only needs to define
+     * the properties that are being overriden, while the remainder come from the
+     * default config.
+     * 
+     * @param overrideConfig
+     */
+    public void setOverrideConfiguration(CornerstoneConfiguration overrideConfig) {
+    	_localMap.putAll(overrideConfig._localPropertyMap);
+    }
+    
+    /**
      * Sets the map of local parameters.
      *
      * @param localMap the parameter map

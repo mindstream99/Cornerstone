@@ -269,6 +269,8 @@ public class DatabaseConnectionPool extends CornerstoneConfigurable {
         for (DatabaseConnection conn : _activePool.keySet()) {
             conn.disconnect();
         }
+        
+        _sweeper.terminate();
     }
 
     @Override

@@ -38,7 +38,12 @@ import org.apache.commons.cli.OptionGroup;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.cli.PosixParser;
+import org.springframework.beans.factory.xml.XmlBeanDefinitionReader;
+import org.springframework.context.support.GenericApplicationContext;
+import org.springframework.core.io.FileSystemResource;
 
+import com.paxxis.cornerstone.database.DatabaseConnectionPool;
+import com.paxxis.cornerstone.database.DatabaseUpdater;
 import com.paxxis.cornerstone.service.IServiceBusManager;
 import com.paxxis.cornerstone.service.IServiceController;
 
@@ -80,6 +85,11 @@ public class ServiceShell {
 		opt.setValueSeparator(',');
 		group.addOption(opt);
 
+		Option updateOpt = new Option(null, "dbupdate", false, "the database update parameters");
+		updateOpt.setArgs(3);
+		updateOpt.setValueSeparator(',');
+		group.addOption(updateOpt);
+		
 		addOptions(group);
 		
 		Options options = new Options();
@@ -103,11 +113,38 @@ public class ServiceShell {
 	}
 
 	protected final void execute() throws Exception {
-		if (processHelp(commandLine) || processShutdown(commandLine) || process()) {
-		    //currently we are assuming once something it is processed it is finished...
+		if (processHelp(commandLine) || processShutdown(commandLine) || processDatabaseUpdates(commandLine) || process()) {
+		    //currently we are assuming once something is processed it is finished...
 		    return;
 		}
 	    printHelp();
+	}
+	
+	private boolean processDatabaseUpdates(CommandLine cmd) throws Exception {
+		String vals[] = getCommandLine().getOptionValues("dbupdate");
+		if (vals != null) {
+			if (vals.length != 3) {
+				throw new ParseException("Invalid argument for database update option");
+			}
+			doDatabaseUpdate(vals);
+			return true;
+		}
+		
+		return false;
+	}
+	
+	private void doDatabaseUpdate(String[] inputs) {
+        GenericApplicationContext ctx = new GenericApplicationContext();
+        ctx.registerShutdownHook();
+        ctx.refresh();
+        XmlBeanDefinitionReader xmlReader = new XmlBeanDefinitionReader(ctx);
+        xmlReader.loadBeanDefinitions(new FileSystemResource(inputs[0]));
+        DatabaseConnectionPool pool = (DatabaseConnectionPool)ctx.getBean("connectionPool");
+
+        DatabaseUpdater updater = (DatabaseUpdater)ctx.getBean("dbUpdater");
+        updater.update(inputs[1], inputs[2]);
+
+        ctx.close();
 	}
 	
 	private boolean processShutdown(CommandLine cmd) throws Exception {

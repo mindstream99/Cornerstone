@@ -17,29 +17,22 @@
 
 package com.paxxis.cornerstone.service;
 
-import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicLong;
 
-import javax.jms.DeliveryMode;
 import javax.jms.JMSException;
 import javax.jms.Message;
 import javax.jms.MessageConsumer;
 import javax.jms.MessageListener;
-import javax.jms.MessageProducer;
-import javax.jms.ObjectMessage;
-import javax.jms.Queue;
 import javax.jms.Session;
 import javax.jms.TemporaryQueue;
 
 import org.apache.log4j.Logger;
 
 import com.paxxis.cornerstone.base.ErrorMessage;
-import com.paxxis.cornerstone.base.MessagingConstants;
 import com.paxxis.cornerstone.base.RequestMessage;
 import com.paxxis.cornerstone.base.ResponseMessage;
-import com.paxxis.cornerstone.common.JavaObjectPayload;
 import com.paxxis.cornerstone.common.MessagePayload;
 import com.paxxis.cornerstone.common.ResponsePromise;
 
@@ -47,29 +40,14 @@ import com.paxxis.cornerstone.common.ResponsePromise;
  *
  * @author Robert Englander
  */
-public class RequestQueueSender extends CornerstoneConfigurable implements IServiceBusConnectorClient {
-    private static final Logger logger = Logger.getLogger(RequestQueueSender.class);
+public class RequestQueueSender extends DestinationSender {
+    private static final Logger logger = Logger.getLogger(DestinationSender.class);
 
     // the temporary queue used for getting responses
     private TemporaryQueue responseQueue = null;
 
-    // the request queue
-    private Queue queue = null;
-
     // the message consumer for the responseQueue
     private MessageConsumer responseConsumer = null;
-
-    // the message sender for sending requests
-    private MessageProducer requestSender = null;
-
-    // the name of the request queue
-    private String requestQueueName = null;
-
-    // the service bus connector
-    private ServiceBusConnector connector = null;
-
-    // teardown pending flag
-    private boolean teardownPending = false;
 
     // mapping of correlation ids to message listeners
     private Map<String, MessageListener> listenerMap = 
@@ -80,46 +58,17 @@ public class RequestQueueSender extends CornerstoneConfigurable implements IServ
     public RequestQueueSender() {
     }
 
-    public void setRequestQueueName(String name) {
-        requestQueueName = name;
-    }
-
-    protected String getRequestQueueName() {
-        return requestQueueName;
-    }
-
-    public void setServiceBusConnector(ServiceBusConnector connector) {
-        this.connector = connector;
-    }
-
-    /**
-     * Is a teardown pending?
-     *
-     * @return true if a disconnect has been initiated and is not
-     * yet complete, false otherwise.
-     */
-    public boolean isTeardownPending() {
-        return teardownPending;
-    }
-
     /**
      * Close the JMS session objects
      */
     protected void closeDown() throws JMSException {
-        
-        requestSender.close();
-        requestSender = null;
-
         responseConsumer.close();
         responseConsumer = null;
 
         responseQueue.delete();
         responseQueue = null;
-
-        queue = null;
-    }
-
-    public void halt() {
+        
+        super.closeDown();
     }
 
     /**
@@ -130,18 +79,12 @@ public class RequestQueueSender extends CornerstoneConfigurable implements IServ
      * @throws RuntimeException if the setup could not be completed
      */
     public void setup() {
-
+    	super.setup();
         try {
-            // lookup the request queue
-            queue = (Queue)connector.getInitialContextFactory().createInitialContext().lookup(requestQueueName);
-
-            requestSender = connector.createMessageProducer(queue);
-            requestSender.setDeliveryMode(DeliveryMode.NON_PERSISTENT);
-
-            responseQueue = connector.createTemporaryQueue();
+            responseQueue = getConnector().createTemporaryQueue();
 
             // create a message consumer
-            responseConsumer = connector.createConsumer(responseQueue, null);
+            responseConsumer = getConnector().createConsumer(responseQueue, null);
 
             responseConsumer.setMessageListener(
                 new MessageListener() {
@@ -172,24 +115,6 @@ public class RequestQueueSender extends CornerstoneConfigurable implements IServ
    }
 
     /**
-     * Tear down the sender.
-     */
-    public void tearDown(final ShutdownListener listener) {
-        // don't do this if we're already in the process of tearing down
-        if (!isTeardownPending()) {
-            teardownPending = true;
-
-            try {
-                closeDown();
-                teardownPending = false;
-                listener.onShutdownComplete();
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
-        }
-    }
-
-    /**
      * Send a request message and return the response.
      *
      * @param clazz the response class
@@ -214,8 +139,8 @@ public class RequestQueueSender extends CornerstoneConfigurable implements IServ
         MessageListener listener = new MessageListener() {
             public void onMessage(Message msg) {
                 handler.init(
-                        connector.getSession(), 
-                        connector.getAcknowledgeMode() == Session.CLIENT_ACKNOWLEDGE);
+                        getConnector().getSession(), 
+                        getConnector().getAcknowledgeMode() == Session.CLIENT_ACKNOWLEDGE);
                 promise.setObject(handler.processMessage(msg));
             }
         };
@@ -302,7 +227,7 @@ public class RequestQueueSender extends CornerstoneConfigurable implements IServ
             throw new NullPointerException("promise is null");
         }
 
-        if (!connector.isConnected()) {
+        if (!getConnector().isConnected()) {
             ErrorMessage errorMsg = new ErrorMessage();
             errorMsg.setMessage("Unable to send request.  Not connected to service bus.");
             throw new SendException(errorMsg);
@@ -320,7 +245,7 @@ public class RequestQueueSender extends CornerstoneConfigurable implements IServ
         try {
             Message message = prepareMessage(msg, payloadType);
             listenerMap.put(message.getJMSCorrelationID(), promiseListener);
-            requestSender.send(message);
+            getMessageSender().send(message);
         } catch (JMSException je) {
             ErrorMessage errorMsg = new ErrorMessage();
             errorMsg.setMessage("Unable to send request. " + je.getMessage());
@@ -354,22 +279,12 @@ public class RequestQueueSender extends CornerstoneConfigurable implements IServ
      *
      * @param requester the service requester
      */
-    private Message prepareMessage(
+    protected Message prepareMessage(
             com.paxxis.cornerstone.base.Message msg,
             MessagePayload payloadType) 
             throws JMSException {
 
-        Message message = payloadType.createMessage(connector.getSession());
-
-        message.setIntProperty(MessagingConstants.HeaderConstant.MessageType.name(), msg.getMessageType());
-        message.setIntProperty(MessagingConstants.HeaderConstant.MessageVersion.name(), msg.getMessageVersion());
-        message.setIntProperty(MessagingConstants.HeaderConstant.PayloadType.name(), payloadType.getType().getValue());
-
-        Object payload = msg.getAsPayload(payloadType.getType());
-        if (payloadType instanceof JavaObjectPayload) {
-            ((ObjectMessage)message).setObject((Serializable)payload);
-        }
-
+        Message message = super.prepareMessage(msg, payloadType);
         message.setJMSReplyTo(responseQueue);
         message.setJMSCorrelationID(generateCorrelationId());
         return message;

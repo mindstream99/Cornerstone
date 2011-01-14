@@ -23,28 +23,25 @@ import java.util.Deque;
 import java.util.Hashtable;
 
 import com.paxxis.cornerstone.common.DataLatch;
-import com.paxxis.cornerstone.service.JndiInitialContextFactory;
-import com.paxxis.cornerstone.service.RequestQueueSender;
-import com.paxxis.cornerstone.service.ServiceBusConnector;
 
 /**
  *
  * @author Robert Englander
  */
-public class ServiceBusSenderPool extends CornerstoneConfigurable
+public abstract class ServiceBusSenderPool<T extends DestinationSender> extends CornerstoneConfigurable
 {
-    public class PoolEntry
+    public static class PoolEntry<T>
     {
-        RequestQueueSender sender;
+        T sender;
         ServiceBusConnector connector;
 
-        public PoolEntry(ServiceBusConnector connector, RequestQueueSender sender)
+        public PoolEntry(ServiceBusConnector connector, T sender)
         {
             this.connector = connector;
             this.sender = sender;
         }
 
-        public RequestQueueSender getSender() {
+        public T getSender() {
             return sender;
         }
     }
@@ -62,10 +59,10 @@ public class ServiceBusSenderPool extends CornerstoneConfigurable
     }
     
     // free pool
-    private ArrayList<PoolEntry> _freePool = new ArrayList<PoolEntry>();
+    private ArrayList<PoolEntry<T>> _freePool = new ArrayList<PoolEntry<T>>();
 
     // assigned connections
-    private Hashtable<PoolEntry, Object> _activePool = new Hashtable<PoolEntry, Object>();
+    private Hashtable<PoolEntry<T>, Object> _activePool = new Hashtable<PoolEntry<T>, Object>();
 
     // borrowers waiting for instances to free up
     private Deque<WaitingBorrower> _borrowersInWaiting = new ArrayDeque<WaitingBorrower>();
@@ -135,9 +132,10 @@ public class ServiceBusSenderPool extends CornerstoneConfigurable
      * @param borrower
      * @return
      */
-    public PoolEntry borrowInstance(Object borrower)
+    @SuppressWarnings("unchecked")
+    public PoolEntry<T> borrowInstance(Object borrower)
     {
-        PoolEntry entry = null;
+        PoolEntry<T> entry = null;
 
         synchronized (_semaphore)
         {
@@ -155,7 +153,7 @@ public class ServiceBusSenderPool extends CornerstoneConfigurable
             // is returned by another borrower
             DataLatch latch = new DataLatch();
             _borrowersInWaiting.add(new WaitingBorrower(latch, borrower));
-            entry = (PoolEntry) latch.waitForObject();
+            entry = (PoolEntry<T>) latch.waitForObject();
         }
 
         return entry;
@@ -172,7 +170,7 @@ public class ServiceBusSenderPool extends CornerstoneConfigurable
      * @param entry the entry to return
      * @param borrower NOT NEEDED???
      */
-    public void returnInstance(PoolEntry entry, Object borrower)
+    public void returnInstance(PoolEntry<T> entry, Object borrower)
     {
         WaitingBorrower waiting = null;
 
@@ -203,16 +201,22 @@ public class ServiceBusSenderPool extends CornerstoneConfigurable
     public void initialize() {
         for (int i = 0; i < poolSize; i++)
         {
-            ServiceBusConnector connector = new ServiceBusConnector();
-            RequestQueueSender sender = new RequestQueueSender();
+            ServiceBusConnector connector = createConnector();
+            T sender = createSender();
             connector.addServiceBusConnectorClient(sender);
             connector.setInitialContextFactory(contextFactory);
             connector.setConnectionFactoryName(this.connectionFactoryName);
-            sender.setRequestQueueName(this.requestQueueName);
+            sender.setDestinationName(this.requestQueueName);
             connector.connect();
-            PoolEntry entry = new PoolEntry(connector, sender);
+            PoolEntry<T> entry = new PoolEntry<T>(connector, sender);
             _freePool.add(entry);
         }
     }
 
+    protected ServiceBusConnector createConnector() {
+        return new ServiceBusConnector();
+    }
+    
+    protected abstract T createSender();
+    
 }

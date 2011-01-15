@@ -204,10 +204,7 @@ public class DatabaseUpdater {
 
             Collections.sort(updates);
 
-            if (updates.size() == 0) {
-            	throw new Exception("Nothing to do.  Database is already at target version.");
-            }
-            
+            validateTargetVersion(updates, currentVersion, targetVersion, database);
             validateDependencies(updates, database);
             
             performUpdates(updates, database);
@@ -218,18 +215,18 @@ public class DatabaseUpdater {
             				
             } else {
             	sql = "update " + catalog + ".Version set version = " + targetVersion + 
-            					" where id = '" + id + "'";
+            					", timestamp = CURRENT_TIMESTAMP where id = '" + id + "'";
             }
         	database.executeStatement(sql);
         	database.commitTransaction();
         	
-        	System.out.println("\nDatabase successfully updated to version " + targetVersion);
+        	System.out.println("\nDatabase successfully updated to version " + targetVersion + "\n");
         } catch (Exception e) {
         	try {
         		database.rollbackTransaction();
         	} catch (Exception ee) {
         	}
-        	System.out.print("\nUpdate Failed: " + e.getLocalizedMessage());
+        	System.out.println("\nUpdate Failed: " + e.getLocalizedMessage() + "\n");
         }
 		
         pool.returnInstance(database, this);
@@ -257,6 +254,36 @@ public class DatabaseUpdater {
 		}
 	}
 
+	private void validateTargetVersion(List<Update> updates, int currentVersion, int targetVersion, DatabaseConnection database) throws Exception {
+		// there must be at least one update for each version after the current version, up to
+		// and including the target version
+		List<Integer> missing = new ArrayList<Integer>();
+		for (int i = (currentVersion + 1); i <= targetVersion; i++) {
+			boolean foundOne = false;
+			for (Update update : updates) {
+				if (update.getVersion() == i) {
+					foundOne = true;
+					break;
+				}
+			}
+			
+			if (!foundOne) {
+				missing.add(i);
+			}
+		}
+		
+		if (missing.size() > 0) {
+			StringBuilder msg = new StringBuilder("No updates found for target versions: ");
+			String op = "";
+			for (Integer version : missing) {
+				msg.append(op).append(version);
+				op = ", ";
+			}
+			
+			throw new Exception(msg.toString());
+		}
+	}
+	
 	private void validateDependencies(List<Update> updates, DatabaseConnection database) throws Exception {
 		for (Update update : updates) {
 			if (update.hasDependency()) {

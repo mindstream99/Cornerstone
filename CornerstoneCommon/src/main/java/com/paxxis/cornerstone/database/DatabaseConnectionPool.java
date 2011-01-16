@@ -18,8 +18,12 @@
 
 package com.paxxis.cornerstone.database;
 
+import java.sql.DriverManager;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
+
+import org.apache.log4j.Logger;
 
 import com.paxxis.cornerstone.common.DataLatch;
 import com.paxxis.cornerstone.common.PasswordGenerator;
@@ -32,12 +36,15 @@ import com.paxxis.cornerstone.service.CornerstoneConfigurable;
  * @author Robert Englander
  */ 
 public class DatabaseConnectionPool extends CornerstoneConfigurable {
+	private static final Logger LOGGER = Logger.getLogger(DatabaseConnectionPool.class);
+	
 	private static final String DERBY = "derby";
 	private static final String MYSQL = "mysql";
 	private static final String ORACLE = "oracle";
     private static final long ONEMINUTE = 60000L;
     private static final long DEFAULTIDLETHRESHOLD = 5L * ONEMINUTE;
     private static final long DEFAULTSWEEPCYCLE = ONEMINUTE;
+    private static final String DERBYDRIVEREMBEDDED = "org.apache.derby.jdbc.EmbeddedDriver";
     
     // the database parameters
     private String dbType = null;
@@ -104,7 +111,9 @@ public class DatabaseConnectionPool extends CornerstoneConfigurable {
                 {
                 }
                 
-                sweep();
+                if (!terminate) {
+                    sweep();
+                }
             }
         }
     }
@@ -271,6 +280,18 @@ public class DatabaseConnectionPool extends CornerstoneConfigurable {
         }
         
         _sweeper.terminate();
+        
+        try {
+        	if (isDerby()) {
+        		// if we're using Derby embedded then we need to shutdown the database
+        		if (DERBYDRIVEREMBEDDED.equals(_dbDriver)) {
+        			DriverManager.getConnection("jdbc:derby:;shutdown=true");
+        		}
+        	}
+		} catch (SQLException e) {
+			LOGGER.info(e.getLocalizedMessage());
+		}
+
     }
 
     @Override

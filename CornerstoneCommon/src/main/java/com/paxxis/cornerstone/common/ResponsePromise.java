@@ -30,7 +30,7 @@ public class ResponsePromise<RESP extends ResponseMessage<?>>
     private long timeout;
     
     public ResponsePromise() {
-        this(0);
+        this(10000);
     }
     
     public ResponsePromise(long timeout) {

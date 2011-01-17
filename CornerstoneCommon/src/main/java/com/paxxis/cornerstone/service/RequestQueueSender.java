@@ -55,9 +55,15 @@ public class RequestQueueSender extends DestinationSender {
 
     private AtomicLong correlationId = new AtomicLong(0);
 
+    private long timeout = 10000;
+    
     public RequestQueueSender() {
     }
 
+    public void setTimeout(long timeout) {
+        this.timeout = timeout;
+    }
+    
     /**
      * Close the JMS session objects
      */
@@ -178,7 +184,7 @@ public class RequestQueueSender extends DestinationSender {
                         RESP extends ResponseMessage<REQ>> ResponsePromise<RESP> send(
             REQ msg,
             MessagePayload payloadType) {
-        ResponsePromise<RESP> promise = new ResponsePromise<RESP>();
+        ResponsePromise<RESP> promise = new ResponsePromise<RESP>(this.timeout);
         send(msg, promise, null, payloadType);
         return promise;
     }
@@ -269,7 +275,7 @@ public class RequestQueueSender extends DestinationSender {
             REQ msg,
             MessageListener listener, 
             MessagePayload payloadType) {
-        ResponsePromise<RESP> promise = new ResponsePromise<RESP>();
+        ResponsePromise<RESP> promise = new ResponsePromise<RESP>(this.timeout);
         send(msg, promise, listener, payloadType);
         return promise;
     }

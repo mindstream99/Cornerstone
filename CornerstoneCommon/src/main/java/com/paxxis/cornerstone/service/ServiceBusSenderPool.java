@@ -70,7 +70,8 @@ public abstract class ServiceBusSenderPool<T extends DestinationSender> extends 
     // the semaphore for protected the pools
     final private Object _semaphore = new Object();
 
-    private int poolSize;
+    private int poolSize = 10;
+    private long borrowTimeout = 10000;
     private JndiInitialContextFactory contextFactory;
     private String connectionFactoryName;
     private String requestQueueName;
@@ -82,6 +83,10 @@ public abstract class ServiceBusSenderPool<T extends DestinationSender> extends 
 
     public void setPoolSize(int size) {
         poolSize = size;
+    }
+
+    public void setBorrowTimeout(long borrowTimeout) {
+        this.borrowTimeout = borrowTimeout;
     }
 
     public void setContextFactory(JndiInitialContextFactory factory) {
@@ -153,7 +158,10 @@ public abstract class ServiceBusSenderPool<T extends DestinationSender> extends 
             // is returned by another borrower
             DataLatch latch = new DataLatch();
             _borrowersInWaiting.add(new WaitingBorrower(latch, borrower));
-            entry = (PoolEntry<T>) latch.waitForObject();
+            entry = (PoolEntry<T>) latch.waitForObject(this.borrowTimeout);
+            if (latch.hasTimedout()) {
+                throw new RuntimeException("Timeout " + this.borrowTimeout + " reached waiting for pool entry");
+            }
         }
 
         return entry;

@@ -31,10 +31,9 @@ import javax.jms.MessageProducer;
 import javax.jms.Session;
 import javax.jms.TemporaryQueue;
 import javax.naming.Context;
+import javax.naming.NamingException;
 
 import org.apache.log4j.Logger;
-
-import com.paxxis.cornerstone.common.DataLatch;
 
 /**
  * ServiceBusConnector manages connections to the service bus.
@@ -238,6 +237,16 @@ public class ServiceBusConnector extends CornerstoneConfigurable
         }
     }
     
+    protected MessageProducer createMessageProducer(String destinationName) {
+        try {
+	        return createMessageProducer((Destination) 
+                getInitialContextFactory().createInitialContext().lookup(destinationName));
+        } catch (NamingException ne) {
+            _logger.error(ne);
+            throw new RuntimeException(ne);
+        }
+    }
+    
     /**
      * Create a message sender for a destination
      *
@@ -253,6 +262,7 @@ public class ServiceBusConnector extends CornerstoneConfigurable
         }
         catch (JMSException e)
         {
+            _logger.error(e);
             throw new RuntimeException(e);
         }
     }
@@ -268,6 +278,7 @@ public class ServiceBusConnector extends CornerstoneConfigurable
         }
         catch (JMSException e)
         {
+            _logger.error(e);
             throw new RuntimeException(e);
         }
     }

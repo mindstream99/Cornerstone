@@ -3,7 +3,6 @@ package com.paxxis.cornerstone.service;
 import java.io.Serializable;
 
 import javax.jms.DeliveryMode;
-import javax.jms.Destination;
 import javax.jms.JMSException;
 import javax.jms.Message;
 import javax.jms.MessageProducer;
@@ -19,9 +18,6 @@ import com.paxxis.cornerstone.common.MessagePayload;
 
 public class DestinationSender extends CornerstoneConfigurable implements IServiceBusConnectorClient {
     private static final Logger logger = Logger.getLogger(RequestQueueSender.class);
-
-    // the destination
-    private Destination destination = null;
 
     // the message sender
     private MessageProducer messageSender = null;
@@ -72,10 +68,8 @@ public class DestinationSender extends CornerstoneConfigurable implements IServi
      * Close the JMS session objects
      */
     protected void closeDown() throws JMSException {
-        
         messageSender.close();
         messageSender = null;
-        destination = null;
     }
 
     public void halt() {
@@ -89,14 +83,11 @@ public class DestinationSender extends CornerstoneConfigurable implements IServi
      * @throws RuntimeException if the setup could not be completed
      */
     public void setup() {
-
         try {
-            // lookup the destination
-            destination = (Destination)connector.getInitialContextFactory().createInitialContext().lookup(destinationName);
-
-            messageSender = connector.createMessageProducer(destination);
+            messageSender = connector.createMessageProducer(destinationName);
             messageSender.setDeliveryMode(DeliveryMode.NON_PERSISTENT);
         } catch(Throwable t) {
+            logger.error(t);
             try {
                 closeDown();
             } catch (JMSException e) {
@@ -120,6 +111,7 @@ public class DestinationSender extends CornerstoneConfigurable implements IServi
                 teardownPending = false;
                 listener.onShutdownComplete();
             } catch (Exception e) {
+                logger.error(e);
                 throw new RuntimeException(e);
             }
         }
@@ -141,6 +133,7 @@ public class DestinationSender extends CornerstoneConfigurable implements IServi
             Message message = prepareMessage(msg, payloadType);
             messageSender.send(message);
         } catch (JMSException je) {
+            logger.error(je);
             ErrorMessage errorMsg = new ErrorMessage();
             errorMsg.setMessage("Unable to publish message. " + je.getMessage());
             throw new SendException(errorMsg);

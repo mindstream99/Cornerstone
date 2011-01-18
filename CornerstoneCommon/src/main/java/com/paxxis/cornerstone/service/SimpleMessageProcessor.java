@@ -18,6 +18,8 @@
 
 package com.paxxis.cornerstone.service;
 
+import org.apache.log4j.Logger;
+
 import com.paxxis.cornerstone.base.RequestMessage;
 import com.paxxis.cornerstone.base.ResponseMessage;
 import com.paxxis.cornerstone.common.MessagePayload;
@@ -27,6 +29,9 @@ import com.paxxis.cornerstone.common.MessagePayload;
  * @author Robert Englander
  */
 public abstract class SimpleMessageProcessor<REQ extends RequestMessage, RESP extends ResponseMessage<REQ>> implements Runnable {
+    
+    private static final Logger logger = Logger.getLogger(SimpleMessageProcessor.class);
+    
     // the session to use for sending responses
     private javax.jms.Session session;
 
@@ -68,6 +73,25 @@ public abstract class SimpleMessageProcessor<REQ extends RequestMessage, RESP ex
         this.message = message;
     }
 
+    /**
+     * Return the message type this processor can handle...
+     * @return
+     */
+    public Integer getMessageType() {
+        //TODO this method should be declared abstract eventually...
+        return null;
+    }
+    
+    /**
+     * Return the message version this processor can handle...
+     * @return
+     */
+    public Integer getMessageVersion() {
+        //TODO this method should be declared abstract eventually...
+        return null;
+    }
+    
+    
     protected abstract RESP process(boolean ignorePreviousChanges) ;
 
     protected Object getPayload() {
@@ -83,6 +107,7 @@ public abstract class SimpleMessageProcessor<REQ extends RequestMessage, RESP ex
         }
     }
 
+    //FIXME this is used in one spot in the whole code base - ChimeService/**/MultiRequestProcessor.java - do we really, really need this?
     public RESP execute(Object payload, boolean ignorePreviousChanges) {
         _payload = payload;
         return process(ignorePreviousChanges);
@@ -97,7 +122,7 @@ public abstract class SimpleMessageProcessor<REQ extends RequestMessage, RESP ex
             // process the request
             execute(false);
         } catch (Exception e) {
-            // we should really do something here.  write to log.  inform mgmt object.
+            logger.error(e); 
         }
     }
 }

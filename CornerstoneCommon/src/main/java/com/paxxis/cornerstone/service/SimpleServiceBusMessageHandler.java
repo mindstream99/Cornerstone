@@ -43,7 +43,7 @@ public abstract class SimpleServiceBusMessageHandler extends CornerstoneConfigur
     public SimpleServiceBusMessageHandler() {
     }
 
-    protected abstract SimpleMessageProcessor getProcessor(int type, int version, int payloadType);
+    protected abstract SimpleMessageProcessor<?, ?> getProcessor(int type, int version, int payloadType);
 
     /**
      * Process a message.
@@ -51,14 +51,14 @@ public abstract class SimpleServiceBusMessageHandler extends CornerstoneConfigur
      * @param msg the JMS message that contains the request.
      */
     public void onMessage(Message msg) {
-        SimpleMessageProcessor processor = buildProcessor(msg);
+        SimpleMessageProcessor<?, ?> processor = buildProcessor(msg);
         processor.setClientAck(isClientAck());
         processor.init(_session, msg);
         submit(processor);
     }
 
     public com.paxxis.cornerstone.base.Message processMessage(Message msg) {
-        SimpleMessageProcessor processor = buildProcessor(msg);
+        SimpleMessageProcessor<?, ?> processor = buildProcessor(msg);
         processor.init(_session, msg);
         com.paxxis.cornerstone.base.Message result = processor.execute(false);
 
@@ -77,12 +77,12 @@ public abstract class SimpleServiceBusMessageHandler extends CornerstoneConfigur
         return clientAck;
     }
 
-    private SimpleMessageProcessor buildProcessor(Message msg) {
+    private SimpleMessageProcessor<?, ?> buildProcessor(Message msg) {
         int type = getMessageIntProperty(msg, MessagingConstants.HeaderConstant.MessageType.name());
         int version = getMessageIntProperty(msg, MessagingConstants.HeaderConstant.MessageVersion.name());
         int payloadType = getMessageIntProperty(msg, MessagingConstants.HeaderConstant.PayloadType.name());
 
-        SimpleMessageProcessor processor = getProcessor(type, version, payloadType);
+        SimpleMessageProcessor<?, ?> processor = getProcessor(type, version, payloadType);
         return processor;
     }
     

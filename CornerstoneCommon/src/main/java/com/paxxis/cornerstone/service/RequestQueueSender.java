@@ -17,6 +17,7 @@
 
 package com.paxxis.cornerstone.service;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicLong;
@@ -33,6 +34,7 @@ import org.apache.log4j.Logger;
 import com.paxxis.cornerstone.base.ErrorMessage;
 import com.paxxis.cornerstone.base.RequestMessage;
 import com.paxxis.cornerstone.base.ResponseMessage;
+import com.paxxis.cornerstone.common.BlockingThreadPoolExecutor;
 import com.paxxis.cornerstone.common.MessagePayload;
 import com.paxxis.cornerstone.common.ResponsePromise;
 
@@ -51,15 +53,34 @@ public class RequestQueueSender extends DestinationSender {
 
     // mapping of correlation ids to message listeners
     private Map<String, MessageListener> listenerMap = 
-        new HashMap<String, MessageListener>();
+        Collections.synchronizedMap(new HashMap<String, MessageListener>());
 
     private AtomicLong correlationId = new AtomicLong(0);
 
     private long timeout = 10000;
+    private BlockingThreadPoolExecutor messageExecutor;
     
     public RequestQueueSender() {
     }
 
+    public void initialize() {
+        if (this.messageExecutor == null) {
+            this.messageExecutor = new BlockingThreadPoolExecutor();
+        }
+    }
+    
+    /**
+     * The blocking thread pool executor that will execute the listeners for response messages.
+     * @param messageExecutor
+     */
+    public void setMessageExecutor(BlockingThreadPoolExecutor messageExecutor) {
+        this.messageExecutor = messageExecutor;
+    }
+    
+    /**
+     * The timeout, defaults to 10 seconds...
+     * @param timeout
+     */
     public void setTimeout(long timeout) {
         this.timeout = timeout;
     }
@@ -68,13 +89,23 @@ public class RequestQueueSender extends DestinationSender {
      * Close the JMS session objects
      */
     protected void closeDown() throws JMSException {
+        //tell the broker to stop sending us messages...
         responseConsumer.close();
         responseConsumer = null;
-
-        responseQueue.delete();
-        responseQueue = null;
         
-        super.closeDown();
+        messageExecutor.shutdown(new ShutdownListener() {
+            @Override
+            public void onShutdownComplete() {
+                try {
+			        responseQueue.delete();
+			        responseQueue = null;
+			        RequestQueueSender.super.closeDown();
+                } catch (JMSException jmse) {
+                    logger.error(jmse);
+                }
+            }
+        });
+        
     }
 
     /**
@@ -94,13 +125,19 @@ public class RequestQueueSender extends DestinationSender {
 
             responseConsumer.setMessageListener(
                 new MessageListener() {
-                    public void onMessage(Message msg) {
+                    public void onMessage(final Message msg) {
                         try
                         {
-                            MessageListener listener = 
+                            final MessageListener listener = 
                                 listenerMap.remove(msg.getJMSCorrelationID());
                             if (listener != null) {
-                                listener.onMessage(msg);
+                                RequestQueueSender.this.messageExecutor.submit(new Runnable() {
+                                    public void run() {
+                                        listener.onMessage(msg);
+                                    }
+                                });
+                            } else {
+                                logger.error("Possible race condition detected: Null listener for message");
                             }
                         } catch (Exception e) {
                             // this needs to be logged (and reported through mgmt interface?)
@@ -165,7 +202,7 @@ public class RequestQueueSender extends DestinationSender {
         }
 
         response = promise.getResponse();
-        if (response == null) {
+        if (promise.hasTimedout()) {
             throw new RequestTimeoutException();
         }
         return response;

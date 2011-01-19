@@ -20,6 +20,8 @@ package com.paxxis.cornerstone.service;
 import java.util.concurrent.RejectedExecutionException;
 import javax.jms.Session;
 
+import com.paxxis.cornerstone.common.BlockingThreadPoolExecutor;
+
 /**
  * This is a base class for service bus message handlers.  
  *
@@ -27,7 +29,7 @@ import javax.jms.Session;
  */
 public abstract class ServiceBusMessageHandler extends SimpleServiceBusMessageHandler {
     // the request processor
-    private ServiceBusMessageProcessor _messageProcessor = null;
+    private BlockingThreadPoolExecutor _messageProcessor = null;
 
     // the thread pool size to use when creating
     // request processor instances
@@ -94,7 +96,7 @@ public abstract class ServiceBusMessageHandler extends SimpleServiceBusMessageHa
                 _messageProcessor.restart();
             }
         } else {
-            _messageProcessor = new ServiceBusMessageProcessor(_poolSize, maxMessagesInFlight);
+            _messageProcessor = new BlockingThreadPoolExecutor(_poolSize, maxMessagesInFlight);
         }
     }
 

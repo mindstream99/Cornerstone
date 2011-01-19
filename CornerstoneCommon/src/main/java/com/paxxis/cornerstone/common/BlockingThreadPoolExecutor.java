@@ -14,8 +14,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package com.paxxis.cornerstone.common;
 
-package com.paxxis.cornerstone.service;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ArrayBlockingQueue;
@@ -23,12 +23,14 @@ import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
+import com.paxxis.cornerstone.service.ShutdownListener;
+
 /**
- * Processes messages using a thread pool.
+ * Processes runnables using a blocking thread pool.
  *
  * @author Robert Englander  
  */
-public class ServiceBusMessageProcessor {
+public class BlockingThreadPoolExecutor {
 	
 	/**
 	 * This is a blocking queue that blocks on the offer method.  Normally the offer method will
@@ -36,10 +38,10 @@ public class ServiceBusMessageProcessor {
 	 * so offer is overridden so that it calls put instead.
 	 * 
 	 */
-	private static class MessageBlockingQueue<M> extends ArrayBlockingQueue<M> {
+	private static class OfferBlockingQueue<M> extends ArrayBlockingQueue<M> {
 		private static final long serialVersionUID = 1L;
 
-		public MessageBlockingQueue(int capacity) {
+		public OfferBlockingQueue(int capacity) {
 			super(capacity);
 		}
 
@@ -62,11 +64,11 @@ public class ServiceBusMessageProcessor {
     private boolean isHalted = false;
     
     private int poolSize;
-    private int maxMessages;
+    private int maxRunnables;
     
     
     /**
-     * Monitors the ExecutorService until it is terminated, at
+     * Monitors the executor until it is terminated, at
      * which point it informs the registered listener and then
      * terminates itself.
      */
@@ -105,31 +107,38 @@ public class ServiceBusMessageProcessor {
     }
     
     /**
+     * Default constructor that sets some reasonable defaults for poolSize and maxRunnables in flight.
+     */
+    public BlockingThreadPoolExecutor() {
+        this(10, 10);
+    }
+    
+    /**
      * Constructor.
      *
      * @param poolSize the size of the thread pool.  
-     * @param max the maximum number of messages in flight.
+     * @param max the maximum number of runnables in flight.
      */
-    public ServiceBusMessageProcessor(int poolSize, int max) {
+    public BlockingThreadPoolExecutor(int poolSize, int max) {
         this.poolSize = poolSize;
-        maxMessages = max;
-        if (maxMessages == 0) {
-        	maxMessages = poolSize;
+        maxRunnables = max;
+        if (maxRunnables == 0) {
+        	maxRunnables = poolSize;
         }
         
         executor = new ThreadPoolExecutor(poolSize, poolSize, 0, TimeUnit.MILLISECONDS, 
-        						new MessageBlockingQueue<Runnable>(maxMessages));
+        						new OfferBlockingQueue<Runnable>(maxRunnables));
         executor.prestartAllCoreThreads();
     }
 
     /**
-     * Submit a message for processing.  Since the executor is constructed with a MessageBlockingQueue,
-     * this method will block if the waiting queue is full, returning only when the message can be accepted.
+     * Submit a runnable for processing.  Since the executor is constructed with a OfferBlockingQueue,
+     * this method will block if the waiting queue is full, returning only when the runnable can be accepted.
      *
      * @param message 
      */
-    public void submit(Runnable message) {
-        executor.execute(message);
+    public void submit(Runnable runnable) {
+        executor.execute(runnable);
     }
     
     public void halt() {
@@ -145,7 +154,7 @@ public class ServiceBusMessageProcessor {
     public void restart() {
         if (isHalted) {
             executor = new ThreadPoolExecutor(poolSize, poolSize, 0, TimeUnit.MILLISECONDS, 
-					new MessageBlockingQueue<Runnable>(maxMessages));
+					new OfferBlockingQueue<Runnable>(maxRunnables));
             
             for (Runnable work : halted) {
                 submit(work);
@@ -171,7 +180,7 @@ public class ServiceBusMessageProcessor {
     }
     
     /**
-     * Determine if the request processor is shut down.
+     * Determine if the executor is shut down.
      *
      * @return true if shutdown, false otherwise.
      */

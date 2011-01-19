@@ -139,9 +139,8 @@ public class ServiceShell {
         ctx.refresh();
         XmlBeanDefinitionReader xmlReader = new XmlBeanDefinitionReader(ctx);
         xmlReader.loadBeanDefinitions(new FileSystemResource(inputs[0]));
-        DatabaseConnectionPool pool = (DatabaseConnectionPool)ctx.getBean("connectionPool");
 
-        DatabaseUpdater updater = (DatabaseUpdater)ctx.getBean("dbUpdater");
+        DatabaseUpdater updater = ctx.getBean(DatabaseUpdater.class);
         updater.update(inputs[1], inputs[2]);
 
         ctx.close();

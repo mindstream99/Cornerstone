@@ -44,9 +44,14 @@ public abstract class SimpleMessageProcessor<REQ extends RequestMessage, RESP ex
 
     private boolean clientAck = false;
 
+	// TODO: after the switch to using ServiceBusMessageRouter this may be removed
     public SimpleMessageProcessor(MessagePayload type) {
         payloadType = type;
     }
+
+	public SimpleMessageProcessor() {
+
+	}
 
     public void setClientAck(boolean ack) {
         clientAck = ack;
@@ -67,6 +72,10 @@ public abstract class SimpleMessageProcessor<REQ extends RequestMessage, RESP ex
     public MessagePayload getPayloadType() {
         return payloadType;
     }
+
+	public void setPayloadType(MessagePayload payloadType) {
+		this.payloadType = payloadType;
+	}
 
     public void init(javax.jms.Session session, javax.jms.Message message) {
         this.session = session;
@@ -91,15 +100,19 @@ public abstract class SimpleMessageProcessor<REQ extends RequestMessage, RESP ex
         return null;
     }
     
+	public Class<REQ> getRequestMessageClass() {
+		// TODO this method should be declared abstract eventually...
+		return null;
+	}
     
     protected abstract RESP process(boolean ignorePreviousChanges) ;
 
-    protected Object getPayload() {
+	protected Object getPayload() {
         if (_payload != null) {
             return _payload;
         } else {
             try {
-                return payloadType.getPayload(message);
+				return payloadType.getPayload(message);
             } catch (RuntimeException ex) {
                 //Logger.getLogger(MessageProcessor.class.getName()).log(Level.SEVERE, null, ex);
                 throw new RuntimeException(ex);

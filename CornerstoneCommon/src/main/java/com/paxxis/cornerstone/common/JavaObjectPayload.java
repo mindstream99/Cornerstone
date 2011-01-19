@@ -17,13 +17,14 @@
 
 package com.paxxis.cornerstone.common;
 
-import com.paxxis.cornerstone.base.MessagingConstants;
-import com.paxxis.cornerstone.base.MessagingConstants.PayloadType;
-
 import java.io.Serializable;
+
 import javax.jms.JMSException;
 import javax.jms.ObjectMessage;
 import javax.jms.Session;
+
+import com.paxxis.cornerstone.base.MessagingConstants;
+import com.paxxis.cornerstone.base.MessagingConstants.PayloadType;
 
 /**
  *
@@ -57,9 +58,12 @@ public class JavaObjectPayload implements MessagePayload {
         }
     }
 
-    public javax.jms.Message createMessage(Session session, Object data) {
+	public javax.jms.Message createMessage(Session session, com.paxxis.cornerstone.base.Message data) {
         try {
             ObjectMessage msg = (ObjectMessage)createMessage(session);
+			msg.setIntProperty(MessagingConstants.HeaderConstant.MessageType.name(), data.getMessageType());
+			msg.setIntProperty(MessagingConstants.HeaderConstant.MessageVersion.name(), data.getMessageVersion());
+
             msg.setObject((Serializable)data);
             return msg;
         } catch (JMSException e) {

@@ -1,21 +1,37 @@
+/*
+ * Copyright 2010 the original author or authors.
+ * Copyright 2009 Paxxis Technology LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package com.paxxis.cornerstone.service;
-
-import java.io.Serializable;
 
 import javax.jms.DeliveryMode;
 import javax.jms.JMSException;
 import javax.jms.Message;
 import javax.jms.MessageProducer;
-import javax.jms.ObjectMessage;
 
 import org.apache.log4j.Logger;
 
 import com.paxxis.cornerstone.base.ErrorMessage;
-import com.paxxis.cornerstone.base.MessagingConstants;
 import com.paxxis.cornerstone.base.RequestMessage;
-import com.paxxis.cornerstone.common.JavaObjectPayload;
 import com.paxxis.cornerstone.common.MessagePayload;
 
+/**
+ * 
+ * @author Robert Englander
+ * 
+ */
 public class DestinationSender extends CornerstoneConfigurable implements IServiceBusConnectorClient {
     private static final Logger logger = Logger.getLogger(RequestQueueSender.class);
 
@@ -150,17 +166,8 @@ public class DestinationSender extends CornerstoneConfigurable implements IServi
             MessagePayload payloadType) 
             throws JMSException {
 
-        Message message = payloadType.createMessage(connector.getSession());
+		Message message = payloadType.createMessage(connector.getSession(), msg);
 
-        message.setIntProperty(MessagingConstants.HeaderConstant.MessageType.name(), msg.getMessageType());
-        message.setIntProperty(MessagingConstants.HeaderConstant.MessageVersion.name(), msg.getMessageVersion());
-        message.setIntProperty(MessagingConstants.HeaderConstant.PayloadType.name(), payloadType.getType().getValue());
-
-        Object payload = msg.getAsPayload(payloadType.getType());
-        if (payloadType instanceof JavaObjectPayload) {
-            ((ObjectMessage)message).setObject((Serializable)payload);
-        }
-
-        return message;
+		return message;
     }
 }

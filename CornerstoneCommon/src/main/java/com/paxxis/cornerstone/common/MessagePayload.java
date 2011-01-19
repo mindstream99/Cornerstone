@@ -17,10 +17,10 @@
 
 package com.paxxis.cornerstone.common;
 
-import com.paxxis.cornerstone.base.MessagingConstants.PayloadType;
-
 import javax.jms.Message;
 import javax.jms.Session;
+
+import com.paxxis.cornerstone.base.MessagingConstants.PayloadType;
 
 /**
  *
@@ -28,7 +28,8 @@ import javax.jms.Session;
  */
 public interface MessagePayload {
     public abstract Object getPayload(Message msg);
-    public abstract Message createMessage(Session session, Object data);
+
+	public abstract Message createMessage(Session session, com.paxxis.cornerstone.base.Message data);
     public abstract Message createMessage(Session session);
     public abstract PayloadType getType();
 }

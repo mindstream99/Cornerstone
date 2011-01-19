@@ -197,7 +197,7 @@ public class RequestQueueSender extends DestinationSender {
 			} catch (Exception e) {
 				throw new RuntimeException(e);
 			}
-            response.setError(se.getErrorMessage());
+			response.setErrorMessage(se.getErrorMessage());
             return response;
         }
 

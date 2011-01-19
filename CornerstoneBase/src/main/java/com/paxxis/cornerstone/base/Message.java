@@ -27,37 +27,5 @@ public abstract class Message implements Serializable {
 
     public Message() {
     }
-
-    public final Object getAsPayload(MessagingConstants.PayloadType type) {
-
-        Object result;
-
-        switch (type) {
-            case JavaObjectPayload:
-                result = this;
-                break;
-
-            default:
-                throw new RuntimeException("Message.createInstance Unknown Payload Type: " + type);
-        }
-
-        return result;
-    }
-
-    public final Message createInstance(Object source)
-    {
-        if (source instanceof Message)
-        {
-            return (Message)source;
-        }
-        //else if (source instanceof String)
-        //{
-        //    Message instance = newInstance();
-        //    instance.populateFromJSON((String)source);
-        //    return instance;
-        //}
-
-        throw new RuntimeException("Message.createInstance invalid source class: " + source.getClass().getName());
-    }
 }
 

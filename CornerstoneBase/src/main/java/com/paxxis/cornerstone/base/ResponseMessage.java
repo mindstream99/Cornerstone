@@ -38,15 +38,15 @@ public abstract class ResponseMessage<D extends RequestMessage> extends Message 
         return request;
     }
 
-    public boolean isError() {
-    	return error != null;
-    }
+	public boolean isError() {
+		return error != null;
+	}
     
-    public void setError(ErrorMessage em) {
+	public void setErrorMessage(ErrorMessage em) {
     	error = em;
     }
     
-    public ErrorMessage getError() {
+	public ErrorMessage getErrorMessage() {
     	return error;
     }
 }

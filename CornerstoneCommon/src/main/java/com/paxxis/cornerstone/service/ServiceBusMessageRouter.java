@@ -21,6 +21,11 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
+import org.codehaus.jackson.map.ObjectMapper;
+
+import com.paxxis.cornerstone.base.MessagingConstants.PayloadType;
+import com.paxxis.cornerstone.common.JSonObjectPayload;
+import com.paxxis.cornerstone.common.JavaObjectPayload;
 
 /**
  * 
@@ -68,17 +73,17 @@ public class ServiceBusMessageRouter extends ServiceBusMessageHandler {
             return null;
         }
         
-        /* detection of invalid message payload type - good opportunity to do something with payload here...
-        try { 
-	        MessagePayload payload = messagePayloadFactory.getMessagePayload(
-	                PayloadType.valueOf(payloadType).toString());
-        } catch (Exception e) {
-            logger.error("Unrecognized payload " + payloadType);
-            return null;
-        }
-        */
-        
-        return messageProcessorFactory.getMessageProcessor(messageProcessorName);
+        MessageProcessor processor = messageProcessorFactory.getMessageProcessor(messageProcessorName);
+		if (payloadType == PayloadType.JavaObjectPayload.getValue()) {
+			processor.setPayloadType(new JavaObjectPayload());
+		} else if (payloadType == PayloadType.JsonObjectPayload.getValue()) {
+			processor.setPayloadType(new JSonObjectPayload(new ObjectMapper(), processor.getRequestMessageClass()));
+		} else {
+			logger.error("Invalid Payload type detected: " + payloadType);
+			return null;
+		}
+
+		return processor;
     }
 
     public void setMessageProcessorNames(List<String> messageProcessorNames) {

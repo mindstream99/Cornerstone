@@ -17,16 +17,12 @@
 
 package com.paxxis.cornerstone.service;
 
-import java.io.Serializable;
-
 import javax.jms.DeliveryMode;
 import javax.jms.JMSException;
 import javax.jms.Message;
 import javax.jms.MessageProducer;
-import javax.jms.ObjectMessage;
 import javax.jms.Topic;
 
-import com.paxxis.cornerstone.base.MessagingConstants;
 import com.paxxis.cornerstone.common.MessagePayload;
 
 /**
@@ -201,15 +197,7 @@ public class NotificationTopicSender extends CornerstoneConfigurable implements 
             MessagePayload payloadType, 
             long ttl) throws JMSException {
 
-        javax.jms.Message message = payloadType.createMessage(_connector.getSession());
-
-        message.setIntProperty(MessagingConstants.HeaderConstant.MessageType.name(), msg.getMessageType());
-        message.setIntProperty(MessagingConstants.HeaderConstant.MessageVersion.name(), msg.getMessageVersion());
-        message.setIntProperty(MessagingConstants.HeaderConstant.PayloadType.name(), payloadType.getType().getValue());
-
-        // only supporting java objects right now
-        Object payload = msg.getAsPayload(payloadType.getType());
-        ((ObjectMessage)message).setObject((Serializable)payload);
+		javax.jms.Message message = payloadType.createMessage(_connector.getSession(), msg);
 
         // send the message to the service notification topic
         _notificationSender.send(message, Message.DEFAULT_DELIVERY_MODE, Message.DEFAULT_PRIORITY, ttl);

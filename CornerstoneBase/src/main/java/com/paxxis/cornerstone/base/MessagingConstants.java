@@ -36,13 +36,15 @@ public class MessagingConstants {
 
     // payload type values
     private final static int JAVAOBJECTPAYLOAD = 1;
+	private final static int JSONOBJECTPAYLOAD = 2;
 
     protected MessagingConstants() {
     }
 
     public enum PayloadType {
         Invalid(INVALID),
-        JavaObjectPayload(JAVAOBJECTPAYLOAD);
+		JavaObjectPayload(JAVAOBJECTPAYLOAD),
+		JsonObjectPayload(JSONOBJECTPAYLOAD);
 
         private int value;
 
@@ -60,6 +62,9 @@ public class MessagingConstants {
                 case JAVAOBJECTPAYLOAD:
                     result = JavaObjectPayload;
                     break;
+				case JSONOBJECTPAYLOAD:
+					result = JsonObjectPayload;
+					break;
             }
 
             return result;

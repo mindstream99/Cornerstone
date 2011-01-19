@@ -34,10 +34,8 @@ public abstract class ResponseProcessor<REQ extends RequestMessage, RESP extends
         _listener = listener;
     }
 
-    protected abstract RESP renderMessage(Object payload);
-
     protected RESP process(boolean ignorePreviousChanges) {
-    	RESP responseMessage = renderMessage(getPayload());
+		RESP responseMessage = (RESP) getPayload();
 
         if (_listener != null) {
             _listener.onComplete(responseMessage);

@@ -17,6 +17,9 @@
 
 package com.paxxis.cornerstone.database;
 
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -28,10 +31,6 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-
-import com.paxxis.cornerstone.database.DataSet;
-import com.paxxis.cornerstone.database.DatabaseConnection;
-import com.paxxis.cornerstone.database.DatabaseConnectionPool;
 
 /**
  * 
@@ -180,7 +179,12 @@ public class DatabaseUpdater {
                                 		Node sqlNode = targetChildren.item(k);
                                 		if (SQL.equalsIgnoreCase(sqlNode.getNodeName())) {
                                         	String sql = sqlNode.getTextContent();
-                                        	sqlList.add(sql);
+                                        	List<String> sqlLines = parseLines(sql);
+                                        	for (String sqlLine : sqlLines) {
+                                        		if (!sqlLine.isEmpty()) {
+                                                	sqlList.add(sqlLine);
+                                        		}
+                                        	}
                                 		}
                                 	}
 
@@ -230,6 +234,41 @@ public class DatabaseUpdater {
         }
 		
         pool.returnInstance(database, this);
+	}
+	
+	/**
+	 * Parses the input into separate lines, combining lines that are continued using
+	 * a backslash at the end of the line
+	 */
+	private List<String> parseLines(String input) throws Exception {
+		StringReader rdr = new StringReader(input);
+		BufferedReader br = new BufferedReader(rdr);
+
+        List<String> list = new ArrayList<String>();
+        
+        String strLine;
+        boolean prevContinues = false;
+	    while ((strLine = br.readLine()) != null)   {
+	    	strLine = strLine.trim();
+	    	boolean thisContinues = strLine.endsWith("\\");
+	    	if (thisContinues) {
+	    		int last = strLine.length() - 1;
+	    		strLine = strLine.substring(0, last);
+	    	}
+	    	
+	    	if (prevContinues) {
+	    		prevContinues = false;
+	    		int last = list.size() - 1;
+	    		String full = list.get(last) + strLine;
+	    		list.set(last, full);
+	    	} else {
+		    	list.add(strLine);
+	    	}
+	    	
+	    	prevContinues = thisContinues;
+	    }
+	    
+	    return list;
 	}
 	
 	private void performUpdates(List<Update> updates, DatabaseConnection database) throws Exception {

@@ -43,7 +43,7 @@ public abstract class SimpleServiceBusMessageHandler extends CornerstoneConfigur
     public SimpleServiceBusMessageHandler() {
     }
 
-    protected abstract SimpleMessageProcessor<?, ?> getProcessor(int type, int version, int payloadType);
+    public abstract SimpleMessageProcessor<?, ?> getProcessor(int type, int version, int payloadType);
 
     /**
      * Process a message.

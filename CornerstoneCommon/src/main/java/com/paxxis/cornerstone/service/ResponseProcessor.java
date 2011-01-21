@@ -30,12 +30,13 @@ public abstract class ResponseProcessor<REQ extends RequestMessage, RESP extends
     private ResponseListener<RESP> _listener;
 
     public ResponseProcessor(MessagePayload type, ResponseListener<RESP> listener) {
-        super(type);
+        setPayloadType(type);
         _listener = listener;
     }
 
     protected RESP process(boolean ignorePreviousChanges) {
-		RESP responseMessage = (RESP) getPayload();
+		@SuppressWarnings("unchecked")
+        RESP responseMessage = (RESP) getPayload();
 
         if (_listener != null) {
             _listener.onComplete(responseMessage);

@@ -40,7 +40,7 @@ public class ResponseHandler<T extends Message> extends SimpleServiceBusMessageH
         _payloadTypes.put(MessagingConstants.PayloadType.JavaObjectPayload, new JavaObjectPayload());
     }
 
-    private ResponseListener _listener = null;
+    private ResponseListener<T> _listener = null;
 
     public ResponseHandler() {
     }
@@ -57,7 +57,7 @@ public class ResponseHandler<T extends Message> extends SimpleServiceBusMessageH
         return _payloadTypes.get(type);
     }
 
-    protected SimpleMessageProcessor getProcessor(int type, int version, int payloadType) {
+    public SimpleMessageProcessor<?, ?> getProcessor(int type, int version, int payloadType) {
         // this is an unknown message type.  the subclass doesn't recognize it and neither do I.
         throw new RuntimeException("Unknown response message type: " + type + " version " + version);
     }

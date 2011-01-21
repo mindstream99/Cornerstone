@@ -25,7 +25,6 @@ import org.apache.log4j.Logger;
 
 import com.paxxis.cornerstone.base.RequestMessage;
 import com.paxxis.cornerstone.base.ResponseMessage;
-import com.paxxis.cornerstone.common.MessagePayload;
 
 
 
@@ -37,15 +36,9 @@ public abstract class MessageProcessor<REQ extends RequestMessage, RESP extends 
 							extends SimpleMessageProcessor<REQ, RESP> {
     private static final Logger logger = Logger.getLogger(MessageProcessor.class);
     
-	// TODO: after the switch to using ServiceBusMessageRouter this may be removed
-    public MessageProcessor(MessagePayload type) {
-        super(type);
-    }
 
-	public MessageProcessor() {
-	}
-
-	public REQ getMessagePayload() {
+	@SuppressWarnings("unchecked")
+    public REQ getMessagePayload() {
 		return (REQ) getPayload();
 	}
 

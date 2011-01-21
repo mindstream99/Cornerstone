@@ -44,10 +44,6 @@ public abstract class SimpleMessageProcessor<REQ extends RequestMessage, RESP ex
 
     private boolean clientAck = false;
 
-	// TODO: after the switch to using ServiceBusMessageRouter this may be removed
-    public SimpleMessageProcessor(MessagePayload type) {
-        payloadType = type;
-    }
 
 	public SimpleMessageProcessor() {
 
@@ -83,28 +79,41 @@ public abstract class SimpleMessageProcessor<REQ extends RequestMessage, RESP ex
     }
 
     /**
-     * Return the message type this processor can handle...
+     * Return the request message type this processor can handle...
      * @return
      */
-    public Integer getMessageType() {
-        //TODO this method should be declared abstract eventually...
-        return null;
-    }
+    public abstract Integer getRequestMessageType();
     
     /**
-     * Return the message version this processor can handle...
+     * Return the request message version this processor can handle...
      * @return
      */
-    public Integer getMessageVersion() {
-        //TODO this method should be declared abstract eventually...
-        return null;
-    }
+    public abstract Integer getRequestMessageVersion();
     
-	public Class<REQ> getRequestMessageClass() {
-		// TODO this method should be declared abstract eventually...
-		return null;
-	}
+    /**
+     * Return the response message type this processor can handle...
+     * @return
+     */
+    public abstract Integer getResponseMessageType();
     
+    /**
+     * Return the response message version this processor can handle...
+     * @return
+     */
+    public abstract Integer getResponseMessageVersion();
+    
+    /**
+     * Return the message class this processor is expecting...
+     * @return
+     */
+	public abstract Class<REQ> getRequestMessageClass();
+	
+    /**
+     * Return the message class this processor is expecting...
+     * @return
+     */
+	public abstract Class<RESP> getResponseMessageClass();
+	
     protected abstract RESP process(boolean ignorePreviousChanges) ;
 
 	protected Object getPayload() {

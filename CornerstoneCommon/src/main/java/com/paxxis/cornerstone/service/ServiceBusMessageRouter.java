@@ -50,7 +50,7 @@ public class ServiceBusMessageRouter extends ServiceBusMessageHandler {
             MessageProcessor<?,?> messageProcessor = 
                 this.messageProcessorFactory.getMessageProcessor(name);
             TypeVersionTuple tvt = new TypeVersionTuple(
-                    messageProcessor.getMessageType(), messageProcessor.getMessageVersion());
+                    messageProcessor.getRequestMessageType(), messageProcessor.getRequestMessageVersion());
             String old = messageProcessorMap.put(tvt, name);
             if (old != null) {
 	            String msg = name  + " overrides "  + old  + " for message "  + tvt; 
@@ -63,7 +63,7 @@ public class ServiceBusMessageRouter extends ServiceBusMessageHandler {
     }
     
     @Override
-    protected MessageProcessor<?, ?> getProcessor(int type, int version, int payloadType) {
+    public MessageProcessor<?, ?> getProcessor(int type, int version, int payloadType) {
         
         TypeVersionTuple tvt = new TypeVersionTuple(type, version);
         String messageProcessorName = this.messageProcessorMap.get(tvt);
@@ -73,7 +73,7 @@ public class ServiceBusMessageRouter extends ServiceBusMessageHandler {
             return null;
         }
         
-        MessageProcessor processor = messageProcessorFactory.getMessageProcessor(messageProcessorName);
+        MessageProcessor<?, ?> processor = messageProcessorFactory.getMessageProcessor(messageProcessorName);
 		if (payloadType == PayloadType.JavaObjectPayload.getValue()) {
 			processor.setPayloadType(new JavaObjectPayload());
 		} else if (payloadType == PayloadType.JsonObjectPayload.getValue()) {
@@ -83,6 +83,12 @@ public class ServiceBusMessageRouter extends ServiceBusMessageHandler {
 			return null;
 		}
 
+		if (processor instanceof MultiRequestProcessor) {
+		    //it is expected that this type of request processor encapsulates multiple requests in
+		    //one message and it will be calling back to use to determine the processors to handle
+		    //the inner requests - unfortunately this means we could have a nice infinite loop too...
+		    ((MultiRequestProcessor) processor).setServiceBusMessageHandler(this);
+		}
 		return processor;
     }
 

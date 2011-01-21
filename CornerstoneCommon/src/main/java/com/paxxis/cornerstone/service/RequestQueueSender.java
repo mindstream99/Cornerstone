@@ -36,6 +36,7 @@ import com.paxxis.cornerstone.base.RequestMessage;
 import com.paxxis.cornerstone.base.ResponseMessage;
 import com.paxxis.cornerstone.common.BlockingThreadPoolExecutor;
 import com.paxxis.cornerstone.common.MessagePayload;
+import com.paxxis.cornerstone.common.TimeoutException;
 import com.paxxis.cornerstone.common.ResponsePromise;
 
 /**
@@ -168,7 +169,7 @@ public class RequestQueueSender extends DestinationSender {
      * @param payloadType the message payload type
      *
      * @return the response
-     * @throws a RequestTimeoutException if response timed out
+     * @throws a TimeoutException if response timed out
      */
     public synchronized <REQ extends RequestMessage, RESP extends ResponseMessage<REQ>> RESP send(
             Class<RESP> clazz, 
@@ -203,7 +204,7 @@ public class RequestQueueSender extends DestinationSender {
 
         response = promise.getResponse();
         if (promise.hasTimedout()) {
-            throw new RequestTimeoutException();
+            throw new TimeoutException();
         }
         return response;
     }

@@ -20,22 +20,22 @@ package com.paxxis.cornerstone.database;
 
 import java.sql.DriverManager;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import org.apache.log4j.Logger;
 
-import com.paxxis.cornerstone.common.DataLatch;
+import com.paxxis.cornerstone.common.AbstractBlockingObjectPool;
 import com.paxxis.cornerstone.common.PasswordGenerator;
 import com.paxxis.cornerstone.database.DatabaseConnection.Type;
-import com.paxxis.cornerstone.service.CornerstoneConfigurable;
 
 /**
  * Manages a pool of DatabaseConnection connections.
  *    
  * @author Robert Englander
  */ 
-public class DatabaseConnectionPool extends CornerstoneConfigurable {
+public class DatabaseConnectionPool extends AbstractBlockingObjectPool<DatabaseConnection> {
 	private static final Logger LOGGER = Logger.getLogger(DatabaseConnectionPool.class);
 	
 	private static final String DERBY = "derby";
@@ -70,18 +70,35 @@ public class DatabaseConnectionPool extends CornerstoneConfigurable {
     
     private PasswordGenerator passwordGenerator = null;
     
-    class PoolEntry
+    private boolean ensureConnected = true;
+    private String ensureConnectedStatment = "select 1";
+    
+    //FIXME this is a work around to keep the api for borrowing connections the same in Chime
+    //will be removed on future refactorings...
+    private Map<DatabaseConnection, PoolEntry> activeConnections = 
+        new HashMap<DatabaseConnection, PoolEntry>();
+    
+    public static class PoolEntry extends AbstractBlockingObjectPool.PoolEntry<DatabaseConnection>
     {
-        long timestamp;
-        DatabaseConnection database;
+        private long timestamp;
         
-        public PoolEntry(DatabaseConnection db)
-        {
-            database = db;
-            timestamp = System.currentTimeMillis();
+        public PoolEntry(DatabaseConnection db) {
+            super(db);
+            this.timestamp = System.currentTimeMillis();
+        }
+        
+        public long getTimestamp() {
+            return this.timestamp;
+        }
+        
+        @Override
+        public void shutdown() {
+            getObject().disconnect();
+            super.shutdown();
         }
     }
     
+    //FIXME this should probably be pushed down into a more generic object pool...
     private static int _sweeperCounter = 0;
     class Sweeper extends Thread
     {
@@ -120,30 +137,19 @@ public class DatabaseConnectionPool extends CornerstoneConfigurable {
     
     private Sweeper _sweeper = new Sweeper();
     
-    // free pool
-    private ArrayList<PoolEntry> _freePool = new ArrayList<PoolEntry>();
     
-    // assigned connections
-    private HashMap<DatabaseConnection, Object> _activePool = new HashMap<DatabaseConnection, Object>();
-    
-    // borrowers waiting for instances to free up
-    private ArrayList<DataLatch> _borrowersInWaiting = new ArrayList<DataLatch>();
-    
-    // the semaphore for protected the pools
-    private final Object _semaphore = new Object();
-    
-    public DatabaseConnectionPool()
-    {
-    }
-
     private void sweep()
     {
         long now = System.currentTimeMillis();
         
-        synchronized (_semaphore)
+        synchronized (getSemaphore())
         {
-            int active = _activePool.size();
-            int free = _freePool.size();
+            Map<AbstractBlockingObjectPool.PoolEntry<DatabaseConnection>, Object> activePool = getActivePool();
+            int active = activePool.size();
+            
+            List<AbstractBlockingObjectPool.PoolEntry<DatabaseConnection>> freePool = getFreePool();
+            int free = freePool.size();
+            
             int total = active + free;
             
             if (free > 0 && total > _minimum)
@@ -161,11 +167,11 @@ public class DatabaseConnectionPool extends CornerstoneConfigurable {
                         int last = free - 1;
                         for (int i = last; i >= 0; i--)
                         {
-                            PoolEntry entry = _freePool.get(i);
+                            PoolEntry entry = (PoolEntry) freePool.get(i);
                             if ((now - entry.timestamp) >= _idleThreshold)
                             {
-                                entry.database.disconnect();
-                                _freePool.remove(i);
+                                entry.getObject().disconnect();
+                                freePool.remove(i);
                                 removed++;
 
                                 if (removed == count)
@@ -179,134 +185,93 @@ public class DatabaseConnectionPool extends CornerstoneConfigurable {
             }
             
             // reconnect any closed connections in the free pool
-            for (PoolEntry entry : _freePool)
+            for (AbstractBlockingObjectPool.PoolEntry<DatabaseConnection> entry : freePool)
             {
-                try
-                {
-                    // just send any old statement; essentially like doing a ping
-                    entry.database.executeStatement("select 1");
-                }
-                catch (Exception e)
-                {}
-                
-                // if after the ping above we find the connection is closed,
-                // try to reconnect it
-                if (!entry.database.isConnected())
-                {
-                    connect(entry.database);
-                }
+                ensureConnection(entry.getObject());
             }
         }
     }
     
+    public void ensureConnection(DatabaseConnection connection) {
+        try
+        {
+            // just send any old statement; essentially like doing a ping
+            connection.executeStatement(getEnsureConnectedStatment());
+        }
+        catch (Exception e)
+        {}
+        
+        // if after the ping above we find the connection is closed,
+        // try to reconnect it
+        if (!connection.isConnected())
+        {
+            connect(connection);
+        }
+    }
+    
     /**
-     * TODO make sure the connection is still open before returning
-     * it to the caller.  it may have been closed.  if so, it needs to
-     * be reconnected.
+     * Return a database connection
      * 
      * @param borrower
      * @return
      */
     public DatabaseConnection borrowInstance(Object borrower)
     {
-        DatabaseConnection db = null;
-
-        synchronized (_semaphore)
-        {
-            if (!_freePool.isEmpty())
-            {
-                // there's a free entry, give it to this borrower.
-                PoolEntry entry = _freePool.remove(0);
-                db = entry.database;
-                _activePool.put(db, borrower);
-            }
-            else if (_activePool.size() < _maximum)
-            {
-                // we can create a new one
-                db = create();
-                _activePool.put(db, borrower);
-            }
-        }
-        
-        if (db == null)
-        {
-            // the borrower will have to wait until an instance
-            // is returned by another borrower
-            DataLatch latch = new DataLatch();
-            _borrowersInWaiting.add(latch);
-            db = (DatabaseConnection)latch.waitForObject();
-        }
-
-        return db;
+        PoolEntry entry = borrow(borrower);
+        activeConnections.put(entry.getObject(), entry);
+        return entry.getObject();
     }
     
-    public void returnInstance(DatabaseConnection database, Object borrower)
-    {
-        DataLatch latch = null;
-        
-        synchronized (_semaphore)
-        {
-            // take this one off the active pool
-            _activePool.remove(database);
-
-            if (_borrowersInWaiting.size() > 0)
-            {
-                // give this one to the next borrower
-                latch = _borrowersInWaiting.remove(0);
-                _activePool.put(database, borrower);
-            }
-            else
-            {
-                // put it back into the free pool
-                PoolEntry entry = new PoolEntry(database);
-                _freePool.add(entry);
-            }
-        }
-
-        if (latch != null)
-        {
-            latch.setObject(database);
-        }
+    public void returnInstance(DatabaseConnection connection, Object borrower) {
+        returnInstance(activeConnections.remove(connection));
     }
 
+    /**
+     * Hook to validate the pool entry before returning it to borrower
+     * @param entry
+     * @return a valid pool entry
+     */
     @Override
-    public void destroy() {
-        for (PoolEntry entry : _freePool) {
-            entry.database.disconnect();
+    protected <P extends AbstractBlockingObjectPool.PoolEntry<DatabaseConnection>> P validatePoolEntry(P entry) {
+        if (isEnsureConnected()) {
+            ensureConnection(entry.getObject());
         }
-
-        for (DatabaseConnection conn : _activePool.keySet()) {
-            conn.disconnect();
-        }
-        
-        _sweeper.terminate();
-        
-        try {
-        	if (isDerby()) {
-        		// if we're using Derby embedded then we need to shutdown the database
-        		if (DERBYDRIVEREMBEDDED.equals(_dbDriver)) {
-        			DriverManager.getConnection("jdbc:derby:;shutdown=true");
-        		}
-        	}
-		} catch (SQLException e) {
-			LOGGER.info(e.getLocalizedMessage());
-		}
-
+        return super.validatePoolEntry(entry);
     }
+    
+    public void shutdown() {
+        try {
+            super.shutdown();
+        } finally {
+	        try {
+	        	if (isDerby()) {
+	        		// if we're using Derby embedded then we need to shutdown the database
+	        		if (DERBYDRIVEREMBEDDED.equals(_dbDriver)) {
+	        			DriverManager.getConnection("jdbc:derby:;shutdown=true");
+	        		}
+	        	}
+			} catch (SQLException e) {
+				LOGGER.info(e.getLocalizedMessage());
+			}
+            _sweeper.terminate();
+            activeConnections.clear();
+        }
+    }
+    
 
     @Override
     public void initialize()
     {
     	_dbPassword = passwordGenerator.encryptPassword(_dbPassword);
-    	
-        for (int i = 0; i < _minimum; i++)
-        {
-            DatabaseConnection database = create();
-            PoolEntry entry = new PoolEntry(database);
-            _freePool.add(entry);
-        }
-        
+    	setPoolSize(_minimum);
+    	super.initialize();     	
         _sweeper.start();
+    }
+    
+    @SuppressWarnings("unchecked")
+    @Override
+    protected PoolEntry createPoolEntry() {
+	    return new PoolEntry(create());
     }
     
     public void setPasswordGenerator(PasswordGenerator generator) {
@@ -503,5 +468,21 @@ public class DatabaseConnectionPool extends CornerstoneConfigurable {
     public void setSweepCycle(float minutes)
     {
         _sweepCycle = (long)(minutes * (float)ONEMINUTE);
+    }
+    
+    public void setEnsureConnected(boolean ensureConnected) {
+        this.ensureConnected = ensureConnected;
+    }
+    
+    public boolean isEnsureConnected() {
+        return this.ensureConnected;
+    }
+
+    public void setEnsureConnectedStatment(String ensureConnectedStatment) {
+        this.ensureConnectedStatment = ensureConnectedStatment;
+    }
+
+    public String getEnsureConnectedStatment() {
+        return ensureConnectedStatment;
     }
 }

@@ -15,14 +15,22 @@
  * limitations under the License.
  */
 
-package com.paxxis.cornerstone.service;
+package com.paxxis.cornerstone.common;
 
 /**
  * This exception is thrown when a service client request times out.
  *
  * @author Robert Englander 
  */
-public class RequestTimeoutException extends RuntimeException
-{
+public class TimeoutException extends RuntimeException {
+    private static final long serialVersionUID = 1L;
    
+    public TimeoutException() {
+        // 
+    }
+    
+    public TimeoutException(String message) {
+        super(message);
+    }
+    
 }

@@ -18,22 +18,21 @@
 
 package com.paxxis.cornerstone.service;
 
+import org.apache.log4j.Logger;
+
 import com.paxxis.cornerstone.base.ErrorMessage;
-import com.paxxis.cornerstone.base.Message;
+import com.paxxis.cornerstone.base.ResponseMessage;
 
 /**
  *
  * @author Robert Englander
  */
-public abstract class ResponseListener<T extends Message> 
-{
-    public void onComplete(T response)
-    {
-        
-    }
+public abstract class ResponseListener<T extends ResponseMessage<?>> {
+    private static final Logger logger = Logger.getLogger(ResponseListener.class);
     
-    public void onError(ErrorMessage response)
-    {
-        
+    public abstract void onComplete(T response);
+    
+    public void onError(ErrorMessage response) {
+        logger.error(response.getMessage());
     }
 }

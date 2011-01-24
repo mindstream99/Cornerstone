@@ -23,6 +23,7 @@ import javax.jms.TextMessage;
 import org.codehaus.jackson.map.DeserializationConfig;
 import org.codehaus.jackson.map.ObjectMapper;
 
+import com.paxxis.cornerstone.base.Message;
 import com.paxxis.cornerstone.base.MessagingConstants;
 import com.paxxis.cornerstone.base.MessagingConstants.PayloadType;
 
@@ -33,9 +34,13 @@ import com.paxxis.cornerstone.base.MessagingConstants.PayloadType;
  */
 public class JSonObjectPayload implements MessagePayload {
 	private ObjectMapper mapper;
-	private Class clazz;
+	private Class<? extends Message> clazz;
 
-	public JSonObjectPayload(ObjectMapper mapper, Class clazz) {
+	public JSonObjectPayload(Class<? extends Message> clazz) {
+	    this(new ObjectMapper(), clazz);
+	}
+	
+	public JSonObjectPayload(ObjectMapper mapper, Class<? extends Message> clazz) {
 		this.mapper = mapper;
 		this.clazz = clazz;
 		this.mapper.configure(DeserializationConfig.Feature.FAIL_ON_UNKNOWN_PROPERTIES, false);
@@ -45,7 +50,6 @@ public class JSonObjectPayload implements MessagePayload {
 		return PayloadType.JsonObjectPayload;
 	}
 
-	@SuppressWarnings("unchecked")
 	public Object getPayload(javax.jms.Message msg) {
 		Object data = null;
 		try {

@@ -17,29 +17,31 @@
 
 package com.paxxis.cornerstone.service;
 
-import javax.jms.JMSException;
-import javax.jms.ObjectMessage;
-
-import org.apache.log4j.Logger;
+import javax.jms.MessageListener;
 
 import com.paxxis.cornerstone.base.ResponseMessage;
+import com.paxxis.cornerstone.common.MessagePayload;
 
 /**
  * 
  * @author Rob Englander
- *
  */
-public abstract class AsyncDataResponseHandler<R extends ResponseMessage<?>> extends ResponseHandler<R> {
-    public abstract void onComplete(R msg);
+public abstract class AsyncResponseListener<R extends ResponseMessage<?>> extends ResponseListener<R>
+        implements MessageListener {
     
-    public void onMessage(javax.jms.Message msg) {
-        ObjectMessage m = (ObjectMessage)msg;
-        try {
-            @SuppressWarnings("unchecked")
-			R result = (R) m.getObject();
-            onComplete(result);
-        } catch (JMSException e) {
-            Logger.getLogger(this.getClass()).error(e.getLocalizedMessage());
+    private MessagePayload payloadType;
+    
+    public AsyncResponseListener(MessagePayload payloadType) {
+        this.payloadType = payloadType;
+    }
+    
+    public final void onMessage(javax.jms.Message msg) {
+        @SuppressWarnings("unchecked")
+        R result = (R) payloadType.getPayload(msg);
+        if (result.isError()) {
+            onError(result.getErrorMessage());
+        } else {
+	        onComplete(result);
         }
     }
 }

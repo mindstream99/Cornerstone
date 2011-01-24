@@ -85,7 +85,7 @@ public class ServiceBusMessageRouter extends ServiceBusMessageHandler {
 
 		if (processor instanceof MultiRequestProcessor) {
 		    //it is expected that this type of request processor encapsulates multiple requests in
-		    //one message and it will be calling back to use to determine the processors to handle
+		    //one message and it will be calling back to the router to determine the processors to handle
 		    //the inner requests - unfortunately this means we could have a nice infinite loop too...
 		    ((MultiRequestProcessor) processor).setServiceBusMessageHandler(this);
 		}

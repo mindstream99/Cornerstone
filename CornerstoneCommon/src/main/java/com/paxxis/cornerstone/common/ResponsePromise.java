@@ -24,8 +24,7 @@ import com.paxxis.cornerstone.base.ResponseMessage;
  * A response promise which is an abstraction over a DataLatch that enforces type safety
  * and provides the ability for clients of services to set reasonable timeouts for a response...
  */
-public class ResponsePromise<RESP extends ResponseMessage<?>> 
-        extends DataLatch {
+public class ResponsePromise<RESP extends ResponseMessage<?>> extends DataLatch {
 
     private long timeout;
     

@@ -26,7 +26,6 @@ import javax.jms.JMSException;
 import javax.jms.Message;
 import javax.jms.MessageConsumer;
 import javax.jms.MessageListener;
-import javax.jms.Session;
 import javax.jms.TemporaryQueue;
 
 import org.apache.log4j.Logger;
@@ -36,7 +35,6 @@ import com.paxxis.cornerstone.base.RequestMessage;
 import com.paxxis.cornerstone.base.ResponseMessage;
 import com.paxxis.cornerstone.common.BlockingThreadPoolExecutor;
 import com.paxxis.cornerstone.common.MessagePayload;
-import com.paxxis.cornerstone.common.TimeoutException;
 import com.paxxis.cornerstone.common.ResponsePromise;
 
 /**
@@ -158,56 +156,6 @@ public class RequestQueueSender extends DestinationSender {
         }
    }
 
-    /**
-     * Send a request message and return the response.
-     *
-     * @param clazz the response class
-     * @param msg the message 
-     * @param handler the message handler
-     * @param timeout the number of milliseconds to wait for the response.  A timeout of
-     * 0 or less is an error
-     * @param payloadType the message payload type
-     *
-     * @return the response
-     * @throws a TimeoutException if response timed out
-     */
-    public synchronized <REQ extends RequestMessage, RESP extends ResponseMessage<REQ>> RESP send(
-            Class<RESP> clazz, 
-            REQ msg,
-            final SimpleServiceBusMessageHandler handler,
-			long timeout, 
-			MessagePayload payloadType) {
-
-
-        final ResponsePromise<RESP> promise = new ResponsePromise<RESP>(timeout); 
-        MessageListener listener = new MessageListener() {
-            public void onMessage(Message msg) {
-                handler.init(
-                        getConnector().getSession(), 
-                        getConnector().getAcknowledgeMode() == Session.CLIENT_ACKNOWLEDGE);
-                promise.setObject(handler.processMessage(msg));
-            }
-        };
-
-        RESP response = null;
-        try {
-            send(msg, promise, listener, payloadType); 
-        } catch (SendException se) {
-			try {
-				response = clazz.newInstance();
-			} catch (Exception e) {
-				throw new RuntimeException(e);
-			}
-			response.setErrorMessage(se.getErrorMessage());
-            return response;
-        }
-
-        response = promise.getResponse();
-        if (promise.hasTimedout()) {
-            throw new TimeoutException();
-        }
-        return response;
-    }
 
     /**
      * Send a request message and return without waiting for a response but

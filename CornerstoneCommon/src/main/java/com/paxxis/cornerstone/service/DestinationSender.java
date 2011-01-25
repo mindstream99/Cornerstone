@@ -32,7 +32,7 @@ import com.paxxis.cornerstone.common.MessagePayload;
  * @author Robert Englander
  * 
  */
-public class DestinationSender extends CornerstoneConfigurable implements IServiceBusConnectorClient {
+public class DestinationSender extends CornerstoneConfigurable implements IServiceBusConnectorClient, DestinationPublisher {
     private static final Logger logger = Logger.getLogger(RequestQueueSender.class);
 
     // the message sender
@@ -133,14 +133,10 @@ public class DestinationSender extends CornerstoneConfigurable implements IServi
         }
     }
 
-    /**
-     * publish a message to the destination with no response.
-     *
-     * @param clazz the response class
-     * @param msg the message 
-     * @param payloadType the message payload type
-     *
+    /* (non-Javadoc)
+     * @see com.paxxis.cornerstone.service.DestinationPublisher#publish(REQ, com.paxxis.cornerstone.common.MessagePayload)
      */
+    @Override
     public synchronized <REQ extends RequestMessage> void publish(
             REQ msg,
 			MessagePayload payloadType) {

@@ -41,7 +41,7 @@ import com.paxxis.cornerstone.common.ResponsePromise;
  *
  * @author Robert Englander
  */
-public class RequestQueueSender extends DestinationSender {
+public class RequestQueueSender extends DestinationSender implements QueueSender {
     private static final Logger logger = Logger.getLogger(DestinationSender.class);
 
     // the temporary queue used for getting responses
@@ -157,15 +157,10 @@ public class RequestQueueSender extends DestinationSender {
    }
 
 
-    /**
-     * Send a request message and return without waiting for a response but
-     * with a promise for one
-     *
-     * @param msg the message 
-     * @param payloadType the message payload type
-     *
-     * @return a response promise
+    /* (non-Javadoc)
+     * @see com.paxxis.cornerstone.service.QueueSender#send(REQ, com.paxxis.cornerstone.common.MessagePayload)
      */
+    @Override
     public synchronized <REQ extends RequestMessage, 
                         RESP extends ResponseMessage<REQ>> ResponsePromise<RESP> send(
             REQ msg,
@@ -176,16 +171,10 @@ public class RequestQueueSender extends DestinationSender {
     }
 
 
-    /**
-     * Send a request message and return without waiting for a response but
-     * with a promise for one
-     *
-     * @param msg the message 
-     * @param promise the response promise to populate
-     * @param payloadType the message payload type
-     *
-     * @return a response promise
+    /* (non-Javadoc)
+     * @see com.paxxis.cornerstone.service.QueueSender#send(REQ, P, com.paxxis.cornerstone.common.MessagePayload)
      */
+    @Override
     public synchronized <REQ extends RequestMessage,
                         RESP extends ResponseMessage<REQ>, 
                         P extends ResponsePromise<RESP>> void send(
@@ -195,18 +184,10 @@ public class RequestQueueSender extends DestinationSender {
         send(msg, promise, null, payloadType);
     }
 
-    /**
-     * Send a request message and return without waiting for a response but
-     * with a promise for one
-     *
-     * @param msg the message 
-     * @param promise the response promise to populate
-     * @param listener the message listener to invoke on receiving a response
-     * but before populating the promise
-     * @param payloadType the message payload type
-     *
-     * @return a response promise
+    /* (non-Javadoc)
+     * @see com.paxxis.cornerstone.service.QueueSender#send(REQ, P, javax.jms.MessageListener, com.paxxis.cornerstone.common.MessagePayload)
      */
+    @Override
     public synchronized <REQ extends RequestMessage, 
                         RESP extends ResponseMessage<REQ>, 
                         P extends ResponsePromise<RESP>> void send(
@@ -245,17 +226,10 @@ public class RequestQueueSender extends DestinationSender {
         }
     }
 
-    /**
-     * Send a request message and return without waiting for a response but
-     * with a promise for one
-     *
-     * @param msg the message 
-     * @param listener the message listener to invoke on receiving a response
-     * but before populating the promise
-     * @param payloadType the message payload type
-     *
-     * @return a response promise
+    /* (non-Javadoc)
+     * @see com.paxxis.cornerstone.service.QueueSender#send(REQ, javax.jms.MessageListener, com.paxxis.cornerstone.common.MessagePayload)
      */
+    @Override
     public synchronized <REQ extends RequestMessage,
                         RESP extends ResponseMessage<REQ>> ResponsePromise<RESP> send(
             REQ msg,

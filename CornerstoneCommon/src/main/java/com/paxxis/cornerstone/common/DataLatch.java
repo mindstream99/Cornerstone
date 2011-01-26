@@ -39,18 +39,55 @@ public class DataLatch
     private CountDownLatch latch = new CountDownLatch(1);
     private boolean interrupted = false;
     private boolean timedout = false;
+    private RuntimeException exception = null;
     private Thread waiting;
 
 
     /**
-     * Block until the object is available.  This is called
-     * by the consumer side of the interaction. It is illegal to
-     * call this method from multiple threads.  It is also illegal to
-     * call this method more than once.
+     * Block until the object is available. This method does not failfast and consequently may
+     * return null. 
+     *
+     * @return the object
+     */
+    public Object waitForObject() {
+        return waitForObject(0, false);
+    }
+
+    /**
+     * Block until the object is available or until the timeout is reached. 
+     * This method does not failfast and consequently may return null.
      *
      * @return the object
      */
     public Object waitForObject(long timeout) {
+        return waitForObject(timeout, false);
+    }
+    
+    /**
+     * Block until the object is available failing with a runtime exception if failfast is true.
+     * 
+     * @param failfast
+     * @return 
+     */
+    public Object waitForObject(boolean failfast) {
+        return waitForObject(0, failfast);
+    }
+    
+    /**
+     * Block until the object is available or until the timeout is reached.  This is called
+     * by the consumer side of the interaction. It is illegal to call this method from 
+     * multiple threads.  It is also illegal to call this method more than once. If failfast 
+     * is true a runtime exception is thrown if for any reason a non-null object cannot be
+     * returned.
+     *
+     * @param timeout the timeout
+     * @param failfast if true throw an exception if we cannot return a valid (non-null) object
+     * @return the object
+     * @throws TimeoutException on timeout if failfast is true
+     * @throws InterruptedRuntimeException on interruption if failfast is true
+     * @throws NullDataException on a null object being set if failfast is true
+     */
+    public Object waitForObject(long timeout, boolean failfast) {
         synchronized (this) {
             if (!isWaitable()) {
                 IllegalStateException e = new IllegalStateException("Illegal state for consumption"); 
@@ -67,9 +104,13 @@ public class DataLatch
                 timeout = Long.MAX_VALUE;
             }
             this.timedout = !this.latch.await(timeout, TimeUnit.MILLISECONDS);
+            if (this.timedout) {
+                this.exception = new TimeoutException("Timed out after " + timeout);
+            }
         } catch (InterruptedException ex) {
             // no-op is correct behavior
             this.interrupted = true;
+            this.exception = new InterruptedRuntimeException(ex);
         }
 
         synchronized (this) {
@@ -79,18 +120,14 @@ public class DataLatch
             obj = null;
             this.latch = null;
             this.waiting = null;
+            if (result == null && this.exception == null) {
+                this.exception = new NullDataException("Null object set on data latch");
+            }
+            if (failfast && this.exception != null) {
+                throw this.exception;
+            }
             return result;
         }
-    }
-
-    /**
-     * Block until the object is available.  This is called
-     * by the consumer side of the interaction.
-     *
-     * @return the object
-     */
-    public Object waitForObject() {
-        return waitForObject(0);
     }
 
     /**
@@ -112,7 +149,16 @@ public class DataLatch
     }
 
     /**
-     * Pool if the data has been set (no waiting).  To get the data call
+     * Return the runtime exception associated with this data latch.
+     * 
+     * @return the exception or null if none
+     */
+    public synchronized RuntimeException getException() {
+        return this.exception;
+    }
+    
+    /**
+     * Poll if the data has been set (no waiting).  To get the data call
      * waitForObject.
      */
     public synchronized boolean hasObject() {

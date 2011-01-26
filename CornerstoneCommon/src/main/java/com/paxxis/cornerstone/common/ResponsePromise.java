@@ -22,39 +22,86 @@ import com.paxxis.cornerstone.base.ResponseMessage;
 
 /**
  * A response promise which is an abstraction over a DataLatch that enforces type safety
- * and provides the ability for clients of services to set reasonable timeouts for a response...
+ * and provides the ability for clients of services to set reasonable timeouts. Response promises
+ * are failfast by default meaning if for any reason a valid response cannot be returned then a
+ * runtime exception is thrown.
  */
 public class ResponsePromise<RESP extends ResponseMessage<?>> extends DataLatch {
 
     private long timeout;
+    private boolean failfast;
+    private RuntimeException exception;
     
     public ResponsePromise() {
-        this(10000);
+        this(10000, true);
     }
     
     public ResponsePromise(long timeout) {
+        this(timeout, true);
+    }
+    
+    public ResponsePromise(long timeout, boolean failfast) {
         this.timeout = timeout;
+        this.failfast = failfast;
     }
     
     @SuppressWarnings("unchecked")
+    public RESP getResponse(long timeout, boolean failfast) {
+        RESP response = (RESP) waitForObject(timeout, failfast);
+        if (response.isError()) {
+            this.exception = new ResponseException(response);
+        }
+        if (failfast && this.exception != null) {
+            throw this.exception;
+        }
+        return response;
+    }
+    
     public RESP getResponse(long timeout) {
-        return (RESP) waitForObject(timeout);
+        return getResponse(timeout, this.failfast);
+    }
+    
+    public RESP getResponse(boolean failfast) {
+        return getResponse(this.timeout, failfast);
     }
     
     public RESP getResponse() {
-        return getResponse(this.timeout);
+        return getResponse(this.timeout, this.failfast);
     }
 
+    public boolean hasResponse() {
+        return hasObject();
+    }
+    
+    @Override
+    public synchronized RuntimeException getException() {
+        if (this.exception != null) {
+            return this.exception;
+        }
+        return super.getException();
+    }
     /**
      * Enforce the timeout value provided at construct time
      */
     @Override
     public RESP waitForObject() {
-        return getResponse(this.timeout);
+        return getResponse(this.timeout, this.failfast);
+    }
+    
+    /**
+     * Enforce the failfast value provided at construct time
+     */
+    @Override
+    public Object waitForObject(long timeout) {
+        return getResponse(timeout, this.failfast);
     }
 
-    public boolean hasResponse() {
-        return hasObject();
+    /**
+     * Enforce the failfast value provided at construct time
+     */
+    @Override
+    public Object waitForObject(boolean failfast) {
+        return getResponse(this.timeout, failfast);
     }
 
 }

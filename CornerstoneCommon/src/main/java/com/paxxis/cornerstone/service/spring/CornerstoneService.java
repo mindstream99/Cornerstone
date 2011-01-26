@@ -21,9 +21,7 @@ package com.paxxis.cornerstone.service.spring;
 import java.util.ArrayList;
 
 import org.apache.log4j.Logger;
-import org.springframework.beans.factory.xml.XmlBeanDefinitionReader;
-import org.springframework.context.support.GenericApplicationContext;
-import org.springframework.core.io.FileSystemResource;
+import org.springframework.context.support.FileSystemXmlApplicationContext;
 
 import com.paxxis.cornerstone.service.CornerstoneConfigurable;
 import com.paxxis.cornerstone.service.ICornerstoneService;
@@ -59,12 +57,8 @@ public class CornerstoneService extends CornerstoneConfigurable implements IServ
     public static void main(String[] args)
     {
         // all we do is load the container
-        GenericApplicationContext ctx = new GenericApplicationContext();
+        FileSystemXmlApplicationContext ctx = new FileSystemXmlApplicationContext(args[0]);
         ctx.registerShutdownHook();
-        ctx.refresh();
-        XmlBeanDefinitionReader xmlReader = new XmlBeanDefinitionReader(ctx);
-        xmlReader.loadBeanDefinitions(new FileSystemResource(args[0]));
-        ctx.getBeanFactory().preInstantiateSingletons();
     }
 
     /**

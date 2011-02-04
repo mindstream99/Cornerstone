@@ -17,6 +17,7 @@
 
 package com.paxxis.cornerstone.service;
 
+import javax.jms.InvalidDestinationException;
 import javax.jms.Message;
 import javax.jms.MessageProducer;
 import javax.jms.TemporaryQueue;
@@ -49,20 +50,24 @@ public abstract class MessageProcessor<REQ extends RequestMessage, RESP extends 
             if (resp != null) {
 
 				Message responseMsg = getPayloadType().createMessage(getSession(), resp);
-
+                // stamp the message
+                responseMsg.setLongProperty("TIMESTAMP", System.currentTimeMillis());
                 // copy the correlation id from the incoming message
                 responseMsg.setJMSCorrelationID(message.getJMSCorrelationID());
 
                 // create a sender for the replyTo queue
-                TemporaryQueue tq = (TemporaryQueue)message.getJMSReplyTo();
+                TemporaryQueue tq = (TemporaryQueue) message.getJMSReplyTo();
                 if (tq != null) {
-                    MessageProducer qsender = getSession().createProducer(tq);
-
-                    // stamp the message
-                    responseMsg.setLongProperty("TIMESTAMP", System.currentTimeMillis());
-                    qsender.send(responseMsg);
-                    qsender.close();
-                }
+                    MessageProducer qsender = getSession().createProducer(null);
+                    try {
+	                    qsender.send(tq, responseMsg);
+                    } catch (InvalidDestinationException ide) {
+                        //this is a valid state...
+                        logger.debug(ide);
+                    } finally {
+	                    qsender.close();
+                    }
+                } 
             }
 
             if (isClientAck()) {
@@ -72,4 +77,5 @@ public abstract class MessageProcessor<REQ extends RequestMessage, RESP extends 
             logger.error(e);
         }
     }
+    
 }

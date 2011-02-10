@@ -4,7 +4,7 @@
   <groupId>com.paxxis</groupId>
   <artifactId>CornerstoneCommon</artifactId>
   <packaging>jar</packaging>
-  <version>SNAPSHOT</version>
+  <version>1.6.1-SNAPSHOT</version>
   <name>CornerstoneCommon</name>
   <url>http://www.paxxis.org</url>
   <dependencies>

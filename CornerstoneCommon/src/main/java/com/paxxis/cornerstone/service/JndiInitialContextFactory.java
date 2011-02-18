@@ -59,6 +59,12 @@ public class JndiInitialContextFactory extends CornerstoneConfigurable
     {
     }
 
+    /**
+     * Sub classes that want to modify the url should override this method
+     */
+    protected String prepareProviderUrl(String url) {
+    	return url;
+    }
     
     /**
      * Factory method for creating an initial context instance.
@@ -73,7 +79,7 @@ public class JndiInitialContextFactory extends CornerstoneConfigurable
         {
             Hashtable<String, Object> env = new Hashtable<String, Object>();
             env.put(Context.INITIAL_CONTEXT_FACTORY, _contextFactory);
-            env.put(Context.PROVIDER_URL, _providerUrl);
+            env.put(Context.PROVIDER_URL, prepareProviderUrl(_providerUrl));
             env.put(Context.SECURITY_PRINCIPAL, _securityPrincipal);
             env.put(Context.SECURITY_CREDENTIALS, _securityCredentials);
             env.put(Context.SECURITY_AUTHENTICATION, "simple");

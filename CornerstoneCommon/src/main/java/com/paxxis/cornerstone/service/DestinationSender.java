@@ -48,6 +48,8 @@ public class DestinationSender extends CornerstoneConfigurable implements IServi
     // the service bus connector
     private ServiceBusConnector connector = null;
 
+    private int deliveryMode = DeliveryMode.NON_PERSISTENT;
+    
     protected ServiceBusConnector getConnector() {
 		return connector;
 	}
@@ -66,6 +68,10 @@ public class DestinationSender extends CornerstoneConfigurable implements IServi
         return destinationName;
     }
 
+    public void setPersistentDelivery(boolean persistent) {
+    	deliveryMode = (persistent ? DeliveryMode.PERSISTENT : DeliveryMode.NON_PERSISTENT);
+    }
+    
     public void setServiceBusConnector(ServiceBusConnector connector) {
         this.connector = connector;
     }
@@ -101,7 +107,7 @@ public class DestinationSender extends CornerstoneConfigurable implements IServi
     public void setup() {
         try {
             messageSender = connector.createMessageProducer(destinationName);
-            messageSender.setDeliveryMode(DeliveryMode.NON_PERSISTENT);
+            messageSender.setDeliveryMode(deliveryMode);
         } catch(Throwable t) {
             logger.error(t);
             try {

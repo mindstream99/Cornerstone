@@ -25,10 +25,11 @@ import com.paxxis.cornerstone.common.ResponsePromise;
 
 
 /**
+ * An interface for request/response over a queue
  * 
  * @author Matthew Pflueger
  */
-public interface QueueSender {
+public interface QueueSender extends DestinationPublisher {
 
     /**
      * Send a request message and return without waiting for a response but

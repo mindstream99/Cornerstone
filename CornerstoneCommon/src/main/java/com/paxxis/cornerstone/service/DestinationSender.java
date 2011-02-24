@@ -71,6 +71,10 @@ public class DestinationSender extends CornerstoneConfigurable implements IServi
     public void setPersistentDelivery(boolean persistent) {
     	deliveryMode = (persistent ? DeliveryMode.PERSISTENT : DeliveryMode.NON_PERSISTENT);
     }
+
+    public boolean isPersistentDelivery() {
+    	return deliveryMode == DeliveryMode.PERSISTENT;
+    }
     
     public void setServiceBusConnector(ServiceBusConnector connector) {
         this.connector = connector;

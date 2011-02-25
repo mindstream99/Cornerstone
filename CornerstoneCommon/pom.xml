@@ -16,16 +16,31 @@
     </parent>
 
     <dependencies>
+        <!-- This is a utter hack to resolve some weird Maven classpath issues
+             (I am sure there is a better way to do this).  For some reason
+             the JMS classes were not being put on the test classpath (they
+             were only found on the compile classpath which is supposed to
+             be global) hence failing projects dependent on CornerstoneCommon.
+             The order is important here also - test before compile -->
         <dependency>
             <groupId>org.apache.activemq</groupId>
             <artifactId>activemq-all</artifactId>
             <version>5.2.0</version>
+            <type>jar</type>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.activemq</groupId>
+            <artifactId>activemq-all</artifactId>
+            <version>5.2.0</version>
+            <type>jar</type>
             <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-context</artifactId>
             <version>3.0.5.RELEASE</version>
+            <type>jar</type>
             <scope>compile</scope>
         </dependency>
         <dependency>

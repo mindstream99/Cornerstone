@@ -51,6 +51,7 @@ public class DatabaseUpdater {
 	private static final String DEPENDSONID = "depends-on-id";
 	private static final String DEPENDSONVERSION = "depends-on-version";
 	private static final String SCHEMA_PLACEHOLDER = "%schema%";
+	private static final int LATESTVERSION = Integer.MAX_VALUE;
 
 	static class Update implements Comparable<Update> {
 		private int version;
@@ -146,14 +147,18 @@ public class DatabaseUpdater {
             }
 
             int currentVersion = getCurrentVersion(database, catalog, id);
-            int targetVersion = Integer.parseInt(target);
+            int targetVersion = LATESTVERSION;
+            if (target != null) {
+                targetVersion = Integer.parseInt(target);
+            }
             
             if (targetVersion <= currentVersion) {
             	throw new Exception("Target version " + targetVersion + " must be greater than current version " + currentVersion);
             }
             
             System.out.println("Updating " + name + "[" + id + "] on catalog " + catalog);
-            System.out.println("Moving from version " + currentVersion + " to version " + targetVersion);
+            System.out.println("Moving from version " + currentVersion + " to " + 
+            						(targetVersion == LATESTVERSION ? "Latest Version" : " version " + targetVersion));
             System.out.println("Using updates for database type " + dbType);
 
             List<Update> updates = new ArrayList<Update>();
@@ -208,7 +213,7 @@ public class DatabaseUpdater {
 
             Collections.sort(updates);
 
-            validateTargetVersion(updates, currentVersion, targetVersion, database);
+            targetVersion = validateTargetVersion(updates, currentVersion, targetVersion, database);
             validateDependencies(updates, database);
             
             performUpdates(updates, database);
@@ -293,11 +298,29 @@ public class DatabaseUpdater {
 		}
 	}
 
-	private void validateTargetVersion(List<Update> updates, int currentVersion, int targetVersion, DatabaseConnection database) throws Exception {
+	private int validateTargetVersion(List<Update> updates, int currentVersion, int targetVersion, DatabaseConnection database) throws Exception {
+		int target = targetVersion;
+		if (target == LATESTVERSION) {
+			// find the latest version in the list
+			int latest = 0;
+			for (Update update : updates) {
+				if (update.getVersion() > latest) {
+					latest = update.getVersion();
+				}
+			}
+			
+			if (latest <= currentVersion) {
+				String msg = "Database version is already at or past the latest version being applied.";
+				throw new Exception(msg);
+			}
+			
+			target = latest;
+		}
+		
 		// there must be at least one update for each version after the current version, up to
 		// and including the target version
 		List<Integer> missing = new ArrayList<Integer>();
-		for (int i = (currentVersion + 1); i <= targetVersion; i++) {
+		for (int i = (currentVersion + 1); i <= target; i++) {
 			boolean foundOne = false;
 			for (Update update : updates) {
 				if (update.getVersion() == i) {
@@ -321,6 +344,8 @@ public class DatabaseUpdater {
 			
 			throw new Exception(msg.toString());
 		}
+		
+		return target;
 	}
 	
 	private void validateDependencies(List<Update> updates, DatabaseConnection database) throws Exception {

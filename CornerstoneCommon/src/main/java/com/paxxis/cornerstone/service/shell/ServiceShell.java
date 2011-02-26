@@ -123,7 +123,7 @@ public class ServiceShell {
 	private boolean processDatabaseUpdates(CommandLine cmd) throws Exception {
 		String vals[] = getCommandLine().getOptionValues("dbupdate");
 		if (vals != null) {
-			if (vals.length != 3) {
+			if (vals.length != 2 && vals.length != 3) {
 				throw new ParseException("Invalid argument for database update option");
 			}
 			doDatabaseUpdate(vals);
@@ -141,7 +141,13 @@ public class ServiceShell {
         xmlReader.loadBeanDefinitions(new FileSystemResource(inputs[0]));
 
         DatabaseUpdater updater = ctx.getBean(DatabaseUpdater.class);
-        updater.update(inputs[1], inputs[2]);
+        
+        String target = null;
+        if (inputs.length == 3) {
+        	target = inputs[2];
+        }
+        
+        updater.update(inputs[1], target);
 
         ctx.close();
 	}

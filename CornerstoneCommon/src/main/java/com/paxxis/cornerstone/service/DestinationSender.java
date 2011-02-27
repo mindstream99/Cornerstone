@@ -52,6 +52,7 @@ public class DestinationSender extends CornerstoneConfigurable implements IServi
 
     private int deliveryMode = DeliveryMode.NON_PERSISTENT;
     private MessageGroup messageGroup = null;
+    private int timeToLive = 0;
     
     protected ServiceBusConnector getConnector() {
 		return connector;
@@ -78,13 +79,21 @@ public class DestinationSender extends CornerstoneConfigurable implements IServi
     public boolean isPersistentDelivery() {
     	return deliveryMode == DeliveryMode.PERSISTENT;
     }
-    
+
     public void setMessageGroup(MessageGroup group) {
     	messageGroup = group;
     }
     
     public MessageGroup getMessageGroup() {
     	return messageGroup;
+    }
+    
+    public void setTimeToLive(int ttl) {
+    	timeToLive = ttl;
+    }
+    
+    public int getTimeToLive() {
+    	return timeToLive;
     }
     
     public void setServiceBusConnector(ServiceBusConnector connector) {
@@ -123,6 +132,7 @@ public class DestinationSender extends CornerstoneConfigurable implements IServi
         try {
             messageSender = connector.createMessageProducer(destinationName);
             messageSender.setDeliveryMode(deliveryMode);
+            messageSender.setTimeToLive(timeToLive);
         } catch(Throwable t) {
             logger.error(t);
             try {
@@ -186,7 +196,7 @@ public class DestinationSender extends CornerstoneConfigurable implements IServi
 		Message message = payloadType.createMessage(connector.getSession(), msg);
 		message.setIntProperty(MessagingConstants.HeaderConstant.GroupId.name(), messageGroup.getId());
 		message.setIntProperty(MessagingConstants.HeaderConstant.GroupVersion.name(), messageGroup.getVersion());
-
+		
 		return message;
     }
 }

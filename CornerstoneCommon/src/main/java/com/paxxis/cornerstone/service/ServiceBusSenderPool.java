@@ -54,6 +54,7 @@ public abstract class ServiceBusSenderPool<T extends DestinationSender> extends 
     private String requestQueueName;
     private int deliveryMode = DeliveryMode.NON_PERSISTENT;
     private MessageGroup messageGroup = null;
+    private int timeToLive = 0;
 
     //FIXME this is just to keep similar apis
     public PoolEntry<T> borrowInstance(Object borrower) {
@@ -107,13 +108,21 @@ public abstract class ServiceBusSenderPool<T extends DestinationSender> extends 
     public boolean isPersistentDelivery() {
     	return deliveryMode == DeliveryMode.PERSISTENT;
     }
-
+    
     public void setMessageGroup(MessageGroup group) {
     	messageGroup = group;
     }
     
     public MessageGroup getMessageGroup() {
     	return messageGroup;
+    }
+    
+    public void setTimeToLive(int ttl) {
+    	timeToLive = ttl;
+    }
+    
+    public int getTimeToLive() {
+    	return timeToLive;
     }
     
     @SuppressWarnings("unchecked")
@@ -123,6 +132,7 @@ public abstract class ServiceBusSenderPool<T extends DestinationSender> extends 
         T sender = createSender();
         sender.setPersistentDelivery(isPersistentDelivery());
         sender.setMessageGroup(messageGroup);
+        sender.setTimeToLive(timeToLive);
         
         connector.addServiceBusConnectorClient(sender);
         connector.setInitialContextFactory(contextFactory);

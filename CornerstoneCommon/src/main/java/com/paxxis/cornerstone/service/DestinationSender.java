@@ -24,6 +24,8 @@ import javax.jms.MessageProducer;
 import org.apache.log4j.Logger;
 
 import com.paxxis.cornerstone.base.ErrorMessage;
+import com.paxxis.cornerstone.base.MessageGroup;
+import com.paxxis.cornerstone.base.MessagingConstants;
 import com.paxxis.cornerstone.base.RequestMessage;
 import com.paxxis.cornerstone.common.MessagePayload;
 
@@ -49,6 +51,7 @@ public class DestinationSender extends CornerstoneConfigurable implements IServi
     private ServiceBusConnector connector = null;
 
     private int deliveryMode = DeliveryMode.NON_PERSISTENT;
+    private MessageGroup messageGroup = null;
     
     protected ServiceBusConnector getConnector() {
 		return connector;
@@ -74,6 +77,14 @@ public class DestinationSender extends CornerstoneConfigurable implements IServi
 
     public boolean isPersistentDelivery() {
     	return deliveryMode == DeliveryMode.PERSISTENT;
+    }
+    
+    public void setMessageGroup(MessageGroup group) {
+    	messageGroup = group;
+    }
+    
+    public MessageGroup getMessageGroup() {
+    	return messageGroup;
     }
     
     public void setServiceBusConnector(ServiceBusConnector connector) {
@@ -173,6 +184,8 @@ public class DestinationSender extends CornerstoneConfigurable implements IServi
             throws JMSException {
 
 		Message message = payloadType.createMessage(connector.getSession(), msg);
+		message.setIntProperty(MessagingConstants.HeaderConstant.GroupId.name(), messageGroup.getId());
+		message.setIntProperty(MessagingConstants.HeaderConstant.GroupVersion.name(), messageGroup.getVersion());
 
 		return message;
     }

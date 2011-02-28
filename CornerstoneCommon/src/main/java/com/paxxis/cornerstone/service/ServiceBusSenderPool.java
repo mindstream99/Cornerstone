@@ -18,6 +18,7 @@ package com.paxxis.cornerstone.service;
 
 import javax.jms.DeliveryMode;
 
+import com.paxxis.cornerstone.base.MessageGroup;
 import com.paxxis.cornerstone.common.AbstractBlockingObjectPool;
 
 /**
@@ -52,6 +53,7 @@ public abstract class ServiceBusSenderPool<T extends DestinationSender> extends 
     private String connectionFactoryName;
     private String requestQueueName;
     private int deliveryMode = DeliveryMode.NON_PERSISTENT;
+    private MessageGroup messageGroup = null;
 
     //FIXME this is just to keep similar apis
     public PoolEntry<T> borrowInstance(Object borrower) {
@@ -106,12 +108,21 @@ public abstract class ServiceBusSenderPool<T extends DestinationSender> extends 
     	return deliveryMode == DeliveryMode.PERSISTENT;
     }
 
+    public void setMessageGroup(MessageGroup group) {
+    	messageGroup = group;
+    }
+    
+    public MessageGroup getMessageGroup() {
+    	return messageGroup;
+    }
+    
     @SuppressWarnings("unchecked")
     @Override
 	protected PoolEntry<T> createPoolEntry() {
         ServiceBusConnector connector = createConnector();
         T sender = createSender();
         sender.setPersistentDelivery(isPersistentDelivery());
+        sender.setMessageGroup(messageGroup);
         
         connector.addServiceBusConnectorClient(sender);
         connector.setInitialContextFactory(contextFactory);

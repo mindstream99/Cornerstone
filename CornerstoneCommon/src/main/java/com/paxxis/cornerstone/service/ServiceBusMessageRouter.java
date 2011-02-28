@@ -17,12 +17,12 @@
 package com.paxxis.cornerstone.service;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.codehaus.jackson.map.ObjectMapper;
 
+import com.paxxis.cornerstone.base.MessageGroup;
 import com.paxxis.cornerstone.base.MessagingConstants.PayloadType;
 import com.paxxis.cornerstone.common.JSonObjectPayload;
 import com.paxxis.cornerstone.common.JavaObjectPayload;
@@ -35,21 +35,19 @@ public class ServiceBusMessageRouter extends ServiceBusMessageHandler {
     private static final Logger logger = Logger.getLogger(ServiceBusMessageRouter.class);
 
     private MessageProcessorFactory messageProcessorFactory;
-    //private MessagePayloadFactory messagePayloadFactory;
-    
-    private List<String> messageProcessorNames;
+    private MessageGroup messageGroup = null;
     private boolean failOnOverride = true;
     
-    private Map<TypeVersionTuple, String> messageProcessorMap;
+    private Map<MessageGroup.TypeVersionTuple, String> messageProcessorMap;
     
     
     public void initialize() {
-        messageProcessorMap = new HashMap<TypeVersionTuple, String>();
+        messageProcessorMap = new HashMap<MessageGroup.TypeVersionTuple, String>();
         
-        for (String name: this.messageProcessorNames) {
+        for (String name: messageGroup.getMessageProcessorNames()) {
             MessageProcessor<?,?> messageProcessor = 
                 this.messageProcessorFactory.getMessageProcessor(name);
-            TypeVersionTuple tvt = new TypeVersionTuple(
+            MessageGroup.TypeVersionTuple tvt = new MessageGroup.TypeVersionTuple(
                     messageProcessor.getRequestMessageType(), messageProcessor.getRequestMessageVersion());
             String old = messageProcessorMap.put(tvt, name);
             if (old != null) {
@@ -60,12 +58,14 @@ public class ServiceBusMessageRouter extends ServiceBusMessageHandler {
                 logger.info(msg);
             }
         }
+
+        messageGroup.validate(messageProcessorMap.keySet());
     }
     
     @Override
     public MessageProcessor<?, ?> getProcessor(int type, int version, int payloadType) {
         
-        TypeVersionTuple tvt = new TypeVersionTuple(type, version);
+        MessageGroup.TypeVersionTuple tvt = new MessageGroup.TypeVersionTuple(type, version);
         String messageProcessorName = this.messageProcessorMap.get(tvt);
         
         if (messageProcessorName == null) {
@@ -92,76 +92,16 @@ public class ServiceBusMessageRouter extends ServiceBusMessageHandler {
 		return processor;
     }
 
-    public void setMessageProcessorNames(List<String> messageProcessorNames) {
-        this.messageProcessorNames = messageProcessorNames;
-    }
-
     public void setMessageProcessorFactory(MessageProcessorFactory messageProcessorFactory) {
         this.messageProcessorFactory = messageProcessorFactory;
     }
 
-    private static class TypeVersionTuple {
-        
-        private Integer type;
-        private Integer version;
-        
-        public TypeVersionTuple(Integer type, Integer version) {
-            if (type == null || version == null) {
-                throw new NullPointerException("type/version cannot be null");
-            }
-            this.type = type;
-            this.version = version;
-        }
-        
-        public boolean equals(Object o) {
-            if (this == o) {
-                return true;
-            }
-            if (!(o instanceof TypeVersionTuple)) {
-                return false;
-            }
-            
-            TypeVersionTuple e = (TypeVersionTuple) o;
-            
-            Integer t1 = getType();
-            Integer t2 = e.getType();
-            if (t1 == null) {
-                if (t2 != null) {
-	                return false;
-                }
-            } else if (!t1.equals(t2)) {
-                return false;
-            }
-            
-            Integer v1 = getVersion();
-            Integer v2 = e.getVersion();
-            if (v1 == null) {
-                if (v2 != null) {
-	                return false;
-                }
-            } else if (!v1.equals(v2)) {
-                return false;
-            }
-            
-            return true;
-        }
-
-        public int hashCode() {
-            return (this.type == null ? 0 : this.type.hashCode()) ^
-                   (this.version == null ? 0 : this.version.hashCode());
-        }
-
-        public String toString() {
-            return "type " + getType() + ", version " + getVersion();
-        }
-        
-        public Integer getType() {
-            return this.type;
-        }
-        
-        public Integer getVersion() {
-            return this.version;
-        }
+    public void setMessageGroup(MessageGroup group) {
+    	messageGroup = group;
+    }
+    
+    public MessageGroup getMessageGroup() {
+    	return messageGroup;
     }
     
 }

@@ -24,6 +24,9 @@ import javax.jms.Session;
 
 import org.apache.activemq.command.ActiveMQQueue;
 
+import com.paxxis.cornerstone.base.MessageGroup;
+import com.paxxis.cornerstone.base.MessagingConstants;
+
 
 /**
  * Manages a message consumer on a service bus message destination.
@@ -61,6 +64,14 @@ public class ServiceBusMessageReceiver extends CornerstoneConfigurable implement
     {
     }
 
+    public void initialize() {
+    	if (_messageHandler instanceof ServiceBusMessageRouter) {
+    		ServiceBusMessageRouter router = (ServiceBusMessageRouter)_messageHandler;
+        	MessageGroup group = router.getMessageGroup();
+        	setMessageSelector(group.getMessageSelector());
+    	}
+    }
+    
     public void setExclusive(boolean val) {
         exclusive = val;
     }

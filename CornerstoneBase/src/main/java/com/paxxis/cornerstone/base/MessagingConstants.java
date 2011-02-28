@@ -33,6 +33,8 @@ public class MessagingConstants {
     private final static int MESSAGETYPE = 1;
     private final static int MESSAGEVERSION = 2;
     private final static int PAYLOADTYPE = 3;
+    private final static int GROUPID = 4;
+    private final static int GROUPVERSION = 5;
 
     // payload type values
     private final static int JAVAOBJECTPAYLOAD = 1;
@@ -75,8 +77,10 @@ public class MessagingConstants {
         Invalid(INVALID),
         MessageType(MESSAGETYPE),
         MessageVersion(MESSAGEVERSION),
-        PayloadType(PAYLOADTYPE);
-
+        PayloadType(PAYLOADTYPE),
+        GroupId(GROUPID),
+        GroupVersion(GROUPVERSION);
+        
         private int value;
 
         private HeaderConstant(int val) {
@@ -98,6 +102,12 @@ public class MessagingConstants {
                     break;
                 case PAYLOADTYPE:
                     result = PayloadType;
+                    break;
+                case GROUPID:
+                    result = GroupId;
+                    break;
+                case GROUPVERSION:
+                    result = GroupVersion;
                     break;
             }
 

@@ -23,6 +23,8 @@ import javax.jms.Message;
 import javax.jms.MessageProducer;
 import javax.jms.Topic;
 
+import com.paxxis.cornerstone.base.MessageGroup;
+import com.paxxis.cornerstone.base.MessagingConstants;
 import com.paxxis.cornerstone.common.MessagePayload;
 
 /**
@@ -47,6 +49,8 @@ public class NotificationTopicSender extends CornerstoneConfigurable implements 
 
     // teardown pending flag
     boolean _teardownPending = false;
+
+    private MessageGroup messageGroup = null;
 
     /**
      * Constructor
@@ -88,6 +92,14 @@ public class NotificationTopicSender extends CornerstoneConfigurable implements 
         return _notificationTopicName;
     }
 
+    public void setMessageGroup(MessageGroup group) {
+    	messageGroup = group;
+    }
+    
+    public MessageGroup getMessageGroup() {
+    	return messageGroup;
+    }
+    
     /**
      * Set the request queue connector.
      *
@@ -198,6 +210,8 @@ public class NotificationTopicSender extends CornerstoneConfigurable implements 
             long ttl) throws JMSException {
 
 		javax.jms.Message message = payloadType.createMessage(_connector.getSession(), msg);
+		message.setIntProperty(MessagingConstants.HeaderConstant.GroupId.name(), messageGroup.getId());
+		message.setIntProperty(MessagingConstants.HeaderConstant.GroupVersion.name(), messageGroup.getVersion());
 
         // send the message to the service notification topic
         _notificationSender.send(message, Message.DEFAULT_DELIVERY_MODE, Message.DEFAULT_PRIORITY, ttl);

@@ -1,25 +1,26 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-  <modelVersion>4.0.0</modelVersion>
-  <groupId>com.paxxis</groupId>
-  <artifactId>CornerstoneBase</artifactId>
-  <packaging>jar</packaging>
-  <version>SNAPSHOT</version>
-  <name>CornerStoneBase</name>
-  <description>CornerStoneBase contains core messaging classes.</description>
-  <url>http://www.paxxis.org</url>
+<?xml version="1.0" encoding="UTF-8"?>
+<project 
+        xmlns="http://maven.apache.org/POM/4.0.0" 
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+    <modelVersion>4.0.0</modelVersion>
+    <artifactId>CornerstoneBase</artifactId>
+    <name>Cornerstone Base</name>
+    <description>Base contains core messaging classes</description>
 
     <parent>
         <groupId>com.paxxis</groupId>
         <artifactId>CornerstoneAll</artifactId>
-        <version>SNAPSHOT</version>
+        <version>1.7-SNAPSHOT</version>
     </parent>
 
-    <build>
-        <resources>
-            <resource>
-                <directory>${basedir}/src/main/java</directory>
-            </resource>
-        </resources>
+    <!-- This is here for GWT because it needs the source code in the build artifact -->
+    <build>     
+        <resources>     
+            <resource>      
+                <directory>${basedir}/src/main/java</directory>     
+            </resource>     
+        </resources>        
     </build>
 </project>

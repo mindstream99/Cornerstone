@@ -72,6 +72,17 @@
                     <encoding>${project.build.sourceEncoding}</encoding>
                 </configuration>
             </plugin>
+
+            <!-- Easily find and update modules/dependencies/plugins in all 
+                 your projects (versions:display-dependency-updates, 
+                 versions:display-plugin-updates, etc).
+
+                 See http://mojo.codehaus.org/versions-maven-plugin/index.html -->
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>versions-maven-plugin</artifactId>
+                <version>1.2</version>
+            </plugin>
         </plugins>
     </build>
 

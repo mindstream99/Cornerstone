@@ -20,8 +20,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.RejectedExecutionException;
+import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import com.paxxis.cornerstone.service.ShutdownListener;
 
@@ -63,6 +65,7 @@ public class BlockingThreadPoolExecutor {
     private ArrayList<Runnable> halted = new ArrayList<Runnable>();
     private boolean isHalted = false;
     
+    private String threadPoolName;
     private int poolSize;
     private int maxRunnables;
     
@@ -110,24 +113,41 @@ public class BlockingThreadPoolExecutor {
      * Default constructor that sets some reasonable defaults for poolSize and maxRunnables in flight.
      */
     public BlockingThreadPoolExecutor() {
-        this(10, 10);
+        this(null, 10, 10);
+    }
+    
+    /**
+     * Constructor for a custom thread pool name while still using the default poolSize and maxRunnables.
+     * 
+     * @param threadPoolName the name of the pool
+     */
+    public BlockingThreadPoolExecutor(String threadPoolName) {
+        this(threadPoolName, 10, 10);
     }
     
     /**
      * Constructor.
      *
+     * @param threadPoolName the name of the thread pool
      * @param poolSize the size of the thread pool.  
      * @param max the maximum number of runnables in flight.
      */
-    public BlockingThreadPoolExecutor(int poolSize, int max) {
+    public BlockingThreadPoolExecutor(String threadPoolName, int poolSize, int max) {
+        this.threadPoolName = threadPoolName;
         this.poolSize = poolSize;
         maxRunnables = max;
         if (maxRunnables == 0) {
         	maxRunnables = poolSize;
         }
         
-        executor = new ThreadPoolExecutor(poolSize, poolSize, 0, TimeUnit.MILLISECONDS, 
-        						new OfferBlockingQueue<Runnable>(maxRunnables));
+        //core
+        executor = new ThreadPoolExecutor(
+                            poolSize, 
+                            poolSize, 
+                            0, 
+                            TimeUnit.MILLISECONDS, 
+        					new OfferBlockingQueue<Runnable>(maxRunnables),
+        					new DefaultThreadFactory(threadPoolName));
         executor.prestartAllCoreThreads();
     }
 
@@ -153,8 +173,13 @@ public class BlockingThreadPoolExecutor {
     
     public void restart() {
         if (isHalted) {
-            executor = new ThreadPoolExecutor(poolSize, poolSize, 0, TimeUnit.MILLISECONDS, 
-					new OfferBlockingQueue<Runnable>(maxRunnables));
+            executor = new ThreadPoolExecutor(
+                                poolSize, 
+                                poolSize, 
+                                0, 
+                                TimeUnit.MILLISECONDS, 
+								new OfferBlockingQueue<Runnable>(maxRunnables),
+								new DefaultThreadFactory(threadPoolName));
             
             for (Runnable work : halted) {
                 submit(work);
@@ -186,6 +211,37 @@ public class BlockingThreadPoolExecutor {
      */
     public boolean isShutdown() {
         return executor.isTerminated();
+    }
+
+    /**
+     * The default thread factory - a complete rip from java.util.concurrent.Executors$DefaultThreadFactory
+     */
+    static class DefaultThreadFactory implements ThreadFactory {
+        static final AtomicInteger poolNumber = new AtomicInteger(1);
+        final ThreadGroup group;
+        final AtomicInteger threadNumber = new AtomicInteger(1);
+        final String namePrefix;
+
+        DefaultThreadFactory(String namePrefix) {
+            SecurityManager s = System.getSecurityManager();
+            group = (s != null)? s.getThreadGroup() :
+                                 Thread.currentThread().getThreadGroup();
+            
+            this.namePrefix = namePrefix == null || "".equals(namePrefix.trim())
+                    ? BlockingThreadPoolExecutor.class.getSimpleName() + "-" + poolNumber.getAndIncrement() + "-thread-"
+                    : namePrefix + "-" + poolNumber.getAndIncrement() + "-thread-";
+        }
+
+        public Thread newThread(Runnable r) {
+            Thread t = new Thread(group, r,
+                                  namePrefix + threadNumber.getAndIncrement(),
+                                  0);
+            if (t.isDaemon())
+                t.setDaemon(false);
+            if (t.getPriority() != Thread.NORM_PRIORITY)
+                t.setPriority(Thread.NORM_PRIORITY);
+            return t;
+        }
     }
 }
 

@@ -82,7 +82,12 @@ public abstract class ServiceBusMessageHandler extends SimpleServiceBusMessageHa
      * @throws RuntimeException if the message handler was previously
      * initialized and has not been shut down.
      */
+    @Override
     public void init(Session session, boolean clientAck) {
+        init("unknown", session, clientAck);
+    }
+    
+    public void init(String destinationName, Session session, boolean clientAck) {
         if (_messageProcessor != null) {
             if (!_messageProcessor.isShutdown()) {
                 throw new RuntimeException("Attempt to init active message handler");
@@ -96,7 +101,8 @@ public abstract class ServiceBusMessageHandler extends SimpleServiceBusMessageHa
                 _messageProcessor.restart();
             }
         } else {
-            _messageProcessor = new BlockingThreadPoolExecutor(_poolSize, maxMessagesInFlight);
+            _messageProcessor = new BlockingThreadPoolExecutor(
+                    destinationName + "MessageHandler", _poolSize, maxMessagesInFlight);
         }
     }
 

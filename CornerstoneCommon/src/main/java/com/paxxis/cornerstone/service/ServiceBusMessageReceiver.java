@@ -25,7 +25,6 @@ import javax.jms.Session;
 import org.apache.activemq.command.ActiveMQQueue;
 
 import com.paxxis.cornerstone.base.MessageGroup;
-import com.paxxis.cornerstone.base.MessagingConstants;
 
 
 /**
@@ -197,7 +196,10 @@ public class ServiceBusMessageReceiver extends CornerstoneConfigurable implement
         try
         {
             // initialize the message handler
-            _messageHandler.init(_connector.getSession(), _connector.getAcknowledgeMode() == Session.CLIENT_ACKNOWLEDGE);
+            _messageHandler.init(
+                    _destinationName,
+                    _connector.getSession(), 
+                    _connector.getAcknowledgeMode() == Session.CLIENT_ACKNOWLEDGE);
 
             // create a message consumer and start the connection so that messages
             // can be delivered

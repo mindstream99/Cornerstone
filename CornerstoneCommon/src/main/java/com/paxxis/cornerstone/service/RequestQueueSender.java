@@ -93,6 +93,12 @@ public class RequestQueueSender extends DestinationSender implements QueueSender
         responseConsumer = null;
         responseQueue.delete();
         responseQueue = null;
+        messageExecutor.shutdown(new ShutdownListener() {
+            @Override
+            public void onShutdownComplete() {
+                logger.info("Message executor shutdown complete");
+            }
+        });
         super.closeDown();
     }
 

@@ -91,20 +91,9 @@ public class RequestQueueSender extends DestinationSender implements QueueSender
         //tell the broker to stop sending us messages...
         responseConsumer.close();
         responseConsumer = null;
-        
-        messageExecutor.shutdown(new ShutdownListener() {
-            @Override
-            public void onShutdownComplete() {
-                try {
-			        responseQueue.delete();
-			        responseQueue = null;
-			        RequestQueueSender.super.closeDown();
-                } catch (JMSException jmse) {
-                    logger.error(jmse);
-                }
-            }
-        });
-        
+        responseQueue.delete();
+        responseQueue = null;
+        super.closeDown();
     }
 
     /**

@@ -4,7 +4,7 @@
   <groupId>com.paxxis</groupId>
   <artifactId>CornerstoneBase</artifactId>
   <packaging>jar</packaging>
-  <version>1.6.1-SNAPSHOT</version>
+  <version>1.6.2</version>
   <name>CornerStoneBase</name>
   <description>CornerStoneBase contains core messaging classes.</description>
   <url>http://www.paxxis.org</url>

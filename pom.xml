@@ -45,14 +45,14 @@
             <uniqueVersion>true</uniqueVersion>
             <id>paxxis-contrib</id>
             <name>Releases</name>
-            <url>http://repo.paxxis.com/content/repositories/releases</url>
+            <url>http://repo.paxxis.com/nexus/content/repositories/releases</url>
             <layout>default</layout>
         </repository>
         <snapshotRepository>
             <uniqueVersion>true</uniqueVersion>
             <id>paxxis-contrib-snapshot</id>
             <name>Snapshots</name>
-            <url>http://repo.paxxis.com/content/repositories/snapshots</url>
+            <url>http://repo.paxxis.com/nexus/content/repositories/snapshots</url>
             <layout>default</layout>
         </snapshotRepository>
     </distributionManagement>

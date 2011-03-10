@@ -59,7 +59,7 @@ public class ServiceBusMessageRouter extends ServiceBusMessageHandler {
             }
         }
 
-        messageGroup.validate(messageProcessorMap.keySet());
+        messageGroup.validate(messageProcessorMap);
     }
     
     @Override

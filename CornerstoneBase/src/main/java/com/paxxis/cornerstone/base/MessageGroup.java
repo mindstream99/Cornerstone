@@ -19,8 +19,9 @@ package com.paxxis.cornerstone.base;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 
@@ -29,7 +30,7 @@ import java.util.List;
  */
 public abstract class MessageGroup implements Serializable {
 
-	private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 2L;
 
 	private List<Message> registeredMessages = new ArrayList<Message>();
     private List<String> messageProcessorNames = null;
@@ -81,15 +82,38 @@ public abstract class MessageGroup implements Serializable {
 		return registeredMessages;
 	}
 	
-	public void validate(Collection<TypeVersionTuple> tuples) {
+	public void validate(Map<TypeVersionTuple, String> processorMap) {
+        Map<TypeVersionTuple, String> processors = new HashMap<TypeVersionTuple, String>(processorMap);
+        StringBuilder errors = new StringBuilder();
+        
 		for (Message message : registeredMessages) {
 			TypeVersionTuple tuple = new TypeVersionTuple(message.getMessageType(), message.getMessageVersion());
-			if (!tuples.contains(tuple)) {
-				String msg = "No processor registered for MessageType " + message.getMessageType() +
-				                ", Version " + message.getMessageVersion();
-				throw new IllegalStateException(msg);
-			}
+            String processorName = processors.remove(tuple);
+            if (processorName == null) {
+                //no processor for message type/version
+                errors
+                    .append("No processor registered for MessageType ")
+                    .append(message.getMessageType())
+                    .append(", Version ")
+                    .append(message.getMessageVersion())
+                    .append("\n");
+            }
 		}
+        for (Map.Entry<TypeVersionTuple, String> entry : processors.entrySet()) {
+            TypeVersionTuple tuple = entry.getKey();
+            String processorName = entry.getValue();
+            errors
+                .append("No message registered for processsor ")
+                .append(processorName)
+                .append(" which handles MessageType ")
+                .append(tuple.getType())
+                .append(", Version ")
+                .append(tuple.getVersion())
+                .append("\n");
+        }
+        if (errors.length() > 0) {
+            throw new IllegalStateException(errors.toString());
+        }
 	}
 	
     public static class TypeVersionTuple {

@@ -96,6 +96,12 @@ public class DatabaseConnectionPool extends AbstractBlockingObjectPool<DatabaseC
             getObject().disconnect();
             super.shutdown();
         }
+
+        @Override
+        public void onReturn() {
+            getObject().cleanUp();
+        }       
+        
     }
     
     //FIXME this should probably be pushed down into a more generic object pool...

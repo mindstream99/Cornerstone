@@ -52,6 +52,10 @@ public abstract class AbstractBlockingObjectPool<T> extends CornerstoneConfigura
         public void shutdown() {
             this.object = null;
         }
+        
+        public void onReturn() {            
+        }
+        
     }
 
     private class WaitingBorrower {
@@ -191,6 +195,7 @@ public abstract class AbstractBlockingObjectPool<T> extends CornerstoneConfigura
         WaitingBorrower waiting = null;
 
         synchronized (semaphore) {
+            entry.onReturn();
             // take this one off the active pool
             Object borrower = activePool.remove(entry);
             if (borrower == null) {
@@ -205,7 +210,7 @@ public abstract class AbstractBlockingObjectPool<T> extends CornerstoneConfigura
                 activePool.put(entry, waiting.borrower);
             } else {
                 // put it back into the free pool
-                freePool.add(entry);
+                freePool.add(entry);                
             }
         }
 

@@ -47,6 +47,8 @@ public class DatabaseConnection implements IDatabaseConnection {
     private String driverName = null;
     private Connection connection;
     private int transactionCount;
+    private List<StatementProxy<? extends Statement>> stmtProxyList = new ArrayList<StatementProxy<? extends Statement>>();
+   
 
     public void setCatalog(String cat) {
     	catalog = cat;
@@ -115,7 +117,7 @@ public class DatabaseConnection implements IDatabaseConnection {
     {
         try
         {
-            return connection.createStatement();
+            return addReturnStmtProxy(new StatementProxy<Statement>(connection.createStatement()), Statement.class);                 
         }
         catch (SQLException e)
         {
@@ -140,6 +142,7 @@ public class DatabaseConnection implements IDatabaseConnection {
         {   
             try
             {   
+                cleanUp();
                 connection.close();
             }
             catch (SQLException ex) 
@@ -149,7 +152,16 @@ public class DatabaseConnection implements IDatabaseConnection {
             
             connection = null;
         }
+        
     }
+    
+    public void cleanUp() {
+        for(StatementProxy<? extends Statement> stmtProxy: stmtProxyList) {
+            stmtProxy.cleanUp();            
+        }
+        stmtProxyList.clear();
+    }
+
     public boolean isConnected()
     {   boolean connected = false;
         
@@ -408,7 +420,8 @@ public class DatabaseConnection implements IDatabaseConnection {
     }
     
     public PreparedStatement getPreparedStatement(String query) throws SQLException {
-        return connection.prepareStatement(query);       
+        
+        return addReturnStmtProxy(new StatementProxy<PreparedStatement>(connection.prepareStatement(query)), PreparedStatement.class);         
     }
 
     protected void finalize() throws Throwable {
@@ -508,5 +521,12 @@ public class DatabaseConnection implements IDatabaseConnection {
     {
         return dbUrl;
     }
+    
+    private <T extends Statement> T addReturnStmtProxy(StatementProxy<T> stmtProxy, Class<T> T) {
+        stmtProxyList.add(stmtProxy);
+        return stmtProxy.createStatementWrapper();
+    }
+    
+   
 
 }

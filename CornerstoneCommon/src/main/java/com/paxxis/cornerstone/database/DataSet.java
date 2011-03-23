@@ -14,8 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-
 package com.paxxis.cornerstone.database;
 
 import java.sql.ResultSet;
@@ -29,8 +27,7 @@ import java.util.Hashtable;
  *
  * @author Robert Englander
  */
-
-public class DataSet implements IDataSet 
+class DataSet implements IDataSet 
 {
     private Statement _stmt = null;
     private ResultSet _resultSet = null;
@@ -587,11 +584,6 @@ public class DataSet implements IDataSet
         public String getColumnName()
         {	
             return columnName;
-        }
-
-        public int getColumnNumber()
-        {	
-            return columnNumber;
         }
 
         public int getColumnType()

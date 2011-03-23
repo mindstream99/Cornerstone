@@ -14,39 +14,35 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-
 package com.paxxis.cornerstone.database;
+
 
 /**
  *
  * @author Robert Englander
  */
-public interface IDataSet
-{
-	public void close();
+public interface IDataSet extends CloseableResource {
 	
-	public boolean first() throws DatabaseException;
-	public boolean next()  throws DatabaseException;
-	public boolean last() throws DatabaseException;
-	public boolean previous()  throws DatabaseException;
-	public boolean absolute(int rowNum)  throws DatabaseException;
+	boolean first() throws DatabaseException;
+	boolean next()  throws DatabaseException;
+	boolean last() throws DatabaseException;
+	boolean previous()  throws DatabaseException;
+	boolean absolute(int rowNum)  throws DatabaseException;
 
-	public int getRowNumber() throws DatabaseException;
-	public int rowCount() throws DatabaseException;
-	public String[] getFieldNames() throws DatabaseException;
-	public Object[] getRow() throws DatabaseException;
-	//public Class getFieldType(String fieldName) throws DatabaseException;
-	public IDataValue getFieldValue(String fieldName) throws DatabaseException;
-	public IDataValue getFieldValue(int fieldIndex) throws DatabaseException;
-	public String getFieldName(int fieldIndex) throws DatabaseException;
-	public void setFieldValue(String fieldName, IDataValue value) throws DatabaseException;
-	public void setFieldValue(int fieldIndex, IDataValue value) throws DatabaseException;
-        public int getFieldIndex(String fieldName) throws DatabaseException;
-	public void newRow() throws DatabaseException;
-        public void update() throws DatabaseException;
-	public void deleteRecord() throws DatabaseException;
+	int getRowNumber() throws DatabaseException;
+	int rowCount() throws DatabaseException;
+	String[] getFieldNames() throws DatabaseException;
+	Object[] getRow() throws DatabaseException;
+	IDataValue getFieldValue(String fieldName) throws DatabaseException;
+	IDataValue getFieldValue(int fieldIndex) throws DatabaseException;
+	String getFieldName(int fieldIndex) throws DatabaseException;
+	void setFieldValue(String fieldName, IDataValue value) throws DatabaseException;
+	void setFieldValue(int fieldIndex, IDataValue value) throws DatabaseException;
+    int getFieldIndex(String fieldName) throws DatabaseException;
+	void newRow() throws DatabaseException;
+    void update() throws DatabaseException;
+	void deleteRecord() throws DatabaseException;
 	
-	public int[] getFieldTypes() throws DatabaseException;
-	public int columnCount();
+	int[] getFieldTypes() throws DatabaseException;
+	int columnCount();
 }

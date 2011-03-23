@@ -18,7 +18,6 @@
 package com.paxxis.cornerstone.database;
 
 import java.io.BufferedReader;
-import java.io.InputStreamReader;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -365,9 +364,16 @@ public class DatabaseUpdater {
 	private int getCurrentVersion(DatabaseConnection database, String catalog, String id) throws Exception {
 		int version = 0;
 		String sql = "select version from " + catalog + ".Version where id = '" + id + "'";
-		DataSet dataSet = database.getDataSet(sql, true);
-		if (dataSet.next()) {
-			version = dataSet.getFieldValue("version").asInteger();
+		IDataSet dataSet = null;
+		try {
+		    dataSet = database.getDataSet(sql, true);
+    		if (dataSet.next()) {
+    			version = dataSet.getFieldValue("version").asInteger();
+    		}
+		} finally {
+            if (dataSet != null) {
+                dataSet.close();
+            }
 		}
 		
 		return version;

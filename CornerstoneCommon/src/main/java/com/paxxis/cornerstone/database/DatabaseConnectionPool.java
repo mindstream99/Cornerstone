@@ -99,7 +99,7 @@ public class DatabaseConnectionPool extends AbstractBlockingObjectPool<DatabaseC
 
         @Override
         public void onReturn() {
-            getObject().cleanUp();
+            getObject().close();
         }       
         
     }

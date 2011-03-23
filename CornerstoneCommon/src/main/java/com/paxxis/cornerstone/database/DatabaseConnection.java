@@ -27,11 +27,15 @@ import java.sql.SQLException;
 import java.sql.SQLWarning;
 import java.sql.Statement;
 
+import org.apache.log4j.Logger;
+
 /**
  *
  * @author Robert Englander
  */
 public class DatabaseConnection implements IDatabaseConnection {
+    private static final Logger logger = Logger.getLogger(DatabaseConnection.class);
+    
 	public enum Type {
 		Oracle,
 		MySQL,
@@ -43,11 +47,10 @@ public class DatabaseConnection implements IDatabaseConnection {
 	private String catalog = "Chime";
     private String dbUrl;
     private String dbUser;
-    private boolean driverInitialized = false;
     private String driverName = null;
     private Connection connection;
     private int transactionCount;
-    private List<StatementProxy<? extends Statement>> stmtProxyList = new ArrayList<StatementProxy<? extends Statement>>();
+    private List<CloseableResource> closeables = new ArrayList<CloseableResource>();
    
 
     public void setCatalog(String cat) {
@@ -74,59 +77,58 @@ public class DatabaseConnection implements IDatabaseConnection {
     	return type == Type.Oracle;
     }
 
-    public void setDriverName(String name)
-    {
+    public void setDriverName(String name) {
         driverName = name;
         initDriver();
     }
     
-    private void initDriver()
-    {
-        try 
-        {
-            Class clazz = Class.forName(driverName);
-        }
-        catch (ClassNotFoundException ex) 
-        {
+    private void initDriver() {
+        try {
+            Class.forName(driverName);
+        } catch (ClassNotFoundException ex) {
             throw new RuntimeException(ex);
         }
     }
     
-    public void connect(String url, Properties props) throws DatabaseException 
-    {
-        if (isConnected())
-        {
+    public void connect(String url, Properties props) throws DatabaseException {
+        if (isConnected()) {
             disconnect();
         }
     
-        try 
-        {
+        try {
             connection = DriverManager.getConnection(url, props);
             connection.setAutoCommit(false);
-            connection.setTransactionIsolation(connection.TRANSACTION_READ_COMMITTED);
+            connection.setTransactionIsolation(Connection.TRANSACTION_READ_COMMITTED);
             
             checkForWarning(connection.getWarnings());
-        }
-        catch (Exception ex) 
-        {
+        } catch (Exception ex) {
             throw new DatabaseException(ex, "Invalid Server Connection. Please Modify Parameters");
         }
     }
+    
+    private <T extends Statement> T createStatement(T statement) {
+        StatementProxy<T> proxy = new StatementProxy<T>(statement);
+        closeables.add(proxy);
+        return proxy.createStatementWrapper();
+    }
+    
+    private Statement createStatement(int resultSetType, int resultSetConcurrency) 
+            throws DatabaseException {
+        validateConnection();
 
-    public Statement createStatement() throws DatabaseException
-    {
-        try
-        {
-            return addReturnStmtProxy(new StatementProxy<Statement>(connection.createStatement()), Statement.class);                 
-        }
-        catch (SQLException e)
-        {
+        try {
+            return createStatement(connection.createStatement(resultSetType, resultSetConcurrency));
+        } catch (SQLException e) {
             throw new DatabaseException(e);
         }
     }
     
-    public void connect(String url, String user, String password) throws DatabaseException 
-    {
+    public Statement createStatement() throws DatabaseException {
+        //create a statement with the default ResultSet type and concurrency (according to docs)
+        return createStatement(ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY);
+    }
+    
+    public void connect(String url, String user, String password) throws DatabaseException {
         Properties props = new Properties();
         props.setProperty("user", user);
         props.setProperty("password", password);
@@ -136,205 +138,91 @@ public class DatabaseConnection implements IDatabaseConnection {
         dbUser = user;
     }
 
-    public void disconnect() 
-    {
-        if (isConnected())
-        {   
-            try
-            {   
-                cleanUp();
+    public void disconnect() {
+        if (isConnected()) {   
+            try {   
+                close();
                 connection.close();
-            }
-            catch (SQLException ex) 
-            {   
+            } catch (SQLException ex) {   
                 // do not propagate this exception
             }
             
             connection = null;
         }
-        
     }
     
-    public void cleanUp() {
-        for(StatementProxy<? extends Statement> stmtProxy: stmtProxyList) {
-            stmtProxy.cleanUp();            
+    public void close() {
+        //we reverse the list because it is nice to close resources in reverse order of opening them...
+        Collections.reverse(closeables);
+        for (CloseableResource closeable : closeables) {
+            closeable.close();
         }
-        stmtProxyList.clear();
+        closeables.clear();
     }
 
-    public boolean isConnected()
-    {   boolean connected = false;
-        
-        try
-        {   
-            connected = (connection != null) && (!connection.isClosed());
+    public boolean isConnected() {   
+        try {
+            validateConnection();
+        } catch (DatabaseException de) {
+            return false;
         }
-        catch (SQLException ex) 
-        {   
-            // the connection is no good
-            connection = null;
-            connected = false;
-        }
-        
-        return connected;
+        return true;
     }
 
-    public IDataValue getValueFromQuery(String sql) throws DatabaseException 
-    {
-        DataSet dataset = null;
-        try{
+    public IDataValue getValueFromQuery(String sql) throws DatabaseException {
+        IDataSet dataset = null;
+        try {
             dataset = getDataSet(sql, true);
             dataset.first();
             IDataValue val = dataset.getFieldValue(1);
-            dataset.close();
             return val;
-        }
-        finally {
-            if (dataset!=null) dataset.close();
+        } finally {
+            if (dataset != null) {
+                dataset.close();
+            }
         }
     }
     
-    public Date getSystemDateTime() throws DatabaseException 
-    {
-        
-        return null;
-    }
     
-    public void executeStatement(String sql) throws DatabaseException 
-    {
-        //sql = databaseSpecific.processSQLBeforeSending(sql.trim());
-        Statement stmt = null;
-        boolean hasResultSet = false;
-        boolean hasResultCount = false;
-        Exception exception = null;
-
-        if (!isConnected())
-            throw new DatabaseException("connection is not open");
+    public void executeStatement(String sql) throws DatabaseException {
+        Statement stmt = createStatement();
 
         try {
-            stmt = connection.createStatement();
+            stmt.execute(sql);
+        } catch (SQLException ex) {   
+            throw new DatabaseException(ex);
+        } finally {
+            close(stmt);
         }
-        catch (SQLException ex)
-        {   throw new DatabaseException(ex);
-        }
-
-        // at this point, we have a valid statement.
-        // we should make sure that it gets closed
-
-        try {
-            hasResultSet = stmt.execute(sql);
-        }
-        catch (SQLException ex)
-        {   exception = ex; // this is the only
-            // message our callers care about
-        }
-
-        try {    // make sure that we close all result sets
-            // The java doc says that we need to check
-            // getUpdateCount() until we get -1, but,
-            // the Oracle driver seems to return only 0's
-            while (hasResultSet)
-            {   if (hasResultSet)
-                {   stmt.getResultSet().close();
-                }
-                hasResultSet = stmt.getMoreResults();
-            }
-        }
-        catch (SQLException ex) {   // ignore messages while closing things up
-        }
-
-        try
-        {   stmt.close();
-        }
-        catch (SQLException ex) {   // ignore messages while closing things up
-        }
-
-        if (exception != null)
-            throw new DatabaseException(exception);
     }
 
-    public IDataSet executeQuery(String sql, String table) throws DatabaseException 
-    {
-        //sql = databaseSpecific.processSQLBeforeSending(sql.trim());
-        Statement stmt = null;
-        boolean hasResultSet = false;
-        boolean hasResultCount = false;
-        Exception exception = null;
+    public IDataSet executeQuery(String sql, String table) throws DatabaseException {
+        Statement stmt = createStatement();
+        IDataSet resultSet = new DataSet(stmt, sql, table, false);
+        closeables.add(resultSet);
 
-        IDataSet resultSet = null;
-        
-        if (!isConnected())
-            throw new DatabaseException("connection is not open");
-
-        try {
-            stmt = connection.createStatement();
-        }
-        catch (SQLException ex)
-        {   throw new DatabaseException(ex);
-        }
-
-        // at this point, we have a valid statement.
-        // we should make sure that it gets closed
-
-        resultSet = new DataSet(stmt, sql, table, false);
-
-        try {    // make sure that we close all result sets
-            // The java doc says that we need to check
-            // getUpdateCount() until we get -1, but,
-            // the Oracle driver seems to return only 0's
-            while (hasResultSet)
-            {   if (hasResultSet)
-                {   stmt.getResultSet().close();
-                }
-                hasResultSet = stmt.getMoreResults();
-            }
-        }
-        catch (SQLException ex) {   // ignore messages while closing things up
-        }
-
-        try
-        {   stmt.close();
-        }
-        catch (SQLException ex) {   // ignore messages while closing things up
-        }
-
-        if (exception != null)
-            throw new DatabaseException(exception);
-        
+        //we purposefully do not close the statement before exiting as the dataset (which wraps
+        //a ResultSet) is long lived and closing a statement closes its associated ResultSets...
         return resultSet;
     }
 
     public void startTransaction() throws DatabaseException {
-        if (!isConnected()) 
-        {
-            throw new DatabaseException("connection is not open");
-        }
-        
-        if (transactionCount == 0) 
-        {
-            //executeStatement("start transaction");
-        }
-        
+        validateConnection();
         transactionCount++;
     }
 
-    public void commitTransaction() throws DatabaseException 
-    {
-        if (!isConnected())
-            throw new DatabaseException("connection is not open");
+    public void commitTransaction() throws DatabaseException {
+        validateConnection();
 
-        if (!inTransaction()) 
-        {
+        if (!inTransaction()) {
             return;
         }
 
-        if (transactionCount > 1) 
-        {
+        if (transactionCount > 1) {
             transactionCount--;
             return;
         }
 
-        //executeStatement("commit");
         try {
             connection.commit();
         } catch (SQLException e) {
@@ -345,15 +233,12 @@ public class DatabaseConnection implements IDatabaseConnection {
     }
 
     public void rollbackTransaction() throws DatabaseException {
-        if (!isConnected())
-            throw new DatabaseException("connection is not open");
+        validateConnection();
 
-        if (!inTransaction()) 
-        {
+        if (!inTransaction()) {
             return;
         }
 
-        //executeStatement("rollback");
         try {
             connection.rollback();
         } catch (SQLException e) {
@@ -363,65 +248,52 @@ public class DatabaseConnection implements IDatabaseConnection {
         transactionCount = 0;
     }
 
-    public boolean inTransaction() 
-    {
+    public boolean inTransaction() {
         return transactionCount > 0;
     }
     
 
-    public void lock(String tableName, String[] keyFields, IDataValue[] keyValues) throws DatabaseException 
-    {
-    }
-
-
-    public void deleteTableData(String tableName) throws DatabaseException 
-    {
-        try
-        {
+    public void deleteTableData(String tableName) throws DatabaseException {
+        try {
             String sqlStr = "delete from " + tableName;
             executeStatement(sqlStr);
-        }
-        catch (DatabaseException ex)
-        {
-            throw new DatabaseException(ex,"Couldn't delete data from table: " +tableName+". An error occured.");
+        } catch (DatabaseException ex) {
+            throw new DatabaseException(ex, "Couldn't delete data from table: " + tableName + ". An error occured.");
         }
     }
 
 
-    public DataSet getDataSet(String query, boolean readOnly) throws DatabaseException {
+    public IDataSet getDataSet(String query, boolean readOnly) throws DatabaseException {
         int resultSetType = ResultSet.TYPE_SCROLL_INSENSITIVE;
-        int resultSetConcurrency = (readOnly) ?  ResultSet.CONCUR_READ_ONLY : ResultSet.CONCUR_UPDATABLE;
+        int resultSetConcurrency = (readOnly) ? ResultSet.CONCUR_READ_ONLY : ResultSet.CONCUR_UPDATABLE;
         String tableName = "";
-        String newQuery = query;
-
-        boolean isAudited = false;
-        try 
-        {
-            Statement stmt = connection.createStatement(resultSetType, resultSetConcurrency);
+        DataSet result = null;
+        
+        Statement stmt = createStatement(resultSetType, resultSetConcurrency);
+        try {
             stmt.setFetchSize(1000);
-
-            //query = databaseSpecific.processSQLBeforeSending(query.trim());
-
-            // we only need to lock the rows if we're
-            // inside a transaction and it's not read-only
-            if (inTransaction() && !readOnly)
-            {
-                //lockRowFromQuery(query);
-            }
-
-            DataSet result = new DataSet(stmt, query, tableName, isAudited);
+            result = new DataSet(stmt, query, tableName, false);
             result.setTableName(tableName);
             result.setDatabase(this);
-            return result;
-        }
-        catch (SQLException ex) {
+        } catch (SQLException ex) {
+            //statement is useless at this point...
+            close(stmt);
             throw new DatabaseException(ex);
         }
+        
+        //we purposefully do not close the statement before exiting as the dataset (which wraps
+        //a ResultSet) is long lived and closing a statement closes its associated ResultSets...
+        return result;
     }
     
-    public PreparedStatement getPreparedStatement(String query) throws SQLException {
+    public PreparedStatement getPreparedStatement(String query) throws DatabaseException {
+        validateConnection();
         
-        return addReturnStmtProxy(new StatementProxy<PreparedStatement>(connection.prepareStatement(query)), PreparedStatement.class);         
+        try {
+            return createStatement(connection.prepareStatement(query));
+        } catch (SQLException sqle) {
+            throw new DatabaseException(sqle);
+        }
     }
 
     protected void finalize() throws Throwable {
@@ -429,40 +301,44 @@ public class DatabaseConnection implements IDatabaseConnection {
         super.finalize();
     }
 
-    private static boolean checkForWarning(SQLWarning warn)
-    throws SQLException {
-        boolean rc = false;
-
+    private static void checkForWarning(SQLWarning warn) throws SQLException {
+        if (warn == null) {
+            return;
+        }
+        
         // If a SQLWarning object was given, display the
         // warning messages.  Note that there could be
         // multiple warnings chained together
-
-        if (warn != null)
-        {	System.out.println("\n *** Warning ***\n");
-                rc = true;
-                while (warn != null) {
-                    System.out.println("SQLState: " + warn.getSQLState());
-                    System.out.println("Message:  " + warn.getMessage());
-                    System.out.println("Vendor:   " + warn.getErrorCode());
-                    System.out.println("");
-                    warn = warn.getNextWarning();
-                }
-        }
-        return rc;
+        
+        //just to keep it all in the same log statement...
+        StringBuilder builder = new StringBuilder();
+        builder.append("\n *** Warning ***\n");
+        do {
+            builder
+                .append("SQLState: ")
+                .append(warn.getSQLState())
+                .append("\n")
+                .append("Message:  ")
+                .append(warn.getMessage())
+                .append("\n")
+                .append("Vendor:   ")
+                .append(warn.getErrorCode())
+                .append("\n");
+            warn = warn.getNextWarning();
+        } while (warn != null);
+        
+        logger.warn(builder.toString());
     }
 
-    public void executeUpdate(String table, String[] columns, IDataValue[] values, String filter) throws DatabaseException
-    {
-        // lock the rows if that's the rule
+    public void executeUpdate(String table, String[] columns, IDataValue[] values, String filter) 
+            throws DatabaseException {
         
         // build up the SQL statement
         StringBuffer sql = new StringBuffer("update " + table + " set ");
 
         int count = columns.length;
-        for (int i = 0; i < count; i++)
-        {
-            if (i > 0)
-            {
+        for (int i = 0; i < count; i++) {
+            if (i > 0) {
                 sql.append(", ");
             }
             sql.append(columns[i]);
@@ -475,26 +351,20 @@ public class DatabaseConnection implements IDatabaseConnection {
         executeStatement(sql.toString());
     }
 
-    public void executeDelete(String table, String filter) throws DatabaseException
-    {
-        // locking...
-        
+    public void executeDelete(String table, String filter) throws DatabaseException {
         String sql = "delete from " + table + " where " + filter;
         executeStatement(sql);
     }
 
-    public void executeInsert(String table, String[] columns, IDataValue[] values) throws DatabaseException
-    {
+    public void executeInsert(String table, String[] columns, IDataValue[] values) 
+            throws DatabaseException {
+        
         // build up the SQL statement
         StringBuffer sql = new StringBuffer("insert into " + table + " set ");
 
-        // AUDITABLE????
-        
         int count = values.length;
-        for (int i = 0; i < count; i++)
-        {
-            if (i > 0) 
-            {
+        for (int i = 0; i < count; i++) {
+            if (i > 0) {
                 sql.append(',');
             }
 
@@ -512,21 +382,33 @@ public class DatabaseConnection implements IDatabaseConnection {
         executeStatement(sql.toString());
     }
 
-    public String getUser()
-    {
+    public String getUser() {
         return dbUser;
     }
 
-    public String getConnectionURL()
-    {
+    public String getConnectionURL() {
         return dbUrl;
     }
     
-    private <T extends Statement> T addReturnStmtProxy(StatementProxy<T> stmtProxy, Class<T> T) {
-        stmtProxyList.add(stmtProxy);
-        return stmtProxy.createStatementWrapper();
+
+    private void close(Statement statement) {
+        try {
+            if (statement != null) {
+                statement.close();
+            }
+        } catch (SQLException sqle) {
+            //ignore
+        }
     }
     
-   
-
+    private void validateConnection() throws DatabaseException {
+        try {
+            if (connection == null || connection.isClosed()) {
+                throw new DatabaseException("Database connection is closed");
+            }
+        } catch (SQLException sqle) {
+            connection = null;
+            throw new DatabaseException(sqle);
+        }
+    }
 }

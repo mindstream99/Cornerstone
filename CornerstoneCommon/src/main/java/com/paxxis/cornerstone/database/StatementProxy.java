@@ -36,7 +36,7 @@ import org.apache.log4j.Logger;
  * @author Philip Kubasov
  *
  */
-public class StatementProxy<T extends Statement> implements InvocationHandler {
+public class StatementProxy<T extends Statement> implements InvocationHandler, CloseableResource {
 
     private static final Logger logger = Logger.getLogger(StatementProxy.class);
     
@@ -74,7 +74,8 @@ public class StatementProxy<T extends Statement> implements InvocationHandler {
         resultSets.add(rs);
     }
     
-    public void cleanUp() {
+    @Override
+    public void close() {
         for (ResultSet rs : resultSets) {
             disposeResultSet(rs);
         }
@@ -99,7 +100,7 @@ public class StatementProxy<T extends Statement> implements InvocationHandler {
     }    
     
     protected void finalize() {
-        cleanUp();
+        close();
     }
 
 }

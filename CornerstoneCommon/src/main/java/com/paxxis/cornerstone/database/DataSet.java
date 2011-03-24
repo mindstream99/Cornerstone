@@ -27,7 +27,7 @@ import java.util.Hashtable;
  *
  * @author Robert Englander
  */
-public class DataSet implements IDataSet 
+class DataSet implements IDataSet 
 {
     private Statement _stmt = null;
     private ResultSet _resultSet = null;

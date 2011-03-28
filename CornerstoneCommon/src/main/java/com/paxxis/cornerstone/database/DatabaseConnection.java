@@ -263,34 +263,52 @@ public class DatabaseConnection implements IDatabaseConnection {
     }
 
 
+    public IDataSet getDataSet(PreparedStatement stmt, boolean readOnly) throws DatabaseException {
+    	return getDataSetResult(stmt, null);
+    }
+
     public IDataSet getDataSet(String query, boolean readOnly) throws DatabaseException {
         int resultSetType = ResultSet.TYPE_SCROLL_INSENSITIVE;
         int resultSetConcurrency = (readOnly) ? ResultSet.CONCUR_READ_ONLY : ResultSet.CONCUR_UPDATABLE;
-        String tableName = "";
-        DataSet result = null;
-        
         Statement stmt = createStatement(resultSetType, resultSetConcurrency);
+        return getDataSetResult(stmt, query);
+    }
+
+    private IDataSet getDataSetResult(Statement stmt, String query) throws DatabaseException {
+        DataSet result = null;
         try {
             stmt.setFetchSize(1000);
-            result = new DataSet(stmt, query, tableName, false);
-            result.setTableName(tableName);
+            
+            if (stmt instanceof PreparedStatement) {
+                result = new DataSet((PreparedStatement)stmt, "", false);
+            } else {
+                result = new DataSet(stmt, query, "", false);
+            }
+            
+            result.setTableName("");
             result.setDatabase(this);
-        } catch (SQLException ex) {
+        } catch (Exception ex) {
             //statement is useless at this point...
             close(stmt);
             throw new DatabaseException(ex);
         }
-        
+
         //we purposefully do not close the statement before exiting as the dataset (which wraps
         //a ResultSet) is long lived and closing a statement closes its associated ResultSets...
         return result;
     }
     
     public PreparedStatement getPreparedStatement(String query) throws DatabaseException {
+    	return getPreparedStatement(query, true);
+    }
+    
+    public PreparedStatement getPreparedStatement(String query, boolean readOnly) throws DatabaseException {
         validateConnection();
         
         try {
-            return createStatement(connection.prepareStatement(query));
+            int resultSetType = ResultSet.TYPE_SCROLL_INSENSITIVE;
+            int resultSetConcurrency = (readOnly) ? ResultSet.CONCUR_READ_ONLY : ResultSet.CONCUR_UPDATABLE;
+            return createStatement(connection.prepareStatement(query, resultSetType, resultSetConcurrency));
         } catch (SQLException sqle) {
             throw new DatabaseException(sqle);
         }

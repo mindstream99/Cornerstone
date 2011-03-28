@@ -16,6 +16,7 @@
  */
 package com.paxxis.cornerstone.database;
 
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
@@ -40,35 +41,38 @@ class DataSet implements IDataSet
     private DatabaseConnection _database;
     private boolean _isAudited = false;
 
-    public DataSet(Statement stmt, String query, String tableName, boolean isAudited) throws DatabaseException 
-    {
+    public DataSet(Statement stmt, String query, String tableName, boolean isAudited) throws DatabaseException  {
+        try  {
+            _resultSet = stmt.executeQuery(query);
+            collectResults(stmt, tableName, isAudited);
+        } catch (Exception ex) {
+            throw new DatabaseException(ex);
+        }
+    }
+
+    public DataSet(PreparedStatement stmt, String tableName, boolean isAudited) throws DatabaseException {
+        try {
+            _resultSet = stmt.executeQuery();
+            collectResults(stmt, tableName, isAudited);
+        } catch (Exception ex) {
+            throw new DatabaseException(ex);
+        }
+    }
+    
+    private void collectResults(Statement stmt, String tableName, boolean isAudited) throws Exception {
         _stmt = stmt;
         _tableName = tableName;
         _isAudited = isAudited;
 
-        try 
-        {
-            //long start = System.currentTimeMillis();
-            _resultSet = stmt.executeQuery(query);
-            //long end = System.currentTimeMillis();
-            //System.out.println("Query time: " + (end - start) + " msecs");
-            
-            ResultSetMetaData metaData = _resultSet.getMetaData();
-            
-            _columnCount = metaData.getColumnCount();
+        ResultSetMetaData metaData = _resultSet.getMetaData();
+        
+        _columnCount = metaData.getColumnCount();
+        _columns = new DataSetColumn[_columnCount];
 
-            _columns = new DataSetColumn[_columnCount];
-
-            for (int i = 1; i <= _columnCount; i++)	
-            {
-                DataSetColumn info = new DataSetColumn(metaData, i, tableName);
-                _columnNameIndex.put(info.getColumnName().toLowerCase(), i);
-                _columns[i - 1] = info;
-            }
-        }
-        catch (Exception ex) {
-
-            throw new DatabaseException(ex);
+        for (int i = 1; i <= _columnCount; i++)	{
+            DataSetColumn info = new DataSetColumn(metaData, i, tableName);
+            _columnNameIndex.put(info.getColumnName().toLowerCase(), i);
+            _columns[i - 1] = info;
         }
     }
 

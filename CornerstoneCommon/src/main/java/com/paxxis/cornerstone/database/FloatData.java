@@ -18,64 +18,65 @@
 
 package com.paxxis.cornerstone.database;
 
-import com.paxxis.cornerstone.base.InstanceId;
-
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import java.util.Date;
+
+import com.paxxis.cornerstone.base.InstanceId;
 
 /**
  *
  * @author Robert Englander
  */
-public class FloatData implements IDataValue
-{
-    Float _data;
+public class FloatData implements IDataValue {
+	private static final long serialVersionUID = 2L;
+	private Float _data;
 
-    public FloatData(Float data)
-    {
+    public FloatData(Float data) {
         _data = data;
     }
     
-    public String asSQLValue()
-    {
+    public FloatData(String data) {
+    	_data = Float.valueOf(data);
+    }
+
+    public String asSQLValue() {
         return asString();
     }
     
-    public String asString() 
-    {
+    public String asString() {
         return String.valueOf(_data);
     }
 
-    public Float asFloat() 
-    {
+    public Float asFloat() {
         return _data;
     }
 
-    public Double asDouble() 
-    {
+    public Double asDouble() {
         return _data.doubleValue();
     }
 
-    public Integer asInteger() 
-    {
+    public Integer asInteger() {
         return _data.intValue();
     }
 
-    public Long asLong() 
-    {
+    public Long asLong() {
         return _data.longValue();
     }
 
-    public Date asDate()
-    {
+    public Date asDate() {
         return null;
     }
 
-    public boolean isNull()
-    {
+    public boolean isNull() {
         return _data == null;
     }
 
     public InstanceId asInstanceId() {
         return null;
     }
+
+	public void insert(PreparedStatement stmt, int idx) throws SQLException {
+        stmt.setFloat(idx, _data);
+	}
 }

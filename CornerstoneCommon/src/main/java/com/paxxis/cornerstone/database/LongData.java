@@ -20,62 +20,63 @@ package com.paxxis.cornerstone.database;
 
 import com.paxxis.cornerstone.base.InstanceId;
 
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import java.util.Date;
 
 /**
  *
  * @author Robert Englander
  */
-public class LongData implements IDataValue
-{
-    Long _data = null;
+public class LongData implements IDataValue {
+	private static final long serialVersionUID = 1L;
+	private Long _data = null;
 
-    public LongData(Long data)
-    {
+    public LongData(Long data) {
         _data = data;
     }
     
-    public String asSQLValue()
-    {
+    public LongData(String data) {
+    	_data = Long.valueOf(data);
+    }
+
+    public String asSQLValue() {
         return asString();
     }
     
-    public String asString() 
-    {
+    public String asString() {
         return String.valueOf(_data);
     }
 
-    public Float asFloat() 
-    {
+    public Float asFloat() {
         return _data.floatValue();
     }
 
-    public Double asDouble() 
-    {
+    public Double asDouble() {
         return _data.doubleValue();
     }
 
-    public Integer asInteger() 
-    {
+    public Integer asInteger() {
         return _data.intValue();
     }
 
-    public Long asLong() 
-    {
+    public Long asLong() {
         return _data;
     }
 
-    public Date asDate()
-    {
+    public Date asDate() {
         return null;
     }
     
-    public boolean isNull()
-    {
+    public boolean isNull() {
         return _data == null;
     }
 
     public InstanceId asInstanceId() {
         return null;
     }
+
+	public void insert(PreparedStatement stmt, int idx) throws SQLException {
+        stmt.setLong(idx, _data);
+	}
 }

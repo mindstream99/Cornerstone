@@ -18,81 +18,78 @@
 
 package com.paxxis.cornerstone.database;
 
-import com.paxxis.cornerstone.base.InstanceId;
-
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+
 import javax.swing.text.DateFormatter;
+
+import com.paxxis.cornerstone.base.InstanceId;
 
 /**
  *
  * @author Robert Englander
  */
 public class DateValue implements IDataValue {
-    private Date _data;
+	private static final long serialVersionUID = 1L;
+	private Date _data;
 
-    public DateValue(Date data)
-    {
+    public DateValue(Date data) {
         _data = data;
     }
     
-    public String asSQLValue()
-    {
+    public String asSQLValue() {
         return "'" + asString() + "'";
     }
     
-    public String asString() 
-    {
+    public String asString() {
         DateFormatter formatter = new DateFormatter();
         
         String result;
-        try
-        {
+        try {
             DateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
             formatter.setFormat(format);
             result = formatter.valueToString(_data);
-        }
-        catch (ParseException e)
-        {
+        } catch (ParseException e) {
             result = e.getMessage();
         }
         
         return result;
     }
 
-    public Float asFloat() 
-    {
+    public Float asFloat() {
         return null;
     }
 
-    public Double asDouble() 
-    {
+    public Double asDouble() {
         return null;
     }
 
-    public Integer asInteger() 
-    {
+    public Integer asInteger() {
         return null;
     }
 
-    public Long asLong() 
-    {
+    public Long asLong() {
         return null;
     }
 
-    public Date asDate()
-    {
+    public Date asDate() {
         return _data;
     }
     
-    public boolean isNull()
-    {
+    public boolean isNull() {
         return _data == null;
     }
 
     public InstanceId asInstanceId() {
         return null;
+    }
+
+    public void insert(PreparedStatement stmt, int idx) throws SQLException {
+    	java.sql.Date dt = new java.sql.Date(_data.getTime());
+    	stmt.setDate(idx, dt);
     }
 }

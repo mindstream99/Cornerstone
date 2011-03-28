@@ -18,10 +18,12 @@
 
 package com.paxxis.cornerstone.database;
 
-import com.paxxis.cornerstone.base.InstanceId;
-
 import java.io.Serializable;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import java.util.Date;
+
+import com.paxxis.cornerstone.base.InstanceId;
 
 /**
  *
@@ -35,7 +37,19 @@ public interface IDataValue extends Serializable
     public Integer asInteger();
     public Long asLong();
     public Date asDate();
-    public String asSQLValue();
     public boolean isNull();
     public InstanceId asInstanceId();
+    
+    /**
+     * Insert the data value into the supplied prepared statement at the
+     * specified index.
+     */
+    public void insert(PreparedStatement stmt, int idx) throws SQLException;
+
+    /**
+     * 
+     * @deprecated the preferred way to prepare data for SQL inserts and updates is by
+     * using prepared statements.
+     */
+    public String asSQLValue();
 }

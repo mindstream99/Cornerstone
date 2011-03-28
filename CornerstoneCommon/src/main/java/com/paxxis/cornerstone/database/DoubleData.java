@@ -18,64 +18,65 @@
 
 package com.paxxis.cornerstone.database;
 
-import com.paxxis.cornerstone.base.InstanceId;
-
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import java.util.Date;
+
+import com.paxxis.cornerstone.base.InstanceId;
 
 /**
  *
  * @author Robert Englander
  */
-public class DoubleData implements IDataValue
-{
-    Double _data;
+public class DoubleData implements IDataValue {
+	private static final long serialVersionUID = 1L;
+	private Double _data;
 
-    public DoubleData(Double data)
-    {
+    public DoubleData(Double data) {
         _data = data;
     }
     
-    public String asSQLValue()
-    {
+    public DoubleData(String data) {
+    	_data = Double.valueOf(data);
+    }
+    
+    public String asSQLValue() {
         return asString();
     }
     
-    public String asString() 
-    {
+    public String asString() {
         return String.valueOf(_data);
     }
 
-    public Float asFloat() 
-    {
+    public Float asFloat() {
         return _data.floatValue();
     }
 
-    public Double asDouble() 
-    {
+    public Double asDouble() {
         return _data;
     }
 
-    public Integer asInteger() 
-    {
+    public Integer asInteger() {
         return _data.intValue();
     }
 
-    public Long asLong() 
-    {
+    public Long asLong() {
         return _data.longValue();
     }
 
-    public Date asDate()
-    {
+    public Date asDate() {
         return null;
     }
     
-    public boolean isNull()
-    {
+    public boolean isNull() {
         return _data == null;
     }
 
     public InstanceId asInstanceId() {
         return null;
     }
+
+	public void insert(PreparedStatement stmt, int idx) throws SQLException {
+        stmt.setDouble(idx, _data);
+	}
 }

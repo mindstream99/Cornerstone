@@ -18,9 +18,12 @@
 
 package com.paxxis.cornerstone.database;
 
-import com.paxxis.cornerstone.base.InstanceId;
-
+import java.io.StringReader;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import java.util.Date;
+
+import com.paxxis.cornerstone.base.InstanceId;
 
 /**
  *
@@ -113,4 +116,9 @@ public class StringData implements IDataValue {
     public InstanceId asInstanceId() {
         return InstanceId.create(_data);
     }
+
+	public void insert(PreparedStatement stmt, int idx) throws SQLException {
+        StringReader reader = new StringReader(_data);
+        stmt.setCharacterStream(idx, reader, _data.length());
+	}
 }

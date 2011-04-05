@@ -27,6 +27,8 @@ public class ActiveMQInitialContextFactory extends JndiInitialContextFactory {
 	private static final String FAILOVER = "failover:";
 	private static final String USEASYNC = "jms.useAsyncSend=";
 	private static final String TRACKMSGS = "trackMessages=";
+	private static final String RECONNECTATTEMPTS = "maxReconnectAttempts=";
+	private static final int DEFAULTMAXATTEMPTS = 3;
 	
 	private enum ThreeState {
 		True,
@@ -37,7 +39,7 @@ public class ActiveMQInitialContextFactory extends JndiInitialContextFactory {
 	private boolean failover = false;
     private ThreeState asyncSend = ThreeState.None;
     private ThreeState trackMessages = ThreeState.None;
-    
+    private int maxConnectionAttempts = DEFAULTMAXATTEMPTS;
 
 	public ActiveMQInitialContextFactory() {
 		super();
@@ -52,7 +54,12 @@ public class ActiveMQInitialContextFactory extends JndiInitialContextFactory {
     	}
 
     	String psep = QMARK;
-    	
+
+    	if (maxConnectionAttempts > 0) {
+			   fullUrl.append(psep).append(RECONNECTATTEMPTS).append(maxConnectionAttempts);
+			   psep = AMP;
+    	}
+
     	switch (asyncSend) {
 	    	case True:
 	    	case False:
@@ -86,6 +93,18 @@ public class ActiveMQInitialContextFactory extends JndiInitialContextFactory {
     	return value;
     }
 
+    public void setMaxConnectionAttempts(int val) {
+    	if (val < 0) {
+    		throw new RuntimeException("Max Connection Attempts can't be less than 0");
+    	}
+    	
+    	maxConnectionAttempts = val;
+    }
+    
+    public int getMaxConnectionAttempts() {
+    	return maxConnectionAttempts;
+    }
+    
     public void setFailover(boolean val) {
     	failover = val;
     }

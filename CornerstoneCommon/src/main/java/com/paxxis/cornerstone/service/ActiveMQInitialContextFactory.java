@@ -28,7 +28,7 @@ public class ActiveMQInitialContextFactory extends JndiInitialContextFactory {
 	private static final String USEASYNC = "jms.useAsyncSend=";
 	private static final String TRACKMSGS = "trackMessages=";
 	private static final String RECONNECTATTEMPTS = "maxReconnectAttempts=";
-	private static final int DEFAULTMAXATTEMPTS = 3;
+	private static final int DEFAULTMAXATTEMPTS = 0;
 	
 	private enum ThreeState {
 		True,
@@ -55,7 +55,7 @@ public class ActiveMQInitialContextFactory extends JndiInitialContextFactory {
 
     	String psep = QMARK;
 
-    	if (maxConnectionAttempts > 0) {
+    	if (failover && maxConnectionAttempts > 0) {
 			   fullUrl.append(psep).append(RECONNECTATTEMPTS).append(maxConnectionAttempts);
 			   psep = AMP;
     	}
@@ -70,13 +70,15 @@ public class ActiveMQInitialContextFactory extends JndiInitialContextFactory {
 	    		break;
     	}
     	
-    	switch (trackMessages) {
-	    	case True:
-	    	case False:
-	    		fullUrl.append(psep).append(TRACKMSGS).append(trackMessages.name().toLowerCase());
-	    		break;
-	    	case None:
-	    		break;
+    	if (failover) {
+        	switch (trackMessages) {
+		    	case True:
+		    	case False:
+		    		fullUrl.append(psep).append(TRACKMSGS).append(trackMessages.name().toLowerCase());
+		    		break;
+		    	case None:
+		    		break;
+	    	}
     	}
 
     	return fullUrl.toString();

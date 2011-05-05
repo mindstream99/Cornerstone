@@ -30,6 +30,10 @@ public abstract class ResponseMessage<D extends RequestMessage> extends Message 
 
     private ErrorMessage error = null;
     
+    private long responseSentOn;
+    private long responseReceivedOn;
+    
+    
     public void setRequest(D request) {
         this.request = request;
     }
@@ -48,5 +52,45 @@ public abstract class ResponseMessage<D extends RequestMessage> extends Message 
     
 	public ErrorMessage getErrorMessage() {
     	return error;
+    }
+
+    public void setResponseSentOn(long responseSentOn) {
+        this.responseSentOn = responseSentOn;
+    }
+
+    public long getResponseSentOn() {
+        return responseSentOn;
+    }
+
+    public void setResponseReceivedOn(long responseReceivedOn) {
+        this.responseReceivedOn = responseReceivedOn;
+    }
+
+    public long getResponseReceivedOn() {
+        return responseReceivedOn;
+    }
+    
+    public long getResponseLatency() {
+        return this.responseReceivedOn - this.responseSentOn;
+    }
+    
+    public long getProcessorTime() {
+        return this.responseSentOn - this.request.getRequestReceivedOn();
+    }
+    
+    public long getTotalRoundTripTime() {
+        return this.responseReceivedOn - this.request.getRequestSentOn();
+    }
+    
+    public String reportTimings() {
+        return new StringBuilder()
+                        .append(this.request.getRequestLatency())
+                        .append(", ")
+                        .append(this.getProcessorTime())
+                        .append(", ")
+                        .append(this.getResponseLatency())
+                        .append(", ")
+                        .append(this.getTotalRoundTripTime())
+                        .toString();
     }
 }

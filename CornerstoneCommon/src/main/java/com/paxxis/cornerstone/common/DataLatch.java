@@ -30,12 +30,12 @@ import org.apache.log4j.Logger;
  *
  * @author Robert Englander
  */
-public class DataLatch
+public class DataLatch<T>
 {
     private static final Logger logger = Logger.getLogger(DataLatch.class);
 
     // the object that is being waited for
-    private Object obj;
+    private T obj;
     private CountDownLatch latch = new CountDownLatch(1);
     private boolean interrupted = false;
     private boolean timedout = false;
@@ -49,7 +49,7 @@ public class DataLatch
      *
      * @return the object
      */
-    public Object waitForObject() {
+    public T waitForObject() {
         return waitForObject(0, false);
     }
 
@@ -59,7 +59,7 @@ public class DataLatch
      *
      * @return the object
      */
-    public Object waitForObject(long timeout) {
+    public T waitForObject(long timeout) {
         return waitForObject(timeout, false);
     }
     
@@ -69,7 +69,7 @@ public class DataLatch
      * @param failfast
      * @return 
      */
-    public Object waitForObject(boolean failfast) {
+    public T waitForObject(boolean failfast) {
         return waitForObject(0, failfast);
     }
     
@@ -87,7 +87,7 @@ public class DataLatch
      * @throws InterruptedRuntimeException on interruption if failfast is true
      * @throws NullDataException on a null object being set if failfast is true
      */
-    public Object waitForObject(long timeout, boolean failfast) {
+    public T waitForObject(long timeout, boolean failfast) {
         synchronized (this) {
             if (!isWaitable()) {
                 IllegalStateException e = new IllegalStateException("Illegal state for consumption"); 
@@ -115,7 +115,7 @@ public class DataLatch
 
         synchronized (this) {
             // grab the object for return to the caller
-            Object result = obj;
+            T result = obj;
             // set internals to null so data latch cannot be reused
             obj = null;
             this.latch = null;
@@ -138,7 +138,7 @@ public class DataLatch
      *
      * @param obj the object
      */
-    public synchronized void setObject(Object obj) {
+    public synchronized void setObject(T obj) {
         if (!isSettable()) {
             //no point to setting the object, the waiting thread is long gone...
             logger.warn("Trying to set data on latch that is not settable");

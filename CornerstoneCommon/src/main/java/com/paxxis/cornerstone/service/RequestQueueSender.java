@@ -35,6 +35,7 @@ import com.paxxis.cornerstone.base.RequestMessage;
 import com.paxxis.cornerstone.base.ResponseMessage;
 import com.paxxis.cornerstone.common.BlockingThreadPoolExecutor;
 import com.paxxis.cornerstone.common.MessagePayload;
+import com.paxxis.cornerstone.common.ResponseMessageListener;
 import com.paxxis.cornerstone.common.ResponsePromise;
 
 /**
@@ -133,7 +134,7 @@ public class RequestQueueSender extends DestinationSender implements QueueSender
                                     }
                                 });
                             } else {
-                                logger.error("Possible race condition detected: Null listener for message");
+                                logger.debug("Possible race condition detected: Null listener for message");
                             }
                         } catch (Exception e) {
                             // this needs to be logged (and reported through mgmt interface?)
@@ -204,11 +205,23 @@ public class RequestQueueSender extends DestinationSender implements QueueSender
         }
 
         MessageListener promiseListener = new MessageListener() {
+            @SuppressWarnings("unchecked")
             public void onMessage(Message message) {
                     if (listener != null) {
                         listener.onMessage(message);
                     }
-                    promise.setObject(payloadType.getPayload(message));
+                    
+                    RESP responseMessage = (RESP) payloadType.getPayload(message);
+                    responseMessage.setResponseReceivedOn(System.currentTimeMillis());
+                    if (logger.isDebugEnabled()) {
+                        logger.debug(responseMessage.reportTimings());
+                    }
+                    
+                    if (listener instanceof ResponseMessageListener) {
+                        ((ResponseMessageListener<RESP>) listener).onResponseMessage(responseMessage);
+                    }
+                    
+                    promise.setObject(responseMessage);
             }
         };
 
@@ -243,11 +256,11 @@ public class RequestQueueSender extends DestinationSender implements QueueSender
      * @param requester the service requester
      */
     protected Message prepareMessage(
-            com.paxxis.cornerstone.base.Message msg,
+            RequestMessage requestMessage,
             MessagePayload payloadType) 
             throws JMSException {
 
-        Message message = super.prepareMessage(msg, payloadType);
+        Message message = super.prepareMessage(requestMessage, payloadType);
         message.setJMSReplyTo(responseQueue);
         message.setJMSCorrelationID(generateCorrelationId());
         return message;

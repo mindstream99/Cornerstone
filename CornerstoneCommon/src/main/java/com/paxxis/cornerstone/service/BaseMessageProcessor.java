@@ -17,9 +17,12 @@ public abstract class BaseMessageProcessor<REQ extends RequestMessage, RESP exte
     private boolean ignorePreviousChanges = false;
     
     
+    @Override
     protected RESP process(boolean ignorePreviousChanges) {
         this.ignorePreviousChanges = ignorePreviousChanges;
         REQ requestMessage = getMessagePayload();
+        requestMessage.setRequestReceivedOn(System.currentTimeMillis());
+        
         RESP responseMessage = createResponseMessage();
         if (responseMessage != null) {
 	        responseMessage.setRequest(requestMessage);
@@ -41,6 +44,7 @@ public abstract class BaseMessageProcessor<REQ extends RequestMessage, RESP exte
             this.databasePoolEntry = null;
         }
         
+        responseMessage.setResponseSentOn(System.currentTimeMillis());
         return responseMessage;
     }
 

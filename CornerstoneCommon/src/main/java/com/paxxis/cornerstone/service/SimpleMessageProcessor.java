@@ -28,7 +28,8 @@ import com.paxxis.cornerstone.common.MessagePayload;
  *
  * @author Robert Englander
  */
-public abstract class SimpleMessageProcessor<REQ extends RequestMessage, RESP extends ResponseMessage<REQ>> implements Runnable {
+public abstract class SimpleMessageProcessor<REQ extends RequestMessage, RESP extends ResponseMessage<REQ>> 
+        implements Runnable {
     
     private static final Logger logger = Logger.getLogger(SimpleMessageProcessor.class);
     

@@ -347,8 +347,10 @@ public class ServiceBusConnector extends CornerstoneConfigurable
      */
     protected void closeSession() throws JMSException
     {
-        _session.close();
-        _session = null;
+        if (_session != null) {
+            _session.close();
+            _session = null;
+        }
     }
 
     /**
@@ -356,8 +358,10 @@ public class ServiceBusConnector extends CornerstoneConfigurable
      */
     protected void closeConnection() throws JMSException
     {
-        _connection.close();
-        _connection = null;
+        if (_connection != null) {
+            _connection.close();
+            _connection = null;
+        }
     }
     
     /**

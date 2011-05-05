@@ -34,7 +34,9 @@ import com.paxxis.cornerstone.common.MessagePayload;
  * @author Robert Englander
  * 
  */
-public class DestinationSender extends CornerstoneConfigurable implements IServiceBusConnectorClient, DestinationPublisher {
+public class DestinationSender extends CornerstoneConfigurable 
+        implements IServiceBusConnectorClient, DestinationPublisher {
+    
     private static final Logger logger = Logger.getLogger(RequestQueueSender.class);
 
     // the message sender
@@ -189,11 +191,13 @@ public class DestinationSender extends CornerstoneConfigurable implements IServi
      * @param requester the service requester
      */
     protected Message prepareMessage(
-            com.paxxis.cornerstone.base.Message msg,
+            RequestMessage requestMessage,
             MessagePayload payloadType) 
             throws JMSException {
 
-		Message message = payloadType.createMessage(connector.getSession(), msg);
+        requestMessage.setRequestSentOn(System.currentTimeMillis());
+        
+		Message message = payloadType.createMessage(connector.getSession(), requestMessage);
 		message.setIntProperty(MessagingConstants.HeaderConstant.GroupId.name(), messageGroup.getId());
 		message.setIntProperty(MessagingConstants.HeaderConstant.GroupVersion.name(), messageGroup.getVersion());
 		

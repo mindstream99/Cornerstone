@@ -21,24 +21,21 @@ package com.paxxis.cornerstone.base;
  *
  * @author Robert Englander
  */
-public abstract class RequestMessage extends Message
-{
+public abstract class RequestMessage extends Message {
 	private static final long serialVersionUID = 1L;
-	private long _correlator = -1;
     
-    public RequestMessage()
-    {
-        
+	private long correlator = -1;
+    
+    private long requestSentOn;
+    private long requestReceivedOn;
+    
+    
+    public void setCorrelator(long value) {
+        correlator = value;
     }
     
-    public void setCorrelator(long value)
-    {
-        _correlator = value;
-    }
-    
-    public long getCorrelator()
-    {
-        return _correlator;
+    public long getCorrelator() {
+        return correlator;
     }
 
     /**
@@ -46,8 +43,28 @@ public abstract class RequestMessage extends Message
      * the request.  subclasses that require additional work before being
      * processed should override this method.
      */
-    public void prepareForProcessing()
-    {
+    public void prepareForProcessing() {
+        //
+    }
+
+    public void setRequestSentOn(long requestSentOn) {
+        this.requestSentOn = requestSentOn;
+    }
+
+    public long getRequestSentOn() {
+        return requestSentOn;
+    }
+
+    public void setRequestReceivedOn(long requestReceivedOn) {
+        this.requestReceivedOn = requestReceivedOn;
+    }
+
+    public long getRequestReceivedOn() {
+        return requestReceivedOn;
+    }
+    
+    public long getRequestLatency() {
+        return this.requestReceivedOn - this.requestSentOn;
     }
 
 }

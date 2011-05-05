@@ -26,7 +26,7 @@ import com.paxxis.cornerstone.base.ResponseMessage;
  * are failfast by default meaning if for any reason a valid response cannot be returned then a
  * runtime exception is thrown.
  */
-public class ResponsePromise<RESP extends ResponseMessage<?>> extends DataLatch {
+public class ResponsePromise<RESP extends ResponseMessage<?>> extends DataLatch<RESP> {
 
     private long timeout;
     private boolean failfast;
@@ -45,7 +45,6 @@ public class ResponsePromise<RESP extends ResponseMessage<?>> extends DataLatch 
         this.failfast = failfast;
     }
     
-    @SuppressWarnings("unchecked")
     public RESP getResponse(long timeout, boolean failfast) {
         RESP response = (RESP) waitForObject(timeout, failfast);
         if (response.isError()) {
@@ -92,7 +91,7 @@ public class ResponsePromise<RESP extends ResponseMessage<?>> extends DataLatch 
      * Enforce the failfast value provided at construct time
      */
     @Override
-    public Object waitForObject(long timeout) {
+    public RESP waitForObject(long timeout) {
         return getResponse(timeout, this.failfast);
     }
 
@@ -100,7 +99,7 @@ public class ResponsePromise<RESP extends ResponseMessage<?>> extends DataLatch 
      * Enforce the failfast value provided at construct time
      */
     @Override
-    public Object waitForObject(boolean failfast) {
+    public RESP waitForObject(boolean failfast) {
         return getResponse(this.timeout, failfast);
     }
 

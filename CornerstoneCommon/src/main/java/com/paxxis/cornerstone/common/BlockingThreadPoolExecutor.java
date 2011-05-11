@@ -20,10 +20,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.RejectedExecutionException;
-import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import com.paxxis.cornerstone.service.ShutdownListener;
 
@@ -213,35 +211,5 @@ public class BlockingThreadPoolExecutor {
         return executor.isTerminated();
     }
 
-    /**
-     * The default thread factory - a complete rip from java.util.concurrent.Executors$DefaultThreadFactory
-     */
-    static class DefaultThreadFactory implements ThreadFactory {
-        static final AtomicInteger poolNumber = new AtomicInteger(1);
-        final ThreadGroup group;
-        final AtomicInteger threadNumber = new AtomicInteger(1);
-        final String namePrefix;
-
-        DefaultThreadFactory(String namePrefix) {
-            SecurityManager s = System.getSecurityManager();
-            group = (s != null)? s.getThreadGroup() :
-                                 Thread.currentThread().getThreadGroup();
-            
-            this.namePrefix = namePrefix == null || "".equals(namePrefix.trim())
-                    ? BlockingThreadPoolExecutor.class.getSimpleName() + "-" + poolNumber.getAndIncrement() + "-thread-"
-                    : namePrefix + "-" + poolNumber.getAndIncrement() + "-thread-";
-        }
-
-        public Thread newThread(Runnable r) {
-            Thread t = new Thread(group, r,
-                                  namePrefix + threadNumber.getAndIncrement(),
-                                  0);
-            if (t.isDaemon())
-                t.setDaemon(false);
-            if (t.getPriority() != Thread.NORM_PRIORITY)
-                t.setPriority(Thread.NORM_PRIORITY);
-            return t;
-        }
-    }
 }
 

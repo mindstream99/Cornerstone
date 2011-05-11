@@ -1,13 +1,34 @@
+/*
+ * Copyright 2010 the original author or authors.
+ * Copyright 2009 Paxxis Technology LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package com.paxxis.cornerstone.service;
 
 import org.apache.log4j.Logger;
 
+import com.paxxis.cornerstone.base.ErrorListener;
 import com.paxxis.cornerstone.base.ErrorMessage;
 import com.paxxis.cornerstone.base.RequestMessage;
 import com.paxxis.cornerstone.base.ResponseMessage;
 import com.paxxis.cornerstone.database.DatabaseConnection;
 import com.paxxis.cornerstone.database.DatabaseConnectionPool;
 
+/**
+ *  
+ * @author Matthew Pflueger
+ */
 public abstract class BaseMessageProcessor<REQ extends RequestMessage, RESP extends ResponseMessage<REQ>> 
         extends MessageProcessor<REQ, RESP> {
     private static final Logger logger = Logger.getLogger(BaseMessageProcessor.class);
@@ -15,6 +36,7 @@ public abstract class BaseMessageProcessor<REQ extends RequestMessage, RESP exte
     private DatabaseConnectionPool databasePool;
     private DatabaseConnectionPool.PoolEntry databasePoolEntry;
     private boolean ignorePreviousChanges = false;
+    private ErrorListener errorListener;
     
     
     @Override
@@ -37,6 +59,16 @@ public abstract class BaseMessageProcessor<REQ extends RequestMessage, RESP exte
 	            em.setMessage(e.getMessage());
 	            responseMessage.setErrorMessage(em);
             }
+            
+            if (this.errorListener != null) {
+                try {
+                    //notify the error listener...
+                    this.errorListener.onError(requestMessage, responseMessage, e);
+                } catch (Exception ee) {
+                    logger.error(ee);
+                }
+            }
+            
         } finally {
             if (this.databasePoolEntry != null && this.databasePool != null) {
                 this.databasePool.returnInstance(this.databasePoolEntry, this);
@@ -113,6 +145,14 @@ public abstract class BaseMessageProcessor<REQ extends RequestMessage, RESP exte
     
     public void setDatabasePool(DatabaseConnectionPool databasePool) {
         this.databasePool = databasePool;
+    }
+
+    public ErrorListener getErrorListener() {
+        return errorListener;
+    }
+
+    public void setErrorListener(ErrorListener errorListener) {
+        this.errorListener = errorListener;
     }
 
 }

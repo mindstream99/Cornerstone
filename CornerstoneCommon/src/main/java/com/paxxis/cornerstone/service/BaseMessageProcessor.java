@@ -44,7 +44,9 @@ public abstract class BaseMessageProcessor<REQ extends RequestMessage, RESP exte
             this.databasePoolEntry = null;
         }
         
-        responseMessage.setResponseSentOn(System.currentTimeMillis());
+		if (responseMessage != null) {
+			responseMessage.setResponseSentOn(System.currentTimeMillis());
+		}
         return responseMessage;
     }
 

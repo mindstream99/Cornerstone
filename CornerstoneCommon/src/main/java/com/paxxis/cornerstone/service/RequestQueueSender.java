@@ -17,9 +17,8 @@
 
 package com.paxxis.cornerstone.service;
 
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 
 import javax.jms.JMSException;
@@ -30,6 +29,7 @@ import javax.jms.TemporaryQueue;
 
 import org.apache.log4j.Logger;
 
+import com.google.common.collect.MapMaker;
 import com.paxxis.cornerstone.base.ErrorMessage;
 import com.paxxis.cornerstone.base.RequestMessage;
 import com.paxxis.cornerstone.base.ResponseMessage;
@@ -52,12 +52,13 @@ public class RequestQueueSender extends DestinationSender implements QueueSender
     private MessageConsumer responseConsumer = null;
 
     // mapping of correlation ids to message listeners
-    private Map<String, MessageListener> listenerMap = 
-        Collections.synchronizedMap(new HashMap<String, MessageListener>());
+	private Map<String, MessageListener> listenerMap = null;
 
     private AtomicLong correlationId = new AtomicLong(0);
 
     private long timeout = 10000;
+	private long listenerTimeout = 60000;
+	private int concurrencyLevel = 16;
     private BlockingThreadPoolExecutor messageExecutor;
     
     public RequestQueueSender() {
@@ -69,6 +70,11 @@ public class RequestQueueSender extends DestinationSender implements QueueSender
             //use for the thread pool :(
             this.messageExecutor = new BlockingThreadPoolExecutor(this.getClass().getSimpleName());
         }
+
+		if (this.listenerMap == null) {
+			this.listenerMap = new MapMaker().concurrencyLevel(concurrencyLevel)
+					.expireAfterWrite(this.listenerTimeout, TimeUnit.MILLISECONDS).makeMap();
+		}
     }
     
     /**
@@ -86,10 +92,28 @@ public class RequestQueueSender extends DestinationSender implements QueueSender
     public void setTimeout(long timeout) {
         this.timeout = timeout;
     }
-    
-    /**
-     * Close the JMS session objects
-     */
+
+	/**
+	 * Listener timeout, defaults to 60 seconds...
+	 * 
+	 * @param timeout
+	 */
+	public void setListenerTimeout(long listenerTimeout) {
+		this.listenerTimeout = listenerTimeout;
+	}
+
+	/**
+	 * The concurrency level for the listener map, defaults to 16...
+	 * 
+	 * @param concurrencyLevel
+	 */
+	public void setConcurrencyLevel(int concurrencyLevel) {
+		this.concurrencyLevel = concurrencyLevel;
+	}
+
+	/**
+	 * Close the JMS session objects
+	 */
     protected void closeDown() throws JMSException {
         //tell the broker to stop sending us messages...
         responseConsumer.close();

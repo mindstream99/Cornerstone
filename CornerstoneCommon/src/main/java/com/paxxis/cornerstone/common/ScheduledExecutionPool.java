@@ -38,8 +38,16 @@ public class ScheduledExecutionPool implements ScheduledExecutor {
     public ScheduledExecutionPool() {
     }
 
-	public ScheduledFuture<?> schedule(Runnable runnable, int delay, TimeUnit timeUnit) {
+	public ScheduledFuture<?> schedule(Runnable runnable, long delay, TimeUnit timeUnit) {
 		return scheduledExecutor.schedule(runnable, delay, timeUnit);
+	}
+
+	public ScheduledFuture<?> scheduleAtFixedRate(Runnable runnable, long initialDelay, long period, TimeUnit timeUnit) {
+		return scheduledExecutor.scheduleAtFixedRate(runnable, initialDelay, period, timeUnit);
+	}
+
+	public ScheduledFuture<?> scheduleWithFixedDelay(Runnable runnable, long initialDelay, long delay, TimeUnit timeUnit) {
+		return scheduledExecutor.scheduleWithFixedDelay(runnable, initialDelay, delay, timeUnit);
 	}
     
     public void setPoolSize(int val) {

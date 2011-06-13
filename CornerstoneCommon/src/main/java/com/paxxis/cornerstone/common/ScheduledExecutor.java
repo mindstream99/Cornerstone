@@ -27,5 +27,9 @@ import java.util.concurrent.TimeUnit;
  */
 public interface ScheduledExecutor {
 
-	public ScheduledFuture<?> schedule(Runnable runnable, int delay, TimeUnit timeUnit);
+	public ScheduledFuture<?> schedule(Runnable runnable, long delay, TimeUnit timeUnit);
+
+	public ScheduledFuture<?> scheduleAtFixedRate(Runnable runnable, long initialDelay, long period, TimeUnit timeUnit);
+
+	public ScheduledFuture<?> scheduleWithFixedDelay(Runnable runnable, long initialDelay, long delay, TimeUnit timeUnit);
 }

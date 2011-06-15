@@ -51,7 +51,8 @@ public abstract class ServiceBusSenderPool<T extends DestinationSender> extends 
 
     private JndiInitialContextFactory contextFactory;
     private String connectionFactoryName;
-    private String requestQueueName;
+    private String requestQueueName = null;
+    private String replyToName = null;
     private int deliveryMode = DeliveryMode.NON_PERSISTENT;
     private MessageGroup messageGroup = null;
     private int timeToLive = 0;
@@ -101,6 +102,21 @@ public abstract class ServiceBusSenderPool<T extends DestinationSender> extends 
         this.requestQueueName = requestQueueName;
     }
 
+    /**
+     * Gets the replyToName for this instance.
+     *
+     */
+    public String getReplyToName() {
+        return this.replyToName;
+    }
+
+    /**
+     * Sets the replyToName for this instance.
+     */
+    public void setReplyToName(String replyToName) {
+        this.replyToName = replyToName;
+    }
+
     public void setPersistentDelivery(boolean persistent) {
     	deliveryMode = (persistent ? DeliveryMode.PERSISTENT : DeliveryMode.NON_PERSISTENT);
     }
@@ -138,6 +154,7 @@ public abstract class ServiceBusSenderPool<T extends DestinationSender> extends 
         connector.setInitialContextFactory(contextFactory);
         connector.setConnectionFactoryName(this.connectionFactoryName);
         sender.setDestinationName(this.requestQueueName);
+        sender.setReplyToName(this.replyToName);
         connector.connect();
         return new PoolEntry<T>(sender, connector);
 	}

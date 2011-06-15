@@ -17,6 +17,7 @@
 package com.paxxis.cornerstone.service;
 
 import javax.jms.DeliveryMode;
+import javax.jms.Destination;
 import javax.jms.JMSException;
 import javax.jms.Message;
 import javax.jms.MessageProducer;
@@ -49,6 +50,12 @@ public class DestinationSender extends CornerstoneConfigurable
 	// the name of the destination
     private String destinationName = null;
 
+    // the optional replyto destination name
+    private String replyToName = null;
+    
+    // the replyto destination
+    private Destination replyTo = null;
+    
     // the service bus connector
     private ServiceBusConnector connector = null;
 
@@ -72,6 +79,14 @@ public class DestinationSender extends CornerstoneConfigurable
 
     protected String getDestinationName() {
         return destinationName;
+    }
+
+    public void setReplyToName(String name) {
+        replyToName = name;
+    }
+
+    protected String getReplyToName() {
+        return replyToName;
     }
 
     public void setPersistentDelivery(boolean persistent) {
@@ -135,6 +150,10 @@ public class DestinationSender extends CornerstoneConfigurable
             messageSender = connector.createMessageProducer(destinationName);
             messageSender.setDeliveryMode(deliveryMode);
             messageSender.setTimeToLive(timeToLive);
+            
+            if (replyToName != null) {
+                replyTo = (Destination)connector.getInitialContextFactory().createInitialContext().lookup(replyToName);
+            }
         } catch(Throwable t) {
             logger.error(t);
             try {
@@ -185,6 +204,26 @@ public class DestinationSender extends CornerstoneConfigurable
         }
     }
 
+    /* (non-Javadoc)
+     * @see com.paxxis.cornerstone.service.DestinationPublisher#publish(REQ, com.paxxis.cornerstone.common.MessagePayload)
+     */
+    @Override
+    public synchronized <REQ extends RequestMessage> void publish(
+    		Destination dest,
+            REQ msg,
+			MessagePayload payloadType) {
+
+    	try {
+            Message message = prepareMessage(msg, payloadType);
+            messageSender.send(dest, message);
+        } catch (JMSException je) {
+            logger.error(je);
+            ErrorMessage errorMsg = new ErrorMessage();
+            errorMsg.setMessage("Unable to publish message. " + je.getMessage());
+            throw new SendException(errorMsg);
+        }
+    }
+
     /**
      * Prepare a message for sending.
      *
@@ -200,6 +239,9 @@ public class DestinationSender extends CornerstoneConfigurable
 		Message message = payloadType.createMessage(connector.getSession(), requestMessage);
 		message.setIntProperty(MessagingConstants.HeaderConstant.GroupId.name(), messageGroup.getId());
 		message.setIntProperty(MessagingConstants.HeaderConstant.GroupVersion.name(), messageGroup.getVersion());
+        if (replyTo != null) {
+        	message.setJMSReplyTo(replyTo);
+        }
 		
 		return message;
     }

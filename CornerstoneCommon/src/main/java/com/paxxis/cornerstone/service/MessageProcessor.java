@@ -17,6 +17,7 @@
 
 package com.paxxis.cornerstone.service;
 
+import javax.jms.Destination;
 import javax.jms.InvalidDestinationException;
 import javax.jms.Message;
 import javax.jms.MessageProducer;
@@ -46,7 +47,10 @@ public abstract class MessageProcessor<REQ extends RequestMessage, RESP extends 
     public void run() {
         try {
             Message message = getJMSMessage();
-            RESP resp = process(false);
+            Destination tq = message.getJMSReplyTo();
+
+            RESP resp = process(false, tq);
+            
             if (resp != null) {
 
 				Message responseMsg = getPayloadType().createMessage(getSession(), resp);
@@ -55,8 +59,6 @@ public abstract class MessageProcessor<REQ extends RequestMessage, RESP extends 
                 // copy the correlation id from the incoming message
                 responseMsg.setJMSCorrelationID(message.getJMSCorrelationID());
 
-                // create a sender for the replyTo queue
-                TemporaryQueue tq = (TemporaryQueue) message.getJMSReplyTo();
                 if (tq != null) {
                     MessageProducer qsender = getSession().createProducer(null);
                     try {

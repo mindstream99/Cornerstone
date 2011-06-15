@@ -28,34 +28,19 @@ import com.paxxis.cornerstone.service.ServiceBusSenderPool.PoolEntry;
  * 
  * @author Matthew Pflueger
  */
-public class RequestQueueSenderPool implements QueueSender, DestinationPublisher {
+public class RequestQueueSenderPool extends DestinationPublisherPool<RequestQueueSender> implements QueueSender {
     
-    private ServiceBusSenderPool<RequestQueueSender> senderPool;
-
-    /* (non-Javadoc)
-     * @see com.paxxis.cornerstone.service.DestinationPublisher#publish(com.paxxis.cornerstone.base.RequestMessage, com.paxxis.cornerstone.common.MessagePayload)
-     */
-    @Override
-    public <REQ extends RequestMessage> void publish(REQ msg, MessagePayload payloadType) {
-        PoolEntry<RequestQueueSender> entry = senderPool.borrow(this);
-        try {
-            entry.getSender().publish(msg, payloadType);
-        } finally {
-            senderPool.returnInstance(entry);
-        }
-    }
-
     /* (non-Javadoc)
      * @see com.paxxis.cornerstone.service.QueueSender#send(com.paxxis.cornerstone.base.RequestMessage, com.paxxis.cornerstone.common.MessagePayload)
      */
     @Override
     public <REQ extends RequestMessage, RESP extends ResponseMessage<REQ>> ResponsePromise<RESP> send(
             REQ msg, MessagePayload payloadType) {
-        PoolEntry<RequestQueueSender> entry = senderPool.borrow(this);
+        PoolEntry<RequestQueueSender> entry = getSenderPool().borrow(this);
         try {
             return entry.getSender().send(msg, payloadType);
         } finally {
-            senderPool.returnInstance(entry);
+            getSenderPool().returnInstance(entry);
         }
     }
 
@@ -65,11 +50,11 @@ public class RequestQueueSenderPool implements QueueSender, DestinationPublisher
     @Override
     public <REQ extends RequestMessage, RESP extends ResponseMessage<REQ>, P extends ResponsePromise<RESP>> void send(
             REQ msg, P promise, MessagePayload payloadType) {
-        PoolEntry<RequestQueueSender> entry = senderPool.borrow(this);
+        PoolEntry<RequestQueueSender> entry = getSenderPool().borrow(this);
         try {
             entry.getSender().send(msg, promise, payloadType);
         } finally {
-            senderPool.returnInstance(entry);
+        	getSenderPool().returnInstance(entry);
         }
     }
 
@@ -80,11 +65,11 @@ public class RequestQueueSenderPool implements QueueSender, DestinationPublisher
     public <REQ extends RequestMessage, RESP extends ResponseMessage<REQ>, P extends ResponsePromise<RESP>> void send(
             REQ msg, P promise, MessageListener listener, MessagePayload payloadType) {
         // TODO Auto-generated method stub
-        PoolEntry<RequestQueueSender> entry = senderPool.borrow(this);
+        PoolEntry<RequestQueueSender> entry = getSenderPool().borrow(this);
         try {
             entry.getSender().send(msg, promise, listener, payloadType);
         } finally {
-            senderPool.returnInstance(entry);
+        	getSenderPool().returnInstance(entry);
         }
 
     }
@@ -95,16 +80,12 @@ public class RequestQueueSenderPool implements QueueSender, DestinationPublisher
     @Override
     public <REQ extends RequestMessage, RESP extends ResponseMessage<REQ>> ResponsePromise<RESP> send(
             REQ msg, MessageListener listener, MessagePayload payloadType) {
-        PoolEntry<RequestQueueSender> entry = senderPool.borrow(this);
+        PoolEntry<RequestQueueSender> entry = getSenderPool().borrow(this);
         try {
             return entry.getSender().send(msg, listener, payloadType);
         } finally {
-            senderPool.returnInstance(entry);
+        	getSenderPool().returnInstance(entry);
         }
-    }
-
-    public void setSenderPool(ServiceBusSenderPool<RequestQueueSender> senderPool) {
-        this.senderPool = senderPool;
     }
 
 }

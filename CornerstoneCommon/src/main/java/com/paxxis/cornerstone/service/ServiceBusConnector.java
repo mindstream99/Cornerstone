@@ -239,8 +239,11 @@ public class ServiceBusConnector extends CornerstoneConfigurable
     
     protected MessageProducer createMessageProducer(String destinationName) {
         try {
-	        return createMessageProducer((Destination) 
-                getInitialContextFactory().createInitialContext().lookup(destinationName));
+        	Destination dest = null;
+        	if (destinationName != null) {
+        		dest = (Destination)getInitialContextFactory().createInitialContext().lookup(destinationName);
+            }
+	        return createMessageProducer(dest);
         } catch (NamingException ne) {
             _logger.error(ne);
             throw new RuntimeException(ne);

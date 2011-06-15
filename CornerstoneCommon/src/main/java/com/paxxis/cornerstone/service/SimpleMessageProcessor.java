@@ -18,6 +18,8 @@
 
 package com.paxxis.cornerstone.service;
 
+import javax.jms.Destination;
+
 import org.apache.log4j.Logger;
 
 import com.paxxis.cornerstone.base.RequestMessage;
@@ -115,7 +117,7 @@ public abstract class SimpleMessageProcessor<REQ extends RequestMessage, RESP ex
      */
 	public abstract Class<RESP> getResponseMessageClass();
 	
-    protected abstract RESP process(boolean ignorePreviousChanges) ;
+    protected abstract RESP process(boolean ignorePreviousChanges, Destination replyTo) ;
 
 	protected Object getPayload() {
         if (_payload != null) {
@@ -133,11 +135,11 @@ public abstract class SimpleMessageProcessor<REQ extends RequestMessage, RESP ex
     //FIXME this is used in one spot in the whole code base - ChimeService/**/MultiRequestProcessor.java - do we really, really need this?
     public RESP execute(Object payload, boolean ignorePreviousChanges) {
         _payload = payload;
-        return process(ignorePreviousChanges);
+        return process(ignorePreviousChanges, null);
     }
 
     public com.paxxis.cornerstone.base.Message execute(boolean ignorePreviousChanges) {
-        return process(ignorePreviousChanges);
+        return process(ignorePreviousChanges, null);
     }
 
     public void run() {

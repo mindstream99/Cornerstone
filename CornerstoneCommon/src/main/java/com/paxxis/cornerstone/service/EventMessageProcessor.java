@@ -24,8 +24,8 @@ import com.paxxis.cornerstone.base.ResponseMessage;
  *  
  * @author Matthew Pflueger
  */
-public abstract class EventMessageProcessor<REQ extends RequestMessage, RESP extends ResponseMessage<REQ>>
-        extends BaseMessageProcessor<REQ, RESP> {
+public abstract class EventMessageProcessor<REQ extends RequestMessage>
+        extends BaseMessageProcessor<REQ, ResponseMessage<REQ>> {
 
     /**
      * Subclasses implement this method to messages that require no immediate response.
@@ -36,7 +36,7 @@ public abstract class EventMessageProcessor<REQ extends RequestMessage, RESP ext
     protected abstract void process(REQ requestMessage) throws Exception;
     
     @Override
-    protected boolean process(REQ requestMessage, RESP responseMessage) throws Exception {
+    protected boolean process(REQ requestMessage, ResponseMessage<REQ> responseMessage) throws Exception {
         process(requestMessage);
         return false;
     }
@@ -48,12 +48,12 @@ public abstract class EventMessageProcessor<REQ extends RequestMessage, RESP ext
      */
     
     @Override
-    public Class<RESP> getResponseMessageClass() {
+    public Class<ResponseMessage<REQ>> getResponseMessageClass() {
         return null;
     }
     
     @Override
-    protected RESP createResponseMessage() {
+    protected ResponseMessage<REQ> createResponseMessage() {
         return null;
     }
     

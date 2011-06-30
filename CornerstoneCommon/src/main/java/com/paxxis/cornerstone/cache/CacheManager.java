@@ -18,6 +18,8 @@ package com.paxxis.cornerstone.cache;
  */
 
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.infinispan.Cache;
@@ -35,12 +37,18 @@ public class CacheManager {
     /** the cache config file location */
     private String cacheConfigLocation = null;
 
+    /** the named caches to preload on initialization */
+    private List<String> preloadCacheNames = new ArrayList<String>();
+    
     private EmbeddedCacheManager cacheManager = null;
 
     public void initialize() {
         try {
             InputStream stream = Thread.currentThread().getContextClassLoader().getResourceAsStream(cacheConfigLocation);
-            cacheManager = new DefaultCacheManager(stream);             
+            cacheManager = new DefaultCacheManager(stream); 
+            for (String name : preloadCacheNames) {
+            	cacheManager.getCache(name);
+            }
         } catch (Exception e) {
             String msg = e.getLocalizedMessage();
             logger.error(msg);
@@ -54,6 +62,11 @@ public class CacheManager {
 
     public void setCacheConfigLocation(String cacheConfigLocation) {
         this.cacheConfigLocation = cacheConfigLocation;
+    }
+    
+    public synchronized void setPreloadCacheNames(List<String> names) {
+    	preloadCacheNames.clear();
+    	preloadCacheNames.addAll(names);
     }
     
     @SuppressWarnings("rawtypes")

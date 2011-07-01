@@ -59,7 +59,7 @@ public abstract class BaseMessageProcessor<REQ extends RequestMessage, RESP exte
 	        	responseMessage = null;
 	        }
         } catch (Exception e) {
-            logger.error(e);
+            logger.error("Unknown error occurred in while processing message " + requestMessage, e);
             if (responseMessage != null) {
 	            ErrorMessage em = new ErrorMessage();
 	            em.setMessage(e.getMessage());
@@ -71,7 +71,7 @@ public abstract class BaseMessageProcessor<REQ extends RequestMessage, RESP exte
                     //notify the error listener...
                     this.errorListener.onError(requestMessage, responseMessage, e);
                 } catch (Exception ee) {
-                    logger.error(ee);
+                    logger.error("Unknown error occurred in error listener", ee);
                 }
             }
             

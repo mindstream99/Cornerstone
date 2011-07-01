@@ -17,6 +17,8 @@
 
 package com.paxxis.cornerstone.cache;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.log4j.Logger;
@@ -37,6 +39,8 @@ public class NamedCache<K, V> {
     /** the cache itself */
     private Cache<K, V> cache = null;
 
+	private List<CacheListener> listeners = new ArrayList<CacheListener>();
+
     public void setCacheName(String name) {
         cacheName = name;
     }
@@ -45,10 +49,18 @@ public class NamedCache<K, V> {
         this.cacheManager = cacheManager;
     }
     
-    @SuppressWarnings("unchecked")
+	public void setListeners(List<CacheListener> listeners) {
+		this.listeners.clear();
+		this.listeners.addAll(listeners);
+	}
+
+	@SuppressWarnings("unchecked")
     public void initialize() {
         try {
             cache = cacheManager.getCache(cacheName);
+			for (CacheListener listener : listeners) {
+				cache.addListener(listener);
+			}
         } catch (Exception e) {
             String msg = e.getLocalizedMessage();
             logger.error(msg);

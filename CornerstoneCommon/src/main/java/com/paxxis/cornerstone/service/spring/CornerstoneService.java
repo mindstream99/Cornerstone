@@ -18,11 +18,16 @@
 
 package com.paxxis.cornerstone.service.spring;
 
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
+import java.util.UUID;
 
 import org.apache.log4j.Logger;
 import org.springframework.context.support.FileSystemXmlApplicationContext;
 
+import com.paxxis.cornerstone.base.InstanceId;
+import com.paxxis.cornerstone.base.monitoring.ServiceInstance;
 import com.paxxis.cornerstone.service.CornerstoneConfigurable;
 import com.paxxis.cornerstone.service.ICornerstoneService;
 import com.paxxis.cornerstone.service.IServiceBusManager;
@@ -37,16 +42,16 @@ import com.paxxis.cornerstone.service.ServiceVersion;
 public class CornerstoneService extends CornerstoneConfigurable implements IServiceController, ICornerstoneService {
     private static final Logger _logger = Logger.getLogger(CornerstoneService.class);
 
-    // the service display name
-    String _displayName = null;
+    /** the service instance */
+    private ServiceInstance serviceInstance = new ServiceInstance();
     
     // the service connection managers
-    ArrayList<IServiceBusManager> _connectorManagers = new ArrayList<IServiceBusManager>();
+    private ArrayList<IServiceBusManager> _connectorManagers = new ArrayList<IServiceBusManager>();
 
     // the version instance
-    ServiceVersion _version = null;
+    private ServiceVersion _version = null;
     
-    LogManager _logManager = null;
+    private LogManager _logManager = null;
     
     /**
      * The main
@@ -64,22 +69,35 @@ public class CornerstoneService extends CornerstoneConfigurable implements IServ
     /**
      * Initializes the main service object.
      */
-    public void initialize()
-    {
-        _logger.info("Initializing " + _displayName + " Service");
-
-
+    public void initialize() {
 
         // we must have a display name
-        if (_displayName == null)
-        {
+        if (serviceInstance.getDisplayName() == null) {
             throw new RuntimeException("CornerstoneService.displayName cannot be null.");
         }
 
-        if (_logManager == null)
-        {
+        if (_logManager == null) {
             //throw new RuntimeException("CornerstoneService.logManager cannot be null.");
         }
+
+        try {
+			serviceInstance.setHostName(InetAddress.getLocalHost().getCanonicalHostName());
+			serviceInstance.setInstanceId(InstanceId.create(UUID.randomUUID().toString()));
+		} catch (UnknownHostException e) {
+			serviceInstance.setHostName("UNKNOWN");
+		}
+        
+        _logger.info("Initializing " + toString());
+
+    }
+    
+    @Override
+    public String toString() {
+    	String text = serviceInstance.getDisplayName() + ". Service ID: " 
+    	                + serviceInstance.getServiceId() 
+    	                + " Instance ID: " + serviceInstance.getInstanceId();
+    
+    	return text;
     }
     
     /**
@@ -94,9 +112,8 @@ public class CornerstoneService extends CornerstoneConfigurable implements IServ
      *
      * @param name the service display name
      */
-    public void setDisplayName(String name)
-    {
-        _displayName = name;
+    public void setDisplayName(String name) {
+    	serviceInstance.setDisplayName(name);
     }
     
     /**
@@ -107,6 +124,14 @@ public class CornerstoneService extends CornerstoneConfigurable implements IServ
     public void setServiceVersion(ServiceVersion version)
     {
         _version = version;
+    }
+    
+    public void setServiceId(String id) {
+    	serviceInstance.setServiceId(InstanceId.create(id));
+    }
+       
+    public ServiceInstance getServiceInstance() {
+    	return serviceInstance;
     }
     
     /**

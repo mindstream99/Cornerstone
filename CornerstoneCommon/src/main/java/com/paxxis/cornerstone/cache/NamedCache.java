@@ -23,6 +23,7 @@ import java.util.concurrent.TimeUnit;
 
 import org.apache.log4j.Logger;
 import org.infinispan.Cache;
+import org.infinispan.container.entries.InternalCacheEntry;
 
 /**
  * @author Rob Englander
@@ -68,6 +69,21 @@ public class NamedCache<K, V> {
         }
     }
 
+    /**
+     * Retrieves a cache entry in the same way as get() except that it 
+     * does not update or reorder any of the internal constructs.
+     */
+    @SuppressWarnings("unchecked")
+	public V peek(K key) {
+        V result = null;
+        InternalCacheEntry entry = cache.getAdvancedCache().getDataContainer().peek(key);
+        if (entry != null) {
+        	result = (V)entry.getValue();
+        }
+        
+        return result;
+    }
+    
     public V put(K key, V content) {
     	return cache.put(key, content);
     }

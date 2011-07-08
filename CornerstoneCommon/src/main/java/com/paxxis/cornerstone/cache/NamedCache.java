@@ -46,6 +46,14 @@ public class NamedCache<K, V> {
         cacheName = name;
     }
     
+    public String getCacheName() {
+    	return cacheName;
+    }
+
+    protected Cache<K, V> getCache() {
+    	return cache;
+    }
+    
     public void setCacheManager(CacheManager cacheManager) {
         this.cacheManager = cacheManager;
     }

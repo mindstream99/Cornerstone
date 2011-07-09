@@ -18,6 +18,7 @@
 package com.paxxis.cornerstone.base.monitoring;
 
 import java.io.Serializable;
+import java.util.Date;
 
 import com.paxxis.cornerstone.base.InstanceId;
 
@@ -29,12 +30,13 @@ import com.paxxis.cornerstone.base.InstanceId;
  */
 public class ServiceInstance implements Serializable {
 
-	private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 2L;
 
 	private String displayName = null;
 	private InstanceId serviceId = null;
 	private InstanceId instanceId = null;
 	private String hostName = null;
+	private Date startTime = null;
 
 	public ServiceInstance() {
 	}
@@ -70,5 +72,12 @@ public class ServiceInstance implements Serializable {
 	public void setHostName(String hostName) {
 		this.hostName = hostName;
 	}
+
+	public Date getStartTime() {
+		return startTime;
+	}
 	
+	public void setStartTime(Date startTime) {
+		this.startTime = startTime;
+	}
 }

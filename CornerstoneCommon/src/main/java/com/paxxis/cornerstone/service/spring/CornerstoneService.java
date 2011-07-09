@@ -21,6 +21,7 @@ package com.paxxis.cornerstone.service.spring;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.UUID;
 
 import org.apache.log4j.Logger;
@@ -82,12 +83,14 @@ public class CornerstoneService extends CornerstoneConfigurable implements IServ
 
         try {
 			serviceInstance.setHostName(InetAddress.getLocalHost().getCanonicalHostName());
-			serviceInstance.setInstanceId(InstanceId.create(UUID.randomUUID().toString()));
 		} catch (UnknownHostException e) {
 			serviceInstance.setHostName("UNKNOWN");
 		}
         
-        _logger.info("Initializing " + toString());
+		serviceInstance.setInstanceId(InstanceId.create(UUID.randomUUID().toString()));
+		serviceInstance.setStartTime(new Date());
+
+		_logger.info("Initializing " + toString());
 
     }
     

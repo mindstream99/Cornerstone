@@ -57,6 +57,10 @@ public class ServiceMetrics implements Serializable {
 		return name;
 	}
 	
+	public int getMaxValues() {
+		return maxValues;
+	}
+	
 	public List<TimestampedValue> getValues() {
 		return values;
 	}

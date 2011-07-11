@@ -17,11 +17,14 @@
 
 package com.paxxis.cornerstone.base.monitoring;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import com.paxxis.cornerstone.base.RequestMessage;
 
 
 public class ServiceMetricsEvent extends RequestMessage {
-	private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 2L;
     private final static int VERSION = 1;
 
 	public ServiceMetricsEvent() {
@@ -47,14 +50,19 @@ public class ServiceMetricsEvent extends RequestMessage {
 
     private ServiceInstance serviceInstance = null;
 
-    private ServiceMetrics metrics = null;
+    private List<ServiceMetrics> metrics = new ArrayList<ServiceMetrics>();
     
-    public ServiceMetrics getMetrics() {
+    public List<ServiceMetrics> getMetrics() {
 		return metrics;
 	}
 
-	public void setMetrics(ServiceMetrics metrics) {
-		this.metrics = metrics;
+	public void setMetrics(List<ServiceMetrics> metrics) {
+		this.metrics.clear();
+		this.metrics.addAll(metrics);
+	}
+
+	public void addMetrics(ServiceMetrics metrics) {
+		this.metrics.add(metrics);
 	}
 
 	public ServiceInstance getServiceInstance() {

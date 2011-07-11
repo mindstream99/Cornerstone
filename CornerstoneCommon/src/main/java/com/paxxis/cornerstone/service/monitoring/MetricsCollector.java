@@ -28,7 +28,7 @@ import org.apache.log4j.Logger;
 import com.paxxis.cornerstone.base.monitoring.ServiceMetrics;
 import com.paxxis.cornerstone.base.monitoring.ServiceMetricsEvent;
 import com.paxxis.cornerstone.base.monitoring.TimestampedValue;
-import com.paxxis.cornerstone.common.JSonObjectPayload;
+import com.paxxis.cornerstone.common.JavaObjectPayload;
 import com.paxxis.cornerstone.common.ScheduledExecutionPool;
 import com.paxxis.cornerstone.service.DestinationPublisherPool;
 import com.paxxis.cornerstone.service.DestinationSender;
@@ -143,49 +143,47 @@ public class MetricsCollector {
 	        	}
 	        }
 	        
-	        if (metricDataMap.size() > 0) {
-	        	Runnable r = new Runnable() {
-	        		public void run() {
-	        			// construct a metrics event message
-	        			ServiceMetricsEvent metricsEvent = new ServiceMetricsEvent();
-	        			metricsEvent.setServiceInstance(service.getServiceInstance());
+        	Runnable r = new Runnable() {
+        		public void run() {
+        			// construct a metrics event message
+        			ServiceMetricsEvent metricsEvent = new ServiceMetricsEvent();
+        			metricsEvent.setServiceInstance(service.getServiceInstance());
 
-	        			Long start = System.currentTimeMillis();
-	        			for (String methodName : metricDataMap.keySet()) {
-        	            	MetricData metric = metricDataMap.get(methodName);
-	        	            try {
-								Serializable result = (Serializable)metric.method.invoke(metricSource, new Object[0]);
-								TimestampedValue value = new TimestampedValue(result);
-								
-								// add this result to the list of values
-								metric.metrics.addValue(value);
-								
-								// add it to the metrics event message
-								metricsEvent.setMetrics(metric.metrics);
-								
-							} catch (Exception e) {
-								Logger.getLogger(getClass()).error(e);
-							}
-	        			}
-	        			
-	        			// publish the metric message
-	        			publisherPool.publish(metricsEvent, new JSonObjectPayload(ServiceMetricsEvent.class));
-	        			
-	        			// subtract the collection time from the frequency so that collections happen uniformly
-	        			long newFreq = collectionFrequency - (System.currentTimeMillis() - start);
+        			Long start = System.currentTimeMillis();
+        			for (String methodName : metricDataMap.keySet()) {
+    	            	MetricData metric = metricDataMap.get(methodName);
+        	            try {
+							Serializable result = (Serializable)metric.method.invoke(metricSource, new Object[0]);
+							TimestampedValue value = new TimestampedValue(result);
+							
+							// add this result to the list of values
+							metric.metrics.addValue(value);
+							
+							// add it to the metrics event message
+							metricsEvent.addMetrics(metric.metrics);
+							
+						} catch (Exception e) {
+							Logger.getLogger(getClass()).error(e);
+						}
+        			}
+        			
+        			// publish the metric message
+        			publisherPool.publish(metricsEvent, new JavaObjectPayload()); //ServiceMetricsEvent.class));
+        			
+        			// subtract the collection time from the frequency so that collections happen uniformly
+        			long newFreq = collectionFrequency - (System.currentTimeMillis() - start);
 
-	        			// TODO adjust the collection frequency if the collection time costs more than a given
-	        			// percentage of the collection frequency
-	        			//if (newFreq < (collectionFrequency / 2)) {
-	        				// it took more than half the collection frequency time to collect metrics.
-	        			//} else {
-	        				
-	        			//}
-	        			future = collectionExecutor.schedule(this, newFreq, TimeUnit.MILLISECONDS);
-	        		}
-	        	};
-	        	future = collectionExecutor.schedule(r, collectionFrequency, TimeUnit.MILLISECONDS);
-	        }
+        			// TODO adjust the collection frequency if the collection time costs more than a given
+        			// percentage of the collection frequency
+        			//if (newFreq < (collectionFrequency / 2)) {
+        				// it took more than half the collection frequency time to collect metrics.
+        			//} else {
+        				
+        			//}
+        			future = collectionExecutor.schedule(this, newFreq, TimeUnit.MILLISECONDS);
+        		}
+        	};
+        	future = collectionExecutor.schedule(r, collectionFrequency, TimeUnit.MILLISECONDS);
 		} catch (ClassNotFoundException e) {
 			throw new RuntimeException(e);
 		}

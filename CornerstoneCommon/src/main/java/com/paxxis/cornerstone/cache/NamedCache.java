@@ -18,7 +18,9 @@
 package com.paxxis.cornerstone.cache;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.log4j.Logger;
@@ -77,6 +79,32 @@ public class NamedCache<K, V> {
         }
     }
 
+	public boolean isExpired(K key) {
+        boolean expired = false;
+        InternalCacheEntry entry = cache.getAdvancedCache().getDataContainer().peek(key);
+        if (null != entry) {
+        	expired = entry.isExpired();
+        }
+        
+        return expired;
+	}
+	
+	public boolean isNearExpiration(K key, long time) {
+		boolean near = false;
+        InternalCacheEntry entry = cache.getAdvancedCache().getDataContainer().peek(key);
+        if (null != entry && entry.canExpire()) {
+        	if (!entry.isExpired()) {
+	        	long expiry = entry.getExpiryTime();
+	        	long now = System.currentTimeMillis();
+	        	if ((expiry - now) < time) {
+	        		near = true;
+	        	}
+        	}
+        }
+        
+        return near;
+	}
+	
     /**
      * Retrieves a cache entry in the same way as get() except that it 
      * does not update or reorder any of the internal constructs.
@@ -128,4 +156,18 @@ public class NamedCache<K, V> {
         return cache.remove(key);
     }
     
+    public Set<K> getKeys() {
+    	return cache.keySet();
+    }
+    
+    public Collection<V> getEntries() {
+    	List<V> list = new ArrayList<V>();
+    	Set<K> keys = cache.keySet();
+    	for (K key : keys) {
+    		V value = this.peek(key);
+    		list.add(value);
+    	}
+
+    	return list;
+    }
 }

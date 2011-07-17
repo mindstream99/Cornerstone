@@ -79,6 +79,10 @@ public class NamedCache<K, V> {
         }
     }
 
+	public void clear() {
+		cache.clear();
+	}
+	
 	public boolean isExpired(K key) {
         boolean expired = false;
         InternalCacheEntry entry = cache.getAdvancedCache().getDataContainer().peek(key);

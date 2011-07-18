@@ -20,7 +20,7 @@ package com.paxxis.cornerstone.cache;
  * 
  * @author Matthew Pflueger
  */
-public class CacheException extends Exception {
+public class CacheException extends RuntimeException {
     
     private static final long serialVersionUID = 1L;
 

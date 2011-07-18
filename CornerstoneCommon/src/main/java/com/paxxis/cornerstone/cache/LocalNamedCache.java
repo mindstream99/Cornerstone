@@ -117,12 +117,12 @@ public class LocalNamedCache<K, V> extends NamedCache<K, V> {
 	        if (entry != null) {
 	        	if (entry.isExpired()) {
 	        		boolean expire = true;
-		        	V result = (V)entry.getValue();
+		        	ValueStorage<V> result = (ValueStorage<V>)entry.getValue();
 	        		if (listener != null) {
-	        			expire = listener.allowExpiration(result, new Date(entry.getExpiryTime()));
+	        			expire = listener.allowExpiration(result.getValue(), new Date(entry.getExpiryTime()));
 	        		}
 	        		if (expire) {
-			        	expiredValues.add(result);
+			        	expiredValues.add(result.getValue());
 			        	cache.remove(key);
 	        		}
 	        	}

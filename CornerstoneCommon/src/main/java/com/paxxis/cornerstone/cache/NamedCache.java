@@ -114,13 +114,13 @@ public class NamedCache<K, V> {
      */
     @SuppressWarnings("unchecked")
 	public V peek(K key) {
-        V result = null;
+        ValueStorage<V> result = null;
         InternalCacheEntry entry = cache.getAdvancedCache().getDataContainer().peek(key);
         if (entry != null) {
-        	result = (V)entry.getValue();
+        	result = (ValueStorage<V>)entry.getValue();
         }
         
-        return result;
+        return result.getValue();
     }
     
     protected ValueStorage<V> put(K key, ValueStorage<V> content) {

@@ -43,7 +43,7 @@ import com.paxxis.cornerstone.common.ScheduledExecutionPool;
  * @author Rob Englander
  */
 public class LocalNamedCache<K, V> extends NamedCache<K, V> {
-    private static final Logger LOGGER = Logger.getLogger(LocalNamedCache.class);
+    private static final Logger logger = Logger.getLogger(LocalNamedCache.class);
     private static final long DEFAULTEVICTIONFREQUENCY = 10000;
     private static final long MINEVICTIONFREQUENCY = 1000;
 
@@ -71,12 +71,14 @@ public class LocalNamedCache<K, V> extends NamedCache<K, V> {
     public void initialize() {
 		super.initialize();
 
+		logger.debug("Initializing cache "  + getCacheName());
+		
 		if (scheduler == null) {
 			throw new RuntimeException("expirationExecutor can't be null.");
 		}
 		
 		// the additional features of LocalNamedCache are only available on non clustered caches.
-		Cache<K, V> cache = getCache();
+		Cache<K, ValueStorage<V>> cache = getCache();
 		if (cache.getConfiguration().getCacheMode().isClustered()) {
 			throw new RuntimeException("LocalNamedCache " + getCacheName() + " can't be clustered.");
 		}
@@ -108,7 +110,7 @@ public class LocalNamedCache<K, V> extends NamedCache<K, V> {
     
     @SuppressWarnings("unchecked")
 	protected List<V> expireEntries() {
-		Cache<K, V> cache = getCache();
+		Cache<K, ValueStorage<V>> cache = getCache();
 		List<V> expiredValues = new ArrayList<V>();
 		for (K key : cache.keySet()) {
 	        InternalCacheEntry entry = cache.getAdvancedCache().getDataContainer().peek(key);

@@ -14,7 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.paxxis.cornerstone.cache;
 
 import java.util.ArrayList;
@@ -40,7 +39,7 @@ public class NamedCache<K, V> {
     private CacheManager cacheManager = null;
 
     /** the cache itself */
-    private Cache<K, V> cache = null;
+    private Cache<K, ValueStorage<V>> cache = null;
 
 	private List<CacheListener> listeners = new ArrayList<CacheListener>();
 
@@ -52,7 +51,7 @@ public class NamedCache<K, V> {
     	return cacheName;
     }
 
-    protected Cache<K, V> getCache() {
+    protected Cache<K, ValueStorage<V>> getCache() {
     	return cache;
     }
     
@@ -124,31 +123,68 @@ public class NamedCache<K, V> {
         return result;
     }
     
-    public V put(K key, V content) {
+    protected ValueStorage<V> put(K key, ValueStorage<V> content) {
     	return cache.put(key, content);
     }
 
-    public V put(K key, V content, long lifespan, TimeUnit lifespanUnits) {
+    protected ValueStorage<V> put(K key, ValueStorage<V> content, long lifespan, TimeUnit lifespanUnits) {
     	return cache.put(key, content, lifespan, lifespanUnits);
     }
 
-    public V put(K key, V content, long lifespan, TimeUnit lifespanUnits, long maxIdle, TimeUnit maxIdleUnits) {
+    protected ValueStorage<V> put(K key, ValueStorage<V> content, long lifespan, 
+            TimeUnit lifespanUnits, long maxIdle, TimeUnit maxIdleUnits) {
     	return cache.put(key, content, lifespan, lifespanUnits, maxIdle, maxIdleUnits);
     }
     
-    public V putIfAbsent(K key, V content) {
+    protected ValueStorage<V> putIfAbsent(K key, ValueStorage<V> content) {
     	return cache.putIfAbsent(key, content);
     }
 
-    public V putIfAbsent(K key, V content, long lifespan, TimeUnit lifespanUnits) {
+    protected ValueStorage<V> putIfAbsent(K key, ValueStorage<V> content, long lifespan, TimeUnit lifespanUnits) {
     	return cache.putIfAbsent(key, content, lifespan, lifespanUnits);
     }
 
-    public V putIfAbsent(K key, V content, long lifespan, TimeUnit lifespanUnits, long maxIdle, TimeUnit maxIdleUnits) {
+    protected ValueStorage<V> putIfAbsent(K key, ValueStorage<V> content, long lifespan, 
+            TimeUnit lifespanUnits, long maxIdle, TimeUnit maxIdleUnits) {
     	return cache.putIfAbsent(key, content, lifespan, lifespanUnits, maxIdle, maxIdleUnits);
     }
+    
+    public V put(K key, V content) {
+        ValueStorage<V> value = put(key, createValueStorage(content));
+        return value == null ? null : value.getValue();
+    }
 
-    public V get(K key) {
+    public V put(K key, V content, long lifespan, TimeUnit lifespanUnits) {
+    	ValueStorage<V> value = put(key, createValueStorage(content), lifespan, lifespanUnits);
+    	return value == null ? null : value.getValue();
+    }
+
+    public V put(K key, V content, long lifespan, TimeUnit lifespanUnits, long maxIdle, TimeUnit maxIdleUnits) {
+    	ValueStorage<V> value = put(key, createValueStorage(content), lifespan, lifespanUnits, maxIdle, maxIdleUnits);
+    	return value == null ? null : value.getValue();
+    }
+    
+    public V putIfAbsent(K key, V content) {
+    	ValueStorage<V> value = putIfAbsent(key, createValueStorage(content));
+    	return value == null ? null : value.getValue();
+    }
+
+    public V putIfAbsent(K key, V content, long lifespan, TimeUnit lifespanUnits) {
+    	ValueStorage<V> value = putIfAbsent(key, createValueStorage(content), lifespan, lifespanUnits);
+    	return value == null ? null : value.getValue();
+    }
+
+    public V putIfAbsent(K key, V content, long lifespan, TimeUnit lifespanUnits, long maxIdle, TimeUnit maxIdleUnits) {
+    	ValueStorage<V> value = putIfAbsent(key, createValueStorage(content), lifespan, lifespanUnits, maxIdle, maxIdleUnits);
+    	return value == null ? null : value.getValue();
+    }
+
+    public V get(K key) throws CacheException {
+        ValueStorage<V> value = getValue(key);
+        return value == null ? null : value.getValue();
+    }
+    
+    protected ValueStorage<V> getValue(K key) throws CacheException {
         if (key == null) {
             return null;
         }
@@ -157,7 +193,7 @@ public class NamedCache<K, V> {
     }
     
     public V remove(K key) {
-        return cache.remove(key);
+        return cache.remove(key).getValue();
     }
     
     public Set<K> getKeys() {
@@ -173,5 +209,16 @@ public class NamedCache<K, V> {
     	}
 
     	return list;
+    }
+
+    protected ValueStorage<V> createValueStorage(final V value) {
+        return new ValueStorage<V>() {
+            private static final long serialVersionUID = 1L;
+
+            @Override
+            public V getValue() {
+                return value;
+            }
+        };
     }
 }

@@ -109,7 +109,7 @@ public class LocalNamedCache<K, V> extends NamedCache<K, V> {
     }
     
     @SuppressWarnings("unchecked")
-	protected List<V> expireEntries() {
+	private List<V> expireEntries() {
 		Cache<K, ValueStorage<V>> cache = getCache();
 		List<V> expiredValues = new ArrayList<V>();
 		for (K key : cache.keySet()) {

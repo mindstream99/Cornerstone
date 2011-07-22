@@ -29,7 +29,7 @@ import org.infinispan.container.entries.InternalCacheEntry;
 /**
  * @author Rob Englander
  */
-public class NamedCache<K, V> {
+public class NamedCache<K, V> implements com.paxxis.cornerstone.cache.Cache<K, V> {
     private static final Logger logger = Logger.getLogger(NamedCache.class);
         
     /** the name of the cache */
@@ -57,6 +57,11 @@ public class NamedCache<K, V> {
     
     public void setCacheManager(CacheManager cacheManager) {
         this.cacheManager = cacheManager;
+    }
+    
+    @Override
+    public void addListener(CacheListener listener) {
+        this.listeners.add(listener);
     }
     
 	public void setListeners(List<CacheListener> listeners) {
@@ -112,6 +117,7 @@ public class NamedCache<K, V> {
      * Retrieves a cache entry in the same way as get() except that it 
      * does not update or reorder any of the internal constructs.
      */
+	@Override
     @SuppressWarnings("unchecked")
 	public V peek(K key) {
         ValueStorage<V> result = null;
@@ -149,36 +155,43 @@ public class NamedCache<K, V> {
     	return cache.putIfAbsent(key, content, lifespan, lifespanUnits, maxIdle, maxIdleUnits);
     }
     
+    @Override
     public V put(K key, V content) {
         ValueStorage<V> value = put(key, createValueStorage(content));
         return value == null ? null : value.getValue();
     }
 
+    @Override
     public V put(K key, V content, long lifespan, TimeUnit lifespanUnits) {
     	ValueStorage<V> value = put(key, createValueStorage(content), lifespan, lifespanUnits);
     	return value == null ? null : value.getValue();
     }
 
+    @Override
     public V put(K key, V content, long lifespan, TimeUnit lifespanUnits, long maxIdle, TimeUnit maxIdleUnits) {
     	ValueStorage<V> value = put(key, createValueStorage(content), lifespan, lifespanUnits, maxIdle, maxIdleUnits);
     	return value == null ? null : value.getValue();
     }
     
+    @Override
     public V putIfAbsent(K key, V content) {
     	ValueStorage<V> value = putIfAbsent(key, createValueStorage(content));
     	return value == null ? null : value.getValue();
     }
 
+    @Override
     public V putIfAbsent(K key, V content, long lifespan, TimeUnit lifespanUnits) {
     	ValueStorage<V> value = putIfAbsent(key, createValueStorage(content), lifespan, lifespanUnits);
     	return value == null ? null : value.getValue();
     }
 
+    @Override
     public V putIfAbsent(K key, V content, long lifespan, TimeUnit lifespanUnits, long maxIdle, TimeUnit maxIdleUnits) {
     	ValueStorage<V> value = putIfAbsent(key, createValueStorage(content), lifespan, lifespanUnits, maxIdle, maxIdleUnits);
     	return value == null ? null : value.getValue();
     }
 
+    @Override
     public V get(K key) throws CacheException {
         ValueStorage<V> value = getValue(key);
         return value == null ? null : value.getValue();

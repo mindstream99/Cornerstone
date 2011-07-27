@@ -126,7 +126,7 @@ public class NamedCache<K, V> implements com.paxxis.cornerstone.cache.Cache<K, V
         	result = (ValueStorage<V>)entry.getValue();
         }
         
-        return result.getValue();
+        return result == null ? null : result.getValue();
     }
     
     protected ValueStorage<V> put(K key, ValueStorage<V> content) {
@@ -206,7 +206,8 @@ public class NamedCache<K, V> implements com.paxxis.cornerstone.cache.Cache<K, V
     }
     
     public V remove(K key) {
-        return cache.remove(key).getValue();
+        ValueStorage<V> value = cache.remove(key);
+    	return value == null ? null : value.getValue();
     }
     
     public Set<K> getKeys() {

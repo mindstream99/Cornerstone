@@ -19,7 +19,9 @@
 package com.paxxis.cornerstone.service;
 
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -62,11 +64,21 @@ public abstract class CornerstoneConfigurable implements IManagedBean
             Method[] methods = this.getClass().getMethods();
             
             Set<String> props = _propertyMap.keySet();
-            for (String propName : props)
-            {
-                String configKey = (String)_propertyMap.get(propName);
-                String value = config.getStringValue(configKey, null);
-                
+            for (String propName : props) {
+            	Object configObject = _propertyMap.get(propName);
+            	Object value = null;
+            	if (configObject instanceof List<?>) {
+            		List<String> valueList = new ArrayList<String>();
+            		List<?> configList = (List<?>)configObject;
+            		for (Object o : configList) {
+            			String v = config.getStringValue(o.toString(), "");
+            			valueList.add(v);
+            		}
+            		
+            		value = valueList;
+            	} else {
+                    value = config.getObjectValue(configObject.toString());
+            	}
                 if (value != null)
                 {
                     // get the setter
@@ -88,23 +100,27 @@ public abstract class CornerstoneConfigurable implements IManagedBean
                                 }
                                 else if (paramClasses[0].getName().equals("int"))
                                 {
-                                    objValue = Integer.valueOf(value);
+                                    objValue = Integer.valueOf(value.toString());
                                 }
                                 else if (paramClasses[0].getName().equals("long"))
                                 {
-                                    objValue = Long.valueOf(value);
+                                    objValue = Long.valueOf(value.toString());
                                 }
                                 else if (paramClasses[0].getName().equals("float"))
                                 {
-                                    objValue = Float.valueOf(value);
+                                    objValue = Float.valueOf(value.toString());
                                 }
                                 else if (paramClasses[0].getName().equals("double"))
                                 {
-                                    objValue = Double.valueOf(value);
+                                    objValue = Double.valueOf(value.toString());
                                 }
                                 else if (paramClasses[0].getName().equals("boolean"))
                                 {
-                                    objValue = Boolean.valueOf(value);
+                                    objValue = Boolean.valueOf(value.toString());
+                                } 
+                                else if (paramClasses[0].getName().equals("java.util.List")) 
+                                {
+                                	objValue = value;
                                 }
                                 
                                 try

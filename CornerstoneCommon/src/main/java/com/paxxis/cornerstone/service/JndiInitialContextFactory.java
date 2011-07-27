@@ -18,7 +18,9 @@
 package com.paxxis.cornerstone.service;
 
 import java.util.Hashtable;
+import java.util.List;
 import java.util.Map;
+
 import javax.naming.Context;
 import javax.naming.InitialContext;
 
@@ -100,6 +102,21 @@ public class JndiInitialContextFactory extends CornerstoneConfigurable
         return ctx;
     }
 
+    public void setQueues(List<String> queues) {
+    	for (String name : queues) {
+    		destinationMap.put("queue." + name, name);
+    	}
+    }
+    
+    public void setTopics(List<String> topics) {
+    	for (String name : topics) {
+    		destinationMap.put("topic." + name, name);
+    	}
+    }
+
+    /**
+     * @deprecated
+     */
     public void setDestinations(Map<String, String> map) {
         destinationMap.clear();
         destinationMap.putAll(map);

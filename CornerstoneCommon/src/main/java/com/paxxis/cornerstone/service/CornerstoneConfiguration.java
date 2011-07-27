@@ -91,6 +91,10 @@ public class CornerstoneConfiguration implements IManagedBean
         return result;
     }
     
+    public Object getObjectValue(String parameter) {
+    	return _localPropertyMap.get(parameter);
+    }
+    
     /**
      * Get the value of a parameter as a String.
      *

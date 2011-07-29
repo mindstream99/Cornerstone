@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" 
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:util="http://www.springframework.org/schema/util"
+       xsi:schemaLocation="
+http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-3.0.xsd"
+       default-init-method="initialize" 
+       default-destroy-method="destroy">
+
+    <!-- Create a override.properties file on your classpath to override specific 
+         values of bean properties by doing 'bean_id.property=value' For example:
+
+         customerServiceContextFactory.providerUrl=tcp://localhost:61616
+
+         NOTE: You cannot set values of properties that are collections...
+    -->
+    <bean class="org.springframework.beans.factory.config.PropertyOverrideConfigurer">
+        <property name="locations" value="classpath:override.properties" />
+        <property name="ignoreResourceNotFound" value="true" />
+    </bean>
+
+    <bean id="passThrough" class="com.paxxis.cornerstone.common.PasswordPassThrough" />   
+
+    <!-- configuration database connection pool -->
+    <bean id="configurationPool" class="com.paxxis.cornerstone.database.DatabaseConnectionPool">
+        <property name="dbType" value="mysql"/>
+        <property name="dbHostname" value="cornerstone-db"/>
+        <property name="dbUsername" value="mozart"/>
+        <property name="dbPassword" value="mozart"/>
+        <property name="dbName" value="Cornerstone"/>
+        <property name="dbDriver" value="com.mysql.jdbc.Driver"/>
+        <property name="dbUrlPrefix" value="jdbc:mysql:"/>
+        <property name="maxPoolSize" value="1"/>
+        <property name="minPoolSize" value="1"/>
+        <property name="idleThreshold" value="1"/>
+        <property name="passwordGenerator" ref="passThrough"/> 
+    </bean>
+
+    <bean id="configuration" class="com.paxxis.cornerstone.service.CornerstoneConfiguration">
+        <property name="databasePool" ref="configurationPool"/>
+        <property name="dbQuery" value="select name, value from Configuration"/>
+        <property name="keyColumn" value="name"/>
+        <property name="valueColumn" value="value"/>
+
+        <!-- add property entries here to override the values in the configuration database -->
+        <property name="parameters">
+            <map>
+                <!-- entry key="some property name" value="some value"/ -->
+            </map>
+        </property>
+    </bean>
+
+    <bean id="contextFactory" class="com.paxxis.cornerstone.service.ActiveMQInitialContextFactory">
+        <property name="configurationPropertyMap">
+            <map>
+                <entry key="connectionFactoryName" value="global.jms.connectionFactoryName"/>
+                <entry key="providerUrl" value="global.jms.providerUrl"/>
+                <entry key="contextFactory" value="global.jms.contextFactory"/>
+                <entry key="failover" value="global.jms.useFailover"/>
+                <entry key="queues">
+                    <list>
+                    </list>
+                </entry>
+                <entry key="topics">
+                    <list>
+                        <value>metrics.topic.eventDestinationName</value>
+                        <value>mgmt.topic.eventDestinationName</value>
+                    </list>
+                </entry>
+            </map>
+        </property>
+        <property name="cornerstoneConfiguration" ref="configuration"/>
+
+    </bean>
+
+    <!-- Spring dynamically implements the MessageProcessorFactory to lookup 
+         message processors by name -->
+    <bean id="messageProcessorFactory"
+          class="org.springframework.beans.factory.config.ServiceLocatorFactoryBean">
+        <property name="serviceLocatorInterface" 
+                  value="com.paxxis.cornerstone.service.MessageProcessorFactory" />
+    </bean>
+
+    <bean id="mgmtEventMessageGroup" class="com.paxxis.cornerstone.base.management.ManagementEventMessageGroupV1">
+    </bean>
+
+    <bean id="msgSender" 
+          class="com.paxxis.cornerstone.service.DestinationSender"
+          scope="prototype" />
+
+    <bean id="senderPool" class="com.paxxis.cornerstone.service.ServiceBusSenderPool">
+        <property name="configurationPropertyMap">
+            <map>
+                <entry key="connectionFactoryName" value="global.jms.connectionFactoryName"/>
+                <entry key="requestQueueName" value="mgmt.topic.eventDestinationName"/>
+            </map>
+        </property>
+        <property name="cornerstoneConfiguration" ref="configuration"/>
+        <property name="contextFactory" ref="contextFactory"/>
+        <property name="poolSize" value="1"/>
+        
+        <property name="messageGroup" ref="mgmtEventMessageGroup" />
+        <lookup-method name="createSender" bean="msgSender" />
+    </bean>          
+    
+    <bean id="publisherPool" class="com.paxxis.cornerstone.service.DestinationPublisherPool">
+        <property name="senderPool" ref="senderPool"/>
+    </bean>
+</beans>
+

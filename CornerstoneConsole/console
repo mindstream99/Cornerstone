@@ -1,0 +1,35 @@
+#!/bin/bash
+
+CONTEXT=CornerstoneConsoleFactory.xml
+TARGET=target/CornerstoneConsole-*-allinone.jar
+MAIN=com.paxxis.cornerstone.console.Console
+
+
+PACKAGE="mvn -DskipTests -Pallinone package"
+
+declare -a ARGS=(
+#'-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=8000'
+'-Xms1024m -Xmx2048m -XX:PermSize=256m'
+)
+
+if [ ! -e ${TARGET} ]; then
+    echo "Missing ${TARGET}, running ${PACKAGE}"
+    $PACKAGE
+    result=$?
+    if [[ $result > 0 ]]; then
+        exit 1;
+    fi
+fi
+
+if [ ! ${1} ]; then
+    echo "Using default Spring context configuration ${CONTEXT}"
+else
+    CONTEXT=${1}
+fi
+ 
+# We set the classpath and specify the main class to allow for override.properties
+# We also use exec here to replace the running shell with our java process
+exec java ${ARGS[*]} -cp .:src/overrides/resources:`ls -1 ${TARGET}` ${MAIN} ${CONTEXT}
+
+
+

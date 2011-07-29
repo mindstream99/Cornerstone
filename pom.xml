@@ -20,6 +20,7 @@
     <modules>
         <module>CornerstoneBase</module>
         <module>CornerstoneCommon</module>
+        <module>CornerstoneConsole</module>
     </modules>
 
     <properties>

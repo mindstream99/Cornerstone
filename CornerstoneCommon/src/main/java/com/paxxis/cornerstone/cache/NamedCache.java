@@ -226,13 +226,6 @@ public class NamedCache<K, V> implements com.paxxis.cornerstone.cache.Cache<K, V
     }
 
     protected ValueStorage<V> createValueStorage(final V value) {
-        return new ValueStorage<V>() {
-            private static final long serialVersionUID = 1L;
-
-            @Override
-            public V getValue() {
-                return value;
-            }
-        };
+        return new SimpleValueStorage<V>(value);
     }
 }

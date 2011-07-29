@@ -17,12 +17,14 @@
 
 package com.paxxis.cornerstone.service;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+
+import com.paxxis.cornerstone.base.management.ConfigurationChange;
 import com.paxxis.cornerstone.database.DatabaseConnection;
 import com.paxxis.cornerstone.database.DatabaseConnectionPool;
 import com.paxxis.cornerstone.database.IDataSet;
-
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * @author Robert Englander
@@ -38,16 +40,21 @@ public class CornerstoneConfiguration implements IManagedBean
     
     private HashMap<String, Object> _localMap = null;
     
-    // indicates if the database should be used (if not only the local
-    // map is used)
-    
     private DatabaseConnectionPool _databasePool = null;
+
+    private List<CornerstoneConfigurable> registeredConfigurables = new ArrayList<CornerstoneConfigurable>();
     
     /**
      * Constructor
      */
     public CornerstoneConfiguration()
     {
+    }
+
+    public void registerConfigurable(CornerstoneConfigurable configurable) {
+    	if (!registeredConfigurables.contains(configurable)) {
+    		registeredConfigurables.add(configurable);
+    	}
     }
     
     /**
@@ -60,6 +67,13 @@ public class CornerstoneConfiguration implements IManagedBean
      */
     public void setOverrideConfiguration(CornerstoneConfiguration overrideConfig) {
     	_localMap.putAll(overrideConfig._localPropertyMap);
+    }
+    
+    public void modifyParameter(ConfigurationChange change) {
+    	_localPropertyMap.put(change.getName(), change.getNewValue());
+    	for (CornerstoneConfigurable cfg : registeredConfigurables) {
+    		cfg.onChange(change.getName());
+    	}
     }
     
     /**

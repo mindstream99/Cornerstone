@@ -20,6 +20,7 @@ package com.paxxis.cornerstone.cache;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.log4j.Logger;
@@ -112,7 +113,8 @@ public class LocalNamedCache<K, V> extends NamedCache<K, V> {
 	private List<V> expireEntries() {
 		Cache<K, ValueStorage<V>> cache = getCache();
 		List<V> expiredValues = new ArrayList<V>();
-		for (K key : cache.keySet()) {
+		Set<Object> set = cache.getAdvancedCache().getDataContainer().keySet();
+		for (K key : (Set<K>)set) {
 	        InternalCacheEntry entry = cache.getAdvancedCache().getDataContainer().peek(key);
 	        if (entry != null) {
 	        	if (entry.isExpired()) {

@@ -36,6 +36,24 @@ import org.apache.log4j.Logger;
 public class DatabaseConnection implements IDatabaseConnection {
     private static final Logger logger = Logger.getLogger(DatabaseConnection.class);
     
+    public enum TransactionIsolation {
+        TRANSACTION_NONE(Connection.TRANSACTION_NONE),
+        TRANSACTION_READ_COMMITTED(Connection.TRANSACTION_READ_COMMITTED),
+        TRANSACTION_READ_UNCOMMITTED(Connection.TRANSACTION_READ_UNCOMMITTED),
+        TRANSACTION_REPEATABLE_READ(Connection.TRANSACTION_REPEATABLE_READ),
+        TRANSACTION_SERIALIZABLE(Connection.TRANSACTION_SERIALIZABLE);
+        
+        private int transactionIsolation;
+        
+        private TransactionIsolation(int transactionIsolation) {
+            this.transactionIsolation = transactionIsolation;
+        }
+        
+        public int getTransactionIsolation() {
+            return this.transactionIsolation;
+        }
+    }
+    
 	public enum Type {
 		Oracle,
 		MySQL,
@@ -48,6 +66,8 @@ public class DatabaseConnection implements IDatabaseConnection {
     private String dbUrl;
     private String dbUser;
     private String driverName = null;
+    private boolean autoCommit = false;
+    private TransactionIsolation transactionIsolation = TransactionIsolation.TRANSACTION_READ_UNCOMMITTED;
     private Connection connection;
     private int transactionCount;
     private List<CloseableResource> closeables = new ArrayList<CloseableResource>();
@@ -97,8 +117,8 @@ public class DatabaseConnection implements IDatabaseConnection {
     
         try {
             connection = DriverManager.getConnection(url, props);
-            connection.setAutoCommit(false);
-            connection.setTransactionIsolation(Connection.TRANSACTION_READ_COMMITTED);
+            connection.setAutoCommit(autoCommit);
+            connection.setTransactionIsolation(transactionIsolation.getTransactionIsolation());
             
             checkForWarning(connection.getWarnings());
         } catch (Exception ex) {
@@ -429,4 +449,25 @@ public class DatabaseConnection implements IDatabaseConnection {
             throw new DatabaseException(sqle);
         }
     }
+
+    public boolean isAutoCommit() {
+        return autoCommit;
+    }
+
+    public void setAutoCommit(boolean autoCommit) {
+        this.autoCommit = autoCommit;
+    }
+
+    public String getTransactionIsolation() {
+        return transactionIsolation.toString();
+    }
+
+    public void setTransactionIsolation(String transactionIsolation) {
+        setTransactionIsolation(TransactionIsolation.valueOf(transactionIsolation));
+    }
+
+    public void setTransactionIsolation(TransactionIsolation transactionIsolation) {
+        this.transactionIsolation = transactionIsolation;
+    }
+    
 }

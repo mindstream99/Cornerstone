@@ -58,6 +58,10 @@ public class DatabaseConnectionPool extends AbstractBlockingObjectPool<DatabaseC
     private String timestampFormat = null;
     private String catalog = "Chime";
     
+    private boolean autoCommit = false;
+    private String transactionIsolation = 
+            DatabaseConnection.TransactionIsolation.TRANSACTION_READ_UNCOMMITTED.toString();
+    
     // the maximum number of instances in the pool
     private int _maximum = 1;
     
@@ -310,6 +314,8 @@ public class DatabaseConnectionPool extends AbstractBlockingObjectPool<DatabaseC
         {
             database.setDriverName(_dbDriver);
             database.setCatalog(catalog);
+            database.setAutoCommit(autoCommit);
+            database.setTransactionIsolation(transactionIsolation);
             
             if (isDerby()) {
                 String url = _dbUrlPrefix + _dbName;
@@ -490,5 +496,21 @@ public class DatabaseConnectionPool extends AbstractBlockingObjectPool<DatabaseC
 
     public String getEnsureConnectedStatment() {
         return ensureConnectedStatment;
+    }
+
+    public String getTransactionIsolation() {
+        return transactionIsolation;
+    }
+
+    public void setTransactionIsolation(String transactionIsolation) {
+        this.transactionIsolation = transactionIsolation;
+    }
+
+    public boolean isAutoCommit() {
+        return autoCommit;
+    }
+
+    public void setAutoCommit(boolean autoCommit) {
+        this.autoCommit = autoCommit;
     }
 }

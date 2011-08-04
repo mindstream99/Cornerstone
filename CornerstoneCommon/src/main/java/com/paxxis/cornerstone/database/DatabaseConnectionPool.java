@@ -59,8 +59,8 @@ public class DatabaseConnectionPool extends AbstractBlockingObjectPool<DatabaseC
     private String catalog = "Chime";
     
     private boolean autoCommit = false;
-    private String transactionIsolation = 
-            DatabaseConnection.TransactionIsolation.TRANSACTION_READ_UNCOMMITTED.toString();
+    private DatabaseConnection.TransactionIsolation transactionIsolation = 
+            DatabaseConnection.TransactionIsolation.TRANSACTION_READ_UNCOMMITTED;
     
     // the maximum number of instances in the pool
     private int _maximum = 1;
@@ -498,11 +498,11 @@ public class DatabaseConnectionPool extends AbstractBlockingObjectPool<DatabaseC
         return ensureConnectedStatment;
     }
 
-    public String getTransactionIsolation() {
+    public DatabaseConnection.TransactionIsolation getTransactionIsolation() {
         return transactionIsolation;
     }
 
-    public void setTransactionIsolation(String transactionIsolation) {
+    public void setTransactionIsolation(DatabaseConnection.TransactionIsolation transactionIsolation) {
         this.transactionIsolation = transactionIsolation;
     }
 

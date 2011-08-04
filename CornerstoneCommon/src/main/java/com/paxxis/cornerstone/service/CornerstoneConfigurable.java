@@ -41,8 +41,7 @@ public abstract class CornerstoneConfigurable implements IManagedBean {
     public CornerstoneConfigurable() {
     }
     
-    @SuppressWarnings("unchecked")
-	public void setConfigurationPropertyMap(Map localMap) {
+	public void setConfigurationPropertyMap(Map<String, ?> localMap) {
         _propertyMap.putAll(localMap);
     }
 
@@ -96,7 +95,7 @@ public abstract class CornerstoneConfigurable implements IManagedBean {
 
                         for (Method method : methods) {
                             if (method.getName().equals(setterName)) {
-                                Class[] paramClasses = method.getParameterTypes();
+                                Class<?>[] paramClasses = method.getParameterTypes();
                                 if (paramClasses.length == 1) {
                                     // this is the one we want, so convert the value to this type
                                     Object objValue = null;
@@ -113,7 +112,18 @@ public abstract class CornerstoneConfigurable implements IManagedBean {
                                     } else if (paramClasses[0].getName().equals("boolean")) {
                                         objValue = Boolean.valueOf(value.toString());
                                     } else if (paramClasses[0].getName().equals("java.util.List")) {
-                                    	objValue = value;
+                                    	objValue = value;                                    
+                                    } else {
+                                        //this covers any class (Enums most importantly) that has
+                                        //a static valueOf(java.lang.String) method
+                                        try {
+                                            Method valueOf = paramClasses[0].getMethod(
+                                                    "valueOf", 
+                                                    String.class);
+                                            objValue = valueOf.invoke(null, value);
+                                        } catch (Exception e) {
+                                            throw new RuntimeException(e);
+                                        }
                                     }
                                     
                                     try {

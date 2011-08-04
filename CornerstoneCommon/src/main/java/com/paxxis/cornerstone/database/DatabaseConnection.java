@@ -458,12 +458,8 @@ public class DatabaseConnection implements IDatabaseConnection {
         this.autoCommit = autoCommit;
     }
 
-    public String getTransactionIsolation() {
-        return transactionIsolation.toString();
-    }
-
-    public void setTransactionIsolation(String transactionIsolation) {
-        setTransactionIsolation(TransactionIsolation.valueOf(transactionIsolation));
+    public TransactionIsolation getTransactionIsolation() {
+        return transactionIsolation;
     }
 
     public void setTransactionIsolation(TransactionIsolation transactionIsolation) {

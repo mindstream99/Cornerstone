@@ -427,12 +427,15 @@ public class ServiceBusConnector extends CornerstoneConfigurable
                 // create a connection
                 _connection = factory.createConnection();
                 _connection.setExceptionListener(
-                    new ExceptionListener()
-                    {
-                        public void onException(JMSException ex) 
-                        {
-                            onConnectionFailed(ex);
-                            notifyConnectionStatusChange();
+                    new ExceptionListener() {
+                        public void onException(JMSException ex) {
+                            _logger.warn(ex);
+                            
+                            // TODO these methods are part of the Cornerstone reconnection mechanism, which
+                            // is incompatible with ActiveMQ's failover protocol (and also doesn't work correctly).
+                            // So for now logging the exception will have to do.
+                        	//onConnectionFailed(ex);
+                            //notifyConnectionStatusChange();
                         }
                     }
                 );

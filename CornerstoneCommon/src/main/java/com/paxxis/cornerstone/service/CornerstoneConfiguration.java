@@ -17,9 +17,8 @@
 
 package com.paxxis.cornerstone.service;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
+import java.util.WeakHashMap;
 
 import com.paxxis.cornerstone.base.management.ConfigurationChange;
 import com.paxxis.cornerstone.database.DatabaseConnection;
@@ -42,7 +41,8 @@ public class CornerstoneConfiguration implements IManagedBean
     
     private DatabaseConnectionPool _databasePool = null;
 
-    private List<CornerstoneConfigurable> registeredConfigurables = new ArrayList<CornerstoneConfigurable>();
+    private WeakHashMap<CornerstoneConfigurable, Object> registeredConfigurables = 
+    				new WeakHashMap<CornerstoneConfigurable, Object>();
     
     /**
      * Constructor
@@ -52,8 +52,8 @@ public class CornerstoneConfiguration implements IManagedBean
     }
 
     public void registerConfigurable(CornerstoneConfigurable configurable) {
-    	if (!registeredConfigurables.contains(configurable)) {
-    		registeredConfigurables.add(configurable);
+    	if (!registeredConfigurables.containsKey(configurable)) {
+    		registeredConfigurables.put(configurable, null);
     	}
     }
     
@@ -71,7 +71,7 @@ public class CornerstoneConfiguration implements IManagedBean
     
     public void modifyParameter(ConfigurationChange change) {
     	_localPropertyMap.put(change.getName(), change.getNewValue());
-    	for (CornerstoneConfigurable cfg : registeredConfigurables) {
+    	for (CornerstoneConfigurable cfg : registeredConfigurables.keySet()) {
     		cfg.onChange(change.getName());
     	}
     }

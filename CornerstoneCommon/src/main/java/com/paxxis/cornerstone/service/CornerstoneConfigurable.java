@@ -38,6 +38,9 @@ public abstract class CornerstoneConfigurable implements IManagedBean {
     /** contains a mapping of property names to configuration values */ 
     private HashMap<String, Object> _propertyMap = new HashMap<String, Object>();
     
+    /** flag indicating if this instance should register for changes */
+    private boolean registerForChanges = true;
+    
     public CornerstoneConfigurable() {
     }
     
@@ -151,7 +154,6 @@ public abstract class CornerstoneConfigurable implements IManagedBean {
      */
     public void setCornerstoneConfiguration(CornerstoneConfiguration configuration) {
         _configuration = configuration;
-        configuration.registerConfigurable(this);
         Set<String> props = _propertyMap.keySet();
         loadConfigurationPropertyValues(props);
     }
@@ -164,10 +166,17 @@ public abstract class CornerstoneConfigurable implements IManagedBean {
         return _configuration;
     }
     
+    public void setRegisterForChanges(boolean register) {
+    	this.registerForChanges = register;
+    }
+    
     /**
      * Initialize the object
      */
     public void initialize() {
+    	if (registerForChanges) {
+            _configuration.registerConfigurable(this);
+    	}
     }
     
     /**

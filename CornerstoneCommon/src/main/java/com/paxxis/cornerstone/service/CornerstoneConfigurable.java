@@ -174,7 +174,7 @@ public abstract class CornerstoneConfigurable implements IManagedBean {
      * Initialize the object
      */
     public void initialize() {
-    	if (registerForChanges) {
+    	if (registerForChanges && _configuration != null) {
             _configuration.registerConfigurable(this);
     	}
     }

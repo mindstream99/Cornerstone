@@ -47,7 +47,8 @@ public class ResponsePromise<RESP extends ResponseMessage<?>> extends DataLatch<
     
     public RESP getResponse(long timeout, boolean failfast) {
         RESP response = (RESP) waitForObject(timeout, failfast);
-        if (response.isError()) {
+        //our response maybe null if failfast is false
+        if (response != null && response.isError()) {
             this.exception = new ResponseException(response);
         }
         if (failfast && this.exception != null) {

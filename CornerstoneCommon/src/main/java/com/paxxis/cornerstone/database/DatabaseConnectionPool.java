@@ -57,6 +57,7 @@ public class DatabaseConnectionPool extends AbstractBlockingObjectPool<DatabaseC
     private String _dbUrlPrefix = null;
     private String timestampFormat = null;
     private String catalog = "Chime";
+    private String extraParameters = "";
     
     private boolean autoCommit = false;
     private DatabaseConnection.TransactionIsolation transactionIsolation = 
@@ -330,6 +331,10 @@ public class DatabaseConnectionPool extends AbstractBlockingObjectPool<DatabaseC
                 
             } else if (isMySQL()){
                 String url = _dbUrlPrefix + "//" + _dbHostname + "/" + _dbName;
+                if (!extraParameters.isEmpty()) {
+                	url += "?" + extraParameters;
+                }
+                
                 database.connect(url, _dbUsername, _dbPassword);
                 database.setDatabaseType(Type.MySQL);
             } else {
@@ -347,6 +352,14 @@ public class DatabaseConnectionPool extends AbstractBlockingObjectPool<DatabaseC
         DatabaseConnection database = new DatabaseConnection();
         connect(database);
         return database;
+    }
+    
+    public void setExtraParameters(String params) {
+    	extraParameters = params;
+    }
+    
+    public String getExtraParameters() {
+    	return extraParameters;
     }
     
     public void setTimestampFormat(String fmt) {

@@ -25,10 +25,12 @@ public class ActiveMQInitialContextFactory extends JndiInitialContextFactory {
 	private static final String QMARK = "?";
 	private static final String AMP = "&";
 	private static final String FAILOVER = "failover:";
+	private static final String FAILOVERSENDTIMEOUT = "timeout=";
 	private static final String USEASYNC = "jms.useAsyncSend=";
 	private static final String TRACKMSGS = "trackMessages=";
 	private static final String RECONNECTATTEMPTS = "maxReconnectAttempts=";
 	private static final int DEFAULTMAXATTEMPTS = 0;
+	private static final int DEFAULTFAILOVERSENDTIMEOUT = 1000;
 	
 	private enum ThreeState {
 		True,
@@ -40,6 +42,7 @@ public class ActiveMQInitialContextFactory extends JndiInitialContextFactory {
     private ThreeState asyncSend = ThreeState.None;
     private ThreeState trackMessages = ThreeState.None;
     private int maxConnectionAttempts = DEFAULTMAXATTEMPTS;
+    private int failoverSendTimeout = DEFAULTFAILOVERSENDTIMEOUT;
 
 	public ActiveMQInitialContextFactory() {
 		super();
@@ -55,9 +58,16 @@ public class ActiveMQInitialContextFactory extends JndiInitialContextFactory {
 
     	String psep = QMARK;
 
-    	if (failover && maxConnectionAttempts > 0) {
+    	if (failover) {
+    		if (maxConnectionAttempts > 0) {
 			   fullUrl.append(psep).append(RECONNECTATTEMPTS).append(maxConnectionAttempts);
 			   psep = AMP;
+    		}
+    		
+			if (failoverSendTimeout > -1) {
+			   fullUrl.append(psep).append(FAILOVERSENDTIMEOUT).append(failoverSendTimeout);
+			   psep = AMP;
+    		}
     	}
 
     	switch (asyncSend) {
@@ -102,9 +112,21 @@ public class ActiveMQInitialContextFactory extends JndiInitialContextFactory {
     	
     	maxConnectionAttempts = val;
     }
-    
+
     public int getMaxConnectionAttempts() {
     	return maxConnectionAttempts;
+    }
+    
+    public void setFailoverSendTimeout(int val) {
+    	if (val < 1000 && val != -1) {
+    		throw new RuntimeException("Failover Send Timeout must be either -1 or greater/equal to 1000");
+    	}
+    	
+    	failoverSendTimeout = val;
+    }
+
+    public int getFailoverSendTimeout() {
+    	return failoverSendTimeout;
     }
     
     public void setFailover(boolean val) {

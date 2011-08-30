@@ -87,6 +87,10 @@ public class CornerstoneConfiguration implements IManagedBean
         _localMap = localMap;
     }
     
+    protected boolean hasValue(String parameter) {
+        return _localPropertyMap.containsKey(parameter);
+    }
+    
     /**
      * Get the value of a parameter.
      *

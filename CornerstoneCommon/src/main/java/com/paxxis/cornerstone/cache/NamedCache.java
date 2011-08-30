@@ -24,16 +24,22 @@ import java.util.concurrent.TimeUnit;
 
 import org.apache.log4j.Logger;
 import org.infinispan.Cache;
+import org.infinispan.config.Configuration;
 import org.infinispan.container.entries.InternalCacheEntry;
 
 /**
  * @author Rob Englander
  */
-public class NamedCache<K, V> implements com.paxxis.cornerstone.cache.Cache<K, V> {
+public class NamedCache<K, V> 
+        extends CacheConfigurable 
+        implements com.paxxis.cornerstone.cache.Cache<K, V> {
+    
     private static final Logger logger = Logger.getLogger(NamedCache.class);
         
     /** the name of the cache */
     private String cacheName = null;
+    private Configuration namedConfig;
+
 
     /** the associated cache manager */
     private CacheManager cacheManager = null;
@@ -69,18 +75,22 @@ public class NamedCache<K, V> implements com.paxxis.cornerstone.cache.Cache<K, V
 		this.listeners.addAll(listeners);
 	}
 
+	
+	
 	@SuppressWarnings("unchecked")
     public void initialize() {
-        try {
-            cache = cacheManager.getCache(cacheName);
-			for (CacheListener listener : listeners) {
-				cache.addListener(listener);
-			}
-        } catch (Exception e) {
-            String msg = e.getLocalizedMessage();
-            logger.error(msg);
-            throw new RuntimeException(msg);
-        }
+	    if (getCornerstoneConfiguration() == null) {
+	        //just being lazy with our spring configuration...
+	        logger.info(getBeanName() + " using cache manager's CornerstoneConfiguration "); 
+	        setCornerstoneConfiguration(cacheManager.getCornerstoneConfiguration());
+	    }
+    
+	    super.initialize();
+	    
+        cache = cacheManager.getCache(cacheName, namedConfig);
+		for (CacheListener listener : listeners) {
+			cache.addListener(listener);
+		}
     }
 
 	public void clear() {
@@ -129,7 +139,7 @@ public class NamedCache<K, V> implements com.paxxis.cornerstone.cache.Cache<K, V
         return result == null ? null : result.getValue();
     }
     
-    protected ValueStorage<V> put(K key, ValueStorage<V> content) {
+    private ValueStorage<V> put(K key, ValueStorage<V> content) {
     	return cache.put(key, content);
     }
 
@@ -142,7 +152,7 @@ public class NamedCache<K, V> implements com.paxxis.cornerstone.cache.Cache<K, V
     	return cache.put(key, content, lifespan, lifespanUnits, maxIdle, maxIdleUnits);
     }
     
-    protected ValueStorage<V> putIfAbsent(K key, ValueStorage<V> content) {
+    private ValueStorage<V> putIfAbsent(K key, ValueStorage<V> content) {
     	return cache.putIfAbsent(key, content);
     }
 
@@ -173,7 +183,7 @@ public class NamedCache<K, V> implements com.paxxis.cornerstone.cache.Cache<K, V
     	return value == null ? null : value.getValue();
     }
     
-    @Override
+    @Override	
     public V putIfAbsent(K key, V content) {
     	ValueStorage<V> value = putIfAbsent(key, createValueStorage(content));
     	return value == null ? null : value.getValue();
@@ -228,4 +238,14 @@ public class NamedCache<K, V> implements com.paxxis.cornerstone.cache.Cache<K, V
     protected ValueStorage<V> createValueStorage(final V value) {
         return new SimpleValueStorage<V>(value);
     }
+
+
+    @Override
+    protected void defineConfiguration() {
+        //named caches always get their default config from the cache manager
+        namedConfig = cacheManager.getDefaultConfig().clone();
+        //namedConfig = new Configuration();
+        defineConfiguration(namedConfig);
+    }
+
 }

@@ -41,6 +41,9 @@ public abstract class CornerstoneConfigurable implements IManagedBean {
     /** flag indicating if this instance should register for changes */
     private boolean registerForChanges = true;
     
+    //this is for dynamically finding config properties for objects based on a configured prefix
+    private Collection<String> configPropertyPrefixes = new ArrayList<String>();
+    
     public CornerstoneConfigurable() {
     }
     
@@ -48,21 +51,107 @@ public abstract class CornerstoneConfigurable implements IManagedBean {
         _propertyMap.putAll(localMap);
     }
 
-    void onChange(String propName) {
-    	// the prop name we want is the key mapped to this propName value.  we don't support this
-    	// for non string mappings (yet).
+	@SuppressWarnings("unchecked")
+    private <T> T getConfigurationValue(String propName, T defaultValue, Collection<String> prefixes) {
+	    CornerstoneConfiguration config = getCornerstoneConfiguration();
+	    if (config == null || prefixes.isEmpty()) {
+	        return defaultValue;
+	    }
+	    
+	    String configPropName = null;
+	    Object value = null;
+	    for (String prefix : prefixes) {
+	        configPropName = prefix + "." + propName;
+	        value = config.getObjectValue(configPropName);
+	        if (value != null) {
+	            break;
+	        }
+	    }
+	    
+	    if (value == null) {
+	        return defaultValue;
+	    }
+	    
+        if (defaultValue != null) {
+            value = convert(defaultValue.getClass(), value);
+        }
+        
+        if (registerForChanges) {
+            //only bother putting a dynamically found property in the map if we are registered
+            //for changes AND we have a config property for it in the database - never seen
+            //before config properties added to the database will still be picked up in the onChange
+            _propertyMap.put(propName, configPropName);
+        }
+        
+        return (T) value;
+	}
+	
+    void onChange(String configPropName) {
+    	// the actual property name we want is the key mapped to this configPropName.
+        // we don't support this for non string mappings (yet).
     	Collection<String> props = new ArrayList<String>();
     	for (String key : _propertyMap.keySet()) {
     		Object obj = _propertyMap.get(key);
     		if (obj instanceof String) {
         		String value = (String)obj;
-    			if (value.equals(propName)) {
+    			if (value.equals(configPropName)) {
         			props.add(key);
         		}
     		}
     	}
-    	props.add(propName);
+    	
+    	for (String prefix : configPropertyPrefixes) {
+    	    //lets see if the propName starts with any of our defined prefixes..
+    	    if (configPropName.startsWith(prefix) && configPropName.charAt(prefix.length()) == '.') {
+    	        //it does so lets add it to the list to be configured and also add it to our
+    	        //property map so loadConfigurationPropertyValues will find it...
+    	        //NOTE: this logic will only happen if a property was ADDED to the database
+    	        //post startup - if the item was in the db on startup it will already be in propertyMap
+    	        //due to being found via reflectConfigurationPropertyValues which ran in initialization 
+    	        String property = configPropName.substring(prefix.length());
+    	        props.add(property);
+    	        _propertyMap.put(property, configPropName);
+    	    }
+    	}
+    	
+    	props.add(configPropName); //why do we do this?
     	loadConfigurationPropertyValues(props);
+    }
+    
+    protected void reflectConfigurationPropertyValues() {
+        CornerstoneConfiguration config = getCornerstoneConfiguration();
+        Collection<String> prefixes = getConfigPropertyPrefixes();
+        if (config == null || prefixes == null || prefixes.size() < 1) {
+            return;
+        }
+        
+        Method[] methods = this.getClass().getMethods();
+        for (Method method : methods) {
+            String methodName = method.getName();
+            if (!methodName.startsWith("set") || methodName.length() < 5) {
+                //not a set method or not a property that is at least 2 letters long
+                //(ie. methods with names like setZ will not be looked at)
+                continue;
+            }
+            
+            Class<?>[] params = method.getParameterTypes(); 
+            if (params.length != 1) {
+                continue;
+            }
+            
+            //looks like we found a setter method, lets look for a value now...
+            String propName = Character.toLowerCase(methodName.charAt(3)) + methodName.substring(4);
+            Object value = getConfigurationValue(propName, null, prefixes);
+            if (value == null) {
+                continue;
+            }
+
+            try {
+                method.invoke(this, convert(params[0], value));
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        }
     }
     
     /**
@@ -70,81 +159,97 @@ public abstract class CornerstoneConfigurable implements IManagedBean {
      */
     public void loadConfigurationPropertyValues(Collection<String> props) {
         CornerstoneConfiguration config = getCornerstoneConfiguration();
-        
-        if (config != null) {
-            Method[] methods = this.getClass().getMethods();
-            
-            for (String propName : props) {
-            	Object configObject = _propertyMap.get(propName);
-            	if (configObject != null) {
-                	Object value = null;
-                	if (configObject instanceof List<?>) {
-                		List<String> valueList = new ArrayList<String>();
-                		List<?> configList = (List<?>)configObject;
-                		for (Object o : configList) {
-                			String v = config.getStringValue(o.toString(), "");
-                			valueList.add(v);
-                		}
-                		
-                		value = valueList;
-                	} else {
-                        value = config.getObjectValue(configObject.toString());
-                	}
-
-                	if (value != null) {
-                        // get the setter
-                        String firstLetter = propName.substring(0, 1).toUpperCase();
-                        String setterName = "set" + firstLetter + propName.substring(1);
-
-                        for (Method method : methods) {
-                            if (method.getName().equals(setterName)) {
-                                Class<?>[] paramClasses = method.getParameterTypes();
-                                if (paramClasses.length == 1) {
-                                    // this is the one we want, so convert the value to this type
-                                    Object objValue = null;
-                                    if (paramClasses[0].getName().equals("java.lang.String")) {
-                                        objValue = String.valueOf(value);
-                                    } else if (paramClasses[0].getName().equals("int")) {
-                                        objValue = Integer.valueOf(value.toString());
-                                    } else if (paramClasses[0].getName().equals("long")) {
-                                        objValue = Long.valueOf(value.toString());
-                                    } else if (paramClasses[0].getName().equals("float")) {
-                                        objValue = Float.valueOf(value.toString());
-                                    } else if (paramClasses[0].getName().equals("double")) {
-                                        objValue = Double.valueOf(value.toString());
-                                    } else if (paramClasses[0].getName().equals("boolean")) {
-                                        objValue = Boolean.valueOf(value.toString());
-                                    } else if (paramClasses[0].getName().equals("java.util.List")) {
-                                    	objValue = value;                                    
-                                    } else {
-                                        //this covers any class (Enums most importantly) that has
-                                        //a static valueOf(java.lang.String) method
-                                        try {
-                                            Method valueOf = paramClasses[0].getMethod(
-                                                    "valueOf", 
-                                                    String.class);
-                                            objValue = valueOf.invoke(null, value);
-                                        } catch (Exception e) {
-                                            throw new RuntimeException(e);
-                                        }
-                                    }
-                                    
-                                    try {
-                                        method.invoke(this, objValue);
-                                    } catch (Exception e) {
-                                        throw new RuntimeException(e);
-                                    }
-
-                                    break;
-                                }
-                            }
-                        }
-                    }
-            	}
-            }
+        if (config == null || props == null || props.isEmpty()) {
+            return;
         }
+        
+
+        Method[] methods = this.getClass().getMethods();
+        
+        for (String propName : props) {
+        	Object configObject = _propertyMap.get(propName);
+        	if (configObject == null) {
+        	    continue;
+        	}
+        	
+
+        	Object value = null;
+        	if (configObject instanceof List<?>) {
+        		List<String> valueList = new ArrayList<String>();
+        		List<?> configList = (List<?>)configObject;
+        		for (Object o : configList) {
+        			String v = config.getStringValue(o.toString(), "");
+        			valueList.add(v);
+        		}
+        		
+        		value = valueList;
+        	} else {
+                value = config.getObjectValue(configObject.toString());
+        	}
+
+        	if (value == null) {
+        	    continue;
+        	}
+        	
+            // get the setter
+            String firstLetter = propName.substring(0, 1).toUpperCase();
+            String setterName = "set" + firstLetter + propName.substring(1);
+
+            for (Method method : methods) {
+                if (!method.getName().equals(setterName)) {
+                    continue;
+                }
+                Class<?>[] paramClasses = method.getParameterTypes();
+                if (paramClasses.length == 1) {
+                    // this is the one we want, so convert the value to this type
+                    Object objValue = convert(paramClasses[0], value);
+                    
+                    try {
+                        method.invoke(this, objValue);
+                    } catch (Exception e) {
+                        throw new RuntimeException(e);
+                    }
+
+                    break;
+                }
+            } //for (Method method : methods)
+            
+    	} //for (String propName : props)
     }
 
+    @SuppressWarnings("rawtypes")
+    private Object convert(Class cls, Object value) {
+        Object objValue = null;
+        if (cls.getName().equals("java.lang.String")) {
+            objValue = String.valueOf(value);
+        } else if (cls.getName().equals("int")) {
+            objValue = Integer.valueOf(value.toString());
+        } else if (cls.getName().equals("long")) {
+            objValue = Long.valueOf(value.toString());
+        } else if (cls.getName().equals("float")) {
+            objValue = Float.valueOf(value.toString());
+        } else if (cls.getName().equals("double")) {
+            objValue = Double.valueOf(value.toString());
+        } else if (cls.getName().equals("boolean")) {
+            objValue = Boolean.valueOf(value.toString());
+        } else if (cls.getName().equals("java.util.List")) {
+        	objValue = value;                                    
+        } else {
+            //this covers any class (Enums most importantly) that has
+            //a static valueOf(java.lang.String) method
+            try {
+                @SuppressWarnings("unchecked")
+                Method valueOf = cls.getMethod(
+                        "valueOf", 
+                        String.class);
+                objValue = valueOf.invoke(null, value);
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        }
+        
+        return objValue;
+    }
     
     /**
      * Set the cornerstoneConfiguration property.  Setting this property
@@ -174,6 +279,7 @@ public abstract class CornerstoneConfigurable implements IManagedBean {
      * Initialize the object
      */
     public void initialize() {
+        reflectConfigurationPropertyValues();
     	if (registerForChanges && _configuration != null) {
             _configuration.registerConfigurable(this);
     	}
@@ -183,5 +289,22 @@ public abstract class CornerstoneConfigurable implements IManagedBean {
      * Tear down the object
      */
     public void destroy() {
+    }
+
+    public void addConfigPropertyPrefix(String configPrefix) {
+        if (configPropertyPrefixes == null) {
+            configPropertyPrefixes = new ArrayList<String>();
+        }
+        if (!configPropertyPrefixes.contains(configPrefix)) {
+            configPropertyPrefixes.add(configPrefix);
+        }
+    }
+    
+    public Collection<String> getConfigPropertyPrefixes() {
+        return configPropertyPrefixes;
+    }
+
+    public void setConfigPropertyPrefixes(Collection<String> configPropertyPrefixes) {
+        this.configPropertyPrefixes = configPropertyPrefixes;
     }
 }

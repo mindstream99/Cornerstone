@@ -17,6 +17,7 @@
 
 package com.paxxis.cornerstone.common;
 
+import java.util.concurrent.Callable;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
@@ -37,6 +38,10 @@ public class ScheduledExecutionPool implements ScheduledExecutor {
     
     public ScheduledExecutionPool() {
     }
+
+    public <V> ScheduledFuture<V> schedule(Callable<V> callable, long delay, TimeUnit timeUnit) {
+		return scheduledExecutor.schedule(callable, delay, timeUnit);
+	}
 
 	public ScheduledFuture<?> schedule(Runnable runnable, long delay, TimeUnit timeUnit) {
 		return scheduledExecutor.schedule(runnable, delay, timeUnit);

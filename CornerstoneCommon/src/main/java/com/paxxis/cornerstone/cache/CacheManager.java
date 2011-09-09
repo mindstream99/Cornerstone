@@ -64,9 +64,24 @@ public class CacheManager extends CacheConfigurable {
 
     @Override
     protected void defineConfiguration() {
-        //cache managers always get their default config from a file - those values can then be
-        //overriden by values in the configuration database...
-        defineConfiguration(getCacheConfigLocation());
+        if (getCacheConfigLocation() != null) {
+            //cache managers can get their default config from a file - those values can then be
+            //overriden by values in the configuration database...
+            defineConfiguration(getCacheConfigLocation());
+            return;
+        } 
+        
+        
+        if (jgroupsConfigLocation == null) {
+            globalConfig = GlobalConfiguration.getNonClusteredDefault();
+            defineConfiguration(globalConfig);
+        } else {
+            globalConfig = GlobalConfiguration.getClusteredDefault();
+            defineConfiguration(globalConfig);
+        }
+        
+        defaultConfig = new Configuration();
+        defineConfiguration(defaultConfig);
     }
     
     protected void defineConfiguration(String configLocation) {
@@ -85,7 +100,12 @@ public class CacheManager extends CacheConfigurable {
         
     protected void defineConfiguration(InfinispanConfiguration infinispanConfig) {
         globalConfig = infinispanConfig.parseGlobalConfiguration();
-
+        defineConfiguration(globalConfig);
+        defaultConfig = infinispanConfig.parseDefaultConfiguration();
+        defineConfiguration(defaultConfig);
+    }
+    
+    protected void defineConfiguration(GlobalConfiguration config) {
         FluentGlobalConfiguration fluentGlobalConfig = globalConfig.fluent();
             
         TransportConfig transport = fluentGlobalConfig.transport();
@@ -113,8 +133,6 @@ public class CacheManager extends CacheConfigurable {
             fluentGlobalConfig.globalJmxStatistics().disable();
         }
         
-        defaultConfig = infinispanConfig.parseDefaultConfiguration();
-        defineConfiguration(defaultConfig);
     }
 
     

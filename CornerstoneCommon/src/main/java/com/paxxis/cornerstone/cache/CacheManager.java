@@ -1,5 +1,3 @@
-package com.paxxis.cornerstone.cache;
-
 /*
  * Copyright 2010 the original author or authors.
  * Copyright 2009 Paxxis Technology LLC
@@ -16,6 +14,8 @@ package com.paxxis.cornerstone.cache;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package com.paxxis.cornerstone.cache;
+
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,6 +31,7 @@ import org.infinispan.config.InfinispanConfiguration;
 import org.infinispan.jmx.PlatformMBeanServerLookup;
 import org.infinispan.manager.DefaultCacheManager;
 import org.infinispan.manager.EmbeddedCacheManager;
+import org.infinispan.remoting.transport.jgroups.JGroupsTransport;
 
 /**
  * 
@@ -50,7 +51,12 @@ public class CacheManager extends CacheConfigurable {
     private GlobalConfiguration globalConfig;
     private Configuration defaultConfig;
     
-    private String jgroupsConfigLocation = null;
+    private String transportChannelLookup = null;
+    private String transportConfigurationFile = null;
+    private String transportConfigurationXml = null;
+    private String transportConfigurationString = null;
+    
+
     private String machineId = null;
     private String rackId = null;
     private String clusterName = null;
@@ -71,8 +77,10 @@ public class CacheManager extends CacheConfigurable {
             return;
         } 
         
-        
-        if (jgroupsConfigLocation == null) {
+        if (transportChannelLookup == null &&
+                transportConfigurationFile == null &&
+                transportConfigurationXml == null &&
+                transportConfigurationString == null) {
             globalConfig = GlobalConfiguration.getNonClusteredDefault();
             defineConfiguration(globalConfig);
         } else {
@@ -109,13 +117,33 @@ public class CacheManager extends CacheConfigurable {
         FluentGlobalConfiguration fluentGlobalConfig = globalConfig.fluent();
             
         TransportConfig transport = fluentGlobalConfig.transport();
-        String transportConfigurationFile = choose(
-                        getJgroupsConfigLocation(), 
-                        globalConfig.getTransportProperties().getProperty("configurationFile"));
-        //probably a local cache if transportConfigurationFile is null...
-        if (transportConfigurationFile != null) {
-            //NOTE this throws a NullPointerException if value is null as it uses a Hashtable...
-            transport.addProperty("configurationFile", transportConfigurationFile);
+        
+        String channelLookup = choose(
+                        getTransportChannelLookup(),
+                        globalConfig.getTransportProperties().getProperty(JGroupsTransport.CHANNEL_LOOKUP));
+        if (channelLookup != null) {
+            transport.addProperty(JGroupsTransport.CHANNEL_LOOKUP, channelLookup);
+        }
+        
+        String configurationFile = choose(
+                        getTransportConfigurationFile(), 
+                        globalConfig.getTransportProperties().getProperty(JGroupsTransport.CONFIGURATION_FILE));
+        if (configurationFile != null) {
+            transport.addProperty(JGroupsTransport.CONFIGURATION_FILE, configurationFile);
+        }
+        
+        String configurationXml = choose(
+                        getTransportConfigurationXml(), 
+                        globalConfig.getTransportProperties().getProperty(JGroupsTransport.CONFIGURATION_XML));
+        if (configurationXml != null) {
+            transport.addProperty(JGroupsTransport.CONFIGURATION_XML, configurationXml);
+        }
+        
+        String configurationString = choose(
+                        getTransportConfigurationString(), 
+                        globalConfig.getTransportProperties().getProperty(JGroupsTransport.CONFIGURATION_STRING));
+        if (configurationString != null) {
+            transport.addProperty(JGroupsTransport.CONFIGURATION_STRING, configurationString);
         }
         
         transport.machineId(choose(getMachineId(), globalConfig.getMachineId()));
@@ -215,14 +243,6 @@ public class CacheManager extends CacheConfigurable {
         this.cacheManagerName = cacheManagerName;
     }
 
-    public String getJgroupsConfigLocation() {
-        return jgroupsConfigLocation;
-    }
-
-    public void setJgroupsConfigLocation(String jgroupsConfigLocation) {
-        this.jgroupsConfigLocation = jgroupsConfigLocation;
-    }
-
     public String getMachineId() {
         return machineId;
     }
@@ -298,5 +318,37 @@ public class CacheManager extends CacheConfigurable {
     
     public void setCacheConfigLocation(String cacheConfigLocation) {
         this.cacheConfigLocation = cacheConfigLocation;
+    }
+
+    public String getTransportConfigurationFile() {
+        return transportConfigurationFile;
+    }
+
+    public void setTransportConfigurationFile(String transportConfigurationFile) {
+        this.transportConfigurationFile = transportConfigurationFile;
+    }
+
+    public String getTransportChannelLookup() {
+        return transportChannelLookup;
+    }
+
+    public void setTransportChannelLookup(String transportChannelLookup) {
+        this.transportChannelLookup = transportChannelLookup;
+    }
+
+    public String getTransportConfigurationXml() {
+        return transportConfigurationXml;
+    }
+
+    public void setTransportConfigurationXml(String transportConfigurationXml) {
+        this.transportConfigurationXml = transportConfigurationXml;
+    }
+
+    public String getTransportConfigurationString() {
+        return transportConfigurationString;
+    }
+
+    public void setTransportConfigurationString(String transportConfigurationString) {
+        this.transportConfigurationString = transportConfigurationString;
     }
 }

@@ -21,10 +21,14 @@ package com.paxxis.cornerstone.service;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import org.apache.log4j.Logger;
 
 /**
  *
@@ -32,6 +36,8 @@ import java.util.Set;
  */
 public abstract class CornerstoneConfigurable implements IManagedBean {
 
+    private static final Logger logger = Logger.getLogger(CornerstoneConfigurable.class);
+    
 	/** the configuration object to use to populate property values */
     private CornerstoneConfiguration _configuration = null;
     
@@ -42,6 +48,10 @@ public abstract class CornerstoneConfigurable implements IManagedBean {
     private boolean registerForChanges = true;
     
     //this is for dynamically finding config properties for objects based on a configured prefix
+    //for example a bean could have two prefixes defined - global, myBeanName - in that order
+    //in the db one can add values like global.propName=defaultGlobalValue and
+    //myBeanName.propName=specificValue and the bean will be configured with myBeanName.propName
+    //as that was the last defined prefix...
     private Collection<String> configPropertyPrefixes = new ArrayList<String>();
     
     public CornerstoneConfigurable() {
@@ -51,6 +61,65 @@ public abstract class CornerstoneConfigurable implements IManagedBean {
         _propertyMap.putAll(localMap);
     }
 
+	/**
+	 * Get the config items WITHOUT any prefixes which results in
+	 * a single view of the config - later defined items override earlier defined ones
+	 * so if a Configurable has defined two prefixes, global and myBeanName, in that order
+	 * a config item of global.propName will be overriden by myBeanName.propName
+	 * 
+	 * @return
+	 */
+	protected Map<String, Object> getPrefixedConfigurationValues() {
+	    Collection<Map<String, Object>> allConfigItems = getAllPrefixedConfigurationValues();
+	    if (allConfigItems.isEmpty()) {
+	        return Collections.<String, Object>emptyMap();
+	    }
+	    
+	    
+	    Iterator<String> prefixes = configPropertyPrefixes.iterator();
+	    Iterator<Map<String, Object>> items = allConfigItems.iterator();
+	    
+	    Map<String, Object> configItems = new HashMap<String, Object>();
+	    
+	    while (prefixes.hasNext()) {
+	        String prefix = prefixes.next();
+	        for (Map.Entry<String, Object> item : items.next().entrySet()) {
+	            //all config items are put into map WITHOUT the prefix + '.' resulting in
+	            //a single view of the config - later defined items override earlier defined ones
+	            //so if a Configurable has defined two prefixes, global and myBeanName, in that order
+	            //a config item of global.propName will be overriden by myBeanName.propName
+	            Object prev = configItems.put(item.getKey().substring(prefix.length()+1), item.getValue());
+	            if (prev != null && logger.isDebugEnabled()) {
+	                logger.debug(
+	                        "Config item " + 
+	                        item.getKey() + 
+	                        " with value " +
+	                        item.getValue() +
+	                        " has overriden previous value " +
+	                        prev);
+	            }
+	        }
+	    }
+	    
+	    return configItems;
+	}
+	
+	protected Collection<Map<String, Object>> getAllPrefixedConfigurationValues() {
+	    CornerstoneConfiguration config = getCornerstoneConfiguration();
+	    if (config == null || configPropertyPrefixes.isEmpty()) {
+	        return Collections.<Map<String, Object>>emptyList();
+	    }
+	    
+	    Collection<Map<String, Object>> results = new ArrayList<Map<String, Object>>();
+	    for (String prefix : configPropertyPrefixes) {
+	        Map<String, Object> configItems = new HashMap<String, Object>();
+	        configItems.putAll(config.findParameters(prefix + "."));
+	        results.add(configItems);
+	    }
+
+	    return results;
+	}
+	
 	@SuppressWarnings("unchecked")
     private <T> T getConfigurationValue(String propName, T defaultValue, Collection<String> prefixes) {
 	    CornerstoneConfiguration config = getCornerstoneConfiguration();
@@ -62,9 +131,19 @@ public abstract class CornerstoneConfigurable implements IManagedBean {
 	    Object value = null;
 	    for (String prefix : prefixes) {
 	        configPropName = prefix + "." + propName;
-	        value = config.getObjectValue(configPropName);
-	        if (value != null) {
-	            break;
+	        //the last prefix defined always overrides previous config items...
+	        Object temp = config.getObjectValue(configPropName);
+	        if (temp != null) {
+	            if (value != null && logger.isDebugEnabled()) {
+	                logger.debug(
+	                        "Config item " + 
+	                        configPropName + 
+	                        " with value " +
+	                        temp +
+	                        " has overriden previous value " +
+	                        value);
+	            }
+	            value = temp;
 	        }
 	    }
 	    
@@ -121,7 +200,7 @@ public abstract class CornerstoneConfigurable implements IManagedBean {
     protected void reflectConfigurationPropertyValues() {
         CornerstoneConfiguration config = getCornerstoneConfiguration();
         Collection<String> prefixes = getConfigPropertyPrefixes();
-        if (config == null || prefixes == null || prefixes.size() < 1) {
+        if (config == null || prefixes == null || prefixes.isEmpty()) {
             return;
         }
         

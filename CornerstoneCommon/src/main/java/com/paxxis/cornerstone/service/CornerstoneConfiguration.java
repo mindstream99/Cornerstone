@@ -18,6 +18,7 @@
 package com.paxxis.cornerstone.service;
 
 import java.util.HashMap;
+import java.util.Map;
 import java.util.WeakHashMap;
 
 import com.paxxis.cornerstone.base.management.ConfigurationChange;
@@ -74,6 +75,16 @@ public class CornerstoneConfiguration implements IManagedBean
     	for (CornerstoneConfigurable cfg : registeredConfigurables.keySet()) {
     		cfg.onChange(change.getName());
     	}
+    }
+    
+    Map<String, Object> findParameters(String startsWith) {
+        Map<String, Object> results = new HashMap<String, Object>();
+        for (Map.Entry<String, Object> entry : _localPropertyMap.entrySet()) {
+            if (entry.getKey().startsWith(startsWith)) {
+                results.put(entry.getKey(), entry.getValue());
+            }
+        }
+        return results;
     }
     
     /**

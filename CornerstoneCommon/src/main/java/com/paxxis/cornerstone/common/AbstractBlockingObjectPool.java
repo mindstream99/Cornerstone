@@ -24,7 +24,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-
 import org.apache.log4j.Logger;
 
 import com.paxxis.cornerstone.service.CornerstoneConfigurable;
@@ -106,6 +105,7 @@ public abstract class AbstractBlockingObjectPool<T> extends CornerstoneConfigura
             throw new NullPointerException("Null borrower");
         }
         P entry = null;
+		DataLatch latch = null;
 
         synchronized (semaphore) {
             if (this.shutdown && borrower != this) {
@@ -116,19 +116,22 @@ public abstract class AbstractBlockingObjectPool<T> extends CornerstoneConfigura
                 entry = (P) freePool.remove(0);
                 activePool.put(entry, borrower);
             }
+			if (entry != null) {
+				return validatePoolEntry(entry);
+			} else {
+				// the borrower will have to wait until an instance
+				// is returned by another borrower
+				latch = new DataLatch();
+				borrowersInWaiting.add(new WaitingBorrower(latch, borrower));
+			}
         }
 
-        if (entry == null) {
-            // the borrower will have to wait until an instance
-            // is returned by another borrower
-            DataLatch latch = new DataLatch();
-            borrowersInWaiting.add(new WaitingBorrower(latch, borrower));
-            entry = (P) latch.waitForObject(this.borrowTimeout);
-            if (latch.hasTimedout()) {
-                throw new TimeoutException("Timeout of " + this.borrowTimeout + " reached waiting for pool entry");
-            }
+		// Only getting here when entry is null
+		// We don't want to waitForObject inside the synchronized block, so these are outside
+		entry = (P) latch.waitForObject(this.borrowTimeout);
+		if (latch.hasTimedout()) {
+			throw new TimeoutException("Timeout of " + this.borrowTimeout + " reached waiting for pool entry");
         }
-
         return validatePoolEntry(entry);
     }
 
@@ -205,9 +208,9 @@ public abstract class AbstractBlockingObjectPool<T> extends CornerstoneConfigura
             
 
             if (borrowersInWaiting.size() > 0) {
-                // give this one to the next borrower
+				// give this one to the next borrower
                 waiting = borrowersInWaiting.removeFirst();
-                activePool.put(entry, waiting.borrower);
+				activePool.put(entry, waiting.borrower);
             } else {
                 // put it back into the free pool
                 freePool.add(entry);                

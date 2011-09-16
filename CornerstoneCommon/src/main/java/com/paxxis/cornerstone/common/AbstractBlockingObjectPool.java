@@ -204,23 +204,24 @@ public abstract class AbstractBlockingObjectPool<T> extends CornerstoneConfigura
             if (borrower == null) {
                 logger.error("Unknown entry returned to pool: " + entry);
                 return;
-            }
-            
+			}
 
-            if (borrowersInWaiting.size() > 0) {
+			while (!borrowersInWaiting.isEmpty()) {
 				// give this one to the next borrower
                 waiting = borrowersInWaiting.removeFirst();
-				activePool.put(entry, waiting.borrower);
-            } else {
-                // put it back into the free pool
-                freePool.add(entry);                
-            }
-        }
-
-        if (waiting != null) {
-            waiting.latch.setObject(entry);
-        }
-    }
+                if (waiting.latch.isSettable()){
+                	waiting.latch.setObject(entry);
+            		activePool.put(entry, waiting.borrower);
+            		return;
+            	}
+            }		
+				
+            // put it back into the free pool
+			freePool.add(entry);
+		}
+            
+        
+     }
 
     public void initialize() {
         synchronized (semaphore) {

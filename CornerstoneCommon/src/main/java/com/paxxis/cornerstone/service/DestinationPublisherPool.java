@@ -17,8 +17,6 @@
 
 package com.paxxis.cornerstone.service;
 
-import javax.jms.Destination;
-
 import com.paxxis.cornerstone.base.RequestMessage;
 import com.paxxis.cornerstone.common.MessagePayload;
 import com.paxxis.cornerstone.service.ServiceBusSenderPool.PoolEntry;
@@ -53,7 +51,7 @@ public class DestinationPublisherPool<T extends DestinationSender> implements De
     }
 
 	@Override
-	public <REQ extends RequestMessage> void publish(Destination dest, REQ msg,
+	public <REQ extends RequestMessage> void publish(String dest, REQ msg,
 			MessagePayload payloadType) {
         PoolEntry<T> entry = senderPool.borrow(this);
         try {

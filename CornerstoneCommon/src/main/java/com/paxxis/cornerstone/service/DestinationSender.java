@@ -54,7 +54,7 @@ public class DestinationSender extends CornerstoneConfigurable
     private String replyToName = null;
     
     // the replyto destination
-    private Destination replyTo = null;
+    //private Destination replyTo = null;
     
     // the service bus connector
     private ServiceBusConnector connector = null;
@@ -150,10 +150,6 @@ public class DestinationSender extends CornerstoneConfigurable
             messageSender = connector.createMessageProducer(destinationName);
             messageSender.setDeliveryMode(deliveryMode);
             messageSender.setTimeToLive(timeToLive);
-            
-            if (replyToName != null) {
-                replyTo = (Destination)connector.getInitialContextFactory().createInitialContext().lookup(replyToName);
-            }
         } catch(Throwable t) {
             logger.error(t);
             try {
@@ -209,13 +205,21 @@ public class DestinationSender extends CornerstoneConfigurable
      */
     @Override
     public synchronized <REQ extends RequestMessage> void publish(
-    		Destination dest,
+    		String destinationName,
             REQ msg,
 			MessagePayload payloadType) {
 
     	try {
             Message message = prepareMessage(msg, payloadType);
-            messageSender.send(dest, message);
+            if (destinationName != null) {
+                MessageProducer sender = connector.createMessageProducer(destinationName);
+                sender.setDeliveryMode(deliveryMode);
+                sender.setTimeToLive(timeToLive);
+                sender.send(message);
+                sender.close();
+            } else {
+                messageSender.send(message);
+            }
         } catch (JMSException je) {
             logger.error(je);
             ErrorMessage errorMsg = new ErrorMessage();
@@ -239,8 +243,8 @@ public class DestinationSender extends CornerstoneConfigurable
 		Message message = payloadType.createMessage(connector.getSession(), requestMessage);
 		message.setIntProperty(MessagingConstants.HeaderConstant.GroupId.name(), messageGroup.getId());
 		message.setIntProperty(MessagingConstants.HeaderConstant.GroupVersion.name(), messageGroup.getVersion());
-        if (replyTo != null) {
-        	message.setJMSReplyTo(replyTo);
+        if (replyToName != null) {
+        	message.setStringProperty(MessagingConstants.HeaderConstant.ReplyToName.name(), replyToName);
         }
 		
 		return message;

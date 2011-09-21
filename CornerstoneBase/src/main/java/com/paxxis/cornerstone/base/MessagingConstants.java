@@ -35,6 +35,7 @@ public class MessagingConstants {
     private final static int PAYLOADTYPE = 3;
     private final static int GROUPID = 4;
     private final static int GROUPVERSION = 5;
+    private final static int REPLYTONAME = 6;
 
     // payload type values
     private final static int JAVAOBJECTPAYLOAD = 1;
@@ -79,7 +80,8 @@ public class MessagingConstants {
         MessageVersion(MESSAGEVERSION),
         PayloadType(PAYLOADTYPE),
         GroupId(GROUPID),
-        GroupVersion(GROUPVERSION);
+        GroupVersion(GROUPVERSION),
+        ReplyToName(REPLYTONAME);
         
         private int value;
 
@@ -108,6 +110,9 @@ public class MessagingConstants {
                     break;
                 case GROUPVERSION:
                     result = GroupVersion;
+                    break;
+                case REPLYTONAME:
+                    result = ReplyToName;
                     break;
             }
 

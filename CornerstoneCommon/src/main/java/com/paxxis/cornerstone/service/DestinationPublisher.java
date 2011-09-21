@@ -16,8 +16,6 @@
  */
 package com.paxxis.cornerstone.service;
 
-import javax.jms.Destination;
-
 import com.paxxis.cornerstone.base.RequestMessage;
 import com.paxxis.cornerstone.common.MessagePayload;
 
@@ -47,5 +45,5 @@ public interface DestinationPublisher {
      * @param payloadType the message payload type
      *
      */
-    <REQ extends RequestMessage> void publish(Destination dest, REQ msg, MessagePayload payloadType);
+    <REQ extends RequestMessage> void publish(String dest, REQ msg, MessagePayload payloadType);
 }

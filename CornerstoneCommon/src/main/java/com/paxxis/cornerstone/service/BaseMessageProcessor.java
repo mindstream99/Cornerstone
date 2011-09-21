@@ -17,11 +17,13 @@
 package com.paxxis.cornerstone.service;
 
 import javax.jms.Destination;
+import javax.jms.JMSException;
 
 import org.apache.log4j.Logger;
 
 import com.paxxis.cornerstone.base.ErrorListener;
 import com.paxxis.cornerstone.base.ErrorMessage;
+import com.paxxis.cornerstone.base.MessagingConstants;
 import com.paxxis.cornerstone.base.RequestMessage;
 import com.paxxis.cornerstone.base.ResponseMessage;
 import com.paxxis.cornerstone.database.DatabaseConnection;
@@ -108,6 +110,18 @@ public abstract class BaseMessageProcessor<REQ extends RequestMessage, RESP exte
     
     protected DatabaseConnection getConnection() {
         return getDatabasePoolEntry().getObject();
+    }
+    
+    protected String getNamedReplyTo() {
+    	String name = null;
+    	
+    	try {
+        	name = getJMSMessage().getStringProperty(MessagingConstants.HeaderConstant.ReplyToName.name());
+        } catch (JMSException e) {
+            logger.error("Unknown error occurred in getNamedReplyTo", e);
+    	}
+
+        return name;
     }
     
     protected Destination getReplyTo() {

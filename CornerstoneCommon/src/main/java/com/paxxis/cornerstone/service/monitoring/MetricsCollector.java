@@ -145,6 +145,14 @@ public class MetricsCollector {
 	        
         	Runnable r = new Runnable() {
         		public void run() {
+        			try {
+        				execute();
+        			} catch (Exception e) {
+						Logger.getLogger(getClass()).error(e);
+        			}
+        		}
+        		
+        		private void execute() {
         			// construct a metrics event message
         			ServiceMetricsEvent metricsEvent = new ServiceMetricsEvent();
         			metricsEvent.setServiceInstance(service.getServiceInstance());
@@ -172,7 +180,10 @@ public class MetricsCollector {
         			
         			// subtract the collection time from the frequency so that collections happen uniformly
         			long newFreq = collectionFrequency - (System.currentTimeMillis() - start);
-
+        			if (newFreq < 0) {
+						Logger.getLogger(getClass()).warn("Invalid new metrics collection frequency: " + newFreq);
+        			}
+        			
         			// TODO adjust the collection frequency if the collection time costs more than a given
         			// percentage of the collection frequency
         			//if (newFreq < (collectionFrequency / 2)) {

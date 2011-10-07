@@ -38,7 +38,7 @@ public class NamedCache<K, V>
         
     /** the name of the cache */
     private String cacheName = null;
-    private Configuration namedConfig;
+    private Configuration configuration;
 
 
     /** the associated cache manager */
@@ -87,7 +87,7 @@ public class NamedCache<K, V>
     
 	    super.initialize();
 	    
-        cache = cacheManager.getCache(cacheName, namedConfig);
+        cache = cacheManager.getCache(cacheName, configuration);
 		for (CacheListener listener : listeners) {
 			cache.addListener(listener);
 		}
@@ -242,10 +242,9 @@ public class NamedCache<K, V>
 
     @Override
     protected void defineConfiguration() {
-        //named caches always get their default config from the cache manager
-        namedConfig = cacheManager.getDefaultConfig().clone();
-        //namedConfig = new Configuration();
-        defineConfiguration(namedConfig);
+        configuration = cacheManager.getDefaultConfig().clone();
+        Configuration namedConfig = cacheManager.getNamedConfiguration(cacheName);
+        defineConfiguration(configuration, namedConfig);
     }
 
 }

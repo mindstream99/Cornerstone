@@ -106,13 +106,19 @@ abstract class CacheConfigurable extends BeanNameAwareConfigurable {
     
     protected abstract void defineConfiguration();
 
-    @SuppressWarnings("unchecked")
     protected void defineConfiguration(Configuration defaultConfig) {
-        //NOTE: the way Infinispan's configuration works is touching a config property will set
-        //it as overriden/enabled.  So, the design choice was to either do a conditional test
-        //to see if we have an override or just use the default value.  I chose use the default
-        //in order to keep the code clean and static type checking...
-        
+    	defineConfiguration(defaultConfig, null);
+    }
+    
+    protected void defineConfiguration(Configuration defConfig, Configuration namedConfig) {
+    	applyConfig(defConfig, defConfig);
+    	if (namedConfig != null) {
+    		applyConfig(namedConfig, defConfig);
+    	}
+    }
+    
+    @SuppressWarnings("unchecked")
+    private void applyConfig(Configuration defaultConfig, Configuration applyTo) {
         Configuration overrides = new Configuration();
         FluentConfiguration fluentOverrides = overrides.fluent();
         
@@ -191,7 +197,7 @@ abstract class CacheConfigurable extends BeanNameAwareConfigurable {
         expiration.wakeUpInterval(choose(getExpirationWakeUpInterval(), defaultConfig.getExpirationWakeUpInterval()));
         
 
-        defaultConfig.applyOverrides(fluentOverrides.build());
+        applyTo.applyOverrides(fluentOverrides.build());
     }
 
     public IsolationLevel getIsolationLevel() {

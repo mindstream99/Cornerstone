@@ -19,6 +19,7 @@ package com.paxxis.cornerstone.cache;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.infinispan.Cache;
@@ -68,6 +69,9 @@ public class CacheManager extends CacheConfigurable {
     private Boolean allowDuplicateDomains = null;
     private String cacheManagerName = null;
 
+    // a mapping of cache names to their specific configurations
+    private Map<String, Configuration> namedConfigs;
+    
     @Override
     protected void defineConfiguration() {
         if (getCacheConfigLocation() != null) {
@@ -110,6 +114,7 @@ public class CacheManager extends CacheConfigurable {
         globalConfig = infinispanConfig.parseGlobalConfiguration();
         defineConfiguration(globalConfig);
         defaultConfig = infinispanConfig.parseDefaultConfiguration();
+        namedConfigs = infinispanConfig.parseNamedConfigurations();
         defineConfiguration(defaultConfig);
     }
     
@@ -189,6 +194,11 @@ public class CacheManager extends CacheConfigurable {
         }
     }
 
+    
+    public Configuration getNamedConfiguration(String name) {
+    	Configuration cfg = namedConfigs.get(name);
+    	return cfg;
+    }
     
     public synchronized void setPreloadCacheNames(List<String> names) {
     	preloadCacheNames.clear();

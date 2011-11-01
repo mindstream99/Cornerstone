@@ -36,7 +36,13 @@ import org.apache.log4j.Logger;
  */
 public abstract class CornerstoneConfigurable implements IManagedBean {
 
+	public interface ChangeListener {
+		public void onChange(String propName, Object value);
+	}
+	
     private static final Logger logger = Logger.getLogger(CornerstoneConfigurable.class);
+    
+    private ArrayList<ChangeListener> listeners = new ArrayList<ChangeListener>();
     
 	/** the configuration object to use to populate property values */
     private CornerstoneConfiguration _configuration = null;
@@ -55,6 +61,20 @@ public abstract class CornerstoneConfigurable implements IManagedBean {
     private Collection<String> configPropertyPrefixes = new ArrayList<String>();
     
     public CornerstoneConfigurable() {
+    }
+    
+    public void addConfigurableListener(ChangeListener listener) {
+    	synchronized (listeners) {
+    		if (!listeners.contains(listener)) {
+    			listeners.add(listener);
+    		}
+    	}
+    }
+    
+    public void removeConfigurableListener(ChangeListener listener) {
+    	synchronized (listeners) {
+    		listeners.remove(listener);
+    	}
     }
     
 	public void setConfigurationPropertyMap(Map<String, ?> localMap) {
@@ -194,7 +214,7 @@ public abstract class CornerstoneConfigurable implements IManagedBean {
     	}
     	
     	props.add(configPropName); //why do we do this?
-    	loadConfigurationPropertyValues(props);
+    	loadConfigurationPropertyValues(props, true);
     }
     
     protected void reflectConfigurationPropertyValues() {
@@ -236,7 +256,7 @@ public abstract class CornerstoneConfigurable implements IManagedBean {
     /**
      * Load property values from the configuration.
      */
-    public void loadConfigurationPropertyValues(Collection<String> props) {
+    private void loadConfigurationPropertyValues(Collection<String> props, boolean changes) {
         CornerstoneConfiguration config = getCornerstoneConfiguration();
         if (config == null || props == null || props.isEmpty()) {
             return;
@@ -268,6 +288,18 @@ public abstract class CornerstoneConfigurable implements IManagedBean {
 
         	if (value == null) {
         	    continue;
+        	}
+        	
+        	if (changes) {
+            	// inform the registered listeners
+            	List<ChangeListener> list = new ArrayList<ChangeListener>();
+            	synchronized (listeners) {
+            		list.addAll(listeners);
+            	}
+            	
+            	for (ChangeListener listener : list) {
+            		listener.onChange(propName, value);
+            	}
         	}
         	
             // get the setter
@@ -339,7 +371,7 @@ public abstract class CornerstoneConfigurable implements IManagedBean {
     public void setCornerstoneConfiguration(CornerstoneConfiguration configuration) {
         _configuration = configuration;
         Set<String> props = _propertyMap.keySet();
-        loadConfigurationPropertyValues(props);
+        loadConfigurationPropertyValues(props, false);
     }
     
     /**

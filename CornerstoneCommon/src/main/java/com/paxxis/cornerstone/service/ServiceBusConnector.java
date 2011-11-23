@@ -19,7 +19,9 @@ package com.paxxis.cornerstone.service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 import javax.jms.Connection;
 import javax.jms.ConnectionFactory;
@@ -35,6 +37,8 @@ import javax.naming.NamingException;
 
 import org.apache.log4j.Logger;
 
+import com.paxxis.cornerstone.common.ScheduledExecutionPool;
+
 /**
  * ServiceBusConnector manages connections to the service bus.
  *  
@@ -48,6 +52,42 @@ public class ServiceBusConnector extends CornerstoneConfigurable
 	private static final String ACK_AUTO = "auto";
 	private static final String ACK_CLIENT = "client";
 	private static final String ACK_DUPS = "dups";
+	
+	private static final int SILENCE_FREQUENCY = 300000;
+	private static final int SILENCE_DURATION = 10000;
+	
+	private int silenceFrequency = SILENCE_FREQUENCY;
+	private int silenceDuration = SILENCE_DURATION;
+	private ScheduledExecutionPool executionPool = null;
+	private boolean periodicSilence = false;
+	
+	private class SilenceStarter implements Runnable {
+		private boolean startSilence;
+		
+		public SilenceStarter(boolean starter) {
+			this.startSilence = starter;
+		}
+		
+		@Override
+		public void run() {
+			if (_connection != null) {
+				try {
+					if (startSilence) {
+						_logger.info("Stopping connection");
+						stopConnection();
+					} else {
+						_logger.info("Starting connection");
+						startConnection();
+					}
+				} catch (Exception e) {
+					_logger.error(e);
+				}
+
+				int freq = startSilence ? silenceDuration : silenceFrequency;
+				executionPool.schedule(new SilenceStarter(!startSilence), freq, TimeUnit.MILLISECONDS);
+			}
+		}
+	}
 	
     // JMS objects
     private Connection _connection = null;
@@ -123,6 +163,44 @@ public class ServiceBusConnector extends CornerstoneConfigurable
      */
     public ServiceBusConnector()
     {
+    }
+    
+    public void setExecutionPool(ScheduledExecutionPool pool) {
+    	executionPool = pool;
+    }
+    
+    public void setPeriodicSilence(boolean periodicSilence) {
+    	this.periodicSilence = periodicSilence;
+    }
+    
+    public void setSilenceFrequency(int freq) {
+    	if (freq < 60000) {
+    		throw new RuntimeException("SilenceFrequency must be greater or equal to 60000");
+    	}
+    	
+    	silenceFrequency = freq;
+    }
+    
+    public void setSilenceDuration(int time) {
+    	if (time < 5000) {
+    		throw new RuntimeException("SilencePauseTime must be greater or equal to 5000");
+    	}
+    	
+    	silenceDuration = time;
+    }
+    
+    public void initialize() {
+    	super.initialize();
+    	if (periodicSilence) {
+        	if (executionPool != null) {
+        		// the initial silence cycle begins randomly within the next 10 minutes
+    			Random rand = new Random();
+    			long wait = 60000 * (1 + rand.nextInt(10));
+    			executionPool.schedule(new SilenceStarter(true), wait, TimeUnit.MILLISECONDS);
+        	} else {
+        		throw new RuntimeException("ExecutionPool can't be null when PeriodicSilence is set to true");
+        	}
+    	}
     }
     
     public void addServiceBusConnectionListener(ServiceBusConnectionListener listener)
@@ -273,17 +351,22 @@ public class ServiceBusConnector extends CornerstoneConfigurable
     /**
      * Start the connection.
      */
-    protected void startConnection()
-    {
-        try
-        {
+    protected void startConnection() throws Exception {
+        try {
             _connection.start();
-        }
-        catch (JMSException e)
-        {
+        } catch (JMSException e) {
             _logger.error(e);
-            throw new RuntimeException(e);
+            throw new Exception(e);
         }
+    }
+
+    protected void stopConnection() throws Exception {
+    	try {
+			_connection.stop();
+		} catch (JMSException e) {
+            _logger.error(e);
+            throw new Exception(e);
+		}
     }
     
     public boolean isConnectOnStartup()
@@ -461,7 +544,11 @@ public class ServiceBusConnector extends CornerstoneConfigurable
                         client.setup();
                     }
                     
-                    _connection.start();
+                    try {
+                        _connection.start();
+                    } catch (Exception e) {
+                    	throw new RuntimeException(e);
+                    }
                 }
 
                 gotConnection = true;

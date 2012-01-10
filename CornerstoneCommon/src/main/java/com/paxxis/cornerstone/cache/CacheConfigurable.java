@@ -146,7 +146,8 @@ abstract class CacheConfigurable extends BeanNameAwareConfigurable {
         TransactionConfig transaction = fluentOverrides.transaction();
         try {
             transaction.transactionManagerLookupClass((Class<? extends TransactionManagerLookup>) 
-                    Class.forName(choose(getTransactionManagerLookupClass(), GenericTransactionManagerLookup.class.getName())));
+					Class.forName(choose(getTransactionManagerLookupClass(), defaultConfig.getTransactionManagerLookupClass(),
+							GenericTransactionManagerLookup.class.getName())));
         } catch (ClassNotFoundException cnfe) {
             throw new RuntimeException("Error lookup up transaction manager lookup class", cnfe);
         }

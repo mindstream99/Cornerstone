@@ -35,6 +35,7 @@ import com.paxxis.cornerstone.service.IServiceBusManager;
 import com.paxxis.cornerstone.service.IServiceController;
 import com.paxxis.cornerstone.service.LogManager;
 import com.paxxis.cornerstone.service.ServiceVersion;
+import com.paxxis.cornerstone.service.UnknownVersion;
 
 /**
  *
@@ -50,7 +51,7 @@ public class CornerstoneService extends CornerstoneConfigurable implements IServ
     private ArrayList<IServiceBusManager> _connectorManagers = new ArrayList<IServiceBusManager>();
 
     // the version instance
-    private ServiceVersion _version = null;
+    private ServiceVersion _version = new UnknownVersion();
     
     private LogManager _logManager = null;
     

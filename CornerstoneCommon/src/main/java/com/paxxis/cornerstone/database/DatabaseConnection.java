@@ -158,6 +158,10 @@ public class DatabaseConnection implements IDatabaseConnection {
         dbUser = user;
     }
 
+    public Connection getRawConnection() {
+    	return connection;
+    }
+    
     public void disconnect() {
         if (isConnected()) {   
             try {   

@@ -8,7 +8,7 @@
     <groupId>com.paxxis</groupId>
     <artifactId>CornerstoneAll</artifactId>
     <packaging>pom</packaging>
-    <version>1.8.2</version>
+    <version>1.9.1-SNAPSHOT</version>
     <name>Cornerstone All</name>
     <url>http://www.paxxis.org</url>
 
@@ -21,6 +21,7 @@
         <module>CornerstoneBase</module>
         <module>CornerstoneCommon</module>
         <module>CornerstoneConsole</module>
+        <module>CornerstoneScripting</module>
     </modules>
 
     <properties>

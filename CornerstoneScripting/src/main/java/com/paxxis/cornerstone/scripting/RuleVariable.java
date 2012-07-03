@@ -20,6 +20,8 @@ package com.paxxis.cornerstone.scripting;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.paxxis.cornerstone.scripting.parser.CSLRuntime;
+
 /**
  * All rule variables are subclasses of this class.
  *

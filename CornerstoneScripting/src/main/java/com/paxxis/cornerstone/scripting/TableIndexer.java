@@ -99,6 +99,12 @@ public class TableIndexer extends RuleVariable {
         return table.valueAt(rowIndex.valueAsInteger(), colIndex.valueAsInteger()).valueAsBoolean();
     }
 
+    @Override
+    public ResultVariable valueAsResult() {
+        ResultVariable res = new ResultVariable(null, valueAsBoolean());
+        return res;
+    }
+
     public IValue evaluate() {
         return table.valueAt(rowIndex.valueAsInteger(), colIndex.valueAsInteger());
     }

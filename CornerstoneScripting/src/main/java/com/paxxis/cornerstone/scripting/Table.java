@@ -254,6 +254,11 @@ public class Table extends RuleVariable {
         throw new RuntimeException("Can't get the Boolean value of a table");
     }
 
+    @Override
+    public ResultVariable valueAsResult() {
+	throw new RuntimeException("Can't get the Result value of a table");
+    }
+
     /**
      * Get the value of this variable as an object.  We
      * just return ourself as an IValue

@@ -128,6 +128,12 @@ public class IntegerVariable extends RuleVariable {
         return value == 1;
     }
 
+    @Override
+    public ResultVariable valueAsResult() {
+        ResultVariable res = new ResultVariable(null, valueAsBoolean());
+        return res;
+    }
+
     public IValue evaluate() {
         return new IntegerVariable(null, value);
     }

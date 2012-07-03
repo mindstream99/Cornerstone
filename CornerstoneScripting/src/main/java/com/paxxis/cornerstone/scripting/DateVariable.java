@@ -275,6 +275,12 @@ public class DateVariable extends RuleVariable {
     	return null != value;
     }
 
+    @Override
+    public ResultVariable valueAsResult() {
+        ResultVariable res = new ResultVariable(null, valueAsBoolean());
+        return res;
+    }
+
     public IValue evaluate() {
         return new DateVariable(null, value);
     }

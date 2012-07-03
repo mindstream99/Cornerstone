@@ -17,6 +17,8 @@
 
 package com.paxxis.cornerstone.scripting;
 
+import com.paxxis.cornerstone.scripting.extension.ExtensionHelper;
+
 
 /**
  * This interface is implemented by services or applications that provide access to
@@ -25,7 +27,7 @@ package com.paxxis.cornerstone.scripting;
  * 
  * @author Robert Englander
  */
-public interface ServiceContextProvider {
-    public ExtensionHelper createExtensionHelper();
+public interface ContextProvider {
+    public ExtensionHelper createExtensionHelper(String extId);
     public boolean allowsWhileLoops();
 }

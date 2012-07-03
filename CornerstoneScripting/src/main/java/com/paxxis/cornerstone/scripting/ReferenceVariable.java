@@ -93,6 +93,12 @@ public class ReferenceVariable extends RuleVariable {
         return ref.valueAsBoolean();
     }
 
+    @Override
+    public ResultVariable valueAsResult() {
+        ResultVariable res = new ResultVariable(null, valueAsBoolean());
+        return res;
+    }
+
     public Object valueAsObject() {
     	if (isNull()) {
     	    return null;

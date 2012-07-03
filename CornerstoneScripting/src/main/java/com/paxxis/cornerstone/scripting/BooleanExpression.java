@@ -133,6 +133,12 @@ public class BooleanExpression extends IValue implements IBinaryExpression {
         return new BooleanVariable(null, valueAsBoolean()).valueAsDouble();
     }
 
+    @Override
+    public ResultVariable valueAsResult() {
+        ResultVariable res = new ResultVariable(null, valueAsBoolean());
+        return res;
+    }
+
     public IValue evaluate() {
         return new BooleanVariable(null, valueAsBoolean());
     }

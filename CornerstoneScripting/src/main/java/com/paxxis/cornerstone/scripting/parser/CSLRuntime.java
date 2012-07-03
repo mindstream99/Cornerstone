@@ -15,9 +15,15 @@
  * limitations under the License.
  */
 
-package com.paxxis.cornerstone.scripting;
+package com.paxxis.cornerstone.scripting.parser;
 
 import java.io.Serializable;
+
+import com.paxxis.cornerstone.scripting.InstructionQueue;
+import com.paxxis.cornerstone.scripting.Rule;
+import com.paxxis.cornerstone.scripting.RuleSet;
+import com.paxxis.cornerstone.scripting.RuleVariable;
+import com.paxxis.cornerstone.scripting.ContextProvider;
 
 
 /**
@@ -32,28 +38,28 @@ public class CSLRuntime implements Serializable {
     private RuleSet ruleSet;
 
     // a context provider
-    transient private ServiceContextProvider serviceContextProvider = null;
+    transient private ContextProvider contextProvider = null;
 
     public CSLRuntime() {
     }
 
-    public void setServiceContextProvider(ServiceContextProvider provider) {
-        serviceContextProvider = provider;
+    public void setContextProvider(ContextProvider provider) {
+        contextProvider = provider;
     }
 
     @SuppressWarnings("unchecked")
-    public <T extends ServiceContextProvider> T getServiceContextProvider(Class<T> contextClass) {
+    public <T extends ContextProvider> T getContextProvider(Class<T> contextClass) {
 	T result = null;
-	if (serviceContextProvider != null) {
-	    if (serviceContextProvider.getClass().isAssignableFrom(contextClass)) {
-		result = (T)serviceContextProvider;
+	if (contextProvider != null) {
+	    if (contextProvider.getClass().isAssignableFrom(contextClass)) {
+		result = (T)contextProvider;
 	    }
 	}
 	return result;
     }
     
-    public ServiceContextProvider getServiceContextProvider() {
-        return serviceContextProvider;
+    public ContextProvider getServiceContextProvider() {
+        return contextProvider;
     }
     
     public void setRuleSet(RuleSet ruleSet) {

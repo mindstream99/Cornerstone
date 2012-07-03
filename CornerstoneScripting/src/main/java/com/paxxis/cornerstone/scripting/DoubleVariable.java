@@ -123,6 +123,12 @@ public class DoubleVariable extends RuleVariable {
     	return value == 1.0;
     }
 
+    @Override
+    public ResultVariable valueAsResult() {
+        ResultVariable res = new ResultVariable(null, valueAsBoolean());
+        return res;
+    }
+
     public IValue evaluate() {
         return new DoubleVariable(null, value);
     }

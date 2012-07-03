@@ -53,6 +53,11 @@ public abstract class IValue implements Serializable {
     public abstract Boolean valueAsBoolean();
 
     /**
+     * Render as a Result
+     */
+    public abstract ResultVariable valueAsResult();
+
+    /**
      * Render as an object
      */
     public abstract Object valueAsObject();

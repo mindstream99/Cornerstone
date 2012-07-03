@@ -52,7 +52,7 @@ public class WhileInstruction extends Instruction {
 
     public boolean process(InstructionQueue queue) {
 	
-	ServiceContextProvider context = block.getRuleSet().getMonitor().getServiceContextProvider(); 
+	ContextProvider context = block.getRuleSet().getMonitor().getServiceContextProvider(); 
 	if (context != null && !context.allowsWhileLoops()) {
 	    throw new RuntimeException("The service context does not allow WHILE loops.");
 	}

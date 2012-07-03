@@ -187,6 +187,20 @@ public class ObjectMethodExpression extends IValue {
         return result.valueAsDouble();
     }
 
+    @Override
+    public ResultVariable valueAsResult() {
+	IValue result = execute();
+	
+	ResultVariable value;
+	if (result instanceof ResultVariable) {
+	    value = (ResultVariable)result;
+	} else {
+	    value = new ResultVariable(null, valueAsBoolean());
+	}
+
+	return value;
+    }
+
     public IValue evaluate() {
         return execute();
     }

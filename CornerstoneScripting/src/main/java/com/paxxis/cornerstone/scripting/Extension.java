@@ -19,6 +19,9 @@ package com.paxxis.cornerstone.scripting;
 
 import java.util.List;
 
+import com.paxxis.cornerstone.scripting.extension.ExtensionHelper;
+import com.paxxis.cornerstone.scripting.parser.CSLRuntime;
+
 /**
  *
  * @author Robert Englander
@@ -26,26 +29,6 @@ import java.util.List;
 public class Extension extends RuleVariable {
 
     private static final long serialVersionUID = 1L;
-
-    private static enum Methods {
-        getName,
-        getId,
-        getDescription,
-        getShapes,
-        getFieldValues;
-        
-	public static boolean contains(String name) {
-	    boolean contains = false;
-	    for (Methods option : Methods.values()) {
-		if (option.toString().equals(name)) {
-		    contains = true;
-		    break;
-		}
-	    }
-	
-	    return contains;
-	}
-    }
 
     private ExtensionHelper helper = null;
 
@@ -77,12 +60,12 @@ public class Extension extends RuleVariable {
     }
     
     private void init() {
-        ServiceContextProvider provider = _monitor.getServiceContextProvider();
+        ContextProvider provider = _monitor.getServiceContextProvider();
         if (provider == null) {
             throw new RuntimeException("No Service Context Provider available");
         }
 
-        helper = _monitor.getServiceContextProvider().createExtensionHelper();
+        helper = _monitor.getServiceContextProvider().createExtensionHelper(getName());
         helper.initialize();
 
         if (_monitor != null) {
@@ -91,27 +74,15 @@ public class Extension extends RuleVariable {
     }
 
     public boolean methodHasReturn(String name) {
-    	if (Methods.contains(name)) {
-            return helper.methodHasReturn(name);
-    	}
-    	
-    	return super.methodHasReturn(name);
+	return helper.methodHasReturn(name);
     }
 
     public int getMethodParameterCount(String name) {
-    	if (Methods.contains(name)) {
-            return helper.getMethodParameterCount(name);
-    	}
-    	
-    	return super.getMethodParameterCount(name);
+	return helper.getMethodParameterCount(name);
     }
 
     public IValue executeMethod(String name, List<IValue> params) {
-    	if (Methods.contains(name)) {
-            return helper.executeMethod(name, params);
-    	}
-
-    	return super.executeMethod(name, params);
+	return helper.executeMethod(name, params);
     }
 
     @Override
@@ -168,6 +139,12 @@ public class Extension extends RuleVariable {
     @Override
     public Boolean valueAsBoolean() {
         return !isNull();
+    }
+
+    @Override
+    public ResultVariable valueAsResult() {
+        ResultVariable res = new ResultVariable(null, valueAsBoolean());
+        return res;
     }
 
     @Override

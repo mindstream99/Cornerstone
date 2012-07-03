@@ -221,6 +221,12 @@ public class StringVariable extends RuleVariable {
     	return value.equals("true");
     }
 
+    @Override
+    public ResultVariable valueAsResult() {
+        ResultVariable res = new ResultVariable(null, valueAsBoolean());
+        return res;
+    }
+
     public IValue evaluate() {
         return new StringVariable(null, value);
     }

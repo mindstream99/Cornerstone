@@ -170,6 +170,12 @@ public class BooleanVariable extends RuleVariable {
     	return value;
     }
 
+    @Override
+    public ResultVariable valueAsResult() {
+        ResultVariable res = new ResultVariable(null, valueAsBoolean());
+        return res;
+    }
+
     /**
      * evaluates this variable without returning its value.
      */

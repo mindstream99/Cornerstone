@@ -19,12 +19,11 @@ package com.paxxis.cornerstone.scripting.parser;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.paxxis.cornerstone.scripting.CSLRuntime;
-import com.paxxis.cornerstone.scripting.ExtensionHelper;
 import com.paxxis.cornerstone.scripting.IValue;
 import com.paxxis.cornerstone.scripting.Rule;
 import com.paxxis.cornerstone.scripting.RuleSet;
-import com.paxxis.cornerstone.scripting.ServiceContextProvider;
+import com.paxxis.cornerstone.scripting.ContextProvider;
+import com.paxxis.cornerstone.scripting.extension.ExtensionHelper;
 
 /**
  * 
@@ -42,10 +41,10 @@ public class ScriptRunner {
 	
 	CSLRuleParser parser = CSLRuleParser.create(content);
         CSLRuntime runtime = new CSLRuntime();
-        runtime.setServiceContextProvider(
-            new ServiceContextProvider() {
+        runtime.setContextProvider(
+            new ContextProvider() {
 		@Override
-		public ExtensionHelper createExtensionHelper() {
+		public ExtensionHelper createExtensionHelper(String id) {
 		    return null;
 		}
 

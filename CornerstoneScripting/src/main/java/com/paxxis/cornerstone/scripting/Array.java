@@ -284,6 +284,11 @@ public class Array extends RuleVariable {
         throw new RuntimeException("Can't get the Boolean value of array '" + getName() + "'.");
     }
 
+    @Override
+    public ResultVariable valueAsResult() {
+        throw new RuntimeException("Can't get the Result value of an array");
+    }
+
     public Object valueAsObject() {
         return this;
     }

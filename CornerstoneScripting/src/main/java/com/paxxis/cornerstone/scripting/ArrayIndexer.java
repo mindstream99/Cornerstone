@@ -18,6 +18,7 @@
 package com.paxxis.cornerstone.scripting;
 
 
+
 /**
  * The ArrayIndexer is used to set and get the value of
  * an array at a given location (index).
@@ -110,6 +111,13 @@ public class ArrayIndexer extends RuleVariable {
     	}
     	
         return array.valueAt(index.valueAsInteger()).valueAsBoolean();
+    }
+
+
+    @Override
+    public ResultVariable valueAsResult() {
+        ResultVariable res = new ResultVariable(null, valueAsBoolean());
+        return res;
     }
 
     public IValue evaluate() {

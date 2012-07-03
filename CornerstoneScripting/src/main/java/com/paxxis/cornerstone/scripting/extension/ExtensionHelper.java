@@ -15,9 +15,11 @@
  * limitations under the License.
  */
 
-package com.paxxis.cornerstone.scripting;
+package com.paxxis.cornerstone.scripting.extension;
 
 import java.util.List;
+
+import com.paxxis.cornerstone.scripting.IValue;
 
 /**
  *

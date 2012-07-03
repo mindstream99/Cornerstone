@@ -179,6 +179,12 @@ public class ValueExpression extends IValue implements IBinaryExpression {
         return val.valueAsBoolean();
     }
 
+    @Override
+    public ResultVariable valueAsResult() {
+        ResultVariable res = new ResultVariable(null, valueAsBoolean());
+        return res;
+    }
+
     public Double valueAsDouble() {
         IValue val = operate();
     	if (val == null) {

@@ -176,6 +176,7 @@ TOKEN :
 |  < CHANGES: ("changes" | "CHANGES") >
 |  < RETURNS: ("returns" | "RETURNS") >
 |  < RETURN: ("return" | "RETURN") >
+|  < RESULT: ("Result") >
 |  < TRUE: ("true" | "TRUE") >
 |  < FALSE: ("false" | "FALSE") >
 |  < REFERENCE: ("Reference") >
@@ -284,6 +285,8 @@ RuleVariable returnType() :
     |
     <INTEGER> { return new IntegerVariable("#return"); }
     |
+    <RESULT> { return new ResultVariable("#return"); }
+    |
     <DATE> { return new DateVariable("#return"); }
     |
     <ARRAY> { return new Array("#return"); }
@@ -334,6 +337,9 @@ RuleVariable parameter() :
     |
     <INTEGER> t = variablename()
     { return new IntegerVariable(t.image); }
+    |
+    <RESULT> t = variablename()
+    { return new ResultVariable(t.image); }
     |
     <DATE> t = variablename()
     { return new DateVariable(t.image); }

@@ -22,6 +22,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import com.paxxis.cornerstone.scripting.parser.CSLRuntime;
+
 /**
  * A related collection of rules.  It provides services
  * such as rule lookup and variable change

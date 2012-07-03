@@ -99,6 +99,12 @@ public class RuleAccessor extends RuleVariable {
         return getRuleName().valueAsBoolean();
     }
 
+    @Override
+    public ResultVariable valueAsResult() {
+        ResultVariable res = new ResultVariable(null, valueAsBoolean());
+        return res;
+    }
+
     public Object valueAsObject() {
         return getRuleName().valueAsObject();
     }

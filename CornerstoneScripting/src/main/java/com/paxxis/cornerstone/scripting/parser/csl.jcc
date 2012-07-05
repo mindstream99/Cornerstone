@@ -1087,6 +1087,35 @@ IValue objectDataValue(InstructionQueue queue) :
 
 IValue objectOperation(InstructionQueue queue) :
 {
+	IValue v;
+}
+{
+    (
+		v = directObjectOperation(queue)
+		// uncomment below if you have custom syntax
+		//|
+		//v = customSyntaxObjectOperation(queue)
+	)
+	{
+		return v;
+	}
+}
+
+/**
+IValue customSyntaxObjectOperation(InstructionQueue queue) :
+{
+	IValue v;
+}
+{
+	v = <custom calls here>
+	{
+		return v;
+	}
+}
+*/
+
+IValue directObjectOperation(InstructionQueue queue) :
+{
     ObjectMethodExpression exp = new ObjectMethodExpression();
     Token t;
     IValue val;
@@ -1160,6 +1189,10 @@ String grabToCharacter(char grab)
              else if (cc == 't')
              {
                 buffer.append("\t");
+             }
+             else 
+             {
+             	buffer.append(cc);
              }
           }
           else

@@ -30,4 +30,6 @@ import com.paxxis.cornerstone.scripting.extension.ExtensionHelper;
 public interface ContextProvider {
     public ExtensionHelper createExtensionHelper(String extId);
     public boolean allowsWhileLoops();
+    public boolean supportsMacroExpansion();
+    public String performMacroExpansion(String value);
 }

@@ -184,8 +184,8 @@ public class Table extends RuleVariable {
 
         elements.get(row).set(col, val.evaluate());
 
-        if (_monitor != null) {
-            _monitor.variableChange(this);
+        if (runtime != null) {
+            runtime.variableChange(this);
         }
     }
 
@@ -217,8 +217,8 @@ public class Table extends RuleVariable {
         }
 
         // tell the monitor about this change
-        if (_monitor != null) {
-            _monitor.variableChange(this);
+        if (runtime != null) {
+            runtime.variableChange(this);
         }
     }
 

@@ -162,7 +162,7 @@ public class Rule implements Serializable {
         try {
             // tell the monitor that we're about to
             // start running a rule
-            ruleSet.getMonitor().ruleBoundary(this, true);
+            ruleSet.getRuntime().ruleBoundary(this, true);
 
             // setup the parameters
             if (params != null) {
@@ -173,7 +173,7 @@ public class Rule implements Serializable {
             boolean result = queue.process(queue);
 
             // tell the monitor that we've finished running the rule
-            ruleSet.getMonitor().ruleBoundary(this, false);
+            ruleSet.getRuntime().ruleBoundary(this, false);
             ruleSet.setCurrentRule(prevRule);
             return result;
         } catch (Exception rte) {
@@ -192,7 +192,7 @@ public class Rule implements Serializable {
 		errorQueue.process(queue);
 
 		// tell the monitor that we've finished running the rule
-		ruleSet.getMonitor().ruleBoundary(this, false);
+		ruleSet.getRuntime().ruleBoundary(this, false);
 
 		ruleSet.setCurrentRule(prevRule);
 		return false;

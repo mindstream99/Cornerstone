@@ -227,7 +227,14 @@ public class InstructionQueue extends Instruction {
         localVariables.put(var.getName(), var);
 
         // pass the monitor to the variable
-        var.setMonitor(getRuleSet().getMonitor());
+        var.setRuntime(getRuleSet().getRuntime());
+        
+        // check macro modifier
+        if (var.isMacro()) {
+            if (!getRuleSet().getRuntime().supportsMacroExpansion()) {
+        	throw new RuleCreationException("The language context provider does not support macro expansion.");
+            }
+        }
     }
 
     /**
@@ -239,7 +246,7 @@ public class InstructionQueue extends Instruction {
         resetVariables();
         
         // push this context onto the monitor stack
-        getRuleSet().getMonitor().push(this);
+        getRuleSet().getRuntime().push(this);
 
         boolean result = true;
 
@@ -257,7 +264,7 @@ public class InstructionQueue extends Instruction {
             // tell the monitor that we're about to run the
             // current instruction
             if (inst.canPoise()) {
-                getRuleSet().getMonitor().setPoised();
+                getRuleSet().getRuntime().setPoised();
             }
             
             // process the instruction
@@ -268,7 +275,7 @@ public class InstructionQueue extends Instruction {
         }
 
         // pop this context off the monitor stack
-        getRuleSet().getMonitor().pop(this);
+        getRuleSet().getRuntime().pop(this);
         //resetVariables();
 
         return result;

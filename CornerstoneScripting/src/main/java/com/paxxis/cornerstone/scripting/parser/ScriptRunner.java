@@ -52,6 +52,17 @@ public class ScriptRunner {
 		public boolean allowsWhileLoops() {
 		    return false;
 		}
+
+		@Override
+		public boolean supportsMacroExpansion() {
+		    // TODO Auto-generated method stub
+		    return false;
+		}
+
+		@Override
+		public String performMacroExpansion(String value) {
+		    return value;
+		}
         	
             }
         );

@@ -52,7 +52,7 @@ public class WhileInstruction extends Instruction {
 
     public boolean process(InstructionQueue queue) {
 	
-	ContextProvider context = block.getRuleSet().getMonitor().getServiceContextProvider(); 
+	ContextProvider context = block.getRuleSet().getRuntime().getServiceContextProvider(); 
 	if (context != null && !context.allowsWhileLoops()) {
 	    throw new RuntimeException("The service context does not allow WHILE loops.");
 	}
@@ -69,7 +69,7 @@ public class WhileInstruction extends Instruction {
         boolean result = true;
 
         // push this context onto the monitor stack
-        block.getRuleSet().getMonitor().push(block);
+        block.getRuleSet().getRuntime().push(block);
 
         while (condition.valueAsBoolean()) {
             if (!block.process(block)) {
@@ -78,11 +78,11 @@ public class WhileInstruction extends Instruction {
             }
 
             block.getRuleSet().setCurrentInstruction(this);
-            block.getRuleSet().getMonitor().setPoised();
+            block.getRuleSet().getRuntime().setPoised();
 
         }
 
-        block.getRuleSet().getMonitor().pop(block);
+        block.getRuleSet().getRuntime().pop(block);
         return result;
     }
 }

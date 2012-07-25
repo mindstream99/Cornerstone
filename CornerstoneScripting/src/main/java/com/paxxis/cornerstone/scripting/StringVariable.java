@@ -72,6 +72,11 @@ public class StringVariable extends RuleVariable {
         value = null;
     }
     
+    @Override
+    public boolean supportsMacroExpansion() {
+	return true;
+    }
+
     public boolean methodHasReturn(String name) {
     	if (Methods.contains(name)) {
             switch (Methods.valueOf(name)) {
@@ -167,31 +172,30 @@ public class StringVariable extends RuleVariable {
             value = val.valueAsString();
         }
 
-        if (_monitor != null) {
-            _monitor.variableChange(this);
+        if (runtime != null) {
+            runtime.variableChange(this);
         }
     }
 
     private void setValue(RuleVariable rv) {
-    	if (rv instanceof StringVariable) {
-    	    StringVariable dv = (StringVariable)rv;
-    	    value = dv.value;
-    	} else {
-    	    String sval = rv.valueAsString();
-    	    if (sval == null) {
-    		value = null;
-    	    } else {
-    		value = sval;
-    	    }
-    	}
+	value = renderAsString(rv.valueAsString());
     }
 
+    protected String renderAsString(String val) {
+	String v = val;
+	if (isMacro()) {
+	    v = runtime.performMacroExpansion(v);
+	}
+	
+	return v;
+    }
+    
     public Object valueAsObject() {
         return value;
     }
 
     public String valueAsString() {
-        return value;
+	return renderAsString(value);
     }
 
     public Double valueAsDouble() {
@@ -228,7 +232,7 @@ public class StringVariable extends RuleVariable {
     }
 
     public IValue evaluate() {
-        return new StringVariable(null, value);
+        return new StringVariable(null, valueAsString());
     }
 
 }

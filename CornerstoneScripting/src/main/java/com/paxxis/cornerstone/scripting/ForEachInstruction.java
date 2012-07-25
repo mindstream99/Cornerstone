@@ -69,7 +69,7 @@ public class ForEachInstruction extends Instruction {
         // set the rule set
         block.setRuleSet(queue.getRuleSet());
 
-        // while instructions want the break
+        // foreach instructions want the break
         block.setWantsBreak(true);
 
         // clear the break before we start
@@ -78,7 +78,7 @@ public class ForEachInstruction extends Instruction {
         boolean result = true;
         
         // push this context onto the monitor stack
-        block.getRuleSet().getMonitor().push(block);
+        block.getRuleSet().getRuntime().push(block);
 
         indexVariable.setValueUnchecked(indexStartValue.valueAsInteger());
         
@@ -91,7 +91,7 @@ public class ForEachInstruction extends Instruction {
             }
 
             block.getRuleSet().setCurrentInstruction(this);
-            block.getRuleSet().getMonitor().setPoised();
+            block.getRuleSet().getRuntime().setPoised();
 
       	    indexVariable.setValueUnchecked(indexVariable.valueAsInteger() + incr);
       	    if (increasing) {
@@ -101,7 +101,7 @@ public class ForEachInstruction extends Instruction {
       	    }
         } while (!done);
 
-        block.getRuleSet().getMonitor().pop(block);
+        block.getRuleSet().getRuntime().pop(block);
         return result;
     }
 }

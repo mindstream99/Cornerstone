@@ -215,8 +215,8 @@ public class Array extends RuleVariable {
     public void setValue(int index, IValue val) {
         elements.set(index, val.evaluate());
 
-        if (_monitor != null) {
-            _monitor.variableChange(this);
+        if (runtime != null) {
+            runtime.variableChange(this);
         }
     }
 
@@ -248,8 +248,8 @@ public class Array extends RuleVariable {
         }
 
         // tell the monitor about this change
-        if (_monitor != null) {
-            _monitor.variableChange(this);
+        if (runtime != null) {
+            runtime.variableChange(this);
         }
     }
 

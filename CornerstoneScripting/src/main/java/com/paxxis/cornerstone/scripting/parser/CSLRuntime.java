@@ -91,4 +91,12 @@ public class CSLRuntime implements Serializable {
 
     public void pop(InstructionQueue context) {
     }
+
+    public String performMacroExpansion(String value) {
+	return contextProvider.performMacroExpansion(value);
+    }
+
+    public boolean supportsMacroExpansion() {
+	return contextProvider.supportsMacroExpansion();
+    }
 }

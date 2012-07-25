@@ -115,7 +115,7 @@ public class RuleSet implements Serializable {
         return sourceCode;
     }
 
-    public CSLRuntime getMonitor() {
+    public CSLRuntime getRuntime() {
         return runtime;
     }
 

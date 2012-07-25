@@ -42,7 +42,7 @@ public abstract class RuleVariable extends IValue {
     private final ArrayList<VariableChangeListener> _listeners = new ArrayList<VariableChangeListener>();
     
     // the monitor
-    protected transient CSLRuntime _monitor = null;
+    protected transient CSLRuntime runtime = null;
 
     // durable?
     private boolean _durable = false;
@@ -50,6 +50,9 @@ public abstract class RuleVariable extends IValue {
     // dynamic?
     private boolean _dynamic = false;
     
+    // use macro expansion?
+    private boolean macro = false;
+
     // can user change the value through script expressions?
     private boolean userMutable = true;
     
@@ -221,6 +224,27 @@ public abstract class RuleVariable extends IValue {
         return userMutable;
     }
     
+    /**
+     * Subclasses that support macro expansion must override this.
+     */
+    public boolean supportsMacroExpansion() {
+	return false;
+    }
+    
+    public void setMacro(boolean macro) throws RuleCreationException {
+	if (macro) {
+	    if (supportsMacroExpansion()) {
+		this.macro = macro;
+	    } else {
+		throw new RuleCreationException(this.getType() + " type does not support macro expansion.");
+	    }
+	}
+    }
+    
+    public boolean isMacro() {
+	return macro;
+    }
+    
     protected void checkUserMutable() {
         if (!userMutable) {
             throw new RuntimeException("Variable '" + getName() + "' can't be modified directly.");
@@ -290,14 +314,7 @@ public abstract class RuleVariable extends IValue {
 
     public abstract String getType();
     
-    public void setMonitor(CSLRuntime agent) {
-        // if we have a null name, or if we have
-        // an internal name that starts with a #,
-        // then we don't want to be monitored
-        //if (_name != null && !_name.startsWith("#"))
-	// FIXME
-	{
-            _monitor = agent;
-        }
+    public void setRuntime(CSLRuntime agent) {
+        runtime = agent;
     }
 }

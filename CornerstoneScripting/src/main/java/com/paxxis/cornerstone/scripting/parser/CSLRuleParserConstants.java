@@ -112,73 +112,75 @@ public interface CSLRuleParserConstants {
   /** RegularExpression Id. */
   int DYNAMIC = 51;
   /** RegularExpression Id. */
-  int AS = 52;
+  int MACRO = 52;
   /** RegularExpression Id. */
-  int ON = 53;
+  int AS = 53;
   /** RegularExpression Id. */
-  int BEFORE = 54;
+  int ON = 54;
   /** RegularExpression Id. */
-  int AFTER = 55;
+  int BEFORE = 55;
   /** RegularExpression Id. */
-  int FOREACH = 56;
+  int AFTER = 56;
   /** RegularExpression Id. */
-  int IF = 57;
+  int FOREACH = 57;
   /** RegularExpression Id. */
-  int IN = 58;
+  int IF = 58;
   /** RegularExpression Id. */
-  int ELSE = 59;
+  int IN = 59;
   /** RegularExpression Id. */
-  int ELSEIF = 60;
+  int ELSE = 60;
   /** RegularExpression Id. */
-  int WHILE = 61;
+  int ELSEIF = 61;
   /** RegularExpression Id. */
-  int BREAK = 62;
+  int WHILE = 62;
   /** RegularExpression Id. */
-  int ERROR = 63;
+  int BREAK = 63;
   /** RegularExpression Id. */
-  int METHODSEP = 64;
+  int ERROR = 64;
   /** RegularExpression Id. */
-  int VALUESEP = 65;
+  int METHODSEP = 65;
   /** RegularExpression Id. */
-  int IS = 66;
+  int VALUESEP = 66;
   /** RegularExpression Id. */
-  int AND = 67;
+  int IS = 67;
   /** RegularExpression Id. */
-  int OR = 68;
+  int AND = 68;
   /** RegularExpression Id. */
-  int NOT = 69;
+  int OR = 69;
   /** RegularExpression Id. */
-  int WAIT = 70;
+  int NOT = 70;
   /** RegularExpression Id. */
-  int UNTIL = 71;
+  int WAIT = 71;
   /** RegularExpression Id. */
-  int ARRAY = 72;
+  int UNTIL = 72;
   /** RegularExpression Id. */
-  int TABLE = 73;
+  int ARRAY = 73;
   /** RegularExpression Id. */
-  int INTEGER = 74;
+  int TABLE = 74;
   /** RegularExpression Id. */
-  int DOUBLE = 75;
+  int INTEGER = 75;
   /** RegularExpression Id. */
-  int BOOLEAN = 76;
+  int DOUBLE = 76;
   /** RegularExpression Id. */
-  int STRING = 77;
+  int BOOLEAN = 77;
   /** RegularExpression Id. */
-  int DATE = 78;
+  int STRING = 78;
   /** RegularExpression Id. */
-  int EXTENSION = 79;
+  int DATE = 79;
   /** RegularExpression Id. */
-  int PRINT = 80;
+  int EXTENSION = 80;
   /** RegularExpression Id. */
-  int NEWLINE = 81;
+  int PRINT = 81;
   /** RegularExpression Id. */
-  int name = 82;
+  int NEWLINE = 82;
   /** RegularExpression Id. */
-  int INTEGERLITERAL = 83;
+  int name = 83;
   /** RegularExpression Id. */
-  int DATELITERAL = 84;
+  int INTEGERLITERAL = 84;
   /** RegularExpression Id. */
-  int FLOATLITERAL = 85;
+  int DATELITERAL = 85;
+  /** RegularExpression Id. */
+  int FLOATLITERAL = 86;
 
   /** Lexical state. */
   int DEFAULT = 0;
@@ -241,6 +243,7 @@ public interface CSLRuleParserConstants {
     "<START>",
     "<DURABLE>",
     "<DYNAMIC>",
+    "<MACRO>",
     "<AS>",
     "<ON>",
     "<BEFORE>",

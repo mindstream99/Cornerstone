@@ -184,6 +184,7 @@ TOKEN :
 |  < START: ("start" | "START") >
 |  < DURABLE: ("durable" | "DURABLE") >
 |  < DYNAMIC: ("dynamic" | "DYNAMIC") >
+|  < MACRO: ("macro" | "MACRO") >
 |  < AS: ("as" | "AS") >
 |  < ON: ("on" | "ON") >
 |  < BEFORE: ("before" | "BEFORE") >
@@ -475,6 +476,7 @@ void defineVariableClause(InstructionQueue queue) :
     Token t;
     boolean durable = false;
     boolean dynamic = false;
+    boolean macro = false;
 }
 {
     ( 
@@ -484,6 +486,10 @@ void defineVariableClause(InstructionQueue queue) :
     ( 
         <DYNAMIC>
         { dynamic = true; }
+    )?
+    ( 
+        <MACRO>
+        { macro = true; }
     )?
     (
         LOOKAHEAD(2) var = parameter()
@@ -517,9 +523,10 @@ void defineVariableClause(InstructionQueue queue) :
     {
         try
         {
-            queue.addVariable(var);
             var.setDurable(durable);
             var.setDynamic(dynamic);
+            var.setMacro(macro);
+            queue.addVariable(var);
         }
         catch (RuleCreationException e)
         {
@@ -1039,7 +1046,7 @@ IValue referenceValue(InstructionQueue queue) :
     v = valueExpression(queue)
     <RBRACE>
     {
-        ref.setMonitor(queue.getRuleSet().getMonitor());
+        ref.setRuntime(queue.getRuleSet().getRuntime());
         ref.setValue(v, true);
         return ref;
     }

@@ -59,8 +59,8 @@ public class IntegerVariable extends RuleVariable {
     public void setValueUnchecked(int val) {
         this.value = val;
 
-        if (_monitor != null) {
-            _monitor.variableChange(this);
+        if (runtime != null) {
+            runtime.variableChange(this);
         }
     }
     
@@ -131,6 +131,7 @@ public class IntegerVariable extends RuleVariable {
     @Override
     public ResultVariable valueAsResult() {
         ResultVariable res = new ResultVariable(null, valueAsBoolean());
+        res.setResultCode(this.value);
         return res;
     }
 

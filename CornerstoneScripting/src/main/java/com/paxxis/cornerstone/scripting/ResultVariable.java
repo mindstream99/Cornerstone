@@ -152,8 +152,8 @@ public class ResultVariable extends RuleVariable {
     public void setValue(boolean val) {
         success = val;
 
-        if (_monitor != null) {
-            _monitor.variableChange(this);
+        if (runtime != null) {
+            runtime.variableChange(this);
         }
     }
 

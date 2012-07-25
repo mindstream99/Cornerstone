@@ -65,7 +65,7 @@ public class ObjectMethodExpression extends IValue {
         	pendingResolution = true;
             } else {
                 RuleAccessor ra = new RuleAccessor(null, q);
-                ra.setMonitor(q.getRuleSet().getMonitor());
+                ra.setRuntime(q.getRuleSet().getRuntime());
                 ra.setValue(new StringVariable(null, name), true);
                 rv = ra;
             }
@@ -86,7 +86,7 @@ public class ObjectMethodExpression extends IValue {
             throw new RuntimeException("Attempt to invoke unknown rule '" + name + "'.");
         } else {
             RuleAccessor ra = new RuleAccessor(null, queue);
-            ra.setMonitor(queue.getRuleSet().getMonitor());
+            ra.setRuntime(queue.getRuleSet().getRuntime());
             ra.setValue(new StringVariable(null, name), true);
             object = ra;
         }

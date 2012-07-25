@@ -41,7 +41,6 @@ public class Extension extends RuleVariable {
     }
 
     public boolean isNull() {
-      //return null == chimeExtension;
       return false;
     }
     
@@ -54,22 +53,22 @@ public class Extension extends RuleVariable {
     {
     }
 
-    public void setMonitor(CSLRuntime agent) {
-        super.setMonitor(agent);
+    public void setRuntime(CSLRuntime agent) {
+        super.setRuntime(agent);
         init();
     }
     
     private void init() {
-        ContextProvider provider = _monitor.getServiceContextProvider();
+        ContextProvider provider = runtime.getServiceContextProvider();
         if (provider == null) {
             throw new RuntimeException("No Service Context Provider available");
         }
 
-        helper = _monitor.getServiceContextProvider().createExtensionHelper(getName());
+        helper = runtime.getServiceContextProvider().createExtensionHelper(getName());
         helper.initialize();
 
-        if (_monitor != null) {
-            _monitor.variableChange(this);
+        if (runtime != null) {
+            runtime.variableChange(this);
         }
     }
 

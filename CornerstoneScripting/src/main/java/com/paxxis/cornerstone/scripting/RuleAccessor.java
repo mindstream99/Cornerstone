@@ -78,8 +78,8 @@ public class RuleAccessor extends RuleVariable {
     protected void setValue(IValue val) {
         setRuleName(new StringVariable(null, val.valueAsString()));
 
-        if (_monitor != null) {
-            _monitor.variableChange(this);
+        if (runtime != null) {
+            runtime.variableChange(this);
         }
     }
 

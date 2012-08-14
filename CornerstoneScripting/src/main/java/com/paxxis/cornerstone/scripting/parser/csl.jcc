@@ -197,6 +197,7 @@ TOKEN :
 |  < WHILE: ("while" | "WHILE") >
 |  < BREAK: ("break" | "BREAK") >
 |  < ERROR: ("error" | "ERROR") >
+|  < ASSERT: ("assert" | "ASSERT") >
 |  < METHODSEP: (":") >
 |  < VALUESEP: ("::") >
 |  < IS: ("is" | "IS" | "are" | "ARE") >
@@ -388,6 +389,10 @@ void doClause(Rule theRule, InstructionQueue queue) :
    |
    returnClause(theRule, queue) ";"
    |
+   errorClause(theRule, queue) ";"
+   |
+   assertClause(theRule, queue) ";"
+   |
    LOOKAHEAD(3) setVariableClause(queue) ";"
    |
    switchClause(theRule, queue)
@@ -452,6 +457,55 @@ void returnClause(Rule theRule, InstructionQueue queue) :
             buffer.append("\nLine " + token.beginLine + " Column " + token.beginColumn);
             throw new ParseException(buffer.toString());
         }
+        ri.setLineNumber(token.beginLine);
+        queue.addInstruction(ri);
+    }
+}
+
+void errorClause(Rule theRule, InstructionQueue queue) :
+{
+    IValue code = new IntegerVariable(null, 0);
+    IValue desc = new StringVariable(null, "");
+}
+{
+    <ERROR>
+    (
+        code = valueExpression(queue)
+    	(  <COMMA> desc = valueExpression(queue) )?
+    )
+    {
+        ErrorInstruction ri = new ErrorInstruction();
+        try
+        {
+            ri.setValue(theRule, desc);
+            ri.setCode(code);
+        }
+        catch (RuleCreationException rce)
+        {
+            StringBuffer buffer = new StringBuffer(rce.getMessage());
+            buffer.append("\nLine " + token.beginLine + " Column " + token.beginColumn);
+            throw new ParseException(buffer.toString());
+        }
+        ri.setLineNumber(token.beginLine);
+        queue.addInstruction(ri);
+    }
+}
+
+void assertClause(Rule theRule, InstructionQueue queue) :
+{
+    IValue cond;
+    IValue msg;
+}
+{
+    <ASSERT>
+    (
+        cond = valueExpression(queue)
+        <LBRACE>
+    	msg = valueExpression(queue)
+        <RBRACE>
+    )
+    {
+        AssertInstruction ri = new AssertInstruction(theRule, cond, msg);
         ri.setLineNumber(token.beginLine);
         queue.addInstruction(ri);
     }

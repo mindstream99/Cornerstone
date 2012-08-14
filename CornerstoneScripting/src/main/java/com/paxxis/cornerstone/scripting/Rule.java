@@ -19,6 +19,7 @@ package com.paxxis.cornerstone.scripting;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 
@@ -198,5 +199,17 @@ public class Rule implements Serializable {
 		return false;
             }
         }
+    }
+
+    public List<RuleVariable> getParameters() {
+	List<RuleVariable> params = new ArrayList<RuleVariable>();
+	HashMap<Integer, RuleVariable> p = queue.getParameters();
+	int cnt = p.size();
+	for (int i = 0; i < cnt; i++) {
+	    RuleVariable rv = p.get(i);
+	    params.add(rv);
+	}
+	
+	return params;
     }
 }

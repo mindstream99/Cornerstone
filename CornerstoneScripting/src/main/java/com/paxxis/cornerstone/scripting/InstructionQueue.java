@@ -87,6 +87,10 @@ public class InstructionQueue extends Instruction {
         return _hitBreak;
     }
 
+    public HashMap<Integer, RuleVariable> getParameters() {
+	return paramNames;
+    }
+    
     /**
      * Sets the values of the parameter variables.  The order
      * of the values must be the same as the order of the

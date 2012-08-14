@@ -200,17 +200,17 @@ public class ResultVariable extends RuleVariable {
     public String valueAsString()
     {
     	if (isNull()) {
-    		return null;
+    	    return null;
     	}
 
-    	if (success == true)
-        {
-            return "true";
-        }
-        else
-        {
-            return "false";
-        }
+	StringBuilder buf = new StringBuilder();
+
+        buf.append("Result: ")
+           .append(success)
+           .append(" Code: ").append(resultCode)
+           .append(" Description: ").append(description);
+        
+        return buf.toString();
     }
 
     /**

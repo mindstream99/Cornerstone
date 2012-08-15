@@ -41,7 +41,7 @@ public class DoubleVariable extends RuleVariable {
 
     public DoubleVariable(String name, String value) {
         super(name);
-        this.value = new Double(value).doubleValue();
+        this.value = new Double(value);
     }
 
     public boolean isNull() {

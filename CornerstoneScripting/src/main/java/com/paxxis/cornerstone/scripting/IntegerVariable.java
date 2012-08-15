@@ -111,7 +111,7 @@ public class IntegerVariable extends RuleVariable {
     	if (isNull()) {
     	    return null;
     	}
-        return (double)value;
+        return (double)value.intValue();
     }
 
     public Integer valueAsInteger() {
@@ -125,7 +125,7 @@ public class IntegerVariable extends RuleVariable {
     	if (isNull()) {
     	    return null;
     	}
-        return value == 1;
+        return value.intValue() == 1;
     }
 
     @Override

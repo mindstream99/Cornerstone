@@ -157,26 +157,26 @@ public class BooleanExpression extends IValue implements IBinaryExpression {
                 }
                 break;
             case BOOLEQUALS:
-                result = (leftOperand.valueAsBoolean() ==
-                            rightOperand.valueAsBoolean());
+                result = (leftOperand.valueAsBoolean().booleanValue() ==
+                            rightOperand.valueAsBoolean().booleanValue());
                 break;
             case VALEQUALS:
-                result = (leftOperand.valueAsDouble() == rightOperand.valueAsDouble());
+                result = (leftOperand.valueAsDouble().doubleValue() == rightOperand.valueAsDouble().doubleValue());
                 break;
             case NOTEQUALS:
-                result = (leftOperand.valueAsDouble() != rightOperand.valueAsDouble());
+                result = (leftOperand.valueAsDouble().doubleValue() != rightOperand.valueAsDouble().doubleValue());
                 break;
             case GREATERTHAN:
-                result = (leftOperand.valueAsDouble() > rightOperand.valueAsDouble());
+                result = (leftOperand.valueAsDouble().doubleValue() > rightOperand.valueAsDouble().doubleValue());
                 break;
             case LESSTHAN:
-                result = (leftOperand.valueAsDouble() < rightOperand.valueAsDouble());
+                result = (leftOperand.valueAsDouble().doubleValue() < rightOperand.valueAsDouble().doubleValue());
                 break;
             case GREATERTHANEQ:
-                result = (leftOperand.valueAsDouble() >= rightOperand.valueAsDouble());
+                result = (leftOperand.valueAsDouble().doubleValue() >= rightOperand.valueAsDouble().doubleValue());
                 break;
             case LESSTHANEQ:
-                result = (leftOperand.valueAsDouble() <= rightOperand.valueAsDouble());
+                result = (leftOperand.valueAsDouble().doubleValue() <= rightOperand.valueAsDouble().doubleValue());
                 break;
             case STREQUALS:
                 result = (leftOperand.valueAsString().equals(rightOperand.valueAsString()));
@@ -185,7 +185,7 @@ public class BooleanExpression extends IValue implements IBinaryExpression {
                 result = !(leftOperand.valueAsString().equals(rightOperand.valueAsString()));
                 break;
             case NOT:
-                result = !(leftOperand.valueAsBoolean());
+                result = !(leftOperand.valueAsBoolean().booleanValue());
                 break;
         }
 

@@ -494,15 +494,15 @@ void errorClause(Rule theRule, InstructionQueue queue) :
 void assertClause(Rule theRule, InstructionQueue queue) :
 {
     IValue cond;
-    IValue msg;
+    IValue msg = new StringVariable(null, "Assertion Failed");
 }
 {
     <ASSERT>
     (
         cond = valueExpression(queue)
-        <LBRACE>
-    	msg = valueExpression(queue)
-        <RBRACE>
+     	(
+    		<METHODSEP> msg = valueExpression(queue)
+        )?
     )
     {
         AssertInstruction ri = new AssertInstruction(theRule, cond, msg);

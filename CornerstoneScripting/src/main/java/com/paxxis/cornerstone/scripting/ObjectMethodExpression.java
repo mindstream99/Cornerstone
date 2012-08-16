@@ -61,8 +61,8 @@ public class ObjectMethodExpression extends IValue {
             Rule r = ruleSet.getRule(name);
             if (r == null)
             {
-        	ruleSet.addReferencedRuleName(this, name);
-        	pendingResolution = true;
+	        	ruleSet.addReferencedRuleName(this, name);
+	        	pendingResolution = true;
             } else {
                 RuleAccessor ra = new RuleAccessor(null, q);
                 ra.setRuntime(q.getRuleSet().getRuntime());

@@ -22,15 +22,20 @@ import com.paxxis.cornerstone.scripting.*;
  * CSLRuleParser to something that make sense for your use case.
  */
 public class CSLRuleParser implements CSLRuleParserConstants {
+        private static final String DEFAULTNAME = "default";
+
     // we generate a static parser, so we keep
     // a singleton instance.
     protected static CSLRuleParser _parser = null;
     protected static String _sourceCode = null;
+    protected static String ruleSetName = DEFAULTNAME;
 
     public static CSLRuleParser create(String contents)
     {
         // save the most recent contents
         _sourceCode = contents;
+
+                ruleSetName = DEFAULTNAME;
 
         StringReader rdr = new StringReader(contents);
 
@@ -78,7 +83,11 @@ public class CSLRuleParser implements CSLRuleParserConstants {
     }
 
   static final public void parseRuleSet(RuleSet ruleSet) throws ParseException {
+        Token t;
     Rule rule;
+    jj_consume_token(RULESET);
+    t = jj_consume_token(name);
+                        ruleSetName = t.image;
     label_1:
     while (true) {
       rule = parseRule(ruleSet);
@@ -108,7 +117,6 @@ public class CSLRuleParser implements CSLRuleParserConstants {
         break label_1;
       }
     }
-        ruleSet.resoveRuleReferences();
   }
 
   static final public Rule parseRule(RuleSet ruleSet) throws ParseException {
@@ -119,6 +127,7 @@ public class CSLRuleParser implements CSLRuleParserConstants {
   }
 
   static final public void rule(Rule theRule) throws ParseException {
+    Token t;
     RuleVariable returnVariable = new StringVariable("#return") ;
     switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
     case RESULT:
@@ -136,7 +145,7 @@ public class CSLRuleParser implements CSLRuleParserConstants {
       jj_la1[1] = jj_gen;
       ;
     }
-     theRule.setReturnValue(returnVariable);
+      theRule.setReturnValue(returnVariable);
     ruleName(theRule);
     jj_consume_token(LPAREN);
     switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
@@ -346,29 +355,29 @@ public class CSLRuleParser implements CSLRuleParserConstants {
   static final public void doClause(Rule theRule, InstructionQueue queue) throws ParseException {
     if (jj_2_2(3)) {
       nullObjectOperation(queue);
-      jj_consume_token(88);
+      jj_consume_token(89);
     } else if (jj_2_3(2)) {
       defineVariableClause(queue);
-      jj_consume_token(88);
+      jj_consume_token(89);
     } else {
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
       case RETURN:
         returnClause(theRule, queue);
-        jj_consume_token(88);
+        jj_consume_token(89);
         break;
       case ERROR:
         errorClause(theRule, queue);
-        jj_consume_token(88);
+        jj_consume_token(89);
         break;
       case ASSERT:
         assertClause(theRule, queue);
-        jj_consume_token(88);
+        jj_consume_token(89);
         break;
       default:
         jj_la1[8] = jj_gen;
         if (jj_2_4(3)) {
           setVariableClause(queue);
-          jj_consume_token(88);
+          jj_consume_token(89);
         } else {
           switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
           case SWITCH:
@@ -385,17 +394,17 @@ public class CSLRuleParser implements CSLRuleParserConstants {
             break;
           case BREAK:
             breakClause(queue);
-            jj_consume_token(88);
+            jj_consume_token(89);
             break;
           case PRINT:
             printClause(queue);
-            jj_consume_token(88);
+            jj_consume_token(89);
             break;
           default:
             jj_la1[9] = jj_gen;
             if (jj_2_5(2)) {
               valueExpression(queue);
-              jj_consume_token(88);
+              jj_consume_token(89);
             } else {
               jj_consume_token(-1);
               throw new ParseException();
@@ -1015,14 +1024,14 @@ public class CSLRuleParser implements CSLRuleParserConstants {
     IValue v;
     jj_consume_token(CONDITION);
     v = valueExpression(theRule.getQueue());
-    jj_consume_token(88);
+    jj_consume_token(89);
       theRule.addCondition(v);
   }
 
   static final public void ruleName(Rule theRule) throws ParseException {
   Token t;
     t = jj_consume_token(name);
-     theRule.setName(t.image);
+     theRule.setName(ruleSetName + "$" + t.image);
   }
 
   static final public ValueExpression.Operator valueOperator() throws ParseException {
@@ -1275,21 +1284,6 @@ public class CSLRuleParser implements CSLRuleParserConstants {
     throw new Error("Missing return statement in function");
   }
 
-  static final public IValue objectDataValue(InstructionQueue queue) throws ParseException {
-    ObjectMethodExpression exp = new ObjectMethodExpression();
-    Token t;
-    IValue val;
-    t = jj_consume_token(name);
-      exp.setObjectName(t.image, queue);
-    jj_consume_token(VALUESEP);
-    t = jj_consume_token(name);
-        exp.setMethodName("valueOf", true);
-        exp.addParameter(new StringVariable(null, t.image));
-        exp.validateParameters();
-        {if (true) return exp;}
-    throw new Error("Missing return statement in function");
-  }
-
   static final public IValue objectOperation(InstructionQueue queue) throws ParseException {
         IValue v;
     v = directObjectOperation(queue);
@@ -1309,13 +1303,40 @@ IValue customSyntaxObjectOperation(InstructionQueue queue) :
 	}
 }
 */
+  static final public IValue objectDataValue(InstructionQueue queue) throws ParseException {
+    ObjectMethodExpression exp = new ObjectMethodExpression();
+    Token t;
+    IValue val;
+    t = jj_consume_token(name);
+        String qualifier;
+        String nm = t.image;
+        if (nm.indexOf('$') == -1) {
+                nm = ruleSetName + "$" + nm;
+        }
+
+        exp.setObjectName(nm, queue);
+    jj_consume_token(VALUESEP);
+    t = jj_consume_token(name);
+        exp.setMethodName("valueOf", true);
+        exp.addParameter(new StringVariable(null, t.image));
+        exp.validateParameters();
+        {if (true) return exp;}
+    throw new Error("Missing return statement in function");
+  }
+
   static final public IValue directObjectOperation(InstructionQueue queue) throws ParseException {
     ObjectMethodExpression exp = new ObjectMethodExpression();
     Token t;
     IValue val;
     boolean useInvoke = true;
     t = jj_consume_token(name);
-      exp.setObjectName(t.image, queue);
+        String qualifier;
+        String nm = t.image;
+        if (nm.indexOf('$') == -1) {
+                nm = ruleSetName + "$" + nm;
+        }
+
+        exp.setObjectName(nm, queue);
     switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
     case METHODSEP:
       jj_consume_token(METHODSEP);
@@ -1541,45 +1562,9 @@ IValue customSyntaxObjectOperation(InstructionQueue queue) :
     finally { jj_save(13, xla); }
   }
 
-  static private boolean jj_3R_39() {
-    if (jj_scan_token(SET)) return true;
-    if (jj_scan_token(TO)) return true;
-    if (jj_3R_15()) return true;
-    return false;
-  }
-
-  static private boolean jj_3R_20() {
-    if (jj_scan_token(name)) return true;
-    if (jj_scan_token(VALUESEP)) return true;
-    return false;
-  }
-
-  static private boolean jj_3R_35() {
-    if (jj_scan_token(TABLE)) return true;
-    if (jj_3R_86()) return true;
-    return false;
-  }
-
-  static private boolean jj_3R_86() {
-    if (jj_scan_token(name)) return true;
-    return false;
-  }
-
-  static private boolean jj_3R_38() {
-    if (jj_3R_87()) return true;
-    if (jj_scan_token(ASSIGNMENT)) return true;
-    if (jj_3R_15()) return true;
-    return false;
-  }
-
   static private boolean jj_3R_34() {
     if (jj_scan_token(ARRAY)) return true;
     if (jj_scan_token(LPAREN)) return true;
-    return false;
-  }
-
-  static private boolean jj_3_6() {
-    if (jj_3R_16()) return true;
     return false;
   }
 
@@ -1590,6 +1575,11 @@ IValue customSyntaxObjectOperation(InstructionQueue queue) :
     jj_scanpos = xsp;
     if (jj_3R_39()) return true;
     }
+    return false;
+  }
+
+  static private boolean jj_3_6() {
+    if (jj_3R_16()) return true;
     return false;
   }
 
@@ -1918,6 +1908,11 @@ IValue customSyntaxObjectOperation(InstructionQueue queue) :
     return false;
   }
 
+  static private boolean jj_3R_95() {
+    if (jj_3R_15()) return true;
+    return false;
+  }
+
   static private boolean jj_3R_72() {
     if (jj_3R_90()) return true;
     return false;
@@ -1925,6 +1920,12 @@ IValue customSyntaxObjectOperation(InstructionQueue queue) :
 
   static private boolean jj_3R_71() {
     if (jj_scan_token(FALSE)) return true;
+    return false;
+  }
+
+  static private boolean jj_3R_93() {
+    if (jj_scan_token(METHODSEP)) return true;
+    if (jj_scan_token(name)) return true;
     return false;
   }
 
@@ -1986,20 +1987,21 @@ IValue customSyntaxObjectOperation(InstructionQueue queue) :
     return false;
   }
 
-  static private boolean jj_3R_95() {
-    if (jj_3R_15()) return true;
-    return false;
-  }
-
   static private boolean jj_3R_85() {
     if (jj_scan_token(PRINT)) return true;
     if (jj_3R_15()) return true;
     return false;
   }
 
-  static private boolean jj_3R_93() {
-    if (jj_scan_token(METHODSEP)) return true;
+  static private boolean jj_3R_75() {
     if (jj_scan_token(name)) return true;
+    Token xsp;
+    xsp = jj_scanpos;
+    if (jj_3R_93()) jj_scanpos = xsp;
+    if (jj_scan_token(LPAREN)) return true;
+    xsp = jj_scanpos;
+    if (jj_3R_95()) jj_scanpos = xsp;
+    if (jj_scan_token(RPAREN)) return true;
     return false;
   }
 
@@ -2019,18 +2021,6 @@ IValue customSyntaxObjectOperation(InstructionQueue queue) :
 
   static private boolean jj_3R_67() {
     if (jj_scan_token(IS)) return true;
-    return false;
-  }
-
-  static private boolean jj_3R_75() {
-    if (jj_scan_token(name)) return true;
-    Token xsp;
-    xsp = jj_scanpos;
-    if (jj_3R_93()) jj_scanpos = xsp;
-    if (jj_scan_token(LPAREN)) return true;
-    xsp = jj_scanpos;
-    if (jj_3R_95()) jj_scanpos = xsp;
-    if (jj_scan_token(RPAREN)) return true;
     return false;
   }
 
@@ -2089,7 +2079,7 @@ IValue customSyntaxObjectOperation(InstructionQueue queue) :
 
   static private boolean jj_3_5() {
     if (jj_3R_15()) return true;
-    if (jj_scan_token(88)) return true;
+    if (jj_scan_token(89)) return true;
     return false;
   }
 
@@ -2127,7 +2117,7 @@ IValue customSyntaxObjectOperation(InstructionQueue queue) :
 
   static private boolean jj_3R_29() {
     if (jj_3R_84()) return true;
-    if (jj_scan_token(88)) return true;
+    if (jj_scan_token(89)) return true;
     return false;
   }
 
@@ -2151,6 +2141,12 @@ IValue customSyntaxObjectOperation(InstructionQueue queue) :
 
   static private boolean jj_3R_56() {
     if (jj_scan_token(STRCAT)) return true;
+    return false;
+  }
+
+  static private boolean jj_3R_20() {
+    if (jj_scan_token(name)) return true;
+    if (jj_scan_token(VALUESEP)) return true;
     return false;
   }
 
@@ -2256,11 +2252,6 @@ IValue customSyntaxObjectOperation(InstructionQueue queue) :
     return false;
   }
 
-  static private boolean jj_3R_19() {
-    if (jj_3R_75()) return true;
-    return false;
-  }
-
   static private boolean jj_3R_87() {
     if (jj_3R_96()) return true;
     Token xsp;
@@ -2346,6 +2337,36 @@ IValue customSyntaxObjectOperation(InstructionQueue queue) :
     return false;
   }
 
+  static private boolean jj_3R_39() {
+    if (jj_scan_token(SET)) return true;
+    if (jj_scan_token(TO)) return true;
+    if (jj_3R_15()) return true;
+    return false;
+  }
+
+  static private boolean jj_3R_35() {
+    if (jj_scan_token(TABLE)) return true;
+    if (jj_3R_86()) return true;
+    return false;
+  }
+
+  static private boolean jj_3R_19() {
+    if (jj_3R_75()) return true;
+    return false;
+  }
+
+  static private boolean jj_3R_86() {
+    if (jj_scan_token(name)) return true;
+    return false;
+  }
+
+  static private boolean jj_3R_38() {
+    if (jj_3R_87()) return true;
+    if (jj_scan_token(ASSIGNMENT)) return true;
+    if (jj_3R_15()) return true;
+    return false;
+  }
+
   static private boolean jj_initialized_once = false;
   /** Generated Token Manager. */
   static public CSLRuleParserTokenManager token_source;
@@ -2371,10 +2392,10 @@ IValue customSyntaxObjectOperation(InstructionQueue queue) :
       jj_la1_0 = new int[] {0x0,0x0,0x0,0x80000000,0x0,0x0,0x100000,0x0,0x0,0x0,0x100000,0x0,0x0,0x0,0x0,0x2b80,0x0,0x8000,0x0,0x0,0x0,0x0,0x0,0x100000,0x2000,0x2000,0x2b80,0x0,0x180,0x0,0x3eef0000,0x2000,0x2000,0x2380,0x100000,0x2b80,0x0,0x100000,0x2b80,0x180,};
    }
    private static void jj_la1_init_1() {
-      jj_la1_1 = new int[] {0x1000,0x1000,0x9000,0x0,0x400000,0x1000,0x0,0x9000,0x800,0xc6000008,0x0,0x0,0x40000,0x80000,0x100000,0x6000,0x8004,0x0,0x0,0x10,0x80,0x10000000,0x1,0x0,0x0,0x0,0x6000,0x6000,0x0,0x100,0x0,0x0,0x0,0x6000,0x0,0x6000,0x0,0x0,0x6000,0x6000,};
+      jj_la1_1 = new int[] {0x2000,0x2000,0x12000,0x0,0x800000,0x2000,0x0,0x12000,0x1000,0x8c000010,0x0,0x0,0x80000,0x100000,0x200000,0xc000,0x10008,0x0,0x0,0x20,0x100,0x20000000,0x1,0x0,0x0,0x0,0xc000,0xc000,0x0,0x200,0x0,0x0,0x0,0xc000,0x0,0xc000,0x0,0x0,0xc000,0xc000,};
    }
    private static void jj_la1_init_2() {
-      jj_la1_2 = new int[] {0x13fc00,0x3fc00,0x3fc00,0x0,0x0,0x3fc00,0x0,0x3fc00,0x3,0x40000,0x0,0x4,0x0,0x0,0x0,0xb80080,0xc00,0x0,0x8000,0x0,0x0,0x0,0x100000,0x0,0x0,0x0,0xb80080,0x0,0x80000,0x0,0xf0,0x0,0x0,0xa80000,0x0,0xb80080,0x4,0x0,0xb80080,0xa80000,};
+      jj_la1_2 = new int[] {0x27f800,0x7f800,0x7f800,0x0,0x0,0x7f800,0x0,0x7f800,0x6,0x80001,0x0,0x8,0x0,0x0,0x0,0x1700100,0x1800,0x0,0x10000,0x0,0x0,0x0,0x200000,0x0,0x0,0x0,0x1700100,0x0,0x100000,0x0,0x1e0,0x0,0x0,0x1500000,0x0,0x1700100,0x8,0x0,0x1700100,0x1500000,};
    }
   static final private JJCalls[] jj_2_rtns = new JJCalls[14];
   static private boolean jj_rescan = false;
@@ -2581,7 +2602,7 @@ IValue customSyntaxObjectOperation(InstructionQueue queue) :
   /** Generate ParseException. */
   static public ParseException generateParseException() {
     jj_expentries.clear();
-    boolean[] la1tokens = new boolean[89];
+    boolean[] la1tokens = new boolean[90];
     if (jj_kind >= 0) {
       la1tokens[jj_kind] = true;
       jj_kind = -1;
@@ -2601,7 +2622,7 @@ IValue customSyntaxObjectOperation(InstructionQueue queue) :
         }
       }
     }
-    for (int i = 0; i < 89; i++) {
+    for (int i = 0; i < 90; i++) {
       if (la1tokens[i]) {
         jj_expentry = new int[1];
         jj_expentry[0] = i;

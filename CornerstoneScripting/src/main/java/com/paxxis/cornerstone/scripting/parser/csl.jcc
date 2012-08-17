@@ -1198,27 +1198,36 @@ IValue directObjectOperation(InstructionQueue queue) :
 {
     ObjectMethodExpression exp = new ObjectMethodExpression();
     Token t;
+    Token t2 = null;
     IValue val;
     boolean useInvoke = true;
 }
 {
     t = <name>
-    {
-    	String qualifier;
-    	String nm = t.image;
-    	if (nm.indexOf('$') == -1) {
-    		nm = ruleSetName + "$" + nm;
-    	}
-    	 
-    	exp.setObjectName(nm, queue); 
-    }
     (
         <METHODSEP>
-        t = <name>
-        { exp.setMethodName(t.image); useInvoke = false; }
+        t2 = <name>
+        { 
+        	useInvoke = false; 
+        }
     )?
     <LPAREN>
-    { if (useInvoke) exp.setMethodName("invoke"); }
+    { 
+    	String nm = t.image;
+    	if (useInvoke) {
+	    	if (nm.indexOf('$') == -1) {
+	    		nm = ruleSetName + "$" + nm;
+	    	}
+    	} 
+
+    	exp.setObjectName(nm, queue); 
+
+    	if (useInvoke) {
+    		exp.setMethodName("invoke");
+    	} else {
+        	exp.setMethodName(t2.image); 
+    	}
+    }
     (
         (
            val = valueExpression(queue)

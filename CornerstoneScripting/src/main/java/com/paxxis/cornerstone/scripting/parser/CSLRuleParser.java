@@ -1327,28 +1327,35 @@ IValue customSyntaxObjectOperation(InstructionQueue queue) :
   static final public IValue directObjectOperation(InstructionQueue queue) throws ParseException {
     ObjectMethodExpression exp = new ObjectMethodExpression();
     Token t;
+    Token t2 = null;
     IValue val;
     boolean useInvoke = true;
     t = jj_consume_token(name);
-        String qualifier;
-        String nm = t.image;
-        if (nm.indexOf('$') == -1) {
-                nm = ruleSetName + "$" + nm;
-        }
-
-        exp.setObjectName(nm, queue);
     switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
     case METHODSEP:
       jj_consume_token(METHODSEP);
-      t = jj_consume_token(name);
-          exp.setMethodName(t.image); useInvoke = false;
+      t2 = jj_consume_token(name);
+                useInvoke = false;
       break;
     default:
       jj_la1[36] = jj_gen;
       ;
     }
     jj_consume_token(LPAREN);
-      if (useInvoke) exp.setMethodName("invoke");
+        String nm = t.image;
+        if (useInvoke) {
+                if (nm.indexOf('$') == -1) {
+                        nm = ruleSetName + "$" + nm;
+                }
+        }
+
+        exp.setObjectName(nm, queue);
+
+        if (useInvoke) {
+                exp.setMethodName("invoke");
+        } else {
+                exp.setMethodName(t2.image);
+        }
     switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
     case SINGLEQUOTE:
     case DOUBLEQUOTE:
@@ -1873,6 +1880,11 @@ IValue customSyntaxObjectOperation(InstructionQueue queue) :
     return false;
   }
 
+  static private boolean jj_3R_95() {
+    if (jj_3R_15()) return true;
+    return false;
+  }
+
   static private boolean jj_3R_40() {
     if (jj_3R_18()) return true;
     Token xsp;
@@ -1908,11 +1920,6 @@ IValue customSyntaxObjectOperation(InstructionQueue queue) :
     return false;
   }
 
-  static private boolean jj_3R_95() {
-    if (jj_3R_15()) return true;
-    return false;
-  }
-
   static private boolean jj_3R_72() {
     if (jj_3R_90()) return true;
     return false;
@@ -1920,12 +1927,6 @@ IValue customSyntaxObjectOperation(InstructionQueue queue) :
 
   static private boolean jj_3R_71() {
     if (jj_scan_token(FALSE)) return true;
-    return false;
-  }
-
-  static private boolean jj_3R_93() {
-    if (jj_scan_token(METHODSEP)) return true;
-    if (jj_scan_token(name)) return true;
     return false;
   }
 
@@ -1984,6 +1985,12 @@ IValue customSyntaxObjectOperation(InstructionQueue queue) :
     }
     }
     }
+    return false;
+  }
+
+  static private boolean jj_3R_93() {
+    if (jj_scan_token(METHODSEP)) return true;
+    if (jj_scan_token(name)) return true;
     return false;
   }
 

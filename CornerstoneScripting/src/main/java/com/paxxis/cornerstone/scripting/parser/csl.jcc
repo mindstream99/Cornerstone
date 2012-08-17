@@ -52,6 +52,7 @@ public class CSLRuleParser
     protected static CSLRuleParser _parser = null;
     protected static String _sourceCode = null;
     protected static String ruleSetName = DEFAULTNAME;
+    protected static int ruleCount = 0;
     
     public static CSLRuleParser create(String contents)
     {
@@ -59,6 +60,7 @@ public class CSLRuleParser
         _sourceCode = contents;
 
 		ruleSetName = DEFAULTNAME;
+		ruleCount = 0;
 
         StringReader rdr = new StringReader(contents);
 
@@ -234,12 +236,6 @@ void parseRuleSet(RuleSet ruleSet) :
     Rule rule;
 }
 {
-  	(
-  		<RULESET> t = <name>
-  		{
-   	  		ruleSetName = t.image;
-  		}
-  	)
     (rule = parseRule(ruleSet)
     {
         try
@@ -258,12 +254,27 @@ void parseRuleSet(RuleSet ruleSet) :
 Rule parseRule(RuleSet ruleSet) :
 {
     Rule theRule = new Rule(ruleSet);
+    Token t;
+    boolean ruleSetDeclared = false;
 }
 {
-  rule(theRule)
-  {
-    return theRule;
-  }
+	{ ruleCount++; }
+  	(
+  		<RULESET> t = <name>
+  		{
+   	  		ruleSetName = t.image;
+   	  		ruleSetDeclared = true;
+  		}
+  	)?
+  	{
+  		if (ruleCount == 1 && !ruleSetDeclared) {
+            throw new ParseException("You must declare a ruleset before the first rule definition.");
+  		}
+  	}
+  	rule(theRule)
+  	{
+   		return theRule;
+  	}
 }
 
 void rule(Rule theRule) :

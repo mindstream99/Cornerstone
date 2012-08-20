@@ -41,29 +41,35 @@ public class FileSystemScriptLoader implements ScriptLoader {
 	private CSLRuntime cslRuntime = null;
 	
 	public static void main(String[] args) {
-		FileSystemScriptLoader loader = new FileSystemScriptLoader();
-		loader.setSourceName(args[0]);
-		loader.setUseSubDirectories(true);
-		loader.setMethodName(args[1]);
-		loader.setRuntime(new CSLRuntime());
-		loader.setParserCreator(new CSLParserCreator());
-		loader.initialize();
-
-        Rule rule = loader.ruleSet.getRule(loader.methodName);
-
-        if (rule == null) {
-        	System.err.println("No such script method: " + loader.methodName);
-        	System.exit(1);
-        }
-        
-        List<IValue> params = new ArrayList<IValue>();
-        boolean result = rule.process(params);
-
-        IValue value = rule.getReturnValue();
-        String str = value.valueAsString();
-        System.out.println(str);
-
-        System.exit(0);
+	    FileSystemScriptLoader loader = new FileSystemScriptLoader();
+	    loader.setSourceName(args[0]);
+	    loader.setUseSubDirectories(true);
+	    loader.setMethodName(args[1]);
+	    loader.setRuntime(new CSLRuntime());
+	    loader.setParserCreator(new CSLParserCreator());
+	    loader.initialize();
+	    try {
+		loader.ruleSet = loader.load();
+	            Rule rule = loader.ruleSet.getRule(loader.methodName);
+	            
+	            if (rule == null) {
+	            	System.err.println("No such script method: " + loader.methodName);
+	            	System.exit(1);
+	            }
+	        
+	            List<IValue> params = new ArrayList<IValue>();
+	            boolean result = rule.process(params);
+	    
+	            IValue value = rule.getReturnValue();
+	            String str = value.valueAsString();
+	            System.out.println(str);
+	    
+	            System.exit(0);
+	    } catch (Exception e) {
+		e.printStackTrace();
+		System.exit(1);
+	    }
+	    
 	}
 
 	public void setSourceName(String name) {
@@ -88,11 +94,7 @@ public class FileSystemScriptLoader implements ScriptLoader {
 	
 	public void initialize() {
 		if (sourceName == null) {
-			throw new RuntimeException("DirectoryName property can't be null");
-		}
-		
-		if (methodName == null) {
-			throw new RuntimeException("MethodName property can't be null");
+			throw new RuntimeException("SourceName property can't be null");
 		}
 		
 		if (parserCreator == null) {
@@ -101,12 +103,6 @@ public class FileSystemScriptLoader implements ScriptLoader {
 		
 		if (cslRuntime == null) {
 			throw new RuntimeException("Runtime property can't be null");
-		}
-		
-		try {
-			ruleSet = load();
-		} catch (Exception e) {
-			throw new RuntimeException(e.getMessage(), e);
 		}
 	}
 	

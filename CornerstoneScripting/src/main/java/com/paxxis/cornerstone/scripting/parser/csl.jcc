@@ -15,6 +15,10 @@
  * limitations under the License.
  */
 
+options {
+    STATIC = false;
+}
+
 /**
  * The CSL rule parser is used to parse rules into
  * a Rule Set. This file is processed using JavaCC.
@@ -47,62 +51,26 @@ public class CSLRuleParser
 {
 	private static final String DEFAULTNAME = "default";
 	
-    // we generate a static parser, so we keep
-    // a singleton instance.
-    protected static CSLRuleParser _parser = null;
-    protected static String _sourceCode = null;
-    protected static String ruleSetName = DEFAULTNAME;
-    protected static int ruleCount = 0;
+    protected String _sourceCode = null;
+    protected String ruleSetName = DEFAULTNAME;
+    protected int ruleCount = 0;
     
-    public static CSLRuleParser create(String contents)
-    {
-        // save the most recent contents
-        _sourceCode = contents;
+    public static CSLRuleParser create(String contents) {
+        StringReader rdr = new StringReader(contents);
+        return new CSLRuleParser(rdr);
+    }
+
+    private CSLRuleParser(StringReader rdr, String sourceCode) {
+		this(rdr);
+
+        _sourceCode = sourceCode;
 
 		ruleSetName = DEFAULTNAME;
 		ruleCount = 0;
 
-        StringReader rdr = new StringReader(contents);
-
-        if (_parser == null)
-        {
-            _parser = new CSLRuleParser(rdr);
-        }
-        else
-        {
-            _parser.ReInit(rdr);
-        }
-
-        return _parser;
     }
-
-    public static CSLRuleParser create(String fileName, String ruleSetName)
-    {
-        // read the rule contents into a String
-        RuleReader ruleReader = new RuleReader();
-        String contents = ruleReader.getFileContents(fileName);
-
-        // add the custom rules to the base rules
-        String fullContents = contents; // + "\n\n" + CustomRulesReader.getContents(ruleSetName);
-
-        // save the most recent contents
-        _sourceCode = fullContents;
-
-        StringReader rdr = new StringReader(fullContents);
-
-        if (_parser == null)
-        {
-            _parser = new CSLRuleParser(rdr);
-        }
-        else
-        {
-            _parser.ReInit(rdr);
-        }
-
-        return _parser;
-    }
-
-    public static String getSourceCode()
+    
+    public String getSourceCode()
     {
         return _sourceCode;
     }
@@ -1279,7 +1247,7 @@ JAVACODE
 String grabToCharacter(char grab)
 {
    StringBuffer buffer = new StringBuffer();
-   SimpleCharStream s = CSLRuleParserTokenManager.input_stream;
+   SimpleCharStream s = this.token_source.input_stream;
 
    try
    {

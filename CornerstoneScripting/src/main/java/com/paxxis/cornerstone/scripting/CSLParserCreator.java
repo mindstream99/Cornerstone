@@ -29,8 +29,8 @@ public class CSLParserCreator implements ParserCreator {
 
 	@Override
 	public void process(String code, RuleSet ruleSet) throws ParseException {
-        CSLRuleParser.create(code);
-        CSLRuleParser.parseRuleSet(ruleSet);
+	    CSLRuleParser parser = CSLRuleParser.create(code);
+	    parser.parseRuleSet(ruleSet);
 	}
 
 }

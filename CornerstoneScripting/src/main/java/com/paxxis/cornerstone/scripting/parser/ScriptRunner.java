@@ -19,10 +19,10 @@ package com.paxxis.cornerstone.scripting.parser;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.paxxis.cornerstone.scripting.ContextProvider;
 import com.paxxis.cornerstone.scripting.IValue;
 import com.paxxis.cornerstone.scripting.Rule;
 import com.paxxis.cornerstone.scripting.RuleSet;
-import com.paxxis.cornerstone.scripting.ContextProvider;
 import com.paxxis.cornerstone.scripting.extension.ExtensionHelper;
 
 /**
@@ -67,10 +67,10 @@ public class ScriptRunner {
             }
         );
         
-        RuleSet ruleSet = new RuleSet(args[0], CSLRuleParser.getSourceCode(), runtime);
+        RuleSet ruleSet = new RuleSet(args[0], parser.getSourceCode(), runtime);
 
         try {
-            CSLRuleParser.parseRuleSet(ruleSet);
+            parser.parseRuleSet(ruleSet);
             Rule rule = ruleSet.getRule(args[1]);
             
             List<IValue> params = new ArrayList<IValue>();

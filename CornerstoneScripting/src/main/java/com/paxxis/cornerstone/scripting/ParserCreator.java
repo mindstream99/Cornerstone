@@ -17,6 +17,7 @@
 
 package com.paxxis.cornerstone.scripting;
 
+import com.paxxis.cornerstone.scripting.parser.CSLRuntime;
 import com.paxxis.cornerstone.scripting.parser.ParseException;
 
 /**
@@ -26,4 +27,6 @@ import com.paxxis.cornerstone.scripting.parser.ParseException;
  */
 public interface ParserCreator {
 	public void process(String code, RuleSet ruleSet) throws ParseException;
+	public CSLRuntime createRuntime();
+	public void setContextProvider(ContextProvider provider);
 }

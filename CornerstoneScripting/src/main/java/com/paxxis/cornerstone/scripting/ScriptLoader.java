@@ -17,7 +17,6 @@
 
 package com.paxxis.cornerstone.scripting;
 
-import com.paxxis.cornerstone.scripting.parser.CSLRuntime;
 
 /**
  * 
@@ -28,6 +27,5 @@ public interface ScriptLoader {
 
 	public RuleSet load() throws Exception;
 	public void setSourceName(String scriptPath);
-	public void setRuntime(CSLRuntime cslRuntime);
 	public void setParserCreator(ParserCreator parserCreator);
 }

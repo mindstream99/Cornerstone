@@ -23,7 +23,6 @@ import java.io.FileReader;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.paxxis.cornerstone.scripting.parser.CSLRuntime;
 import com.paxxis.cornerstone.scripting.parser.ParseException;
 
 /**
@@ -35,25 +34,21 @@ public class FileSystemScriptLoader implements ScriptLoader {
 
 	private String sourceName = null;
 	private boolean useSubDirectories = true;
-	private String methodName = null;
-	private RuleSet ruleSet = null;
 	private ParserCreator parserCreator = null;
-	private CSLRuntime cslRuntime = null;
 	
 	public static void main(String[] args) {
 	    FileSystemScriptLoader loader = new FileSystemScriptLoader();
 	    loader.setSourceName(args[0]);
 	    loader.setUseSubDirectories(true);
-	    loader.setMethodName(args[1]);
-	    loader.setRuntime(new CSLRuntime());
+	    String methodName = args[1];
 	    loader.setParserCreator(new CSLParserCreator());
 	    loader.initialize();
 	    try {
-		loader.ruleSet = loader.load();
-	            Rule rule = loader.ruleSet.getRule(loader.methodName);
+		RuleSet ruleSet = loader.load();
+	            Rule rule = ruleSet.getRule(methodName);
 	            
 	            if (rule == null) {
-	            	System.err.println("No such script method: " + loader.methodName);
+	            	System.err.println("No such script method: " + methodName);
 	            	System.exit(1);
 	            }
 	        
@@ -80,18 +75,10 @@ public class FileSystemScriptLoader implements ScriptLoader {
 		this.useSubDirectories = useSubDirectories;
 	}
 
-	public void setMethodName(String name) {
-		methodName = name;
-	}
-
 	public void setParserCreator(ParserCreator parserCreator) {
 		this.parserCreator = parserCreator;
 	}
 
-	public void setRuntime(CSLRuntime runtime) {
-		this.cslRuntime = runtime;
-	}
-	
 	public void initialize() {
 		if (sourceName == null) {
 			throw new RuntimeException("SourceName property can't be null");
@@ -100,20 +87,16 @@ public class FileSystemScriptLoader implements ScriptLoader {
 		if (parserCreator == null) {
 			throw new RuntimeException("ParserCreator property can't be null");
 		}
-		
-		if (cslRuntime == null) {
-			throw new RuntimeException("Runtime property can't be null");
-		}
 	}
 	
-	private void loadSource(File source, boolean recursive) throws Exception {
+	private void loadSource(File source, boolean recursive, RuleSet ruleSet) throws Exception {
 		try {
 			if (source.isDirectory()) {
 				if (recursive) {
 		            String[] fileList = source.list();
 		            for (String file : fileList) {
 		            	File f = new File(source.getAbsolutePath() + File.separator + file);
-		            	loadSource(f, useSubDirectories);
+		            	loadSource(f, useSubDirectories, ruleSet);
 		            }
 				}
 			} else {
@@ -138,9 +121,9 @@ public class FileSystemScriptLoader implements ScriptLoader {
 	
 	public RuleSet load() throws Exception {
 		try {
-			ruleSet = new RuleSet(sourceName, "", cslRuntime);
+			RuleSet ruleSet = new RuleSet(sourceName, "", parserCreator.createRuntime());
 			File source = new File(sourceName);
-			loadSource(source, true);
+			loadSource(source, true, ruleSet);
         	ruleSet.resoveRuleReferences();
         	return ruleSet;
 

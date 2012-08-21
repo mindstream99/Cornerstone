@@ -18,6 +18,7 @@
 package com.paxxis.cornerstone.scripting;
 
 import com.paxxis.cornerstone.scripting.parser.CSLRuleParser;
+import com.paxxis.cornerstone.scripting.parser.CSLRuntime;
 import com.paxxis.cornerstone.scripting.parser.ParseException;
 
 /**
@@ -27,10 +28,30 @@ import com.paxxis.cornerstone.scripting.parser.ParseException;
  */
 public class CSLParserCreator implements ParserCreator {
 
+    private ContextProvider contextProvider = null;
+    
 	@Override
 	public void process(String code, RuleSet ruleSet) throws ParseException {
 	    CSLRuleParser parser = CSLRuleParser.create(code);
 	    parser.parseRuleSet(ruleSet);
+	}
+
+	@Override
+	public CSLRuntime createRuntime() {
+	    CSLRuntime rt = new CSLRuntime();
+	    rt.setContextProvider(contextProvider);
+	    return rt;
+	}
+
+	public void initialize() {
+	    if (contextProvider == null) {
+		throw new RuntimeException("ContextProvider property can't be null.");
+	    }
+	}
+	
+	@Override
+	public void setContextProvider(ContextProvider provider) {
+	    this.contextProvider = provider;
 	}
 
 }

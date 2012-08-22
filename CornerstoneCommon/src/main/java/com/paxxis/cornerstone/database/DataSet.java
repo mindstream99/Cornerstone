@@ -59,6 +59,10 @@ class DataSet implements IDataSet
         }
     }
     
+    public DatabaseConnection getConnection() {
+    	return this._database;
+    }
+    
     private void collectResults(Statement stmt, String tableName, boolean isAudited) throws Exception {
         _stmt = stmt;
         _tableName = tableName;

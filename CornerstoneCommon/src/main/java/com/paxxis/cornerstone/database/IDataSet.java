@@ -22,6 +22,7 @@ package com.paxxis.cornerstone.database;
  * @author Robert Englander
  */
 public interface IDataSet extends CloseableResource {
+	DatabaseConnection getConnection();
 	
 	boolean first() throws DatabaseException;
 	boolean next()  throws DatabaseException;

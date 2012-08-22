@@ -93,6 +93,12 @@ public abstract class AbstractBlockingObjectPool<T> extends CornerstoneConfigura
         this.borrowTimeout = borrowTimeout;
     }
 
+    public boolean isEmpty() {
+		synchronized (semaphore) {
+		    return freePool.isEmpty() && activePool.isEmpty();
+		}
+    }
+    
     /**
      *
      * @param borrower
@@ -104,35 +110,41 @@ public abstract class AbstractBlockingObjectPool<T> extends CornerstoneConfigura
             //don't allow null borrowers as we look to make sure we have a borrower on return (for now)
             throw new NullPointerException("Null borrower");
         }
+        
         P entry = null;
-		DataLatch latch = null;
+	DataLatch latch = null;
 
         synchronized (semaphore) {
             if (this.shutdown && borrower != this) {
                 throw new RuntimeException("Object pool is shutdown");
             }
+        
             if (!freePool.isEmpty()) {
                 // there's a free entry, give it to this borrower.
                 entry = (P) freePool.remove(0);
                 activePool.put(entry, borrower);
+            } else if (activePool.isEmpty()) {
+                throw new RuntimeException("Object pool is empty");
             }
-			if (entry != null) {
-				return validatePoolEntry(entry);
-			} else {
-				// the borrower will have to wait until an instance
-				// is returned by another borrower
-				latch = new DataLatch();
-				borrowersInWaiting.add(new WaitingBorrower(latch, borrower));
-			}
+
+            if (entry != null) {
+		return validatePoolEntry(entry);
+            } else {
+		// the borrower will have to wait until an instance
+		// is returned by another borrower
+		latch = new DataLatch();
+		borrowersInWaiting.add(new WaitingBorrower(latch, borrower));
+            }
         }
 
-		// Only getting here when entry is null
-		// We don't want to waitForObject inside the synchronized block, so these are outside
-		entry = (P) latch.waitForObject(this.borrowTimeout);
-		if (latch.hasTimedout()) {
-			throw new TimeoutException("Timeout of " + this.borrowTimeout + " reached waiting for pool entry");
+	// Only getting here when entry is null
+	// We don't want to waitForObject inside the synchronized block, so these are outside
+	entry = (P) latch.waitForObject(this.borrowTimeout);
+	if (latch.hasTimedout()) {
+	    throw new TimeoutException("Timeout of " + this.borrowTimeout + " reached waiting for pool entry");
         }
-        return validatePoolEntry(entry);
+      
+	return validatePoolEntry(entry);
     }
 
     /**
@@ -225,6 +237,8 @@ public abstract class AbstractBlockingObjectPool<T> extends CornerstoneConfigura
 
     public void initialize() {
         synchronized (semaphore) {
+            freePool.clear();
+            activePool.clear();
             this.shutdown = false;
             
 	        for (int i = 0; i < poolSize; i++) {

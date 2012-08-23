@@ -63,9 +63,9 @@ public class BlockingThreadPoolExecutor {
     private ArrayList<Runnable> halted = new ArrayList<Runnable>();
     private boolean isHalted = false;
     
-    private String threadPoolName;
-    private int poolSize;
-    private int maxRunnables;
+    private String threadPoolName = null;
+    private int poolSize = 10;
+    private int maxRunnables = 10;
     
     
     /**
@@ -107,38 +107,10 @@ public class BlockingThreadPoolExecutor {
         }
     }
     
-    /**
-     * Default constructor that sets some reasonable defaults for poolSize and maxRunnables in flight.
-     */
     public BlockingThreadPoolExecutor() {
-        this(null, 10, 10);
     }
     
-    /**
-     * Constructor for a custom thread pool name while still using the default poolSize and maxRunnables.
-     * 
-     * @param threadPoolName the name of the pool
-     */
-    public BlockingThreadPoolExecutor(String threadPoolName) {
-        this(threadPoolName, 10, 10);
-    }
-    
-    /**
-     * Constructor.
-     *
-     * @param threadPoolName the name of the thread pool
-     * @param poolSize the size of the thread pool.  
-     * @param max the maximum number of runnables in flight.
-     */
-    public BlockingThreadPoolExecutor(String threadPoolName, int poolSize, int max) {
-        this.threadPoolName = threadPoolName;
-        this.poolSize = poolSize;
-        maxRunnables = max;
-        if (maxRunnables == 0) {
-        	maxRunnables = poolSize;
-        }
-        
-        //core
+    public void initialize() {
         executor = new ThreadPoolExecutor(
                             poolSize, 
                             poolSize, 
@@ -165,7 +137,19 @@ public class BlockingThreadPoolExecutor {
         halted.addAll(unprocessed);
     }
     
-    public boolean isHalted() {
+    public void setThreadPoolName(String threadPoolName) {
+		this.threadPoolName = threadPoolName;
+	}
+
+	public void setPoolSize(int poolSize) {
+		this.poolSize = poolSize;
+	}
+
+	public void setMaxRunnables(int maxRunnables) {
+		this.maxRunnables = maxRunnables;
+	}
+
+	public boolean isHalted() {
         return isHalted;
     }
     

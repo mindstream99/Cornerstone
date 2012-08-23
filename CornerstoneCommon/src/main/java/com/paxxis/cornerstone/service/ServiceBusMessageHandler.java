@@ -101,8 +101,11 @@ public abstract class ServiceBusMessageHandler extends SimpleServiceBusMessageHa
                 _messageProcessor.restart();
             }
         } else {
-            _messageProcessor = new BlockingThreadPoolExecutor(
-                    destinationName + "MessageHandler", _poolSize, maxMessagesInFlight);
+            _messageProcessor = new BlockingThreadPoolExecutor();
+            _messageProcessor.setThreadPoolName(destinationName);
+            _messageProcessor.setPoolSize(_poolSize);
+            _messageProcessor.setMaxRunnables(maxMessagesInFlight);
+            _messageProcessor.initialize();
         }
     }
 

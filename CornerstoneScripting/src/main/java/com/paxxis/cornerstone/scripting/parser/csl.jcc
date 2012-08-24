@@ -141,6 +141,7 @@ TOKEN :
 |  < WHEN: ("WHEN" | "when") >
 |  < SET: ("set" | "SET") >
 |  < TO: ("to" | "TO") >
+|  < ANNO_DESCRIPTION: ("@description" | "@Description" | "@DESCRIPTION") >
 |  < RULESET: ("ruleset" | "RULESET") >
 |  < RULE: ("rule" | "Rule" | "RULE") >
 |  < SWITCH: ("switch" | "SWITCH") >
@@ -247,10 +248,17 @@ Rule parseRule(RuleSet ruleSet) :
 
 void rule(Rule theRule) :
 {
+	String desc = null;
     Token t;
     RuleVariable returnVariable = new StringVariable("#return") ;
 }
 {
+  (
+  	  <ANNO_DESCRIPTION> desc = stringValue()
+  	  {
+  	  	  theRule.setDescription(desc);
+  	  }
+  )?
   (
       returnVariable = returnType()
   )?

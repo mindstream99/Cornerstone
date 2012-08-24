@@ -1,0 +1,28 @@
+ruleset appnexus
+
+execute(Date startDate) {
+   assert startDate:isNull() : "sdsdsds" ;
+
+   Integer y = 0;
+   dynamic Integer z = y * 100;
+   foreach (i in 1 to 300) {
+      y = 2 * i;
+   }
+
+   y = utils$runAgg(y, 2);
+
+   /*
+   Integer idx = 0;
+   while (idx < 10) {
+      idx = idx + 1;
+   }
+   */
+
+   return "Value of z is " | newLine | z;
+}
+
+ruleset utils
+
+runAgg(Integer aggno, Integer incr) {
+   return aggno * 10 * incr;
+}

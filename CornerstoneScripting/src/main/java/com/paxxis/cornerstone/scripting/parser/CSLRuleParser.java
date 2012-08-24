@@ -63,6 +63,7 @@ public class CSLRuleParser implements CSLRuleParserConstants {
             {if (true) throw new ParseException(rce.getMessage());}
         }
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+      case ANNO_DESCRIPTION:
       case RULESET:
       case RESULT:
       case ARRAY:
@@ -108,8 +109,19 @@ public class CSLRuleParser implements CSLRuleParserConstants {
   }
 
   final public void rule(Rule theRule) throws ParseException {
+        String desc = null;
     Token t;
     RuleVariable returnVariable = new StringVariable("#return") ;
+    switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+    case ANNO_DESCRIPTION:
+      jj_consume_token(ANNO_DESCRIPTION);
+      desc = stringValue();
+                  theRule.setDescription(desc);
+      break;
+    default:
+      jj_la1[2] = jj_gen;
+      ;
+    }
     switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
     case RESULT:
     case ARRAY:
@@ -123,7 +135,7 @@ public class CSLRuleParser implements CSLRuleParserConstants {
       returnVariable = returnType();
       break;
     default:
-      jj_la1[2] = jj_gen;
+      jj_la1[3] = jj_gen;
       ;
     }
       theRule.setReturnValue(returnVariable);
@@ -143,7 +155,7 @@ public class CSLRuleParser implements CSLRuleParserConstants {
       ruleParams(theRule);
       break;
     default:
-      jj_la1[3] = jj_gen;
+      jj_la1[4] = jj_gen;
       ;
     }
     jj_consume_token(RPAREN);
@@ -155,7 +167,7 @@ public class CSLRuleParser implements CSLRuleParserConstants {
       whenClauses(theRule);
       break;
     default:
-      jj_la1[4] = jj_gen;
+      jj_la1[5] = jj_gen;
       ;
     }
     doClauses(theRule, theRule.getQueue());
@@ -167,7 +179,7 @@ public class CSLRuleParser implements CSLRuleParserConstants {
       doClauses(theRule, theRule.getErrorQueue());
       break;
     default:
-      jj_la1[5] = jj_gen;
+      jj_la1[6] = jj_gen;
       ;
     }
     jj_consume_token(RBRACE);
@@ -212,7 +224,7 @@ public class CSLRuleParser implements CSLRuleParserConstants {
                   {if (true) return new Extension("#return");}
       break;
     default:
-      jj_la1[6] = jj_gen;
+      jj_la1[7] = jj_gen;
       jj_consume_token(-1);
       throw new ParseException();
     }
@@ -228,7 +240,7 @@ public class CSLRuleParser implements CSLRuleParserConstants {
         ;
         break;
       default:
-        jj_la1[7] = jj_gen;
+        jj_la1[8] = jj_gen;
         break label_2;
       }
       jj_consume_token(COMMA);
@@ -307,7 +319,7 @@ public class CSLRuleParser implements CSLRuleParserConstants {
       {if (true) return new ReferenceVariable(t.image);}
       break;
     default:
-      jj_la1[8] = jj_gen;
+      jj_la1[9] = jj_gen;
       jj_consume_token(-1);
       throw new ParseException();
     }
@@ -336,29 +348,29 @@ public class CSLRuleParser implements CSLRuleParserConstants {
   final public void doClause(Rule theRule, InstructionQueue queue) throws ParseException {
     if (jj_2_2(3)) {
       nullObjectOperation(queue);
-      jj_consume_token(89);
+      jj_consume_token(90);
     } else if (jj_2_3(2)) {
       defineVariableClause(queue);
-      jj_consume_token(89);
+      jj_consume_token(90);
     } else {
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
       case RETURN:
         returnClause(theRule, queue);
-        jj_consume_token(89);
+        jj_consume_token(90);
         break;
       case ERROR:
         errorClause(theRule, queue);
-        jj_consume_token(89);
+        jj_consume_token(90);
         break;
       case ASSERT:
         assertClause(theRule, queue);
-        jj_consume_token(89);
+        jj_consume_token(90);
         break;
       default:
-        jj_la1[9] = jj_gen;
+        jj_la1[10] = jj_gen;
         if (jj_2_4(3)) {
           setVariableClause(queue);
-          jj_consume_token(89);
+          jj_consume_token(90);
         } else {
           switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
           case SWITCH:
@@ -375,17 +387,17 @@ public class CSLRuleParser implements CSLRuleParserConstants {
             break;
           case BREAK:
             breakClause(queue);
-            jj_consume_token(89);
+            jj_consume_token(90);
             break;
           case PRINT:
             printClause(queue);
-            jj_consume_token(89);
+            jj_consume_token(90);
             break;
           default:
-            jj_la1[10] = jj_gen;
+            jj_la1[11] = jj_gen;
             if (jj_2_5(2)) {
               valueExpression(queue);
-              jj_consume_token(89);
+              jj_consume_token(90);
             } else {
               jj_consume_token(-1);
               throw new ParseException();
@@ -443,7 +455,7 @@ public class CSLRuleParser implements CSLRuleParserConstants {
       desc = valueExpression(queue);
       break;
     default:
-      jj_la1[11] = jj_gen;
+      jj_la1[12] = jj_gen;
       ;
     }
         ErrorInstruction ri = new ErrorInstruction();
@@ -473,7 +485,7 @@ public class CSLRuleParser implements CSLRuleParserConstants {
       msg = valueExpression(queue);
       break;
     default:
-      jj_la1[12] = jj_gen;
+      jj_la1[13] = jj_gen;
       ;
     }
         AssertInstruction ri = new AssertInstruction(theRule, cond, msg);
@@ -502,7 +514,7 @@ public class CSLRuleParser implements CSLRuleParserConstants {
           durable = true;
       break;
     default:
-      jj_la1[13] = jj_gen;
+      jj_la1[14] = jj_gen;
       ;
     }
     switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
@@ -511,7 +523,7 @@ public class CSLRuleParser implements CSLRuleParserConstants {
           dynamic = true;
       break;
     default:
-      jj_la1[14] = jj_gen;
+      jj_la1[15] = jj_gen;
       ;
     }
     switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
@@ -520,7 +532,7 @@ public class CSLRuleParser implements CSLRuleParserConstants {
           macro = true;
       break;
     default:
-      jj_la1[15] = jj_gen;
+      jj_la1[16] = jj_gen;
       ;
     }
     if (jj_2_6(2)) {
@@ -546,7 +558,7 @@ public class CSLRuleParser implements CSLRuleParserConstants {
           v = valueExpression(queue);
           break;
         default:
-          jj_la1[16] = jj_gen;
+          jj_la1[17] = jj_gen;
           ;
         }
         jj_consume_token(RPAREN);
@@ -575,7 +587,7 @@ public class CSLRuleParser implements CSLRuleParserConstants {
             var = new ReferenceVariable(t.image);
         break;
       default:
-        jj_la1[17] = jj_gen;
+        jj_la1[18] = jj_gen;
         jj_consume_token(-1);
         throw new ParseException();
       }
@@ -605,7 +617,7 @@ public class CSLRuleParser implements CSLRuleParserConstants {
             queue.addInstruction(si);
       break;
     default:
-      jj_la1[18] = jj_gen;
+      jj_la1[19] = jj_gen;
       ;
     }
   }
@@ -623,7 +635,7 @@ public class CSLRuleParser implements CSLRuleParserConstants {
                 inst.setStringMatching(true);
       break;
     default:
-      jj_la1[19] = jj_gen;
+      jj_la1[20] = jj_gen;
       ;
     }
     jj_consume_token(LPAREN);
@@ -645,7 +657,7 @@ public class CSLRuleParser implements CSLRuleParserConstants {
         ;
         break;
       default:
-        jj_la1[20] = jj_gen;
+        jj_la1[21] = jj_gen;
         break label_4;
       }
     }
@@ -659,7 +671,7 @@ public class CSLRuleParser implements CSLRuleParserConstants {
                               inst.setDefaultCase(q);
       break;
     default:
-      jj_la1[21] = jj_gen;
+      jj_la1[22] = jj_gen;
       ;
     }
     jj_consume_token(RBRACE);
@@ -762,7 +774,7 @@ public class CSLRuleParser implements CSLRuleParserConstants {
       jj_consume_token(RBRACE);
       break;
     default:
-      jj_la1[22] = jj_gen;
+      jj_la1[23] = jj_gen;
       ;
     }
   }
@@ -786,7 +798,7 @@ public class CSLRuleParser implements CSLRuleParserConstants {
       setvariables(queue, instr);
       break;
     default:
-      jj_la1[23] = jj_gen;
+      jj_la1[24] = jj_gen;
       jj_consume_token(-1);
       throw new ParseException();
     }
@@ -803,7 +815,7 @@ public class CSLRuleParser implements CSLRuleParserConstants {
         ;
         break;
       default:
-        jj_la1[24] = jj_gen;
+        jj_la1[25] = jj_gen;
         break label_6;
       }
       jj_consume_token(COMMA);
@@ -836,14 +848,14 @@ public class CSLRuleParser implements CSLRuleParserConstants {
                isTable = true;
           break;
         default:
-          jj_la1[25] = jj_gen;
+          jj_la1[26] = jj_gen;
           jj_consume_token(-1);
           throw new ParseException();
         }
       }
       break;
     default:
-      jj_la1[26] = jj_gen;
+      jj_la1[27] = jj_gen;
       ;
     }
         RuleVariable rv = queue.getVariable(t.image);
@@ -914,7 +926,7 @@ public class CSLRuleParser implements CSLRuleParserConstants {
        exp.setOperator(ValueExpression.Operator.NOT, left);
       break;
     default:
-      jj_la1[27] = jj_gen;
+      jj_la1[28] = jj_gen;
       jj_consume_token(-1);
       throw new ParseException();
     }
@@ -941,7 +953,7 @@ public class CSLRuleParser implements CSLRuleParserConstants {
        {if (true) return t;}
       break;
     default:
-      jj_la1[28] = jj_gen;
+      jj_la1[29] = jj_gen;
       jj_consume_token(-1);
       throw new ParseException();
     }
@@ -978,7 +990,7 @@ public class CSLRuleParser implements CSLRuleParserConstants {
       t = getNewLine();
       break;
     default:
-      jj_la1[29] = jj_gen;
+      jj_la1[30] = jj_gen;
       jj_consume_token(-1);
       throw new ParseException();
     }
@@ -995,7 +1007,7 @@ public class CSLRuleParser implements CSLRuleParserConstants {
         ;
         break;
       default:
-        jj_la1[30] = jj_gen;
+        jj_la1[31] = jj_gen;
         break label_8;
       }
     }
@@ -1005,7 +1017,7 @@ public class CSLRuleParser implements CSLRuleParserConstants {
     IValue v;
     jj_consume_token(CONDITION);
     v = valueExpression(theRule.getQueue());
-    jj_consume_token(89);
+    jj_consume_token(90);
       theRule.addCondition(v);
   }
 
@@ -1083,7 +1095,7 @@ public class CSLRuleParser implements CSLRuleParserConstants {
            {if (true) return ValueExpression.Operator.BOOLEQUALS;}
       break;
     default:
-      jj_la1[31] = jj_gen;
+      jj_la1[32] = jj_gen;
       jj_consume_token(-1);
       throw new ParseException();
     }
@@ -1130,7 +1142,7 @@ public class CSLRuleParser implements CSLRuleParserConstants {
       {if (true) return v;}
       break;
     default:
-      jj_la1[34] = jj_gen;
+      jj_la1[35] = jj_gen;
       if (jj_2_11(2)) {
         v = objectOperation(queue);
       {if (true) return v;}
@@ -1157,14 +1169,14 @@ public class CSLRuleParser implements CSLRuleParserConstants {
                isTable = true;
               break;
             default:
-              jj_la1[32] = jj_gen;
+              jj_la1[33] = jj_gen;
               jj_consume_token(-1);
               throw new ParseException();
             }
           }
           break;
         default:
-          jj_la1[33] = jj_gen;
+          jj_la1[34] = jj_gen;
           ;
         }
         RuleVariable rv = queue.getVariable(t.image);
@@ -1247,7 +1259,7 @@ public class CSLRuleParser implements CSLRuleParserConstants {
           ;
           break;
         default:
-          jj_la1[35] = jj_gen;
+          jj_la1[36] = jj_gen;
           break label_9;
         }
         jj_consume_token(COMMA);
@@ -1256,7 +1268,7 @@ public class CSLRuleParser implements CSLRuleParserConstants {
       }
       break;
     default:
-      jj_la1[36] = jj_gen;
+      jj_la1[37] = jj_gen;
       ;
     }
     jj_consume_token(RBRACKET);
@@ -1319,7 +1331,7 @@ IValue customSyntaxObjectOperation(InstructionQueue queue) :
                 useInvoke = false;
       break;
     default:
-      jj_la1[37] = jj_gen;
+      jj_la1[38] = jj_gen;
       ;
     }
     jj_consume_token(LPAREN);
@@ -1359,7 +1371,7 @@ IValue customSyntaxObjectOperation(InstructionQueue queue) :
           ;
           break;
         default:
-          jj_la1[38] = jj_gen;
+          jj_la1[39] = jj_gen;
           break label_10;
         }
         jj_consume_token(COMMA);
@@ -1368,7 +1380,7 @@ IValue customSyntaxObjectOperation(InstructionQueue queue) :
       }
       break;
     default:
-      jj_la1[39] = jj_gen;
+      jj_la1[40] = jj_gen;
       ;
     }
     jj_consume_token(RPAREN);
@@ -1401,7 +1413,7 @@ IValue customSyntaxObjectOperation(InstructionQueue queue) :
                          {if (true) return t.image;}
       break;
     default:
-      jj_la1[40] = jj_gen;
+      jj_la1[41] = jj_gen;
       jj_consume_token(-1);
       throw new ParseException();
     }
@@ -1548,71 +1560,6 @@ IValue customSyntaxObjectOperation(InstructionQueue queue) :
     try { return !jj_3_14(); }
     catch(LookaheadSuccess ls) { return true; }
     finally { jj_save(13, xla); }
-  }
-
-  private boolean jj_3_2() {
-    if (jj_3R_12()) return true;
-    return false;
-  }
-
-  private boolean jj_3R_11() {
-    Token xsp;
-    xsp = jj_scanpos;
-    if (jj_3_2()) {
-    jj_scanpos = xsp;
-    if (jj_3_3()) {
-    jj_scanpos = xsp;
-    if (jj_3R_22()) {
-    jj_scanpos = xsp;
-    if (jj_3R_23()) {
-    jj_scanpos = xsp;
-    if (jj_3R_24()) {
-    jj_scanpos = xsp;
-    if (jj_3_4()) {
-    jj_scanpos = xsp;
-    if (jj_3R_25()) {
-    jj_scanpos = xsp;
-    if (jj_3R_26()) {
-    jj_scanpos = xsp;
-    if (jj_3R_27()) {
-    jj_scanpos = xsp;
-    if (jj_3R_28()) {
-    jj_scanpos = xsp;
-    if (jj_3R_29()) {
-    jj_scanpos = xsp;
-    if (jj_3R_30()) {
-    jj_scanpos = xsp;
-    if (jj_3_5()) return true;
-    }
-    }
-    }
-    }
-    }
-    }
-    }
-    }
-    }
-    }
-    }
-    }
-    return false;
-  }
-
-  private boolean jj_3R_37() {
-    if (jj_scan_token(REFERENCE)) return true;
-    if (jj_3R_86()) return true;
-    return false;
-  }
-
-  private boolean jj_3R_36() {
-    if (jj_scan_token(RULE)) return true;
-    if (jj_3R_86()) return true;
-    return false;
-  }
-
-  private boolean jj_3_1() {
-    if (jj_3R_11()) return true;
-    return false;
   }
 
   private boolean jj_3R_39() {
@@ -2162,7 +2109,7 @@ IValue customSyntaxObjectOperation(InstructionQueue queue) :
 
   private boolean jj_3_5() {
     if (jj_3R_15()) return true;
-    if (jj_scan_token(89)) return true;
+    if (jj_scan_token(90)) return true;
     return false;
   }
 
@@ -2200,7 +2147,7 @@ IValue customSyntaxObjectOperation(InstructionQueue queue) :
 
   private boolean jj_3R_29() {
     if (jj_3R_84()) return true;
-    if (jj_scan_token(89)) return true;
+    if (jj_scan_token(90)) return true;
     return false;
   }
 
@@ -2355,6 +2302,71 @@ IValue customSyntaxObjectOperation(InstructionQueue queue) :
     return false;
   }
 
+  private boolean jj_3_2() {
+    if (jj_3R_12()) return true;
+    return false;
+  }
+
+  private boolean jj_3R_11() {
+    Token xsp;
+    xsp = jj_scanpos;
+    if (jj_3_2()) {
+    jj_scanpos = xsp;
+    if (jj_3_3()) {
+    jj_scanpos = xsp;
+    if (jj_3R_22()) {
+    jj_scanpos = xsp;
+    if (jj_3R_23()) {
+    jj_scanpos = xsp;
+    if (jj_3R_24()) {
+    jj_scanpos = xsp;
+    if (jj_3_4()) {
+    jj_scanpos = xsp;
+    if (jj_3R_25()) {
+    jj_scanpos = xsp;
+    if (jj_3R_26()) {
+    jj_scanpos = xsp;
+    if (jj_3R_27()) {
+    jj_scanpos = xsp;
+    if (jj_3R_28()) {
+    jj_scanpos = xsp;
+    if (jj_3R_29()) {
+    jj_scanpos = xsp;
+    if (jj_3R_30()) {
+    jj_scanpos = xsp;
+    if (jj_3_5()) return true;
+    }
+    }
+    }
+    }
+    }
+    }
+    }
+    }
+    }
+    }
+    }
+    }
+    return false;
+  }
+
+  private boolean jj_3R_37() {
+    if (jj_scan_token(REFERENCE)) return true;
+    if (jj_3R_86()) return true;
+    return false;
+  }
+
+  private boolean jj_3R_36() {
+    if (jj_scan_token(RULE)) return true;
+    if (jj_3R_86()) return true;
+    return false;
+  }
+
+  private boolean jj_3_1() {
+    if (jj_3R_11()) return true;
+    return false;
+  }
+
   /** Generated Token Manager. */
   public CSLRuleParserTokenManager token_source;
   SimpleCharStream jj_input_stream;
@@ -2366,7 +2378,7 @@ IValue customSyntaxObjectOperation(InstructionQueue queue) :
   private Token jj_scanpos, jj_lastpos;
   private int jj_la;
   private int jj_gen;
-  final private int[] jj_la1 = new int[41];
+  final private int[] jj_la1 = new int[42];
   static private int[] jj_la1_0;
   static private int[] jj_la1_1;
   static private int[] jj_la1_2;
@@ -2376,13 +2388,13 @@ IValue customSyntaxObjectOperation(InstructionQueue queue) :
       jj_la1_init_2();
    }
    private static void jj_la1_init_0() {
-      jj_la1_0 = new int[] {0x0,0x0,0x0,0x0,0x80000000,0x0,0x0,0x100000,0x0,0x0,0x0,0x100000,0x0,0x0,0x0,0x0,0x2b80,0x0,0x8000,0x0,0x0,0x0,0x0,0x0,0x100000,0x2000,0x2000,0x2b80,0x0,0x180,0x0,0x3eef0000,0x2000,0x2000,0x2380,0x100000,0x2b80,0x0,0x100000,0x2b80,0x180,};
+      jj_la1_0 = new int[] {0x0,0x0,0x0,0x0,0x0,0x80000000,0x0,0x0,0x100000,0x0,0x0,0x0,0x100000,0x0,0x0,0x0,0x0,0x2b80,0x0,0x8000,0x0,0x0,0x0,0x0,0x0,0x100000,0x2000,0x2000,0x2b80,0x0,0x180,0x0,0x3eef0000,0x2000,0x2000,0x2380,0x100000,0x2b80,0x0,0x100000,0x2b80,0x180,};
    }
    private static void jj_la1_init_1() {
-      jj_la1_1 = new int[] {0x2004,0x4,0x2000,0x12000,0x0,0x800000,0x2000,0x0,0x12000,0x1000,0x8c000010,0x0,0x0,0x80000,0x100000,0x200000,0xc000,0x10008,0x0,0x0,0x20,0x100,0x20000000,0x1,0x0,0x0,0x0,0xc000,0xc000,0x0,0x200,0x0,0x0,0x0,0xc000,0x0,0xc000,0x0,0x0,0xc000,0xc000,};
+      jj_la1_1 = new int[] {0x400c,0x8,0x4,0x4000,0x24000,0x0,0x1000000,0x4000,0x0,0x24000,0x2000,0x18000020,0x0,0x0,0x100000,0x200000,0x400000,0x18000,0x20010,0x0,0x0,0x40,0x200,0x40000000,0x1,0x0,0x0,0x0,0x18000,0x18000,0x0,0x400,0x0,0x0,0x0,0x18000,0x0,0x18000,0x0,0x0,0x18000,0x18000,};
    }
    private static void jj_la1_init_2() {
-      jj_la1_2 = new int[] {0x27f800,0x0,0x7f800,0x7f800,0x0,0x0,0x7f800,0x0,0x7f800,0x6,0x80001,0x0,0x8,0x0,0x0,0x0,0x1700100,0x1800,0x0,0x10000,0x0,0x0,0x0,0x200000,0x0,0x0,0x0,0x1700100,0x0,0x100000,0x0,0x1e0,0x0,0x0,0x1500000,0x0,0x1700100,0x8,0x0,0x1700100,0x1500000,};
+      jj_la1_2 = new int[] {0x4ff000,0x0,0x0,0xff000,0xff000,0x0,0x0,0xff000,0x0,0xff000,0xc,0x100003,0x0,0x10,0x0,0x0,0x0,0x2e00200,0x3000,0x0,0x20000,0x0,0x0,0x0,0x400000,0x0,0x0,0x0,0x2e00200,0x0,0x200000,0x0,0x3c0,0x0,0x0,0x2a00000,0x0,0x2e00200,0x10,0x0,0x2e00200,0x2a00000,};
    }
   final private JJCalls[] jj_2_rtns = new JJCalls[14];
   private boolean jj_rescan = false;
@@ -2399,7 +2411,7 @@ IValue customSyntaxObjectOperation(InstructionQueue queue) :
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 41; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 42; i++) jj_la1[i] = -1;
     for (int i = 0; i < jj_2_rtns.length; i++) jj_2_rtns[i] = new JJCalls();
   }
 
@@ -2414,7 +2426,7 @@ IValue customSyntaxObjectOperation(InstructionQueue queue) :
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 41; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 42; i++) jj_la1[i] = -1;
     for (int i = 0; i < jj_2_rtns.length; i++) jj_2_rtns[i] = new JJCalls();
   }
 
@@ -2425,7 +2437,7 @@ IValue customSyntaxObjectOperation(InstructionQueue queue) :
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 41; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 42; i++) jj_la1[i] = -1;
     for (int i = 0; i < jj_2_rtns.length; i++) jj_2_rtns[i] = new JJCalls();
   }
 
@@ -2436,7 +2448,7 @@ IValue customSyntaxObjectOperation(InstructionQueue queue) :
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 41; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 42; i++) jj_la1[i] = -1;
     for (int i = 0; i < jj_2_rtns.length; i++) jj_2_rtns[i] = new JJCalls();
   }
 
@@ -2446,7 +2458,7 @@ IValue customSyntaxObjectOperation(InstructionQueue queue) :
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 41; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 42; i++) jj_la1[i] = -1;
     for (int i = 0; i < jj_2_rtns.length; i++) jj_2_rtns[i] = new JJCalls();
   }
 
@@ -2456,7 +2468,7 @@ IValue customSyntaxObjectOperation(InstructionQueue queue) :
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 41; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 42; i++) jj_la1[i] = -1;
     for (int i = 0; i < jj_2_rtns.length; i++) jj_2_rtns[i] = new JJCalls();
   }
 
@@ -2568,12 +2580,12 @@ IValue customSyntaxObjectOperation(InstructionQueue queue) :
   /** Generate ParseException. */
   public ParseException generateParseException() {
     jj_expentries.clear();
-    boolean[] la1tokens = new boolean[90];
+    boolean[] la1tokens = new boolean[91];
     if (jj_kind >= 0) {
       la1tokens[jj_kind] = true;
       jj_kind = -1;
     }
-    for (int i = 0; i < 41; i++) {
+    for (int i = 0; i < 42; i++) {
       if (jj_la1[i] == jj_gen) {
         for (int j = 0; j < 32; j++) {
           if ((jj_la1_0[i] & (1<<j)) != 0) {
@@ -2588,7 +2600,7 @@ IValue customSyntaxObjectOperation(InstructionQueue queue) :
         }
       }
     }
-    for (int i = 0; i < 90; i++) {
+    for (int i = 0; i < 91; i++) {
       if (la1tokens[i]) {
         jj_expentry = new int[1];
         jj_expentry[0] = i;

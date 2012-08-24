@@ -36,6 +36,9 @@ public class Rule implements Serializable {
     // the name of the rule
     private String name = null;
 
+    // the description
+    private String description = "";
+    
     // the conditions for firing can be boolean
     // conditions.
     private List<IValue> booleanConditions = new ArrayList<IValue>();
@@ -127,6 +130,14 @@ public class Rule implements Serializable {
         return name;
     }
 
+    public void setDescription(String desc) {
+	this.description = desc;
+    }
+    
+    public String getDescription() {
+	return description;
+    }
+    
     public InstructionQueue getQueue() {
         return queue;
     }

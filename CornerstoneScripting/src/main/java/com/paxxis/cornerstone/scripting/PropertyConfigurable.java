@@ -1,4 +1,4 @@
-package com.paxxis.cornerstone.common;
+package com.paxxis.cornerstone.scripting;
 
 import java.util.List;
 

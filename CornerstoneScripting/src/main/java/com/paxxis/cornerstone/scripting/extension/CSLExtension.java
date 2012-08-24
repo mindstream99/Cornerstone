@@ -17,6 +17,7 @@ package com.paxxis.cornerstone.scripting.extension;
 
 import java.util.HashMap;
 
+import com.paxxis.cornerstone.scripting.PropertySetter;
 
 /**
  * @author Rob Englander
@@ -30,8 +31,10 @@ public abstract class CSLExtension {
     private String cslClassName = null;
     private HashMap<String, Object> propertyMap = new HashMap<String, Object>();
     private boolean enabled = true;
-	
+    private PropertySetter propertySetter;
+    
     protected CSLExtension() {
+	propertySetter = new PropertySetter(this);
     }
 
     public abstract void initialize();
@@ -59,6 +62,11 @@ public abstract class CSLExtension {
     public void setPropertyMap(HashMap<String, Object> map) {
         propertyMap.clear();
         propertyMap.putAll(map);
+	HashMap<String, Object> propMap = getPropertyMap();
+	for (String name : propMap.keySet()) {
+	    Object value = propMap.get(name);
+	    propertySetter.setValue(name, value);
+	}
     }
 
     public HashMap<String, Object> getPropertyMap() {

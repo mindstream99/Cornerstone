@@ -18,6 +18,7 @@
 package com.paxxis.cornerstone.scripting;
 
 
+
 /**
  * 
  * @author Rob Englander
@@ -27,5 +28,5 @@ public interface ScriptLoader {
 
 	public RuleSet load() throws Exception;
 	public void setSourceName(String scriptPath);
-	public void setParserCreator(ParserCreator parserCreator);
+	public void setParserCreator(CSLParserCreator parserCreator);
 }

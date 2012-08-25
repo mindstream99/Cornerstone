@@ -23,7 +23,7 @@ import java.io.FileReader;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.paxxis.cornerstone.scripting.parser.ParseException;
+import com.paxxis.cornerstone.scripting.parser.RuleParser;
 
 /**
  * 
@@ -34,7 +34,7 @@ public class FileSystemScriptLoader implements ScriptLoader {
 
 	private String sourceName = null;
 	private boolean useSubDirectories = true;
-	private ParserCreator parserCreator = null;
+	private CSLParserCreator parserCreator = null;
 	
 	public static void main(String[] args) {
 	    FileSystemScriptLoader loader = new FileSystemScriptLoader();
@@ -75,7 +75,7 @@ public class FileSystemScriptLoader implements ScriptLoader {
 		this.useSubDirectories = useSubDirectories;
 	}
 
-	public void setParserCreator(ParserCreator parserCreator) {
+	public void setParserCreator(CSLParserCreator parserCreator) {
 		this.parserCreator = parserCreator;
 	}
 
@@ -89,14 +89,14 @@ public class FileSystemScriptLoader implements ScriptLoader {
 		}
 	}
 	
-	private void loadSource(File source, boolean recursive, RuleSet ruleSet) throws Exception {
+	private RuleParser loadSource(RuleParser ruleParser, File source, boolean recursive, RuleSet ruleSet) throws Exception {
 		try {
 			if (source.isDirectory()) {
 				if (recursive) {
 		            String[] fileList = source.list();
 		            for (String file : fileList) {
 		            	File f = new File(source.getAbsolutePath() + File.separator + file);
-		            	loadSource(f, useSubDirectories, ruleSet);
+		            	ruleParser = loadSource(ruleParser, f, useSubDirectories, ruleSet);
 		            }
 				}
 			} else {
@@ -110,20 +110,25 @@ public class FileSystemScriptLoader implements ScriptLoader {
 				}
 				
 				rdr.close();
-				
-				parserCreator.process(buffer.toString(), ruleSet);
+				if (ruleParser == null) {
+					ruleParser = parserCreator.process(buffer.toString(), ruleSet);
+				} else {
+					parserCreator.process(ruleParser, buffer.toString(), ruleSet);
+				}
 			}
 
-		} catch (ParseException pe) {
+		} catch (Exception pe) {
 			throw new Exception("Source: " + source.getCanonicalPath() + "\n" + pe.getMessage(), pe);
 		}
+
+		return ruleParser;
 	}
 	
 	public RuleSet load() throws Exception {
 		try {
 			RuleSet ruleSet = new RuleSet(sourceName, "", parserCreator.createRuntime());
 			File source = new File(sourceName);
-			loadSource(source, true, ruleSet);
+			loadSource(null, source, true, ruleSet);
         	ruleSet.resoveRuleReferences();
         	return ruleSet;
 

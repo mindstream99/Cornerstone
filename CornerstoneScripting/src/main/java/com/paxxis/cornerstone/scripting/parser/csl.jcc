@@ -47,7 +47,7 @@ import com.paxxis.cornerstone.scripting.*;
  * If you are generating an extended parser, you should change
  * CSLRuleParser to something that make sense for your use case.
  */
-public class CSLRuleParser
+public class CSLRuleParser implements RuleParser
 {
 	private static final String DEFAULTNAME = "default";
 	
@@ -55,21 +55,21 @@ public class CSLRuleParser
     protected String ruleSetName = DEFAULTNAME;
     protected int ruleCount = 0;
     
-    public static CSLRuleParser create(String contents) {
-        StringReader rdr = new StringReader(contents);
-        return new CSLRuleParser(rdr);
+    public CSLRuleParser() {
     }
-
-    private CSLRuleParser(StringReader rdr, String sourceCode) {
-		this(rdr);
-
-        _sourceCode = sourceCode;
+    
+    public void initialize(String contents) {
+        StringReader rdr = new StringReader(contents);
+	    jj_input_stream = new SimpleCharStream(rdr, 1, 1);
+    	token_source = new CSLRuleParserTokenManager(jj_input_stream);
+    	token = new Token();
+    	this.ReInit(rdr);
+        _sourceCode = contents;
 
 		ruleSetName = DEFAULTNAME;
 		ruleCount = 0;
-
     }
-    
+
     public String getSourceCode()
     {
         return _sourceCode;

@@ -17,41 +17,59 @@
 
 package com.paxxis.cornerstone.scripting;
 
-import com.paxxis.cornerstone.scripting.parser.CSLRuleParser;
 import com.paxxis.cornerstone.scripting.parser.CSLRuntime;
-import com.paxxis.cornerstone.scripting.parser.ParseException;
+import com.paxxis.cornerstone.scripting.parser.RuleParser;
 
 /**
  * 
  * @author Rob Englander
  *
  */
-public class CSLParserCreator implements ParserCreator {
+public class CSLParserCreator {
 
-    private ContextProvider contextProvider = null;
-    
-	@Override
-	public void process(String code, RuleSet ruleSet) throws ParseException {
-	    CSLRuleParser parser = CSLRuleParser.create(code);
-	    parser.parseRuleSet(ruleSet);
+	private ContextProvider contextProvider = null;
+	private String parserClassName = null;
+	
+	public <P extends RuleParser> P process(String code, RuleSet ruleSet) throws Exception {
+		Class<?> parserClass = Class.forName(parserClassName);
+		Object obj = parserClass.newInstance();
+		if (!RuleParser.class.isAssignableFrom(parserClass)) {
+			throw new Exception(parserClassName + " is not an instance of RuleParser");
+		}
+
+		@SuppressWarnings("unchecked")
+		P parser = (P)parserClass.newInstance();
+		process(parser, code, ruleSet);
+		return parser;
 	}
 
-	@Override
+	public <P extends RuleParser> void process(P parser, String code, RuleSet ruleSet) throws Exception {
+		parser.initialize(code);
+		parser.parseRuleSet(ruleSet);
+	}
+	
 	public CSLRuntime createRuntime() {
-	    CSLRuntime rt = new CSLRuntime();
-	    rt.setContextProvider(contextProvider);
-	    return rt;
+		CSLRuntime rt = new CSLRuntime();
+		rt.setContextProvider(contextProvider);
+		return rt;
 	}
 
 	public void initialize() {
-	    if (contextProvider == null) {
-		throw new RuntimeException("ContextProvider property can't be null.");
-	    }
+		if (contextProvider == null) {
+			throw new RuntimeException("ContextProvider property can't be null.");
+		}
+
+		if (parserClassName == null) {
+			throw new RuntimeException("parserClassName property can't be null.");
+		}
+	}
+
+	public void setParserClassName(String name) {
+		this.parserClassName = name;
 	}
 	
-	@Override
 	public void setContextProvider(ContextProvider provider) {
-	    this.contextProvider = provider;
+		this.contextProvider = provider;
 	}
 
 }

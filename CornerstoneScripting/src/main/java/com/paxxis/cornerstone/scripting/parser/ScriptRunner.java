@@ -20,10 +20,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.paxxis.cornerstone.scripting.CSLParserCreator;
-import com.paxxis.cornerstone.scripting.ContextProvider;
 import com.paxxis.cornerstone.scripting.IValue;
 import com.paxxis.cornerstone.scripting.Rule;
 import com.paxxis.cornerstone.scripting.RuleSet;
+import com.paxxis.cornerstone.scripting.ServiceContext;
 import com.paxxis.cornerstone.scripting.extension.ExtensionHelper;
 
 /**
@@ -33,64 +33,39 @@ import com.paxxis.cornerstone.scripting.extension.ExtensionHelper;
  */
 public class ScriptRunner {
 
-	/**
-	 * @param args
-	 */
-	public static void main(String[] args) {
-		RuleReader reader = new RuleReader();
-		String content = reader.getFileContents(args[0]);
+    /**
+     * @param args
+     */
+    public static void main(String[] args) {
+	RuleReader reader = new RuleReader();
+	String content = reader.getFileContents(args[0]);
 
-		CSLParserCreator creator = new CSLParserCreator();
-		creator.setParserClassName(CSLRuleParser.class.getName());
-		creator.setContextProvider(
-				new ContextProvider() {
-					@Override
-					public ExtensionHelper createExtensionHelper(String id) {
-						return null;
-					}
+	CSLParserCreator creator = new CSLParserCreator();
+	creator.setParserClassName(CSLRuleParser.class.getName());
+	creator.setServiceContext(new ServiceContext());
+	CSLRuntime runtime = creator.createRuntime();
 
-					@Override
-					public boolean allowsWhileLoops() {
-						return false;
-					}
+	try {
+	    RuleSet ruleSet = new RuleSet(args[0], "", runtime);
+	    CSLRuleParser parser = creator.process(content, ruleSet);
 
-					@Override
-					public boolean supportsMacroExpansion() {
-						// TODO Auto-generated method stub
-						return false;
-					}
+	    parser.parseRuleSet(ruleSet);
+	    Rule rule = ruleSet.getRule(args[1]);
 
-					@Override
-					public String performMacroExpansion(String value) {
-						return value;
-					}
+	    List<IValue> params = new ArrayList<IValue>();
+	    if (rule == null) {
+		throw new Exception("No such script method: " + args[1]);
+	    }
 
-				}
-		);
-
-		CSLRuntime runtime = creator.createRuntime();
-
-		try {
-			RuleSet ruleSet = new RuleSet(args[0], "", runtime);
-			CSLRuleParser parser = creator.process(content, ruleSet);
-
-			parser.parseRuleSet(ruleSet);
-			Rule rule = ruleSet.getRule(args[1]);
-
-			List<IValue> params = new ArrayList<IValue>();
-			if (rule == null) {
-				throw new Exception("No such script method: " + args[1]);
-			}
-
-			long start = System.currentTimeMillis();
-			boolean result = rule.process(params);
-			long end = System.currentTimeMillis();
-			System.out.println("Completed: " + rule.getReturnValue().valueAsString());
-			System.out.println("Elapsed time: " + (end - start) + " msecs");
-		} catch (Exception e) {
-			System.err.println(e.getMessage());
-		}
-
+	    long start = System.currentTimeMillis();
+	    boolean result = rule.process(params);
+	    long end = System.currentTimeMillis();
+	    System.out.println("Completed: " + rule.getReturnValue().valueAsString());
+	    System.out.println("Elapsed time: " + (end - start) + " msecs");
+	} catch (Exception e) {
+	    System.err.println(e.getMessage());
 	}
+
+    }
 
 }

@@ -59,12 +59,12 @@ public class Extension extends RuleVariable {
     }
     
     private void init() {
-        ContextProvider provider = runtime.getServiceContextProvider();
+	ServiceContext provider = runtime.getServiceContext();
         if (provider == null) {
             throw new RuntimeException("No Service Context Provider available");
         }
 
-        helper = runtime.getServiceContextProvider().createExtensionHelper(getName());
+        helper = runtime.getServiceContext().createExtensionHelper(getName());
         helper.initialize();
 
         if (runtime != null) {

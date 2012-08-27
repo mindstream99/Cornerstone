@@ -23,7 +23,7 @@ import com.paxxis.cornerstone.scripting.InstructionQueue;
 import com.paxxis.cornerstone.scripting.Rule;
 import com.paxxis.cornerstone.scripting.RuleSet;
 import com.paxxis.cornerstone.scripting.RuleVariable;
-import com.paxxis.cornerstone.scripting.ContextProvider;
+import com.paxxis.cornerstone.scripting.ServiceContext;
 
 
 /**
@@ -38,28 +38,17 @@ public class CSLRuntime implements Serializable {
     private RuleSet ruleSet;
 
     // a context provider
-    transient private ContextProvider contextProvider = null;
+    transient private ServiceContext serviceContext = null;
 
     public CSLRuntime() {
     }
 
-    public void setContextProvider(ContextProvider provider) {
-        contextProvider = provider;
+    public void setServiceContext(ServiceContext provider) {
+        serviceContext = provider;
     }
 
-    @SuppressWarnings("unchecked")
-    public <T extends ContextProvider> T getContextProvider(Class<T> contextClass) {
-	T result = null;
-	if (contextProvider != null) {
-	    if (contextProvider.getClass().isAssignableFrom(contextClass)) {
-		result = (T)contextProvider;
-	    }
-	}
-	return result;
-    }
-    
-    public ContextProvider getServiceContextProvider() {
-        return contextProvider;
+    public ServiceContext getServiceContext() {
+        return serviceContext;
     }
     
     public void setRuleSet(RuleSet ruleSet) {
@@ -93,10 +82,11 @@ public class CSLRuntime implements Serializable {
     }
 
     public String performMacroExpansion(String value) {
-	return contextProvider.performMacroExpansion(value);
+	// FIXME
+	return serviceContext.performMacroExpansion(value);
     }
 
     public boolean supportsMacroExpansion() {
-	return contextProvider.supportsMacroExpansion();
+	return serviceContext.supportsMacroExpansion();
     }
 }

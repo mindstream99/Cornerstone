@@ -14,22 +14,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-package com.paxxis.cornerstone.scripting;
-
-import com.paxxis.cornerstone.scripting.extension.ExtensionHelper;
-
+package com.paxxis.cornerstone.scripting.strategy;
 
 /**
- * This interface is implemented by services or applications that provide access to
- * some of their functionality to CSL objects, since CSL objects do not know anything about the
- * environment that they run in.
  * 
- * @author Robert Englander
+ * @author Rob Englander
+ *
  */
-public interface ContextProvider {
-    public ExtensionHelper createExtensionHelper(String extId);
-    public boolean allowsWhileLoops();
-    public boolean supportsMacroExpansion();
-    public String performMacroExpansion(String value);
+public interface MacroExpansionStrategy extends Strategy {
+
+    public String expand(String value);
 }

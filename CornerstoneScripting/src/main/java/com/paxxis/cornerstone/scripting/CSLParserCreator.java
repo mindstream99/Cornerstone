@@ -27,49 +27,48 @@ import com.paxxis.cornerstone.scripting.parser.RuleParser;
  */
 public class CSLParserCreator {
 
-	private ContextProvider contextProvider = null;
-	private String parserClassName = null;
-	
-	public <P extends RuleParser> P process(String code, RuleSet ruleSet) throws Exception {
-		Class<?> parserClass = Class.forName(parserClassName);
-		Object obj = parserClass.newInstance();
-		if (!RuleParser.class.isAssignableFrom(parserClass)) {
-			throw new Exception(parserClassName + " is not an instance of RuleParser");
-		}
+    private ServiceContext serviceContext = null;
+    private String parserClassName = null;
 
-		@SuppressWarnings("unchecked")
-		P parser = (P)parserClass.newInstance();
-		process(parser, code, ruleSet);
-		return parser;
+    public <P extends RuleParser> P process(String code, RuleSet ruleSet) throws Exception {
+	Class<?> parserClass = Class.forName(parserClassName);
+	if (!RuleParser.class.isAssignableFrom(parserClass)) {
+	    throw new Exception(parserClassName + " is not an instance of RuleParser");
 	}
 
-	public <P extends RuleParser> void process(P parser, String code, RuleSet ruleSet) throws Exception {
-		parser.initialize(code);
-		parser.parseRuleSet(ruleSet);
-	}
-	
-	public CSLRuntime createRuntime() {
-		CSLRuntime rt = new CSLRuntime();
-		rt.setContextProvider(contextProvider);
-		return rt;
+	@SuppressWarnings("unchecked")
+	P parser = (P)parserClass.newInstance();
+	process(parser, code, ruleSet);
+	return parser;
+    }
+
+    public <P extends RuleParser> void process(P parser, String code, RuleSet ruleSet) throws Exception {
+	parser.initialize(code);
+	parser.parseRuleSet(ruleSet);
+    }
+
+    public CSLRuntime createRuntime() {
+	CSLRuntime rt = new CSLRuntime();
+	rt.setServiceContext(serviceContext);
+	return rt;
+    }
+
+    public void initialize() {
+	if (serviceContext == null) {
+	    throw new RuntimeException("serviceContext property can't be null.");
 	}
 
-	public void initialize() {
-		if (contextProvider == null) {
-			throw new RuntimeException("ContextProvider property can't be null.");
-		}
+	if (parserClassName == null) {
+	    throw new RuntimeException("parserClassName property can't be null.");
+	}
+    }
 
-		if (parserClassName == null) {
-			throw new RuntimeException("parserClassName property can't be null.");
-		}
-	}
+    public void setParserClassName(String name) {
+	this.parserClassName = name;
+    }
 
-	public void setParserClassName(String name) {
-		this.parserClassName = name;
-	}
-	
-	public void setContextProvider(ContextProvider provider) {
-		this.contextProvider = provider;
-	}
+    public void setServiceContext(ServiceContext context) {
+	this.serviceContext = context;
+    }
 
 }

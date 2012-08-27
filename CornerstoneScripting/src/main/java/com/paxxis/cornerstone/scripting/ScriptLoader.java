@@ -28,5 +28,5 @@ public interface ScriptLoader {
 
 	public RuleSet load() throws Exception;
 	public void setSourceName(String scriptPath);
-	public void setParserCreator(CSLParserCreator parserCreator);
+	public void setParserManager(ParserManager parserCreator);
 }

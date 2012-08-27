@@ -19,7 +19,7 @@ package com.paxxis.cornerstone.scripting.parser;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.paxxis.cornerstone.scripting.CSLParserCreator;
+import com.paxxis.cornerstone.scripting.ParserManager;
 import com.paxxis.cornerstone.scripting.IValue;
 import com.paxxis.cornerstone.scripting.Rule;
 import com.paxxis.cornerstone.scripting.RuleSet;
@@ -40,7 +40,7 @@ public class ScriptRunner {
 	RuleReader reader = new RuleReader();
 	String content = reader.getFileContents(args[0]);
 
-	CSLParserCreator creator = new CSLParserCreator();
+	ParserManager creator = new ParserManager();
 	creator.setParserClassName(CSLRuleParser.class.getName());
 	creator.setServiceContext(new ServiceContext());
 	CSLRuntime runtime = creator.createRuntime();

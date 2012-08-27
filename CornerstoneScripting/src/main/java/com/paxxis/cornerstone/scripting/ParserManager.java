@@ -25,26 +25,29 @@ import com.paxxis.cornerstone.scripting.parser.RuleParser;
  * @author Rob Englander
  *
  */
-public class CSLParserCreator {
+public class ParserManager {
 
     private ServiceContext serviceContext = null;
     private String parserClassName = null;
 
     public <P extends RuleParser> P process(String code, RuleSet ruleSet) throws Exception {
-	Class<?> parserClass = Class.forName(parserClassName);
-	if (!RuleParser.class.isAssignableFrom(parserClass)) {
-	    throw new Exception(parserClassName + " is not an instance of RuleParser");
-	}
-
-	@SuppressWarnings("unchecked")
-	P parser = (P)parserClass.newInstance();
-	process(parser, code, ruleSet);
-	return parser;
+	return process((P)null, code, ruleSet);
     }
 
-    public <P extends RuleParser> void process(P parser, String code, RuleSet ruleSet) throws Exception {
+    @SuppressWarnings("unchecked")
+    public <P extends RuleParser> P process(P parser, String code, RuleSet ruleSet) throws Exception {
+	if (parser == null) {
+	    Class<?> parserClass = Class.forName(parserClassName);
+	    if (!RuleParser.class.isAssignableFrom(parserClass)) {
+		throw new Exception(parserClassName + " is not an instance of RuleParser");
+	    }
+
+	    parser = (P)parserClass.newInstance();
+	}
+
 	parser.initialize(code);
 	parser.parseRuleSet(ruleSet);
+	return parser;
     }
 
     public CSLRuntime createRuntime() {

@@ -18,7 +18,6 @@
 
 package com.paxxis.cornerstone.database;
 
-import java.util.*;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -26,6 +25,10 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.SQLWarning;
 import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Properties;
 
 import org.apache.log4j.Logger;
 
@@ -54,14 +57,6 @@ public class DatabaseConnection implements IDatabaseConnection {
         }
     }
     
-	public enum Type {
-		Oracle,
-		MySQL,
-		Derby,
-		Unknown
-	}
-	
-	private Type type = Type.Unknown;
 	private String catalog = "Chime";
     private String dbUrl;
     private String dbUser;
@@ -81,22 +76,6 @@ public class DatabaseConnection implements IDatabaseConnection {
     	return catalog;
     }
     
-    public void setDatabaseType(Type type) {
-    	this.type = type;
-    }
-    
-    public boolean isDerby() {
-    	return type == Type.Derby;
-    }
-    
-    public boolean isMySQL() {
-    	return type == Type.MySQL;
-    }
-    
-    public boolean isOracle() {
-    	return type == Type.Oracle;
-    }
-
     public void setDriverName(String name) {
         driverName = name;
         initDriver();
@@ -126,18 +105,20 @@ public class DatabaseConnection implements IDatabaseConnection {
         }
     }
     
+    /*
     private <T extends Statement> T createStatement(T statement) {
         StatementProxy<T> proxy = new StatementProxy<T>(statement);
         closeables.add(proxy);
         return proxy.createStatementWrapper();
     }
+    */
     
     private Statement createStatement(int resultSetType, int resultSetConcurrency) 
             throws DatabaseException {
         validateConnection();
 
         try {
-            return createStatement(connection.createStatement(resultSetType, resultSetConcurrency));
+            return connection.createStatement(resultSetType, resultSetConcurrency);
         } catch (SQLException e) {
             throw new DatabaseException(e);
         }
@@ -292,7 +273,7 @@ public class DatabaseConnection implements IDatabaseConnection {
     }
 
     public IDataSet getDataSet(String query, boolean readOnly) throws DatabaseException {
-        int resultSetType = ResultSet.TYPE_SCROLL_INSENSITIVE;
+        int resultSetType = ResultSet.TYPE_FORWARD_ONLY;
         int resultSetConcurrency = (readOnly) ? ResultSet.CONCUR_READ_ONLY : ResultSet.CONCUR_UPDATABLE;
         Statement stmt = createStatement(resultSetType, resultSetConcurrency);
         return getDataSetResult(stmt, query);
@@ -332,7 +313,7 @@ public class DatabaseConnection implements IDatabaseConnection {
         try {
             int resultSetType = ResultSet.TYPE_SCROLL_INSENSITIVE;
             int resultSetConcurrency = (readOnly) ? ResultSet.CONCUR_READ_ONLY : ResultSet.CONCUR_UPDATABLE;
-            return createStatement(connection.prepareStatement(query, resultSetType, resultSetConcurrency));
+            return connection.prepareStatement(query, resultSetType, resultSetConcurrency);
         } catch (SQLException sqle) {
             throw new DatabaseException(sqle);
         }

@@ -133,7 +133,7 @@ public class DatabaseUpdater {
             Element root = doc.getDocumentElement();
 
             String catalog = pool.getCatalog();
-            String dbType = pool.getDbType();
+            String dbType = pool.getTypeProvider().getName();
             
             String id = root.getAttributes().getNamedItem(ID).getNodeValue();
             String name = root.getAttributes().getNamedItem(NAME).getNodeValue();

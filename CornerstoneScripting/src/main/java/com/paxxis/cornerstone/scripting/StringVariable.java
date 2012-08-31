@@ -70,7 +70,7 @@ public class StringVariable extends RuleVariable {
     }
     
     public void resetValue() {
-	if (this.getHasParameterDefault()) {
+	if (this.getHasParameterDefault() && value == null) {
 	    value = parameterDefault;
 	}
     }

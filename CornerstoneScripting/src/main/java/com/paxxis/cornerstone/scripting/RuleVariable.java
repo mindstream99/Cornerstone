@@ -52,6 +52,8 @@ public abstract class RuleVariable extends IValue {
     
     // use macro expansion?
     private boolean macro = false;
+    
+    private boolean hasParameterDefault = false;
 
     // can user change the value through script expressions?
     private boolean userMutable = true;
@@ -98,7 +100,17 @@ public abstract class RuleVariable extends IValue {
         resetValue();
     }
 
-
+    public void setParameterDefaultValue(String val) {
+    }
+    
+    protected void setHasParameterDefault(boolean val) {
+	this.hasParameterDefault = val;
+    }
+    
+    protected boolean getHasParameterDefault() {
+	return this.hasParameterDefault;
+    }
+    
     public final void setValue(IValue val, boolean trigger) {
         if (trigger) {
             buildDependencies(val);

@@ -327,16 +327,36 @@ void ruleParam(Rule theRule) :
 RuleVariable parameter() :
 {
     Token t;
+    Token defaultToken = null;
+    String defaultValue = null;
 }
 {
-    <STRING> t = variablename()
-    { return new StringVariable(t.image); }
+    <STRING> t = variablename() (LOOKAHEAD(2) "=" defaultValue = stringValue())?
+    { 
+        StringVariable sv = new StringVariable(t.image);
+        if (defaultValue != null) {
+            sv.setParameterDefaultValue(defaultValue);
+        }
+        return sv; 
+    }
     |
-    <DOUBLE> t = variablename()
-    { return new DoubleVariable(t.image); }
+    <DOUBLE> t = variablename() (LOOKAHEAD(2) "=" (defaultToken = doubleValue() | defaultToken = integerValue()))?
+    { 
+        DoubleVariable dv = new DoubleVariable(t.image);
+        if (defaultToken != null) {
+            dv.setParameterDefaultValue(defaultToken.image);
+        }
+        return dv; 
+    }
     |
-    <INTEGER> t = variablename()
-    { return new IntegerVariable(t.image); }
+    <INTEGER> t = variablename() (LOOKAHEAD(2) "=" defaultToken = integerValue())?
+    { 
+        IntegerVariable iv = new IntegerVariable(t.image);
+        if (defaultToken != null) {
+            iv.setParameterDefaultValue(defaultToken.image);
+        }
+        return iv; 
+    }
     |
     <RESULT> t = variablename()
     { return new ResultVariable(t.image); }
@@ -344,8 +364,14 @@ RuleVariable parameter() :
     <DATE> t = variablename()
     { return new DateVariable(t.image); }
     |
-    <BOOLEAN> t = variablename()
-    { return new BooleanVariable(t.image); }
+    <BOOLEAN> t = variablename() (LOOKAHEAD(2) "=" defaultToken = booleanValue())?
+    { 
+        BooleanVariable bv = new BooleanVariable(t.image);
+        if (defaultToken != null) {
+            bv.setParameterDefaultValue(defaultToken.image);
+        }
+        return bv; 
+    }
     |
     <ARRAY> t = variablename()
     { return new Array(t.image); }

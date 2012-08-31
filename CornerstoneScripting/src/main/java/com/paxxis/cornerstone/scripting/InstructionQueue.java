@@ -288,10 +288,8 @@ public class InstructionQueue extends Instruction {
     private void resetVariables() {
         Collection<RuleVariable> variables = localVariables.values();
         for (RuleVariable variable : variables) {
-            if (!paramNames.containsValue(variable)) {
-                if (!variable.isDurable()) {
-                    variable.reset();
-                }
+            if (!variable.isDurable()) {
+                variable.reset();
             }
         }
     }

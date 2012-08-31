@@ -46,6 +46,7 @@ public class StringVariable extends RuleVariable {
 
     // the value
     private String value = null;
+    private String parameterDefault = null;
 
     public StringVariable() {
 
@@ -69,7 +70,14 @@ public class StringVariable extends RuleVariable {
     }
     
     public void resetValue() {
-        value = null;
+	if (this.getHasParameterDefault()) {
+	    value = parameterDefault;
+	}
+    }
+    
+    public void setParameterDefaultValue(String val) {
+	parameterDefault = val;
+	setHasParameterDefault(true);
     }
     
     @Override

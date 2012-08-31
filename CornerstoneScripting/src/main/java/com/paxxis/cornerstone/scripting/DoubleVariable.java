@@ -26,7 +26,8 @@ public class DoubleVariable extends RuleVariable {
 
     // the value
     private Double value = null;
-
+    private Double parameterDefault = null;
+    
     public DoubleVariable() {
     }
     
@@ -44,6 +45,15 @@ public class DoubleVariable extends RuleVariable {
         this.value = new Double(value);
     }
 
+    public void setParameterDefaultValue(String val) {
+	if (val == null) {
+	    parameterDefault = null;
+	} else {
+	    parameterDefault = new Double(val);
+	}
+	setHasParameterDefault(true);
+    }
+    
     public boolean isNull() {
     	return null == value;
     }
@@ -53,7 +63,9 @@ public class DoubleVariable extends RuleVariable {
     }
     
     public void resetValue() {
-        value = null;
+	if (this.getHasParameterDefault()) {
+	    value = parameterDefault;
+	}
     }
     
     protected void setValue(IValue val) {

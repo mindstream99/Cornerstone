@@ -25,6 +25,7 @@ public class IntegerVariable extends RuleVariable {
 
     // the value
     private Integer value = null;
+    private Integer parameterDefault = null;
 
     public IntegerVariable() {
 
@@ -53,7 +54,18 @@ public class IntegerVariable extends RuleVariable {
     }
     
     public void resetValue() {
-        value = null;
+	if (this.getHasParameterDefault()) {
+	    value = parameterDefault;
+	}
+    }
+    
+    public void setParameterDefaultValue(String val) {
+	if (val == null) {
+	    parameterDefault = null;
+	} else {
+	    parameterDefault = new Integer(val);
+	}
+	setHasParameterDefault(true);
     }
     
     public void setValueUnchecked(int val) {

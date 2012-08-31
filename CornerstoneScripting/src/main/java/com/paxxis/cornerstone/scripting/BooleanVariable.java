@@ -29,7 +29,8 @@ public class BooleanVariable extends RuleVariable {
 
     // the value
     private Boolean value = null;
-
+    private Boolean parameterDefault = null;
+    
     public BooleanVariable() {
     }
 
@@ -50,7 +51,18 @@ public class BooleanVariable extends RuleVariable {
     }
     
     public void resetValue() {
-        value = null;
+	if (this.getHasParameterDefault()) {
+	    value = parameterDefault;
+	}
+    }
+    
+    public void setParameterDefaultValue(String val) {
+	if (val == null) {
+	    parameterDefault = null;
+	} else {
+	    parameterDefault = new Boolean(val);
+	}
+	setHasParameterDefault(true);
     }
     
     public BooleanVariable(String name, boolean value) {

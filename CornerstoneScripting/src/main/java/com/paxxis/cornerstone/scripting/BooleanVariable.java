@@ -25,176 +25,176 @@ package com.paxxis.cornerstone.scripting;
  * @author Robert Englander
  */
 public class BooleanVariable extends RuleVariable {
-    private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 1L;
 
-    // the value
-    private Boolean value = null;
-    private Boolean parameterDefault = null;
-    
-    public BooleanVariable() {
-    }
+	// the value
+	private Boolean value = null;
+	private Boolean parameterDefault = null;
 
-    /**
-     * Constructs the variable
-     * @param name the name of the variable, or null if anonymous
-     */
-    public BooleanVariable(String name) {
-        super(name);
-    }
-
-    public boolean isNull() {
-    	return null == value;
-    }
-    
-    public String getType() {
-        return "Boolean";
-    }
-    
-    public void resetValue() {
-	if (this.getHasParameterDefault() && value == null) {
-	    value = parameterDefault;
+	public BooleanVariable() {
 	}
-    }
-    
-    public void setParameterDefaultValue(String val) {
-	if (val == null) {
-	    parameterDefault = null;
-	} else {
-	    parameterDefault = new Boolean(val);
+
+	/**
+	 * Constructs the variable
+	 * @param name the name of the variable, or null if anonymous
+	 */
+	public BooleanVariable(String name) {
+		super(name);
 	}
-	setHasParameterDefault(true);
-    }
-    
-    public BooleanVariable(String name, boolean value) {
-        super(name);
-        this.value = value;
-    }
 
-    public void setValue(boolean val) {
-        value = val;
+	public boolean isNull() {
+		return null == value;
+	}
 
-        if (runtime != null) {
-            runtime.variableChange(this);
-        }
-    }
+	public String getType() {
+		return "Boolean";
+	}
 
-    protected void setValue(IValue val) {
-        if (val instanceof RuleVariable) {
-            RuleVariable rv = (RuleVariable)val;
-            setValue(rv);
-        } else {
-            setValue(val.valueAsBoolean());
-        }
-    }
+	public void resetValue() {
+		if (this.getHasParameterDefault() && value == null) {
+			value = parameterDefault;
+		}
+	}
 
-    private void setValue(RuleVariable rv) {
-    	if (rv instanceof BooleanVariable) {
-    		BooleanVariable dv = (BooleanVariable)rv;
-    		value = dv.value;
-    	} else {
-    		Boolean sval = rv.valueAsBoolean();
-    		if (sval == null) {
-    			value = null;
-    		} else {
-    			value = sval;
-    		}
-    	}
-    }
+	public void setParameterDefaultValue(String val) {
+		if (val == null) {
+			parameterDefault = null;
+		} else {
+			parameterDefault = new Boolean(val);
+		}
+		setHasParameterDefault(true);
+	}
 
-    /**
-     * @return the value as an Object
-     */
-    public Object valueAsObject()
-    {
-    	if (isNull()) {
-    		return null;
-    	}
+	public BooleanVariable(String name, boolean value) {
+		super(name);
+		this.value = value;
+	}
 
-    	return new Boolean(valueAsBoolean());
-    }
+	public void setValue(boolean val) {
+		value = val;
 
-    /**
-     * @return the value as a String
-     */
-    public String valueAsString()
-    {
-    	if (isNull()) {
-    		return null;
-    	}
+		if (runtime != null) {
+			runtime.variableChange(this);
+		}
+	}
 
-    	if (value == true)
-        {
-            return "true";
-        }
-        else
-        {
-            return "false";
-        }
-    }
+	protected void setValue(IValue val) {
+		if (val instanceof RuleVariable) {
+			RuleVariable rv = (RuleVariable)val;
+			setValue(rv);
+		} else {
+			setValue(val.valueAsBoolean());
+		}
+	}
 
-    /**
-     * @return the value as a double
-     */
-    public Double valueAsDouble()
-    {
-    	if (isNull()) {
-    		return null;
-    	}
-    	
-        if (value == true)
-        {
-            return 1.0;
-        }
-        else
-        {
-            return 0.0;
-        }
-    }
+	private void setValue(RuleVariable rv) {
+		if (rv instanceof BooleanVariable) {
+			BooleanVariable dv = (BooleanVariable)rv;
+			value = dv.value;
+		} else {
+			Boolean sval = rv.valueAsBoolean();
+			if (sval == null) {
+				value = null;
+			} else {
+				value = sval;
+			}
+		}
+	}
 
-    /**
-     * @return the value as an int
-     */
-    public Integer valueAsInteger()
-    {
-    	if (isNull()) {
-    		return null;
-    	}
+	/**
+	 * @return the value as an Object
+	 */
+	 public Object valueAsObject()
+	{
+		if (isNull()) {
+			return null;
+		}
 
-    	if (value == true)
-        {
-            return 1;
-        }
-        else
-        {
-            return 0;
-        }
-    }
+		return new Boolean(valueAsBoolean());
+	}
 
-    /**
-     * @return the value as a boolean
-     */
-    public Boolean valueAsBoolean()
-    {
-    	if (isNull()) {
-    		return null;
-    	}
+	 /**
+	  * @return the value as a String
+	  */
+	 public String valueAsString()
+	 {
+		 if (isNull()) {
+			 return null;
+		 }
 
-    	return value;
-    }
+		 if (value == true)
+		 {
+			 return "true";
+		 }
+		 else
+		 {
+			 return "false";
+		 }
+	 }
 
-    @Override
-    public ResultVariable valueAsResult() {
-        ResultVariable res = new ResultVariable(null, valueAsBoolean());
-        return res;
-    }
+	 /**
+	  * @return the value as a double
+	  */
+	 public Double valueAsDouble()
+	 {
+		 if (isNull()) {
+			 return null;
+		 }
 
-    /**
-     * evaluates this variable without returning its value.
-     */
-    public IValue evaluate()
-    {
-        // this is a no-op
-        return this;
-    }
+		 if (value == true)
+		 {
+			 return 1.0;
+		 }
+		 else
+		 {
+			 return 0.0;
+		 }
+	 }
+
+	 /**
+	  * @return the value as an int
+	  */
+	 public Integer valueAsInteger()
+	 {
+		 if (isNull()) {
+			 return null;
+		 }
+
+		 if (value == true)
+		 {
+			 return 1;
+		 }
+		 else
+		 {
+			 return 0;
+		 }
+	 }
+
+	 /**
+	  * @return the value as a boolean
+	  */
+	 public Boolean valueAsBoolean()
+	 {
+		 if (isNull()) {
+			 return null;
+		 }
+
+		 return value;
+	 }
+
+	 @Override
+	 public ResultVariable valueAsResult() {
+		 ResultVariable res = new ResultVariable(null, valueAsBoolean());
+		 return res;
+	 }
+
+	 /**
+	  * evaluates this variable without returning its value.
+	  */
+	 public IValue evaluate()
+	 {
+		 // this is a no-op
+		 return this;
+	 }
 
 }

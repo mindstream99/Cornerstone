@@ -50,6 +50,7 @@ public class DateVariable extends RuleVariable {
 
     // the value
     private Date value = null;
+    private Date parameterDefault = null;
 
     public DateVariable() {
 
@@ -74,10 +75,25 @@ public class DateVariable extends RuleVariable {
     }
     
     public void resetValue() {
-        value = null;
+    	if (this.getHasParameterDefault() && value == null) {
+    	    value = parameterDefault;
+    	}
     }
     
-    public boolean isNull() {
+	public void setParameterDefaultValue(String val) {
+    	if (val == null) {
+    	    this.parameterDefault = null;
+    	} else {
+            try {
+            	parameterDefault = new Date(java.sql.Date.valueOf(val).getTime());
+            } catch (Exception e) {
+                throw new RuntimeException("Bad date format used to set date default value: " + val);
+            }
+    	}
+		setHasParameterDefault(true);
+	}
+
+	public boolean isNull() {
     	return null == value;
     }
 
@@ -205,7 +221,7 @@ public class DateVariable extends RuleVariable {
     	    if (sval == null) {
     		value = null;
     	    } else {
-    		value = new Date(sval);
+    		value = new Date(java.sql.Date.valueOf(sval).getTime());
     	    }
     	}
     }
@@ -226,7 +242,7 @@ public class DateVariable extends RuleVariable {
     	    value = null;
     	} else {
             try {
-                value = new Date(dt);
+                value = new Date(java.sql.Date.valueOf(dt).getTime());
             } catch (Exception e) {
                 throw new RuntimeException("Bad date format used to set date value: " + dt);
             }
@@ -249,10 +265,11 @@ public class DateVariable extends RuleVariable {
     @SuppressWarnings("deprecation")
     public String valueAsString() {
     	if (value == null) {
-    	    return null;
-    	}
-
-    	return value.toLocaleString();
+    		return "null";
+    	} 
+    	
+    	java.sql.Date dt = new java.sql.Date(value.getTime());
+    	return dt.toString();
     }
 
     public Double valueAsDouble() {

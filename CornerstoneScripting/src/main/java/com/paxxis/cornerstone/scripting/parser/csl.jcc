@@ -361,8 +361,14 @@ RuleVariable parameter() :
     <RESULT> t = variablename()
     { return new ResultVariable(t.image); }
     |
-    <DATE> t = variablename()
-    { return new DateVariable(t.image); }
+    <DATE> t = variablename() (LOOKAHEAD(2) "=" defaultValue = stringValue())?
+    { 
+        DateVariable dtv = new DateVariable(t.image);
+        if (defaultToken != null) {
+            dtv.setParameterDefaultValue(defaultToken.image);
+        }
+        return dtv; 
+    }
     |
     <BOOLEAN> t = variablename() (LOOKAHEAD(2) "=" defaultToken = booleanValue())?
     { 

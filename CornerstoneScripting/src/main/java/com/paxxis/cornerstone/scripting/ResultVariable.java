@@ -78,9 +78,11 @@ public class ResultVariable extends RuleVariable {
     }
     
     public void resetValue() {
-        success = null;
-        resultCode = new Integer(0);
-        description = "";
+    	if (!this.getHasParameterDefault()) {
+            success = null;
+            resultCode = new Integer(0);
+            description = "";
+    	}
     }
     
     public ResultVariable(String name, boolean value) {

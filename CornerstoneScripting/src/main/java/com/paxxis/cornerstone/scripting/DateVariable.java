@@ -218,11 +218,7 @@ public class DateVariable extends RuleVariable {
     	    value = dv.value;
     	} else {
     	    String sval = rv.valueAsString();
-    	    if (sval == null) {
-    		value = null;
-    	    } else {
-    		value = new Date(java.sql.Date.valueOf(sval).getTime());
-    	    }
+    	    setValue(sval);
     	}
     }
     

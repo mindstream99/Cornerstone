@@ -73,7 +73,9 @@ public class Array extends RuleVariable {
     }
     
     public void resetValue() {
-        elements = null;
+    	if (!this.getHasParameterDefault()) {
+            elements = null;
+    	}
     }
     
     public boolean methodHasReturn(String name) {

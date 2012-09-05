@@ -103,7 +103,7 @@ public abstract class RuleVariable extends IValue {
     public void setParameterDefaultValue(String val) {
     }
     
-    protected void setHasParameterDefault(boolean val) {
+    public void setHasParameterDefault(boolean val) {
 	this.hasParameterDefault = val;
     }
     

@@ -98,6 +98,7 @@ public class InstructionQueue extends Instruction {
      * @param vals
      */
     public void setVariableValues(List<IValue> vals) {
+	ruleSet.setCurrentInstruction(this);
         int cnt = vals.size();
         for (int i = 0; i < cnt; i++) {
             Integer idx = new Integer(i);

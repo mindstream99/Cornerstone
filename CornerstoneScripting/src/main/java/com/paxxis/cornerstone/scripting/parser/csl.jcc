@@ -359,7 +359,11 @@ RuleVariable parameter() :
     }
     |
     <RESULT> t = variablename()
-    { return new ResultVariable(t.image); }
+    { 
+        ResultVariable resv = new ResultVariable(t.image);
+        resv.setHasParameterDefault(true);
+        return resv; 
+    }
     |
     <DATE> t = variablename() (LOOKAHEAD(2) "=" defaultValue = stringValue())?
     { 
@@ -380,16 +384,28 @@ RuleVariable parameter() :
     }
     |
     <ARRAY> t = variablename()
-    { return new Array(t.image); }
+    { 
+        Array array = new Array(t.image);
+        array.setHasParameterDefault(true);
+        return array; 
+    }
     |
     <TABLE> t = variablename()
-    { return new Table(t.image); }
+    { 
+        Table table = new Table(t.image);
+        table.setHasParameterDefault(true);
+        return table; 
+    }
     |
     <EXTENSION> t = variablename()
     { return new Extension(t.image); }
     |
     <REFERENCE> t = variablename()
-    { return new ReferenceVariable(t.image); }
+    { 
+        ReferenceVariable refv = new ReferenceVariable(t.image);
+        refv.setHasParameterDefault(true);
+        return refv; 
+    }
 }
 
 Token variablename() :

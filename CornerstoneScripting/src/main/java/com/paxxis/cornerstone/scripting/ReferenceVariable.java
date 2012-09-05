@@ -41,7 +41,9 @@ public class ReferenceVariable extends RuleVariable {
     }
     
     public void resetValue() {
-        ref = null;
+    	if (!this.getHasParameterDefault()) {
+            ref = null;
+    	}
     }
     
     protected void setValue(IValue val) {

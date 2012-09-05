@@ -110,9 +110,11 @@ public class Table extends RuleVariable {
     }
 
     public void resetValue() {
-        elements = new ArrayList<ArrayList<IValue>>();
-        columnNames = new ArrayList<IValue>();
-        columnFormats = new HashMap<Integer, String>();
+    	if (this.getHasParameterDefault()) {
+            elements = new ArrayList<ArrayList<IValue>>();
+            columnNames = new ArrayList<IValue>();
+            columnFormats = new HashMap<Integer, String>();
+    	}
     }
 
     public boolean methodHasReturn(String name) {

@@ -41,7 +41,9 @@ public class FileSystemScriptLoader implements ScriptLoader {
 	loader.setSourceName(args[0]);
 	loader.setUseSubDirectories(true);
 	String methodName = args[1];
-	loader.setParserManager(new ParserManager());
+	ParserManager mgr = new ParserManager();
+	mgr.setParserClassName(com.paxxis.cornerstone.scripting.parser.CSLRuleParser.class.getName());
+	loader.setParserManager(mgr);
 	loader.initialize();
 	try {
 	    RuleSet ruleSet = loader.load();

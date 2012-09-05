@@ -185,7 +185,9 @@ public class DateVariable extends RuleVariable {
         }
         
         long newVal = inc + value.getTime();
-        value.setTime(newVal);
+        Date temp = new Date(newVal);
+        this.setValue(new DateVariable(null, temp), true);
+        //value.setTime(newVal);
         
         return result;
     }

@@ -274,7 +274,6 @@ public class CSLRuleParser implements RuleParser, CSLRuleParserConstants {
       jj_consume_token(STRING);
       t = variablename();
       if (jj_2_1(2)) {
-        jj_consume_token(ASSIGNMENT);
         defaultValue = stringValue();
       } else {
         ;
@@ -289,7 +288,6 @@ public class CSLRuleParser implements RuleParser, CSLRuleParserConstants {
       jj_consume_token(DOUBLE);
       t = variablename();
       if (jj_2_2(2)) {
-        jj_consume_token(ASSIGNMENT);
         switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
         case FLOATLITERAL:
           defaultToken = doubleValue();
@@ -315,7 +313,6 @@ public class CSLRuleParser implements RuleParser, CSLRuleParserConstants {
       jj_consume_token(INTEGER);
       t = variablename();
       if (jj_2_3(2)) {
-        jj_consume_token(ASSIGNMENT);
         defaultToken = integerValue();
       } else {
         ;
@@ -337,7 +334,6 @@ public class CSLRuleParser implements RuleParser, CSLRuleParserConstants {
       jj_consume_token(DATE);
       t = variablename();
       if (jj_2_4(2)) {
-        jj_consume_token(ASSIGNMENT);
         defaultValue = stringValue();
       } else {
         ;
@@ -352,7 +348,6 @@ public class CSLRuleParser implements RuleParser, CSLRuleParserConstants {
       jj_consume_token(BOOLEAN);
       t = variablename();
       if (jj_2_5(2)) {
-        jj_consume_token(ASSIGNMENT);
         defaultToken = booleanValue();
       } else {
         ;
@@ -1680,7 +1675,6 @@ IValue customSyntaxObjectOperation(InstructionQueue queue) :
   }
 
   private boolean jj_3_2() {
-    if (jj_scan_token(ASSIGNMENT)) return true;
     Token xsp;
     xsp = jj_scanpos;
     if (jj_3R_12()) {
@@ -1709,7 +1703,6 @@ IValue customSyntaxObjectOperation(InstructionQueue queue) :
   }
 
   private boolean jj_3_1() {
-    if (jj_scan_token(ASSIGNMENT)) return true;
     if (jj_3R_11()) return true;
     return false;
   }
@@ -2327,11 +2320,6 @@ IValue customSyntaxObjectOperation(InstructionQueue queue) :
     return false;
   }
 
-  private boolean jj_3R_13() {
-    if (jj_3R_14()) return true;
-    return false;
-  }
-
   private boolean jj_3R_50() {
     if (jj_scan_token(SET)) return true;
     if (jj_scan_token(TO)) return true;
@@ -2342,6 +2330,11 @@ IValue customSyntaxObjectOperation(InstructionQueue queue) :
   private boolean jj_3R_46() {
     if (jj_scan_token(TABLE)) return true;
     if (jj_3R_97()) return true;
+    return false;
+  }
+
+  private boolean jj_3R_13() {
+    if (jj_3R_14()) return true;
     return false;
   }
 
@@ -2384,7 +2377,6 @@ IValue customSyntaxObjectOperation(InstructionQueue queue) :
   }
 
   private boolean jj_3_5() {
-    if (jj_scan_token(ASSIGNMENT)) return true;
     if (jj_3R_15()) return true;
     return false;
   }
@@ -2443,7 +2435,6 @@ IValue customSyntaxObjectOperation(InstructionQueue queue) :
   }
 
   private boolean jj_3_4() {
-    if (jj_scan_token(ASSIGNMENT)) return true;
     if (jj_3R_11()) return true;
     return false;
   }
@@ -2485,11 +2476,6 @@ IValue customSyntaxObjectOperation(InstructionQueue queue) :
     return false;
   }
 
-  private boolean jj_3R_12() {
-    if (jj_3R_30()) return true;
-    return false;
-  }
-
   private boolean jj_3_12() {
     if (jj_scan_token(ELSE)) return true;
     if (jj_scan_token(IF)) return true;
@@ -2509,6 +2495,11 @@ IValue customSyntaxObjectOperation(InstructionQueue queue) :
     return false;
   }
 
+  private boolean jj_3R_12() {
+    if (jj_3R_30()) return true;
+    return false;
+  }
+
   private boolean jj_3R_59() {
     if (jj_scan_token(ARRAY)) return true;
     if (jj_3R_97()) return true;
@@ -2516,7 +2507,6 @@ IValue customSyntaxObjectOperation(InstructionQueue queue) :
   }
 
   private boolean jj_3_3() {
-    if (jj_scan_token(ASSIGNMENT)) return true;
     if (jj_3R_14()) return true;
     return false;
   }

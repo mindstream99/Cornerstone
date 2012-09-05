@@ -4,7 +4,7 @@ execute(Date startDate) {
    assert startDate:isNull() : "sdsdsds" ;
 
    Integer y = 0;
-   dynamic Integer z = y * 100;
+   dynamic Integer z = (1 + y * 100);
    foreach (i in 1 to 300) {
       y = 2 * i;
    }
@@ -17,12 +17,40 @@ execute(Date startDate) {
       idx = idx + 1;
    }
    */
-
-   return "Value of z is " | newLine | z;
+   Date dt;
+   dt:setNow();
+   dynamic String xxx = "The date is " | dt ;
+   foreach (i in 1 to 10) {
+      dt:incrementDays(1);
+   }
+   
+   return "Value of z is " | newLine | z | newLine | dt | newLine | xxx;
 }
 
 ruleset utils
 
+crapola(Date startDate) {
+    dynamic String sql1 = "SELECT date(ymdh) as day, sum(imps) as vertica_imps, sum(clicks) as clicks, " |
+                  "sum(convs) as convs, sum(media_cost_dollars) as buyer_media_cost, " |
+                  "sum(reseller_revenue) as seller_revenue, sum(booked_revenue_dollars) as booked_revenue " |
+                  "FROM agg_dw_billing_adjusted WHERE date(ymdh) = '" | startDate | "' and adjustment_id = 0 " |
+                  "group by day order by day";
+
+}
+
 runAgg(Integer aggno, Integer incr) {
    return aggno * 10 * incr;
 }
+
+   dynamic Reference suff = "for date " | startDate | " comparing " | firstResource | " to " | secondResource;
+   while (not startDate:isAfter(endDate)) {
+      validate query sql1 on firstResource, sql2 on secondResource {
+        alert suffix suff;
+        alert level critical;
+        alert prefix "My Validation";
+        each ["vertica_imps"] == ["nz_imps"] within threshold;
+        each ["clicks"] == ["clicks"] within threshold;
+        each ["convs"] == ["convs"] within threshold;
+      };
+      startDate:incrementDays(1);
+   }

@@ -187,13 +187,13 @@ public class DateVariable extends RuleVariable {
         long newVal = inc + value.getTime();
         Date temp = new Date(newVal);
         this.setValue(new DateVariable(null, temp), true);
-        //value.setTime(newVal);
         
         return result;
     }
     
     public void setNow(List<IValue> params) {
-        value = new Date();
+        Date temp = new Date();
+        this.setValue(new DateVariable(null, temp), true);
     }
 
     public IValue isAfter(List<IValue> params) {

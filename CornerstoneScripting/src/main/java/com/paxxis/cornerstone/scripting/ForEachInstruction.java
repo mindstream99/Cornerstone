@@ -53,7 +53,6 @@ public class ForEachInstruction extends Instruction {
     
     public void setIndexEndValue(IValue end) {
 	indexEndValue = end;
-	increasing = indexEndValue.valueAsInteger() >= indexStartValue.valueAsInteger();
     }
     
     @Override
@@ -66,7 +65,9 @@ public class ForEachInstruction extends Instruction {
     }
 
     public boolean process(InstructionQueue queue) {
-        // set the rule set
+	increasing = indexEndValue.valueAsInteger() >= indexStartValue.valueAsInteger();
+
+	// set the rule set
         block.setRuleSet(queue.getRuleSet());
 
         // foreach instructions want the break

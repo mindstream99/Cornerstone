@@ -85,8 +85,13 @@ public abstract class AbstractBlockingObjectPool<T> extends CornerstoneConfigura
     private boolean shutdown = false;
 
     private int poolSize = 10;
-    private long borrowTimeout = 10000;
+    private long borrowTimeout = 600000;
 
+    private BlockingThreadPoolExecutor executor = null;
+
+    public void setExecutor(BlockingThreadPoolExecutor executor) {
+	this.executor = executor;
+    }
 
     public void setPoolSize(int size) {
 	poolSize = size;
@@ -245,18 +250,28 @@ public abstract class AbstractBlockingObjectPool<T> extends CornerstoneConfigura
     }
 
     public void initialize() {
-	synchronized (semaphore) {
-	    // copy everything in the activePool into the abandonedPool so that when the instance is returned it
-	    // doesn't get put back in the free pool
-	    abandonedPool.putAll(activePool);
+	Runnable r = new Runnable() {
+	    public void run() {
+		synchronized (semaphore) {
+		    // copy everything in the activePool into the abandonedPool so that when the instance is returned it
+		    // doesn't get put back in the free pool
+		    abandonedPool.putAll(activePool);
 
-	    freePool.clear();
-	    activePool.clear();
-	    this.shutdown = false;
+		    freePool.clear();
+		    activePool.clear();
+		    shutdown = false;
 
-	    for (int i = 0; i < poolSize; i++) {
-		freePool.add(createPoolEntry());
+		    for (int i = 0; i < poolSize; i++) {
+			freePool.add(createPoolEntry());
+		    }
+		}
 	    }
+	};
+	
+	if (executor == null) {
+	    r.run();
+	} else {
+	    executor.submit(r);
 	}
     }
 

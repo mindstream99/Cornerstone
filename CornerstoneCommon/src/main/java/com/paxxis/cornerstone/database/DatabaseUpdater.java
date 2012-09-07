@@ -124,9 +124,10 @@ public class DatabaseUpdater {
 	
 	public void update(String updaterFileName, String target) {
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-        DatabaseConnection database = pool.borrowInstance(this);
+        DatabaseConnection database = null;
         
         try {
+            database = pool.borrowInstance(this);
         	database.startTransaction();
             DocumentBuilder db = dbf.newDocumentBuilder();
             Document doc = db.parse(updaterFileName);
@@ -231,13 +232,18 @@ public class DatabaseUpdater {
         	System.out.println("\nDatabase successfully updated to version " + targetVersion + "\n");
         } catch (Exception e) {
         	try {
+        	    if (database != null) {
         		database.rollbackTransaction();
+        	    }
         	} catch (Exception ee) {
         	}
         	System.out.println("\nUpdate Failed: " + e.getLocalizedMessage() + "\n");
+        } finally {
+            if (database != null) {
+                pool.returnInstance(database, this);
+            }
         }
 		
-        pool.returnInstance(database, this);
 	}
 	
 	/**

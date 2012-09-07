@@ -78,15 +78,6 @@ public class DatabaseConnection implements IDatabaseConnection {
     
     public void setDriverName(String name) {
         driverName = name;
-        initDriver();
-    }
-    
-    private void initDriver() {
-        try {
-            Class.forName(driverName);
-        } catch (ClassNotFoundException ex) {
-            throw new RuntimeException(ex);
-        }
     }
     
     public void connect(String url, Properties props) throws DatabaseException {
@@ -95,6 +86,7 @@ public class DatabaseConnection implements IDatabaseConnection {
         }
     
         try {
+            DriverManager.setLoginTimeout(5);
             connection = DriverManager.getConnection(url, props);
             connection.setAutoCommit(autoCommit);
             connection.setTransactionIsolation(transactionIsolation.getTransactionIsolation());
@@ -133,10 +125,9 @@ public class DatabaseConnection implements IDatabaseConnection {
         Properties props = new Properties();
         props.setProperty("user", user);
         props.setProperty("password", password);
-        connect(url, props);
-        
         dbUrl = url;
         dbUser = user;
+        connect(url, props);
     }
 
     public Connection getRawConnection() {
@@ -427,7 +418,7 @@ public class DatabaseConnection implements IDatabaseConnection {
     private void validateConnection() throws DatabaseException {
         try {
             if (connection == null || connection.isClosed()) {
-                throw new DatabaseException("Database connection is closed");
+                throw new DatabaseException("Database connection is closed for " + dbUrl);
             }
         } catch (SQLException sqle) {
             connection = null;

@@ -25,6 +25,11 @@ public class OracleProvider implements DatabaseConnectionProvider {
 
     @Override
     public String getConnectionUrl(DatabaseConnectionPool pool) {
+	String port = "";
+	Integer portNum = pool.getDbPort();
+	if (portNum != null) {
+	    port = ":" + portNum;
+	}
 	StringBuilder builder = new StringBuilder();
 	builder.append(pool.getDbUrlPrefix())
 	       .append(pool.getDbUsername())
@@ -32,6 +37,7 @@ public class OracleProvider implements DatabaseConnectionProvider {
 	       .append(pool.getDbPassword())
 	       .append("@//")
 	       .append(pool.getDbHostname())
+	       .append(port)
 	       .append("/")
 	       .append(pool.getDbSid());
         return builder.toString();

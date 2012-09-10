@@ -25,10 +25,17 @@ public class VerticaProvider implements DatabaseConnectionProvider {
 
     @Override
     public String getConnectionUrl(DatabaseConnectionPool pool) {
+	String port = "";
+	Integer portNum = pool.getDbPort();
+	if (portNum != null) {
+	    port = ":" + portNum;
+	}
+	
 	StringBuilder builder = new StringBuilder();
 	builder.append(pool.getDbUrlPrefix())
 	       .append("//")
 	       .append(pool.getDbHostname())
+	       .append(port)
 	       .append("/")
 	       .append(pool.getDbName());
         String extraParameters = pool.getExtraParameters();

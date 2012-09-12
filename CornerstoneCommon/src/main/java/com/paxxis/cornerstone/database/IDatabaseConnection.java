@@ -30,6 +30,7 @@ public interface IDatabaseConnection extends CloseableResource
     // connection
     void connect(String connectionString, Properties props) throws DatabaseException;
     void connect(String connectionString, String user, String password) throws DatabaseException;
+    void disconnect(boolean force);
     void disconnect();
     boolean isConnected();
     String getUser();

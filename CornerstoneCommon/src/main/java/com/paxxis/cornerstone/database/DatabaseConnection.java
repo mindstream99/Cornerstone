@@ -135,10 +135,22 @@ public class DatabaseConnection implements IDatabaseConnection {
     }
     
     public void disconnect() {
-        if (isConnected()) {   
+        disconnect(false);
+    }
+
+    public void disconnect(boolean force) {
+        boolean disconnect = true;
+        if (!force) {
+            disconnect = isConnected();
+        }
+        
+        if (disconnect) {   
             try {   
                 close();
-                connection.close();
+                
+                if (!force) {
+                    connection.close();
+                }
             } catch (SQLException ex) {   
                 // do not propagate this exception
             }

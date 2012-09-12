@@ -55,7 +55,7 @@ public class DatabaseConnectionPool extends AbstractBlockingObjectPool<DatabaseC
 
     private boolean autoCommit = false;
     private DatabaseConnection.TransactionIsolation transactionIsolation = 
-	    DatabaseConnection.TransactionIsolation.TRANSACTION_READ_UNCOMMITTED;
+            DatabaseConnection.TransactionIsolation.TRANSACTION_READ_UNCOMMITTED;
 
     private DatabaseConnectionProvider typeProvider = null;
 
@@ -77,31 +77,31 @@ public class DatabaseConnectionPool extends AbstractBlockingObjectPool<DatabaseC
     //FIXME this is a work around to keep the api for borrowing connections the same in Chime
     //will be removed on future refactorings...
     private Map<DatabaseConnection, PoolEntry> activeConnections = 
-	    new HashMap<DatabaseConnection, PoolEntry>();
+            new HashMap<DatabaseConnection, PoolEntry>();
 
     public static class PoolEntry extends AbstractBlockingObjectPool.PoolEntry<DatabaseConnection>
     {
-	private long timestamp;
+        private long timestamp;
 
-	public PoolEntry(DatabaseConnection db) {
-	    super(db);
-	    this.timestamp = System.currentTimeMillis();
-	}
+        public PoolEntry(DatabaseConnection db) {
+            super(db);
+            this.timestamp = System.currentTimeMillis();
+        }
 
-	public long getTimestamp() {
-	    return this.timestamp;
-	}
+        public long getTimestamp() {
+            return this.timestamp;
+        }
 
-	@Override
-	public void shutdown() {
-	    getObject().disconnect();
-	    super.shutdown();
-	}
+        @Override
+        public void shutdown() {
+            getObject().disconnect();
+            super.shutdown();
+        }
 
-	@Override
-	public void onReturn() {
-	    getObject().close();
-	}       
+        @Override
+        public void onReturn() {
+            getObject().close();
+        }       
 
     }
 
@@ -109,37 +109,37 @@ public class DatabaseConnectionPool extends AbstractBlockingObjectPool<DatabaseC
     private static int _sweeperCounter = 0;
     class Sweeper extends Thread
     {
-	boolean terminate = false;
+        boolean terminate = false;
 
-	public Sweeper()
-	{
-	    setName("Cornerstone Database Connection Pool Sweeper - " + _sweeperCounter++);
-	}
+        public Sweeper()
+        {
+            setName("Cornerstone Database Connection Pool Sweeper - " + _sweeperCounter++);
+        }
 
-	public synchronized void terminate()
-	{
-	    terminate = true;
-	    interrupt();
-	}
+        public synchronized void terminate()
+        {
+            terminate = true;
+            interrupt();
+        }
 
-	@Override
-	public void run()
-	{
-	    while (!terminate)
-	    {
-		try
-		{
-		    Thread.sleep(_sweepCycle);
-		}
-		catch (InterruptedException e)
-		{
-		}
+        @Override
+        public void run()
+        {
+            while (!terminate)
+            {
+                try
+                {
+                    Thread.sleep(_sweepCycle);
+                }
+                catch (InterruptedException e)
+                {
+                }
 
-		if (!terminate) {
-		    sweep();
-		}
-	    }
-	}
+                if (!terminate) {
+                    sweep();
+                }
+            }
+        }
     }
 
     private Sweeper _sweeper = new Sweeper();
@@ -147,75 +147,86 @@ public class DatabaseConnectionPool extends AbstractBlockingObjectPool<DatabaseC
 
     private void sweep()
     {
-	long now = System.currentTimeMillis();
+        long now = System.currentTimeMillis();
 
-	synchronized (getSemaphore())
-	{
-	    Map<AbstractBlockingObjectPool.PoolEntry<DatabaseConnection>, Object> activePool = getActivePool();
-	    int active = activePool.size();
+        synchronized (getSemaphore())
+        {
+            Map<AbstractBlockingObjectPool.PoolEntry<DatabaseConnection>, Object> activePool = getActivePool();
+            int active = activePool.size();
 
-	    List<AbstractBlockingObjectPool.PoolEntry<DatabaseConnection>> freePool = getFreePool();
-	    int free = freePool.size();
+            List<AbstractBlockingObjectPool.PoolEntry<DatabaseConnection>> freePool = getFreePool();
+            int free = freePool.size();
 
-	    int total = active + free;
+            int total = active + free;
 
-	    if (free > 0 && total > _minimum)
-	    {
-		// how many should we remove?
-		int over = total - _minimum;
-		int target = free - over;
-		if (free > target)
-		{
-		    int count = free - target;
+            if (free > 0 && total > _minimum)
+            {
+                // how many should we remove?
+                int over = total - _minimum;
+                int target = free - over;
+                if (free > target)
+                {
+                    int count = free - target;
 
-		    if (count > 0)
-		    {
-			int removed = 0;
-			int last = free - 1;
-			for (int i = last; i >= 0; i--)
-			{
-			    PoolEntry entry = (PoolEntry) freePool.get(i);
-			    if ((now - entry.timestamp) >= _idleThreshold)
-			    {
-				entry.getObject().disconnect();
-				freePool.remove(i);
-				removed++;
+                    if (count > 0)
+                    {
+                        int removed = 0;
+                        int last = free - 1;
+                        for (int i = last; i >= 0; i--)
+                        {
+                            PoolEntry entry = (PoolEntry) freePool.get(i);
+                            if ((now - entry.timestamp) >= _idleThreshold)
+                            {
+                                entry.getObject().disconnect();
+                                freePool.remove(i);
+                                removed++;
 
-				if (removed == count)
-				{
-				    break;
-				}
-			    }
-			}
-		    }
-		}
-	    }
+                                if (removed == count)
+                                {
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
 
-	    // reconnect any closed connections in the free pool
-	    for (AbstractBlockingObjectPool.PoolEntry<DatabaseConnection> entry : freePool)
-	    {
-		ensureConnection(entry.getObject());
-	    }
-	}
+            // reconnect any closed connections in the free pool
+            for (AbstractBlockingObjectPool.PoolEntry<DatabaseConnection> entry : freePool)
+            {
+                try {
+                    ensureConnection(entry.getObject());
+                } catch (DatabaseException e) {
+                }
+            }
+        }
     }
 
-    public void ensureConnection(DatabaseConnection connection) {
-	try
-	{
-	    // just send any old statement; essentially like doing a ping
-	    connection.executeStatement(getEnsureConnectedStatment());
-	}
-	catch (Exception e)
-	{
-	    connection.disconnect();
-	}
+    public void ensureConnection(DatabaseConnection connection) throws DatabaseException {
+        boolean force = false;
+        try
+        {
+            InetAddress address = InetAddress.getByName(_dbHostname);
+            if (!address.isReachable(2000)) {
+                force = true;
+                String url = typeProvider.getConnectionUrl(this);
+                throw new Exception(url + " is unreachable");
+            }
 
-	// if after the ping above we find the connection is closed,
-	// try to reconnect it
-	if (!connection.isConnected())
-	{
-	    connect(connection);
-	}
+            // just send any old statement; essentially like doing a ping
+            connection.executeStatement(getEnsureConnectedStatment());
+        }
+        catch (Exception e)
+        {
+            connection.disconnect(force);
+        }
+
+        // if after the ping above we find the connection is closed,
+        // try to reconnect it
+        if (!connection.isConnected())
+        {
+            connect(connection);
+        }
     }
 
     /**
@@ -225,17 +236,21 @@ public class DatabaseConnectionPool extends AbstractBlockingObjectPool<DatabaseC
      * @return
      */
     public DatabaseConnection borrowInstance(Object borrower) throws DatabaseException {
-	try {
-	    PoolEntry entry = borrow(borrower);
-	    activeConnections.put(entry.getObject(), entry);
-	    return entry.getObject();
-	} catch (Throwable t) {
-	    throw new DatabaseException(t);
-	}
+        try {
+            PoolEntry entry = borrow(borrower);
+            if (entry.getObject().isConnected()) {
+                activeConnections.put(entry.getObject(), entry);
+                return entry.getObject();
+            } else {
+                throw new Exception("Unable to borrow broken connection.");
+            }
+        } catch (Throwable t) {
+            throw new DatabaseException(t);
+        }
     }
 
     public void returnInstance(DatabaseConnection connection, Object borrower) {
-	returnInstance(activeConnections.remove(connection));
+        returnInstance(activeConnections.remove(connection));
     }
 
     /**
@@ -245,132 +260,140 @@ public class DatabaseConnectionPool extends AbstractBlockingObjectPool<DatabaseC
      */
     @Override
     protected <P extends AbstractBlockingObjectPool.PoolEntry<DatabaseConnection>> P validatePoolEntry(P entry) {
-	if (isEnsureConnected()) {
-	    ensureConnection(entry.getObject());
-	}
-	return super.validatePoolEntry(entry);
+        if (isEnsureConnected()) {
+            try {
+                ensureConnection(entry.getObject());
+            } catch (DatabaseException e) {
+            }
+        }
+        return super.validatePoolEntry(entry);
     }
 
     public void shutdown() {
-	try {
-	    super.shutdown();
-	} finally {
-	    typeProvider.onShutdown(this);
-	    _sweeper.terminate();
-	    activeConnections.clear();
-	}
+        try {
+            super.shutdown();
+        } finally {
+            typeProvider.onShutdown(this);
+            _sweeper.terminate();
+            activeConnections.clear();
+        }
     }
 
 
     @Override
     public void initialize()
     {
-	if (typeProvider == null) {
-	    throw new RuntimeException("typeProvider can't be null.");
-	}
+        if (typeProvider == null) {
+            throw new RuntimeException("typeProvider can't be null.");
+        }
 
-	_dbPassword = passwordGenerator.encryptPassword(_dbPassword);
-	setPoolSize(_minimum);
-	initDriver();
-	super.initialize();     	
-	_sweeper.start();
+        _dbPassword = passwordGenerator.encryptPassword(_dbPassword);
+        setPoolSize(_minimum);
+        initDriver();
+        super.initialize();     	
+        _sweeper.start();
     }
 
     private void initDriver() {
-	try {
-	    Class.forName(_dbDriver);
-	} catch (ClassNotFoundException ex) {
-	    throw new RuntimeException(ex);
-	}
+        try {
+            Class.forName(_dbDriver);
+        } catch (ClassNotFoundException ex) {
+            throw new RuntimeException(ex);
+        }
     }
 
     @SuppressWarnings("unchecked")
     @Override
     protected PoolEntry createPoolEntry() {
-	return new PoolEntry(create());
+        return new PoolEntry(create());
     }
 
     public void setPasswordGenerator(PasswordGenerator generator) {
-	passwordGenerator = generator;
+        passwordGenerator = generator;
     }
 
     public void setCatalog(String cat) {
-	catalog = cat;
+        catalog = cat;
     }
 
     public String getCatalog() {
-	return catalog;
+        return catalog;
     }
 
-    public void connect(DatabaseConnection database)
+    public void connect(DatabaseConnection database) throws DatabaseException
     {
-	try
-	{
-	    database.setDriverName(_dbDriver);
-	    database.setCatalog(catalog);
-	    database.setAutoCommit(autoCommit);
-	    database.setTransactionIsolation(transactionIsolation);
+        try
+        {
+            database.setDriverName(_dbDriver);
+            database.setCatalog(catalog);
+            database.setAutoCommit(autoCommit);
+            database.setTransactionIsolation(transactionIsolation);
 
-	    String url = typeProvider.getConnectionUrl(this);
-	    InetAddress address = InetAddress.getByName(_dbHostname);
-	    if (!address.isReachable(2000)) {
-		throw new Exception(url + " is unreachable");
-	    }
-	    database.connect(url, _dbUsername, _dbPassword);
-	} catch (Exception e) {
-	    LOGGER.error(e);
-	}
+            String url = typeProvider.getConnectionUrl(this);
+            InetAddress address = InetAddress.getByName(_dbHostname);
+            if (!address.isReachable(2000)) {
+                throw new Exception(url + " is unreachable");
+            }
+            database.connect(url, _dbUsername, _dbPassword);
+        } catch (Exception e) {
+            LOGGER.error(e);
+            throw new DatabaseException(e);
+        }
     }
 
-    private DatabaseConnection create()
+    private DatabaseConnection create() 
     {
-	DatabaseConnection database = new DatabaseConnection();
-	connect(database);
-	return database;
+        DatabaseConnection database = new DatabaseConnection();
+        try {
+            connect(database);
+        } catch (DatabaseException e) {
+            throw new RuntimeException(e);
+        }
+        return database;
     }
 
     public void setExtraParameters(String params) {
-	extraParameters = params;
+        extraParameters = params;
     }
 
     public String getExtraParameters() {
-	return extraParameters;
+        return extraParameters;
     }
 
     public void setTimestampFormat(String fmt) {
-	timestampFormat = fmt;
+        timestampFormat = fmt;
     }
 
     public String getTimestampFormat() {
-	return timestampFormat;
+        return timestampFormat;
     }
 
     public void setDbSid(String sid) {
-	dbSid = sid;
+        dbSid = sid;
     }
 
     public String getDbSid() {
-	return dbSid;
+        return dbSid;
     }
 
     public void setDbDriver(String driver)
     {
-	_dbDriver = driver;
+        _dbDriver = driver;
     }
 
     public String getDbDriver()
     {
-	return _dbDriver;
+        return _dbDriver;
     }
 
     public void setDbUrlPrefix(String prefix)
     {
-	_dbUrlPrefix = prefix;
+        _dbUrlPrefix = prefix;
     }
 
     public String getDbUrlPrefix()
     {
-	return _dbUrlPrefix;
+        return _dbUrlPrefix;
     }
 
     /**
@@ -380,20 +403,20 @@ public class DatabaseConnectionPool extends AbstractBlockingObjectPool<DatabaseC
      */
     public void setDbHostname(String name)
     {
-	_dbHostname = name;
+        _dbHostname = name;
     }
 
     public String getDbHostname()
     {
-	return _dbHostname;
+        return _dbHostname;
     }
-    
+
     public void setDbPort(int port) {
-	_dbPort = port;
+        _dbPort = port;
     }
-    
+
     public Integer getDbPort() {
-	return _dbPort;
+        return _dbPort;
     }
 
     /**
@@ -403,12 +426,12 @@ public class DatabaseConnectionPool extends AbstractBlockingObjectPool<DatabaseC
      */
     public void setDbUsername(String name)
     {
-	_dbUsername = name;
+        _dbUsername = name;
     }
 
     public String getDbUsername()
     {
-	return _dbUsername;
+        return _dbUsername;
     }
     /**
      * Set the user password for logging in to the configuration database
@@ -417,12 +440,12 @@ public class DatabaseConnectionPool extends AbstractBlockingObjectPool<DatabaseC
      */
     public void setDbPassword(String pw)
     {
-	_dbPassword = pw;
+        _dbPassword = pw;
     }
 
     public String getDbPassword()
     {
-	return _dbPassword;
+        return _dbPassword;
     }
 
     /**
@@ -432,86 +455,86 @@ public class DatabaseConnectionPool extends AbstractBlockingObjectPool<DatabaseC
      */
     public void setDbName(String name)
     {
-	_dbName = name;
+        _dbName = name;
     }
 
     public String getDbName()
     {
-	return _dbName;
+        return _dbName;
     }
 
     public void setMinPoolSize(int minimum)
     {
-	_minimum = minimum;
+        _minimum = minimum;
     }
 
     public int getMinPoolSize()
     {
-	return _minimum;
+        return _minimum;
     }
 
     public void setMaxPoolSize(int maximum)
     {
-	_maximum = maximum;
+        _maximum = maximum;
     }
 
     public int getMaxPoolSize()
     {
-	return _maximum;
+        return _maximum;
     }
 
     public void setIdleThreshold(float minutes)
     {
-	_idleThreshold = (long)(minutes * (float)ONEMINUTE);
+        _idleThreshold = (long)(minutes * (float)ONEMINUTE);
     }
 
     public void setSweepCycle(float minutes)
     {
-	_sweepCycle = (long)(minutes * (float)ONEMINUTE);
+        _sweepCycle = (long)(minutes * (float)ONEMINUTE);
     }
 
     public void setEnsureConnected(boolean ensureConnected) {
-	this.ensureConnected = ensureConnected;
+        this.ensureConnected = ensureConnected;
     }
 
     public boolean isEnsureConnected() {
-	return this.ensureConnected;
+        return this.ensureConnected;
     }
 
     public void setEnsureConnectedStatment(String ensureConnectedStatment) {
-	this.ensureConnectedStatment = ensureConnectedStatment;
+        this.ensureConnectedStatment = ensureConnectedStatment;
     }
 
     public String getEnsureConnectedStatment() {
-	return ensureConnectedStatment;
+        return ensureConnectedStatment;
     }
 
     public DatabaseConnection.TransactionIsolation getTransactionIsolation() {
-	return transactionIsolation;
+        return transactionIsolation;
     }
 
     public void setTransactionIsolationLevel(String level) {
-	DatabaseConnection.TransactionIsolation tlevel = DatabaseConnection.TransactionIsolation.valueOf(level);
-	setTransactionIsolation(tlevel);
+        DatabaseConnection.TransactionIsolation tlevel = DatabaseConnection.TransactionIsolation.valueOf(level);
+        setTransactionIsolation(tlevel);
     }
 
     public void setTransactionIsolation(DatabaseConnection.TransactionIsolation transactionIsolation) {
-	this.transactionIsolation = transactionIsolation;
+        this.transactionIsolation = transactionIsolation;
     }
 
     public boolean isAutoCommit() {
-	return autoCommit;
+        return autoCommit;
     }
 
     public void setAutoCommit(boolean autoCommit) {
-	this.autoCommit = autoCommit;
+        this.autoCommit = autoCommit;
     }
 
     public DatabaseConnectionProvider getTypeProvider() {
-	return typeProvider;
+        return typeProvider;
     }
 
     public void setTypeProvider(DatabaseConnectionProvider typeProvider) {
-	this.typeProvider = typeProvider;
+        this.typeProvider = typeProvider;
     }
 }

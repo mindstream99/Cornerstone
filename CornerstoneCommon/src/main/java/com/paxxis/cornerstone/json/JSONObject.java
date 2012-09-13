@@ -17,7 +17,10 @@
 
 package com.paxxis.cornerstone.json;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Hashtable;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -202,7 +205,8 @@ public class JSONObject implements JSONValue
     {
         buffer.append("{");
         
-        Set<String> names = _pairs.keySet();
+        List<String> names = new ArrayList<String>(_pairs.keySet());
+        Collections.sort(names);
         String preop = "";
         for (String name : names)
         {

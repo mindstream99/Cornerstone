@@ -54,7 +54,7 @@ public class ErrorInstruction extends Instruction {
 
     public boolean process(InstructionQueue queue) {
 	ResultVariable rv = new ResultVariable();
-	rv.setDescription(returnValue.valueAsString());
+	rv.addMessage(returnValue.valueAsString());
 	rv.setResultCode(returnCode.valueAsInteger());
 	rv.setValue(false);
 	rule.setReturnValue(rv);

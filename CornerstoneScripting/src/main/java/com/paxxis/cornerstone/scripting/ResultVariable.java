@@ -39,7 +39,7 @@ public class ResultVariable extends RuleVariable {
 		isSuccess,
 		getResultCode,
 		getMessages,
-		merge;
+		mergeWith;
 
 		public static boolean contains(String name) {
 			boolean contains = false;
@@ -111,7 +111,7 @@ public class ResultVariable extends RuleVariable {
 	public int getMethodParameterCount(String name) {
 		if (Methods.contains(name)) {
 			switch (Methods.valueOf(name)) {
-			case merge:
+			case mergeWith:
 				return 1;
 			case isSuccess:
 			case getResultCode:
@@ -132,7 +132,7 @@ public class ResultVariable extends RuleVariable {
 				return getResultCode(params);
 			case getMessages:
 				return getMessages(params);
-			case merge:
+			case mergeWith:
 				return merge(params);
 			}
 		}

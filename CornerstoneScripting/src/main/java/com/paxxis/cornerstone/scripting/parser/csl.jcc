@@ -141,6 +141,8 @@ TOKEN :
 |  < WHEN: ("WHEN" | "when") >
 |  < SET: ("set" | "SET") >
 |  < TO: ("to" | "TO") >
+|  < MERGE: ("merge" | "MERGE") >
+|  < INTO: ("into" | "INTO") >
 |  < ANNO_DESCRIPTION: ("@description" | "@Description" | "@DESCRIPTION") >
 |  < RULESET: ("ruleset" | "RULESET") >
 |  < RULE: ("rule" | "Rule" | "RULE") >
@@ -453,6 +455,8 @@ void doClause(Rule theRule, InstructionQueue queue) :
    |
    printClause(queue) ";"
    |
+   LOOKAHEAD(3) mergeResultsClause(queue) ";"
+   |
    LOOKAHEAD(2) valueExpression(queue) ";"
 }
 
@@ -466,6 +470,36 @@ void nullObjectOperation(InstructionQueue queue) :
         EvaluationInstruction ei = new EvaluationInstruction(v);
         ei.setLineNumber(token.beginLine);
         queue.addInstruction(ei);
+    }
+}
+
+void mergeResultsClause(InstructionQueue queue) :
+{
+    IValue source;
+    IValue target;
+}
+{
+    <MERGE> source = valueExpression(queue) <INTO> target = valueExpression(queue)
+    {
+        try {
+            if ( !(target instanceof ResultVariable) ) {
+                throw new RuleCreationException("Target of merge must be a Result."); 
+            }
+            
+            ResultVariable rv = (ResultVariable)target;
+            ObjectMethodExpression exp = new ObjectMethodExpression();
+            exp.setObjectName(rv.getName(), queue); 
+            exp.setMethodName("mergeWith"); 
+            exp.addParameter(source);
+    
+            EvaluationInstruction ei = new EvaluationInstruction(exp);
+            ei.setLineNumber(token.beginLine);
+            queue.addInstruction(ei);
+        } catch (RuleCreationException rce) {
+            StringBuffer buffer = new StringBuffer(rce.getMessage());
+            buffer.append("\nLine " + token.beginLine + " Column " + token.beginColumn);
+            throw new ParseException(buffer.toString());
+        }
     }
 }
 
@@ -1180,27 +1214,11 @@ IValue objectOperation(InstructionQueue queue) :
 {
     (
 		v = directObjectOperation(queue)
-		// uncomment below if you have custom syntax
-		//|
-		//v = customSyntaxObjectOperation(queue)
 	)
 	{
 		return v;
 	}
 }
-
-/**
-IValue customSyntaxObjectOperation(InstructionQueue queue) :
-{
-	IValue v;
-}
-{
-	v = <custom calls here>
-	{
-		return v;
-	}
-}
-*/
 
 IValue objectDataValue(InstructionQueue queue) :
 {

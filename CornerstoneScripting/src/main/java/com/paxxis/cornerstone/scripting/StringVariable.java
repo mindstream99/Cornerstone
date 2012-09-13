@@ -69,6 +69,10 @@ public class StringVariable extends RuleVariable {
         return "String";
     }
     
+	public String getDefaultValue() {
+		return (parameterDefault == null) ? "null" : parameterDefault;
+	}
+
     public void resetValue() {
 	if (this.getHasParameterDefault() && value == null) {
 	    value = parameterDefault;

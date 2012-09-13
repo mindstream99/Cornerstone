@@ -18,6 +18,7 @@
 package com.paxxis.cornerstone.scripting.parser;
 
 import java.io.Serializable;
+import java.util.Map;
 
 import com.paxxis.cornerstone.scripting.InstructionQueue;
 import com.paxxis.cornerstone.scripting.Rule;
@@ -89,4 +90,13 @@ public class CSLRuntime implements Serializable {
     public boolean supportsMacroExpansion() {
 	return serviceContext.supportsMacroExpansion();
     }
+
+    public Map<String, String[]> getSessionParameters() {
+    	if (this.ruleSet == null) {
+    		return null;
+    	}
+    	
+    	return ruleSet.getSessionParameters();
+	}
+
 }

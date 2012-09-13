@@ -41,7 +41,7 @@ public abstract class RuleVariable extends IValue {
     // direct listeners of changes
     private final ArrayList<VariableChangeListener> _listeners = new ArrayList<VariableChangeListener>();
     
-    // the monitor
+    // the runtime
     protected transient CSLRuntime runtime = null;
 
     // durable?
@@ -326,7 +326,15 @@ public abstract class RuleVariable extends IValue {
 
     public abstract String getType();
     
-    public void setRuntime(CSLRuntime agent) {
-        runtime = agent;
+    public CSLRuntime getRuntime() {
+    	return runtime;
     }
+    
+    public void setRuntime(CSLRuntime rt) {
+        runtime = rt;
+    }
+
+	public String getDefaultValue() {
+		return "null";
+	}
 }

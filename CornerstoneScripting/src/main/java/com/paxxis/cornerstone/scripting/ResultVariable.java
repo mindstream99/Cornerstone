@@ -59,6 +59,9 @@ public class ResultVariable extends RuleVariable {
 
 	private Integer resultCode = new Integer(0);
 	private List<String> messages = new ArrayList<String>();
+	
+	// sub results that have been merged
+	private List<ResultVariable> mergedResults = new ArrayList<ResultVariable>();
 
 	public ResultVariable() {
 	}
@@ -149,6 +152,10 @@ public class ResultVariable extends RuleVariable {
 		return messages;
 	}
 	
+	public List<ResultVariable> getMerged() {
+		return mergedResults;
+	}
+	
 	private IValue getMessages(List<IValue> params) {
 		Array msgs = new Array();
 		List<IValue> list = new ArrayList<IValue>();
@@ -172,7 +179,10 @@ public class ResultVariable extends RuleVariable {
 			success = rv.success;
 		}
 
-		messages.addAll(rv.messages);
+		// rule variables are re-used, so we copy the merged variable before copying
+		ResultVariable result = new ResultVariable();
+		result.setValue(rv);
+		mergedResults.add(result);
 		
 		return new BooleanVariable(null, true);
 	}
@@ -183,6 +193,10 @@ public class ResultVariable extends RuleVariable {
 
 	public void addMessage(String message) {
 		messages.add(message);
+	}
+
+	public void insertMessage(String message) {
+		messages.add(0, message);
 	}
 
 	public void setValue(boolean val) {

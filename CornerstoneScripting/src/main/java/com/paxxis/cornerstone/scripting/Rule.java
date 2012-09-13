@@ -223,4 +223,10 @@ public class Rule implements Serializable {
 	
 	return params;
     }
+
+	public Object getParameterDefault(String varName) {
+		RuleVariable rv = queue.getVariable(varName);
+		String result = rv.getDefaultValue();
+		return result;
+	}
 }

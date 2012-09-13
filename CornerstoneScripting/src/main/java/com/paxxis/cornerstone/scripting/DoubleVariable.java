@@ -45,6 +45,10 @@ public class DoubleVariable extends RuleVariable {
         this.value = new Double(value);
     }
 
+	public String getDefaultValue() {
+		return (parameterDefault == null) ? "null" : parameterDefault.toString();
+	}
+
     public void setParameterDefaultValue(String val) {
 	if (val == null) {
 	    parameterDefault = null;

@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import com.paxxis.cornerstone.scripting.parser.CSLRuntime;
 
@@ -37,6 +38,9 @@ public class RuleSet implements Serializable {
 
     // the rules
     private HashMap<String, Rule> rules = new HashMap<String, Rule>();
+
+    // the session parameters
+    private HashMap<String, String[]> sessionParameters = new HashMap<String, String[]>();
 
     // a list of locally referenced rules (i.e. invoked from other rules defined in
     // the same file.
@@ -243,6 +247,19 @@ public class RuleSet implements Serializable {
 
 	public Collection<String> getRuleNames() {
 		return new ArrayList<String>(rules.keySet());
+	}
+
+	public Map<String, String[]> getSessionParameters() {
+		return sessionParameters;
+	}
+	
+	public void setSessionParameters(Map<String, String[]> sessionParams) {
+		clearSessionParameters();
+		sessionParameters.putAll(sessionParams);
+	}
+
+	public void clearSessionParameters() {
+		sessionParameters.clear();
 	}
 
 }

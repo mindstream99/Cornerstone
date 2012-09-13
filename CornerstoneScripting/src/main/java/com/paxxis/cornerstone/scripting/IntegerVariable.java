@@ -59,6 +59,10 @@ public class IntegerVariable extends RuleVariable {
 	}
     }
     
+	public String getDefaultValue() {
+		return (parameterDefault == null) ? "null" : parameterDefault.toString();
+	}
+
     public void setParameterDefaultValue(String val) {
 	if (val == null) {
 	    parameterDefault = null;

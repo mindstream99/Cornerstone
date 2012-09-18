@@ -210,7 +210,7 @@ public class JSONObject implements JSONValue
         String preop = "";
         for (String name : names)
         {
-            buffer.append(preop + "\"" + name + "\":");
+            buffer.append(preop + '"' + name + '"' + ":");
             JSONValue value = _pairs.get(name);
             buffer.append(value.toString());
             preop = ",";

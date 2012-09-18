@@ -26,7 +26,8 @@ package com.paxxis.cornerstone.scripting;
  */
 public interface ScriptLoader {
 
-	public RuleSet load() throws Exception;
+    public RuleSet load() throws Exception;
+    public RuleSet load(String extraRules) throws Exception;
 	public void setSourceName(String scriptPath);
 	public void setParserManager(ParserManager parserCreator);
 }

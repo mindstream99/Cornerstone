@@ -294,6 +294,7 @@ public interface CSLRuleParserConstants {
     "<DATELITERAL>",
     "<FLOATLITERAL>",
     "\";\"",
+    "\"$\"",
   };
 
 }

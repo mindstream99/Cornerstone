@@ -195,7 +195,7 @@ TOKEN :
 |  < EXTENSION: ("Extension") >
 |  < PRINT: ("print" | "PRINT") >
 |  < NEWLINE: ("newLine") >
-|  < name: (["a"-"z","A"-"Z","$","@","_","."]) (["a"-"z","A"-"Z",".","_","$","@","?","&","0"-"9","\\"])* >
+|  < name: (["a"-"z","A"-"Z","@","_","."]) (["a"-"z","A"-"Z",".","_","@","?","&","0"-"9","\\"])* >
 |  < INTEGERLITERAL: ("-")? (["0"-"9"])+ >
 |  < DATELITERAL: (<INTEGERLITERAL> "/" <INTEGERLITERAL> "/" <INTEGERLITERAL>)  >
 |  < FLOATLITERAL: (["0"-"9"])+ "." (["0"-"9"])+ >
@@ -1223,19 +1223,26 @@ IValue objectOperation(InstructionQueue queue) :
 IValue objectDataValue(InstructionQueue queue) :
 {
     ObjectMethodExpression exp = new ObjectMethodExpression();
+    Token nameToken;
+    Token nameSpaceToken = null;
     Token t;
     IValue val;
 }
 {
-    t = <name>
+    ( LOOKAHEAD(2)
+       nameSpaceToken = <name> "$"
+    )?
+    nameToken = <name>
     { 
-    	String qualifier;
-    	String nm = t.image;
-    	if (nm.indexOf('$') == -1) {
-    		nm = ruleSetName + "$" + nm;
-    	}
-    	 
-    	exp.setObjectName(nm, queue); 
+        String qualifier;
+        String nm = nameToken.image;
+        if (nameSpaceToken != null) {
+            nm = nameSpaceToken.image + "$" + nm;
+        } else {
+            nm = ruleSetName + "$" + nm;
+        }
+         
+        exp.setObjectName(nm, queue); 
     }
     <VALUESEP>
     t = <name>
@@ -1244,42 +1251,49 @@ IValue objectDataValue(InstructionQueue queue) :
         exp.addParameter(new StringVariable(null, t.image));
         exp.validateParameters();
         return exp;
+        
     }
 }
 
 IValue directObjectOperation(InstructionQueue queue) :
 {
     ObjectMethodExpression exp = new ObjectMethodExpression();
-    Token t;
+    Token nameToken;
+    Token nameSpaceToken = null;
     Token t2 = null;
     IValue val;
     boolean useInvoke = true;
 }
 {
-    t = <name>
+    ( LOOKAHEAD(2)
+       nameSpaceToken = <name> "$"
+    )?
+    nameToken = <name>
     (
         <METHODSEP>
         t2 = <name>
         { 
-        	useInvoke = false; 
+            useInvoke = false; 
         }
     )?
     <LPAREN>
     { 
-    	String nm = t.image;
-    	if (useInvoke) {
-	    	if (nm.indexOf('$') == -1) {
-	    		nm = ruleSetName + "$" + nm;
-	    	}
-    	} 
+        String nm = nameToken.image;
+        if (useInvoke) {
+            if (nameSpaceToken != null) {
+                nm = nameSpaceToken.image + "$" + nm;
+            } else {
+                nm = ruleSetName + "$" + nm;
+            }
+        } 
 
-    	exp.setObjectName(nm, queue); 
+        exp.setObjectName(nm, queue); 
 
-    	if (useInvoke) {
-    		exp.setMethodName("invoke");
-    	} else {
-        	exp.setMethodName(t2.image); 
-    	}
+        if (useInvoke) {
+            exp.setMethodName("invoke");
+        } else {
+            exp.setMethodName(t2.image); 
+        }
     }
     (
         (

@@ -1383,13 +1383,23 @@ public class CSLRuleParser implements RuleParser, CSLRuleParserConstants {
 
   final public IValue objectDataValue(InstructionQueue queue) throws ParseException {
     ObjectMethodExpression exp = new ObjectMethodExpression();
+    Token nameToken;
+    Token nameSpaceToken = null;
     Token t;
     IValue val;
-    t = jj_consume_token(name);
+    if (jj_2_21(2)) {
+      nameSpaceToken = jj_consume_token(name);
+      jj_consume_token(93);
+    } else {
+      ;
+    }
+    nameToken = jj_consume_token(name);
         String qualifier;
-        String nm = t.image;
-        if (nm.indexOf('$') == -1) {
-                nm = ruleSetName + "$" + nm;
+        String nm = nameToken.image;
+        if (nameSpaceToken != null) {
+            nm = nameSpaceToken.image + "$" + nm;
+        } else {
+            nm = ruleSetName + "$" + nm;
         }
 
         exp.setObjectName(nm, queue);
@@ -1404,35 +1414,44 @@ public class CSLRuleParser implements RuleParser, CSLRuleParserConstants {
 
   final public IValue directObjectOperation(InstructionQueue queue) throws ParseException {
     ObjectMethodExpression exp = new ObjectMethodExpression();
-    Token t;
+    Token nameToken;
+    Token nameSpaceToken = null;
     Token t2 = null;
     IValue val;
     boolean useInvoke = true;
-    t = jj_consume_token(name);
+    if (jj_2_22(2)) {
+      nameSpaceToken = jj_consume_token(name);
+      jj_consume_token(93);
+    } else {
+      ;
+    }
+    nameToken = jj_consume_token(name);
     switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
     case METHODSEP:
       jj_consume_token(METHODSEP);
       t2 = jj_consume_token(name);
-                useInvoke = false;
+            useInvoke = false;
       break;
     default:
       jj_la1[39] = jj_gen;
       ;
     }
     jj_consume_token(LPAREN);
-        String nm = t.image;
+        String nm = nameToken.image;
         if (useInvoke) {
-                if (nm.indexOf('$') == -1) {
-                        nm = ruleSetName + "$" + nm;
-                }
+            if (nameSpaceToken != null) {
+                nm = nameSpaceToken.image + "$" + nm;
+            } else {
+                nm = ruleSetName + "$" + nm;
+            }
         }
 
         exp.setObjectName(nm, queue);
 
         if (useInvoke) {
-                exp.setMethodName("invoke");
+            exp.setMethodName("invoke");
         } else {
-                exp.setMethodName(t2.image);
+            exp.setMethodName(t2.image);
         }
     switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
     case SINGLEQUOTE:
@@ -1689,6 +1708,20 @@ public class CSLRuleParser implements RuleParser, CSLRuleParserConstants {
     finally { jj_save(19, xla); }
   }
 
+  private boolean jj_2_21(int xla) {
+    jj_la = xla; jj_lastpos = jj_scanpos = token;
+    try { return !jj_3_21(); }
+    catch(LookaheadSuccess ls) { return true; }
+    finally { jj_save(20, xla); }
+  }
+
+  private boolean jj_2_22(int xla) {
+    jj_la = xla; jj_lastpos = jj_scanpos = token;
+    try { return !jj_3_22(); }
+    catch(LookaheadSuccess ls) { return true; }
+    finally { jj_save(21, xla); }
+  }
+
   private boolean jj_3_2() {
     Token xsp;
     xsp = jj_scanpos;
@@ -1791,6 +1824,11 @@ public class CSLRuleParser implements RuleParser, CSLRuleParserConstants {
     return false;
   }
 
+  private boolean jj_3R_104() {
+    if (jj_3R_21()) return true;
+    return false;
+  }
+
   private boolean jj_3_17() {
     if (jj_3R_25()) return true;
     return false;
@@ -1872,11 +1910,6 @@ public class CSLRuleParser implements RuleParser, CSLRuleParserConstants {
     return false;
   }
 
-  private boolean jj_3R_104() {
-    if (jj_3R_21()) return true;
-    return false;
-  }
-
   private boolean jj_3R_89() {
     if (jj_scan_token(RETURN)) return true;
     if (jj_3R_21()) return true;
@@ -1935,6 +1968,12 @@ public class CSLRuleParser implements RuleParser, CSLRuleParserConstants {
     return false;
   }
 
+  private boolean jj_3R_102() {
+    if (jj_scan_token(METHODSEP)) return true;
+    if (jj_scan_token(name)) return true;
+    return false;
+  }
+
   private boolean jj_3R_97() {
     if (jj_scan_token(PRINT)) return true;
     if (jj_3R_21()) return true;
@@ -1943,6 +1982,12 @@ public class CSLRuleParser implements RuleParser, CSLRuleParserConstants {
 
   private boolean jj_3R_103() {
     if (jj_scan_token(STRING)) return true;
+    return false;
+  }
+
+  private boolean jj_3_22() {
+    if (jj_scan_token(name)) return true;
+    if (jj_scan_token(93)) return true;
     return false;
   }
 
@@ -1955,6 +2000,20 @@ public class CSLRuleParser implements RuleParser, CSLRuleParserConstants {
     return false;
   }
 
+  private boolean jj_3R_87() {
+    Token xsp;
+    xsp = jj_scanpos;
+    if (jj_3_22()) jj_scanpos = xsp;
+    if (jj_scan_token(name)) return true;
+    xsp = jj_scanpos;
+    if (jj_3R_102()) jj_scanpos = xsp;
+    if (jj_scan_token(LPAREN)) return true;
+    xsp = jj_scanpos;
+    if (jj_3R_104()) jj_scanpos = xsp;
+    if (jj_scan_token(RPAREN)) return true;
+    return false;
+  }
+
   private boolean jj_3R_79() {
     if (jj_scan_token(IS)) return true;
     return false;
@@ -1962,12 +2021,6 @@ public class CSLRuleParser implements RuleParser, CSLRuleParserConstants {
 
   private boolean jj_3R_78() {
     if (jj_scan_token(OR)) return true;
-    return false;
-  }
-
-  private boolean jj_3R_102() {
-    if (jj_scan_token(METHODSEP)) return true;
-    if (jj_scan_token(name)) return true;
     return false;
   }
 
@@ -1995,18 +2048,6 @@ public class CSLRuleParser implements RuleParser, CSLRuleParserConstants {
 
   private boolean jj_3R_75() {
     if (jj_scan_token(GREATERTHANEQ)) return true;
-    return false;
-  }
-
-  private boolean jj_3R_87() {
-    if (jj_scan_token(name)) return true;
-    Token xsp;
-    xsp = jj_scanpos;
-    if (jj_3R_102()) jj_scanpos = xsp;
-    if (jj_scan_token(LPAREN)) return true;
-    xsp = jj_scanpos;
-    if (jj_3R_104()) jj_scanpos = xsp;
-    if (jj_scan_token(RPAREN)) return true;
     return false;
   }
 
@@ -2150,6 +2191,12 @@ public class CSLRuleParser implements RuleParser, CSLRuleParserConstants {
     return false;
   }
 
+  private boolean jj_3_21() {
+    if (jj_scan_token(name)) return true;
+    if (jj_scan_token(93)) return true;
+    return false;
+  }
+
   private boolean jj_3R_99() {
     if (jj_3R_105()) return true;
     Token xsp;
@@ -2160,14 +2207,17 @@ public class CSLRuleParser implements RuleParser, CSLRuleParserConstants {
     return false;
   }
 
-  private boolean jj_3R_17() {
-    if (jj_3R_25()) return true;
+  private boolean jj_3R_26() {
+    Token xsp;
+    xsp = jj_scanpos;
+    if (jj_3_21()) jj_scanpos = xsp;
+    if (jj_scan_token(name)) return true;
+    if (jj_scan_token(VALUESEP)) return true;
     return false;
   }
 
-  private boolean jj_3R_26() {
-    if (jj_scan_token(name)) return true;
-    if (jj_scan_token(VALUESEP)) return true;
+  private boolean jj_3R_17() {
+    if (jj_3R_25()) return true;
     return false;
   }
 
@@ -2527,14 +2577,14 @@ public class CSLRuleParser implements RuleParser, CSLRuleParserConstants {
     return false;
   }
 
-  private boolean jj_3R_12() {
-    if (jj_3R_31()) return true;
-    return false;
-  }
-
   private boolean jj_3R_60() {
     if (jj_scan_token(ARRAY)) return true;
     if (jj_3R_98()) return true;
+    return false;
+  }
+
+  private boolean jj_3R_12() {
+    if (jj_3R_31()) return true;
     return false;
   }
 
@@ -2598,7 +2648,7 @@ public class CSLRuleParser implements RuleParser, CSLRuleParserConstants {
    private static void jj_la1_init_2() {
       jj_la1_2 = new int[] {0x13fc000,0x0,0x0,0x3fc000,0x3fc000,0x0,0x0,0x3fc000,0x0,0xa000000,0x3fc000,0x30,0x40000c,0x0,0x40,0x0,0x0,0x0,0xb800800,0xc000,0x0,0x80000,0x0,0x0,0x1,0x1000000,0x0,0x0,0x0,0xb800800,0x0,0x800000,0x0,0xf00,0x0,0x0,0xa800000,0x0,0xb800800,0x40,0x0,0xb800800,0xa800000,};
    }
-  final private JJCalls[] jj_2_rtns = new JJCalls[20];
+  final private JJCalls[] jj_2_rtns = new JJCalls[22];
   private boolean jj_rescan = false;
   private int jj_gc = 0;
 
@@ -2782,7 +2832,7 @@ public class CSLRuleParser implements RuleParser, CSLRuleParserConstants {
   /** Generate ParseException. */
   public ParseException generateParseException() {
     jj_expentries.clear();
-    boolean[] la1tokens = new boolean[93];
+    boolean[] la1tokens = new boolean[94];
     if (jj_kind >= 0) {
       la1tokens[jj_kind] = true;
       jj_kind = -1;
@@ -2802,7 +2852,7 @@ public class CSLRuleParser implements RuleParser, CSLRuleParserConstants {
         }
       }
     }
-    for (int i = 0; i < 93; i++) {
+    for (int i = 0; i < 94; i++) {
       if (la1tokens[i]) {
         jj_expentry = new int[1];
         jj_expentry[0] = i;
@@ -2829,7 +2879,7 @@ public class CSLRuleParser implements RuleParser, CSLRuleParserConstants {
 
   private void jj_rescan_token() {
     jj_rescan = true;
-    for (int i = 0; i < 20; i++) {
+    for (int i = 0; i < 22; i++) {
     try {
       JJCalls p = jj_2_rtns[i];
       do {
@@ -2856,6 +2906,8 @@ public class CSLRuleParser implements RuleParser, CSLRuleParserConstants {
             case 17: jj_3_18(); break;
             case 18: jj_3_19(); break;
             case 19: jj_3_20(); break;
+            case 20: jj_3_21(); break;
+            case 21: jj_3_22(); break;
           }
         }
         p = p.next;

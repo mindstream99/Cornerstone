@@ -75,7 +75,7 @@ public class CornerstoneService extends CornerstoneConfigurable implements IServ
 
         // we must have a display name
         if (serviceInstance.getDisplayName() == null) {
-            throw new RuntimeException("CornerstoneService.displayName cannot be null.");
+            throw new RuntimeException("displayName cannot be null.");
         }
 
         if (_logManager == null) {

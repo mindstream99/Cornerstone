@@ -107,7 +107,7 @@ public abstract class RuleVariable extends IValue {
 	this.hasParameterDefault = val;
     }
     
-    protected boolean getHasParameterDefault() {
+    public boolean getHasParameterDefault() {
 	return this.hasParameterDefault;
     }
     

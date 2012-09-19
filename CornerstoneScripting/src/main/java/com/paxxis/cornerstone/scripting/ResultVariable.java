@@ -95,6 +95,10 @@ public class ResultVariable extends RuleVariable {
 		this.success = value;
 	}
 
+	public Integer getResultCode() {
+	    return this.resultCode;
+	}
+	
 	public boolean methodHasReturn(String name) {
 		if (Methods.contains(name)) {
 			switch (Methods.valueOf(name)) {

@@ -36,6 +36,7 @@ public class ServiceInstance implements Serializable {
 	private InstanceId serviceId = null;
 	private InstanceId instanceId = null;
 	private String hostName = null;
+	private String clusterName = null;
 	private Date startTime = null;
 
 	public ServiceInstance() {
@@ -65,13 +66,21 @@ public class ServiceInstance implements Serializable {
 		this.instanceId = instanceId;
 	}
 
-	public String getHostName() {
-		return hostName;
-	}
+    public String getClusterName() {
+        return clusterName;
+    }
 
-	public void setHostName(String hostName) {
-		this.hostName = hostName;
-	}
+    public void setClusterName(String clusterName) {
+        this.clusterName = clusterName;
+    }
+
+    public String getHostName() {
+        return hostName;
+    }
+
+    public void setHostName(String hostName) {
+        this.hostName = hostName;
+    }
 
 	public Date getStartTime() {
 		return startTime;

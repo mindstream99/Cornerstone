@@ -97,9 +97,10 @@ public class CornerstoneService extends CornerstoneConfigurable implements IServ
     
     @Override
     public String toString() {
-    	String text = serviceInstance.getDisplayName() + ". Service ID: " 
+    	String text = serviceInstance.getDisplayName() + " Service ID: " 
     	                + serviceInstance.getServiceId() 
-    	                + " Instance ID: " + serviceInstance.getInstanceId();
+                        + " Instance ID: " + serviceInstance.getInstanceId()
+                        + " Cluster: " + serviceInstance.getClusterName();
     
     	return text;
     }
@@ -136,6 +137,10 @@ public class CornerstoneService extends CornerstoneConfigurable implements IServ
        
     public ServiceInstance getServiceInstance() {
     	return serviceInstance;
+    }
+    
+    public void setClusterName(String name) {
+        serviceInstance.setClusterName(name);
     }
     
     /**

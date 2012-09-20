@@ -38,8 +38,17 @@ public class ServiceInstance implements Serializable {
 	private String hostName = null;
 	private String clusterName = null;
 	private Date startTime = null;
+	private boolean startTimeUTC = false;
 
 	public ServiceInstance() {
+	}
+	
+	public void setStartTimeUTC(boolean val) {
+	    this.startTimeUTC = val;
+	}
+	
+	public boolean isStartTimeUTC() {
+	    return this.startTimeUTC;
 	}
 	
 	public String getDisplayName() {
@@ -87,6 +96,8 @@ public class ServiceInstance implements Serializable {
 	}
 	
 	public void setStartTime(Date startTime) {
-		this.startTime = startTime;
+        int offset = 60000 * startTime.getTimezoneOffset();
+        long newTime = startTime.getTime() + offset;
+		this.startTime = new Date(newTime);
 	}
 }

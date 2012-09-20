@@ -112,6 +112,10 @@ public class CornerstoneService extends CornerstoneConfigurable implements IServ
     {
     }
     
+    public void setStartTimeUTC(boolean val) {
+        serviceInstance.setStartTimeUTC(val);
+    }
+    
     /**
      * Set the display name for the service
      *

@@ -63,7 +63,8 @@ public class CornerstoneService extends CornerstoneConfigurable implements ICorn
      * Initializes the main service object.
      */
     public void initialize() {
-
+    	super.initialize();
+    	
         // we must have a display name
         if (serviceInstance.getDisplayName() == null) {
             throw new RuntimeException("displayName cannot be null.");

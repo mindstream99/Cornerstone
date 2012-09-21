@@ -26,6 +26,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
@@ -61,7 +62,13 @@ public abstract class CornerstoneConfigurable implements IManagedBean {
     //as that was the last defined prefix...
     private Collection<String> configPropertyPrefixes = new ArrayList<String>();
     
-    public CornerstoneConfigurable() {
+	/** a prefix found in system variables to prepend onto any supplied prefixes */ 
+	private String configSystemPrefix = null;
+	
+	/** get properties directly from system variables based on prefixes */
+	private boolean useSystemProperties = false;
+
+	public CornerstoneConfigurable() {
     }
     
     public void addConfigurableListener(ChangeListener listener) {
@@ -219,12 +226,41 @@ public abstract class CornerstoneConfigurable implements IManagedBean {
     }
     
     protected void reflectConfigurationPropertyValues() {
+    	
         CornerstoneConfiguration config = getCornerstoneConfiguration();
         Collection<String> prefixes = getConfigPropertyPrefixes();
         if (config == null || prefixes == null || prefixes.isEmpty()) {
             return;
         }
         
+    	// add any prefixes from the system prefix to the end of the list
+    	if (configSystemPrefix != null) {
+    		String prefix = System.getProperty(configSystemPrefix);
+    		List<String> list = new ArrayList<String>();
+    		for (String pref : prefixes) {
+    			list.add(prefix + "." + pref);
+    		}
+    		
+    		prefixes.addAll(list);
+    	}
+    	
+    	Map<String, String> systemProps = new HashMap<String, String>();
+        if (useSystemProperties) {
+            for (String prefix : this.configPropertyPrefixes) {
+            	Properties properties = System.getProperties();
+            	Set<Object> propNames = properties.keySet();
+            	for (Object obj : propNames) {
+            		String pName = obj.toString();
+            		if (pName.startsWith(prefix + ".")) {
+            			String value = System.getProperty(pName);
+            			String shortName = pName.substring(prefix.length() + 1);
+            			systemProps.put(shortName, value);
+            			break;
+            		}
+            	}
+            }
+        }
+
         Method[] methods = this.getClass().getMethods();
         for (Method method : methods) {
             String methodName = method.getName();
@@ -241,8 +277,15 @@ public abstract class CornerstoneConfigurable implements IManagedBean {
             
             //looks like we found a setter method, lets look for a value now...
             String propName = Character.toLowerCase(methodName.charAt(3)) + methodName.substring(4);
-            Object value = getConfigurationValue(propName, null, prefixes);
+            
+            // if there is a system variable with this name, we use that value instead of what's in the config
+            Object value = systemProps.get(propName);
+
             if (value == null) {
+                value = getConfigurationValue(propName, null, prefixes);
+    		}
+
+    		if (value == null) {
                 continue;
             }
 
@@ -418,5 +461,13 @@ public abstract class CornerstoneConfigurable implements IManagedBean {
 
     public void setConfigPropertyPrefixes(Collection<String> configPropertyPrefixes) {
         this.configPropertyPrefixes = configPropertyPrefixes;
+    }
+    
+    public void setUseSystemProperties(boolean val) {
+    	this.useSystemProperties = val;
+    }
+    
+    public void setConfigSystemPrefix(String prefix) {
+    	this.configSystemPrefix = prefix;
     }
 }

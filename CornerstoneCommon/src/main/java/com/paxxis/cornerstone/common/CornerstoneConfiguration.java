@@ -8,27 +8,25 @@ import com.paxxis.cornerstone.base.management.ConfigurationChange;
 
 public class CornerstoneConfiguration implements IManagedBean {
     
-	private Map<String, Object> _localPropertyMap = new HashMap<String, Object>();
-    private Map<String, Object> _localMap = null;
+	private Map<String, Object> localPropertyMap = new HashMap<String, Object>();
+    private Map<String, Object> localMap = null;
     private Map<CornerstoneConfigurable, Object> registeredConfigurables = 
     				new WeakHashMap<CornerstoneConfigurable, Object>();
 
     public CornerstoneConfiguration() {
     }
 
-    /**
-     * subclasses must call the this method AFTER they perform their own initialization.
-     */
-    public void afterInitialize() {
-        if (_localMap != null) {
-            _localPropertyMap.putAll(_localMap);
-        }
+    protected void setup() {
     }
     
     @Override
-    public void initialize() {
+    public final void initialize() {
+    	setup();
+        if (localMap != null) {
+            localPropertyMap.putAll(localMap);
+        }
     }
-
+    
     @Override
     public void destroy() {
     	
@@ -49,11 +47,11 @@ public class CornerstoneConfiguration implements IManagedBean {
      * @param overrideConfig
      */
     public void setOverrideConfiguration(CornerstoneConfiguration overrideConfig) {
-    	_localMap.putAll(overrideConfig.getLocalPropertyMap());
+    	localMap.putAll(overrideConfig.getLocalPropertyMap());
     }
     
     public void modifyParameter(ConfigurationChange change) {
-    	_localPropertyMap.put(change.getName(), change.getNewValue());
+    	localPropertyMap.put(change.getName(), change.getNewValue());
     	for (CornerstoneConfigurable cfg : registeredConfigurables.keySet()) {
     		cfg.onChange(change.getName());
     	}
@@ -61,7 +59,7 @@ public class CornerstoneConfiguration implements IManagedBean {
     
     public Map<String, Object> findParameters(String startsWith) {
         Map<String, Object> results = new HashMap<String, Object>();
-        for (Map.Entry<String, Object> entry : _localPropertyMap.entrySet()) {
+        for (Map.Entry<String, Object> entry : localPropertyMap.entrySet()) {
             if (entry.getKey().startsWith(startsWith)) {
                 results.put(entry.getKey(), entry.getValue());
             }
@@ -77,11 +75,11 @@ public class CornerstoneConfiguration implements IManagedBean {
     public void setParameters(HashMap<String, Object> localMap)
     {
         // just keep these until we initialize
-        _localMap = localMap;
+        this.localMap = localMap;
     }
     
     public boolean hasValue(String parameter) {
-        return _localPropertyMap.containsKey(parameter);
+        return localPropertyMap.containsKey(parameter);
     }
     
     /**
@@ -94,16 +92,16 @@ public class CornerstoneConfiguration implements IManagedBean {
     private String getValue(String parameter)
     {
         String result = null;
-        if (_localPropertyMap.containsKey(parameter))
+        if (localPropertyMap.containsKey(parameter))
         {
-            result = String.valueOf(_localPropertyMap.get(parameter));
+            result = String.valueOf(localPropertyMap.get(parameter));
         }
         
         return result;
     }
     
     public Object getObjectValue(String parameter) {
-    	return _localPropertyMap.get(parameter);
+    	return localPropertyMap.get(parameter);
     }
     
     /**
@@ -173,6 +171,6 @@ public class CornerstoneConfiguration implements IManagedBean {
     }
 
     protected Map<String, Object> getLocalPropertyMap() {
-		return _localPropertyMap;
+		return localPropertyMap;
 	}
 }

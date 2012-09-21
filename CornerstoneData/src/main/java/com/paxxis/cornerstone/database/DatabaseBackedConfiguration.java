@@ -31,7 +31,7 @@ public class DatabaseBackedConfiguration extends CornerstoneConfiguration {
     public DatabaseBackedConfiguration() {
     }
 
-    public void initialize() {
+    public void setup() {
         if (databasePool != null) {
         	DatabaseConnection database = null;
         	IDataSet dataSet = null;
@@ -59,8 +59,6 @@ public class DatabaseBackedConfiguration extends CornerstoneConfiguration {
             	}
             }
         }
-        
-        afterInitialize();
     }
     
     public void setDatabasePool(DatabaseConnectionPool pool) {

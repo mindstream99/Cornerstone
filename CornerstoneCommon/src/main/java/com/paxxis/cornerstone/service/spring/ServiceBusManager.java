@@ -26,7 +26,7 @@ import org.springframework.jmx.export.notification.NotificationPublisherAware;
 /**
  * The mechanism for exposing management interfaces for service connectors is based on a pair
  * of collaborating objects that implement IServiceBusController.  The primary
- * management class is com.mindstream.cornerstone.service.common.ServiceBusManagementBean.  
+ * management class is com.paxxis.cornerstone.service.common.ServiceBusManagementBean.  
  * <br>
  * This class collaborates with the primary management object in order to expose the
  * management interface to the JMX container using the Spring framework.  This collaboration
@@ -38,13 +38,13 @@ import org.springframework.jmx.export.notification.NotificationPublisherAware;
 public class ServiceBusManager implements IServiceBusController, NotificationPublisherAware
 {
     // used for publishing JMX notifications
-    NotificationPublisher _publisher = null;
+    private NotificationPublisher _publisher = null;
     
     // the sequence number for notification messages
-    int _seqNum = 0;
+    private int _seqNum = 0;
 
     // the collaborating management object
-    IServiceBusController _collaborator = null;
+    private IServiceBusController _collaborator = null;
     
     /** 
      * Constructor

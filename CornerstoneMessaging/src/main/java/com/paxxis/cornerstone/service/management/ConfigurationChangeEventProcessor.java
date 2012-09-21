@@ -23,7 +23,7 @@ import java.util.List;
 
 import com.paxxis.cornerstone.base.management.ConfigurationChange;
 import com.paxxis.cornerstone.base.management.ConfigurationChangeEvent;
-import com.paxxis.cornerstone.service.DatabaseBackedConfiguration;
+import com.paxxis.cornerstone.database.DatabaseBackedConfiguration;
 import com.paxxis.cornerstone.service.EventMessageProcessor;
 
 /**

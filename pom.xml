@@ -19,9 +19,12 @@
 
     <modules>
         <module>CornerstoneBase</module>
+        <module>CornerstoneData</module>
         <module>CornerstoneCommon</module>
         <module>CornerstoneConsole</module>
         <module>CornerstoneScripting</module>
+        <module>CornerstoneCache</module>
+        <module>CornerstoneMessaging</module>
     </modules>
 
     <properties>

@@ -20,7 +20,6 @@ package com.paxxis.cornerstone.service.spring;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.UUID;
 
@@ -29,11 +28,8 @@ import org.springframework.context.support.FileSystemXmlApplicationContext;
 
 import com.paxxis.cornerstone.base.InstanceId;
 import com.paxxis.cornerstone.base.monitoring.ServiceInstance;
-import com.paxxis.cornerstone.service.CornerstoneConfigurable;
+import com.paxxis.cornerstone.common.CornerstoneConfigurable;
 import com.paxxis.cornerstone.service.ICornerstoneService;
-import com.paxxis.cornerstone.service.IServiceBusManager;
-import com.paxxis.cornerstone.service.IServiceController;
-import com.paxxis.cornerstone.service.LogManager;
 import com.paxxis.cornerstone.service.ServiceVersion;
 import com.paxxis.cornerstone.service.UnknownVersion;
 
@@ -41,19 +37,14 @@ import com.paxxis.cornerstone.service.UnknownVersion;
  *
  * @author Robert Englander
  */
-public class CornerstoneService extends CornerstoneConfigurable implements IServiceController, ICornerstoneService {
+public class CornerstoneService extends CornerstoneConfigurable implements ICornerstoneService {
     private static final Logger _logger = Logger.getLogger(CornerstoneService.class);
 
     /** the service instance */
     private ServiceInstance serviceInstance = new ServiceInstance();
     
-    // the service connection managers
-    private ArrayList<IServiceBusManager> _connectorManagers = new ArrayList<IServiceBusManager>();
-
     // the version instance
     private ServiceVersion _version = new UnknownVersion();
-    
-    private LogManager _logManager = null;
     
     /**
      * The main
@@ -76,10 +67,6 @@ public class CornerstoneService extends CornerstoneConfigurable implements IServ
         // we must have a display name
         if (serviceInstance.getDisplayName() == null) {
             throw new RuntimeException("displayName cannot be null.");
-        }
-
-        if (_logManager == null) {
-            //throw new RuntimeException("CornerstoneService.logManager cannot be null.");
         }
 
         try {
@@ -148,29 +135,10 @@ public class CornerstoneService extends CornerstoneConfigurable implements IServ
     }
     
     /**
-     * Set the connection managers
-     *
-     * @param managers the connection managers
-     */
-    public void setConnectionManagers(ArrayList<IServiceBusManager> managers)
-    {
-        _connectorManagers = new ArrayList<IServiceBusManager>(managers);
-    }
-
-    /**
      * Determine if the service can shut down.
      */
     public boolean canShutdown()
     {
-        // can't shut down if there are connected service bus connectors
-        for (IServiceBusManager mgr : _connectorManagers)
-        {
-            if (mgr.isConnected())
-            {
-                return false;
-            }
-        }
-        
         return true;
     }
     
@@ -194,37 +162,6 @@ public class CornerstoneService extends CornerstoneConfigurable implements IServ
         return _version.getVersionDescriptor();
     }
     
-
-    /**
-     * Set the service log level.
-     * 
-     * @param level
-     */
-    public void setLogLevel(String level)
-    {
-        _logManager.setLogLevel(level);
-    }
-    
-    /**
-     * Get the current service log level.
-     * 
-     * @return the log level
-     */
-    public String getLogLevel()
-    {
-        return _logManager.getLogLevel();
-    }
-    
-    /**
-     * Set the log manager.
-     * 
-     * @param manager
-     */
-    public void setLogManager(LogManager manager)
-    {
-        _logManager = manager;
-    }
-
     /** 
      * Constructor
      */

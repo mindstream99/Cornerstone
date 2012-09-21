@@ -26,8 +26,6 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 
-import com.paxxis.cornerstone.service.CornerstoneConfigurable;
-
 
 /**
  * 

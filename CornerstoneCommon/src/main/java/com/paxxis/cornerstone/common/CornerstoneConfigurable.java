@@ -302,7 +302,7 @@ public abstract class CornerstoneConfigurable implements IManagedBean {
      */
     private void loadConfigurationPropertyValues(Collection<String> props, boolean changes) {
         CornerstoneConfiguration config = getCornerstoneConfiguration();
-        if (config == null || props == null || props.isEmpty()) {
+        if (config == null) {
             return;
         }
         

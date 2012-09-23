@@ -289,7 +289,6 @@ public class DatabaseConnectionPool extends AbstractBlockingObjectPool<DatabaseC
 
         _dbPassword = passwordGenerator.encryptPassword(_dbPassword);
         setPoolSize(_minimum);
-        initDriver();
         super.initialize();     	
         _sweeper.start();
     }
@@ -379,6 +378,7 @@ public class DatabaseConnectionPool extends AbstractBlockingObjectPool<DatabaseC
     public void setDbDriver(String driver)
     {
         _dbDriver = driver;
+        initDriver();
     }
 
     public String getDbDriver()

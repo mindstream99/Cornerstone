@@ -60,4 +60,9 @@ public class DerbyProvider implements DatabaseConnectionProvider {
     public String getName() {
 	return "derby";
     }
+
+    @Override
+    public int getDefaultPort() {
+        return 1527;
+    }
 }

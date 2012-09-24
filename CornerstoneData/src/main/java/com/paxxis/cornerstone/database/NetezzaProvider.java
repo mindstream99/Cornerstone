@@ -38,4 +38,9 @@ public class NetezzaProvider implements DatabaseConnectionProvider {
 	return "netezza";
     }
 
+    @Override
+    public int getDefaultPort() {
+        return 5480;
+    }
+
 }

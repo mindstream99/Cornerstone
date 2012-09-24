@@ -18,7 +18,11 @@
 
 package com.paxxis.cornerstone.database;
 
+import java.io.IOException;
 import java.net.InetAddress;
+import java.net.InetSocketAddress;
+import java.net.Socket;
+import java.net.SocketAddress;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -202,15 +206,48 @@ public class DatabaseConnectionPool extends AbstractBlockingObjectPool<DatabaseC
         }
     }
 
+    public boolean isReachable() {
+        int port;
+        if (_dbPort != null) {
+            port = _dbPort;
+        } else {
+            port = this.getTypeProvider().getDefaultPort();
+        }
+
+        Socket s = null;
+        try {
+            s = new Socket();
+            s.setReuseAddress(true);
+            SocketAddress sa = new InetSocketAddress(this._dbHostname, port);
+            s.connect(sa, 3000);
+            return true;
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            if (s != null) {
+                try {
+                    s.close();
+                } catch (IOException e) {
+                }
+            }
+        }
+        return false;
+    }
+    
     public void ensureConnection(DatabaseConnection connection) throws DatabaseException {
         boolean force = false;
         try
         {
-            InetAddress address = InetAddress.getByName(_dbHostname);
-            if (!address.isReachable(2000)) {
-                force = true;
-                String url = typeProvider.getConnectionUrl(this);
-                throw new Exception(url + " is unreachable");
+            try {
+                
+                if (!isReachable()) {
+                    force = true;
+                    String url = typeProvider.getConnectionUrl(this);
+                    throw new Exception(url + " is unreachable");
+                }
+            } catch (IOException ioe) {
+                // not allowed to run this?
+                LOGGER.error(ioe); 
             }
 
             // just send any old statement; essentially like doing a ping

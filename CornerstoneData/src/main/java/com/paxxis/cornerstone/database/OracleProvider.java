@@ -58,4 +58,9 @@ public class OracleProvider implements DatabaseConnectionProvider {
 	return "oracle";
     }
 
+    @Override
+    public int getDefaultPort() {
+        return 1521;
+    }
+
 }

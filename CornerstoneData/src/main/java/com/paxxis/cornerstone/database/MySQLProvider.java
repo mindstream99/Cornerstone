@@ -58,4 +58,9 @@ public class MySQLProvider implements DatabaseConnectionProvider {
     public String getName() {
 	return "mysql";
     }
+
+    @Override
+    public int getDefaultPort() {
+        return 3306;
+    }
 }

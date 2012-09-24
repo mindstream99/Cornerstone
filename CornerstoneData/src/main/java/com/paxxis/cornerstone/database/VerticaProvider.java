@@ -60,4 +60,9 @@ public class VerticaProvider implements DatabaseConnectionProvider {
 	return "vertica";
     }
 
+    @Override
+    public int getDefaultPort() {
+        return 5433;
+    }
+
 }

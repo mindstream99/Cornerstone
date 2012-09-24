@@ -27,4 +27,5 @@ public interface DatabaseConnectionProvider {
     public void postConnect(DatabaseConnectionPool pool, DatabaseConnection database) throws DatabaseException;
     public void onShutdown(DatabaseConnectionPool pool);
     public String getName();
+    public int getDefaultPort();
 }

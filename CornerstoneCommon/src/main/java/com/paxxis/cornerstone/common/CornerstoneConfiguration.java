@@ -2,6 +2,7 @@ package com.paxxis.cornerstone.common;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.TreeMap;
 import java.util.WeakHashMap;
 
 import com.paxxis.cornerstone.base.management.ConfigurationChange;
@@ -41,7 +42,7 @@ public class CornerstoneConfiguration implements IManagedBean {
     /**
      * Use another configuration instance to set parameter values.  this is useful
      * for creating an override configuration instance that only needs to define
-     * the properties that are being overriden, while the remainder come from the
+     * the properties that are being overridden, while the remainder come from the
      * default config.
      * 
      * @param overrideConfig
@@ -170,6 +171,12 @@ public class CornerstoneConfiguration implements IManagedBean {
         return result;
     }
 
+    public Map<String, Object> getPropertyMap() {
+        TreeMap<String, Object> result = new TreeMap<String, Object>();
+        result.putAll(localPropertyMap);
+        return result;
+    }
+    
     protected Map<String, Object> getLocalPropertyMap() {
 		return localPropertyMap;
 	}

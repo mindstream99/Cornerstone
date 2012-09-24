@@ -381,7 +381,11 @@ public class DatabaseConnectionPool extends AbstractBlockingObjectPool<DatabaseC
             if (tryIt) {
                 database.connect(url, _dbUsername, _dbPassword);
             }
-        } catch (Exception e) {
+        } catch (Throwable e) {
+            Throwable cause;
+            while (null != (cause = e.getCause())) {
+                e = cause;
+            }
             LOGGER.error(e);
             throw new DatabaseException(e);
         }

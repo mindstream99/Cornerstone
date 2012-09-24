@@ -19,7 +19,6 @@
 package com.paxxis.cornerstone.database;
 
 import java.io.IOException;
-import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.net.SocketAddress;
@@ -206,12 +205,21 @@ public class DatabaseConnectionPool extends AbstractBlockingObjectPool<DatabaseC
         }
     }
 
-    public boolean isReachable() {
+    public void checkReachable() throws DatabaseException, IOException {
         int port;
         if (_dbPort != null) {
             port = _dbPort;
         } else {
             port = this.getTypeProvider().getDefaultPort();
+        }
+
+        SecurityManager manager = System.getSecurityManager();
+        if (manager != null) {
+            try {
+                manager.checkConnect(_dbHostname, port);
+            } catch (SecurityException se) {
+                throw new DatabaseException(se);
+            }
         }
 
         Socket s = null;
@@ -220,9 +228,11 @@ public class DatabaseConnectionPool extends AbstractBlockingObjectPool<DatabaseC
             s.setReuseAddress(true);
             SocketAddress sa = new InetSocketAddress(this._dbHostname, port);
             s.connect(sa, 3000);
-            return true;
         } catch (IOException e) {
-            e.printStackTrace();
+            // that's just fine
+            throw e;
+        } catch (Throwable e) {
+            throw new DatabaseException(e);
         } finally {
             if (s != null) {
                 try {
@@ -231,23 +241,18 @@ public class DatabaseConnectionPool extends AbstractBlockingObjectPool<DatabaseC
                 }
             }
         }
-        return false;
     }
     
     public void ensureConnection(DatabaseConnection connection) throws DatabaseException {
         boolean force = false;
-        try
-        {
+        try {
             try {
-                
-                if (!isReachable()) {
-                    force = true;
-                    String url = typeProvider.getConnectionUrl(this);
-                    throw new Exception(url + " is unreachable");
-                }
+                checkReachable();
+            } catch (DatabaseException de) {
             } catch (IOException ioe) {
-                // not allowed to run this?
-                LOGGER.error(ioe); 
+                force = true;
+                String url = typeProvider.getConnectionUrl(this);
+                throw new Exception(url + " is unreachable");
             }
 
             // just send any old statement; essentially like doing a ping
@@ -366,11 +371,16 @@ public class DatabaseConnectionPool extends AbstractBlockingObjectPool<DatabaseC
             database.setTransactionIsolation(transactionIsolation);
 
             String url = typeProvider.getConnectionUrl(this);
-            InetAddress address = InetAddress.getByName(_dbHostname);
-            if (!address.isReachable(2000)) {
-                throw new Exception(url + " is unreachable");
+            boolean tryIt = true;
+            try {
+                checkReachable();
+            } catch (DatabaseException de) {
+                tryIt = false;
             }
-            database.connect(url, _dbUsername, _dbPassword);
+
+            if (tryIt) {
+                database.connect(url, _dbUsername, _dbPassword);
+            }
         } catch (Exception e) {
             LOGGER.error(e);
             throw new DatabaseException(e);

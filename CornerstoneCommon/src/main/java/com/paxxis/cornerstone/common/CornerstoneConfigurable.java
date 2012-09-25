@@ -236,9 +236,11 @@ public abstract class CornerstoneConfigurable implements IManagedBean {
     	// add any prefixes from the system prefix to the end of the list
     	if (configSystemPrefix != null) {
     		String prefix = System.getProperty(configSystemPrefix);
-    		List<String> list = new ArrayList<String>();
-    		for (String pref : prefixes) {
-    			list.add(prefix + "." + pref);
+            List<String> list = new ArrayList<String>();
+    		if (prefix != null) {
+                for (String pref : prefixes) {
+                    list.add(prefix + "." + pref);
+                }
     		}
     		
     		prefixes.addAll(list);
@@ -255,7 +257,6 @@ public abstract class CornerstoneConfigurable implements IManagedBean {
             			String value = System.getProperty(pName);
             			String shortName = pName.substring(prefix.length() + 1);
             			systemProps.put(shortName, value);
-            			break;
             		}
             	}
             }

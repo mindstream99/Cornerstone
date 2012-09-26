@@ -292,6 +292,14 @@ public class DatabaseConnectionPool extends AbstractBlockingObjectPool<DatabaseC
     }
 
     public void returnInstance(DatabaseConnection connection, Object borrower) {
+    	if (connection.inTransaction()) {
+    		LOGGER.error("Rolling back database connection returned to pool while in transaction: " + connection.getConnectionURL());
+    		try {
+				connection.rollbackTransaction();
+			} catch (DatabaseException e) {
+				LOGGER.error(e);
+			}
+    	}
         returnInstance(activeConnections.remove(connection));
     }
 

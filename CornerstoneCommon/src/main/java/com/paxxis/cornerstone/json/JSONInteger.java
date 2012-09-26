@@ -17,6 +17,8 @@
 
 package com.paxxis.cornerstone.json;
 
+import java.util.Map;
+
 /**
  *
  * @author Robert Englander
@@ -42,6 +44,10 @@ public class JSONInteger implements JSONValue
         setValue(val);
     }
     
+    public Object getObjectValue() {
+    	return new Integer(_value);
+    }
+
     public int getValue()
     {
         return _value;
@@ -61,4 +67,9 @@ public class JSONInteger implements JSONValue
     {
         return String.valueOf(_value);
     }
+
+	@Override
+	public void toMap(String name, Map<String, Object> map) {
+		map.put(name, _value);
+	}
 }

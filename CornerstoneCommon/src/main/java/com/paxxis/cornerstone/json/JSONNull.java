@@ -17,6 +17,8 @@
 
 package com.paxxis.cornerstone.json;
 
+import java.util.Map;
+
 
 /**
  *
@@ -29,9 +31,18 @@ public class JSONNull implements JSONValue
         buffer.append(toString());
     }
 
+    public Object getObjectValue() {
+    	return null;
+    }
+
     public String toString()
     {
         return "null";
     }
 
+
+	@Override
+	public void toMap(String name, Map<String, Object> map) {
+		map.put(name, null);
+	}
 }

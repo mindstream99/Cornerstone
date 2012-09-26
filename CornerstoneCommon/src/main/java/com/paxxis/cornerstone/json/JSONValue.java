@@ -17,6 +17,8 @@
 
 package com.paxxis.cornerstone.json;
 
+import java.util.Map;
+
 /**
  *
  * @author Robert Englander
@@ -24,5 +26,7 @@ package com.paxxis.cornerstone.json;
 public interface JSONValue 
 {
     public String toString();
+    public void toMap(String name, Map<String, Object> map);
     public void append(StringBuffer buffer);
+    public Object getObjectValue();
 }

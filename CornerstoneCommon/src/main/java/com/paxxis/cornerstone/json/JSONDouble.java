@@ -17,6 +17,8 @@
 
 package com.paxxis.cornerstone.json;
 
+import java.util.Map;
+
 
 /**
  *
@@ -43,6 +45,10 @@ public class JSONDouble implements JSONValue
         setValue(val);
     }
     
+    public Object getObjectValue() {
+    	return new Double(_value);
+    }
+
     public double getValue()
     {
         return _value;
@@ -62,4 +68,9 @@ public class JSONDouble implements JSONValue
     {
         return String.valueOf(_value);
     }
+
+	@Override
+	public void toMap(String name, Map<String, Object> map) {
+		map.put(name, _value);
+	}
 }

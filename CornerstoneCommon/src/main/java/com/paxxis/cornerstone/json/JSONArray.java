@@ -20,6 +20,7 @@ package com.paxxis.cornerstone.json;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  *
@@ -29,6 +30,14 @@ public class JSONArray implements JSONValue
 {
     ArrayList<JSONValue> _values = new ArrayList<JSONValue>();
     
+    public Object getObjectValue() {
+    	List<Object> list = new ArrayList<Object>();
+    	for (JSONValue value : _values) {
+    		list.add(value.getObjectValue());
+    	}
+    	return list;
+    }
+
     public void add(JSONValue value)
     {
         _values.add(value);
@@ -74,4 +83,9 @@ public class JSONArray implements JSONValue
         append(buffer);
         return buffer.toString();
     }
+
+	@Override
+	public void toMap(String name, Map<String, Object> map) {
+		map.put(name, getObjectValue());
+	}
 }

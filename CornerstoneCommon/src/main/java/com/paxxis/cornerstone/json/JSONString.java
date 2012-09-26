@@ -17,6 +17,8 @@
 
 package com.paxxis.cornerstone.json;
 
+import java.util.Map;
+
 /**
  *
  * @author Robert Englander
@@ -30,6 +32,10 @@ public class JSONString implements JSONValue
         setValue(val);
     }
     
+    public Object getObjectValue() {
+    	return _value;
+    }
+
     public String getValue()
     {
         return _value;
@@ -56,4 +62,9 @@ public class JSONString implements JSONValue
         val = val.replaceAll("\"", "\\\\\"");
         return "\"" + val + "\"";
     }
+
+	@Override
+	public void toMap(String name, Map<String, Object> map) {
+		map.put(name, _value);
+	}
 }

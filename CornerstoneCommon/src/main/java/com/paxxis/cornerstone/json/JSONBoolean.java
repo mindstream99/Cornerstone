@@ -17,6 +17,8 @@
 
 package com.paxxis.cornerstone.json;
 
+import java.util.Map;
+
 
 /**
  *
@@ -34,6 +36,10 @@ public class JSONBoolean implements JSONValue
     public boolean isTrue()
     {
         return _value;
+    }
+    
+    public Object getObjectValue() {
+    	return new Boolean(_value);
     }
     
     public void setValue(boolean val)
@@ -57,4 +63,9 @@ public class JSONBoolean implements JSONValue
             return "false";
         }
     }
+
+	@Override
+	public void toMap(String name, Map<String, Object> map) {
+		map.put(name, _value);
+	}
 }

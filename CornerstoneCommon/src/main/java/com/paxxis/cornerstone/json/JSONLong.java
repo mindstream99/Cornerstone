@@ -18,6 +18,8 @@
 
 package com.paxxis.cornerstone.json;
 
+import java.util.Map;
+
 /**
  *
  * @author Robert Englander
@@ -43,6 +45,10 @@ public class JSONLong implements JSONValue
         setValue(val);
     }
     
+    public Object getObjectValue() {
+    	return new Long(_value);
+    }
+
     public long getValue()
     {
         return _value;
@@ -62,5 +68,10 @@ public class JSONLong implements JSONValue
     {
         return String.valueOf(_value);
     }
+
+	@Override
+	public void toMap(String name, Map<String, Object> map) {
+		map.put(name, _value);
+	}
 }
 

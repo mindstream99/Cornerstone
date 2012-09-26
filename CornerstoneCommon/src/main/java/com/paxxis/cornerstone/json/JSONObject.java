@@ -20,7 +20,9 @@ package com.paxxis.cornerstone.json;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Hashtable;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -226,6 +228,32 @@ public class JSONObject implements JSONValue
         append(buffer);
         return buffer.toString();
     }
+
+	public Map<String, Object> toMap() {
+		Map<String, Object> map = new LinkedHashMap<String, Object>();
+		toMap(map, this);
+		return map;
+	}
+	
+	private void toMap(Map<String, Object> map, JSONObject json) {
+        List<String> names = new ArrayList<String>(_pairs.keySet());
+        Collections.sort(names);
+        for (String name : names) {
+            JSONValue value = _pairs.get(name);
+    		map.put(name, value.getObjectValue());
+        }
+	}
+
+	@Override
+	public void toMap(String name, Map<String, Object> map) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public Object getObjectValue() {
+		return toMap();
+	}
 }
 
 

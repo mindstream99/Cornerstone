@@ -65,9 +65,6 @@ public class DatabaseConnectionPool extends AbstractBlockingObjectPool<DatabaseC
     // the maximum number of instances in the pool
     private int _maximum = 1;
 
-    // the minimum number of instances in the pool
-    private int _minimum = 1;
-
     private long _idleThreshold = DEFAULTIDLETHRESHOLD;
 
     private long _sweepCycle = DEFAULTSWEEPCYCLE;
@@ -162,10 +159,10 @@ public class DatabaseConnectionPool extends AbstractBlockingObjectPool<DatabaseC
 
             int total = active + free;
 
-            if (free > 0 && total > _minimum)
+            if (free > 0 && total > getPoolSize())
             {
                 // how many should we remove?
-                int over = total - _minimum;
+                int over = total - getPoolSize();
                 int target = free - over;
                 if (free > target)
                 {
@@ -338,7 +335,6 @@ public class DatabaseConnectionPool extends AbstractBlockingObjectPool<DatabaseC
         }
 
         _dbPassword = passwordGenerator.encryptPassword(_dbPassword);
-        setPoolSize(_minimum);
         super.initialize();     	
         _sweeper.start();
     }
@@ -524,12 +520,12 @@ public class DatabaseConnectionPool extends AbstractBlockingObjectPool<DatabaseC
 
     public void setMinPoolSize(int minimum)
     {
-        _minimum = minimum;
+        setPoolSize(minimum);
     }
 
     public int getMinPoolSize()
     {
-        return _minimum;
+        return this.getPoolSize();
     }
 
     public void setMaxPoolSize(int maximum)

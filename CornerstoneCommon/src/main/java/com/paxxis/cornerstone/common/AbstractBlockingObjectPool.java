@@ -82,7 +82,7 @@ public abstract class AbstractBlockingObjectPool<T> extends CornerstoneConfigura
 
 	private boolean shutdown = false;
 
-	private int poolSize = 10;
+	private int poolSize = 1;
 	private long borrowTimeout = 600000;
 
 	private BlockingThreadPoolExecutor executor = null;
@@ -95,6 +95,10 @@ public abstract class AbstractBlockingObjectPool<T> extends CornerstoneConfigura
 		poolSize = size;
 	}
 
+	public int getPoolSize() {
+		return poolSize;
+	}
+	
 	public void setBorrowTimeout(long borrowTimeout) {
 		this.borrowTimeout = borrowTimeout;
 	}

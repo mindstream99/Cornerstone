@@ -327,7 +327,7 @@ public class CSLRuleParser implements RuleParser, CSLRuleParserConstants {
       jj_consume_token(RESULT);
       t = variablename();
         ResultVariable resv = new ResultVariable(t.image);
-        resv.setHasParameterDefault(true);
+        resv.setHasParameterDefault(false);
         {if (true) return resv;}
       break;
     case DATE:
@@ -362,14 +362,14 @@ public class CSLRuleParser implements RuleParser, CSLRuleParserConstants {
       jj_consume_token(ARRAY);
       t = variablename();
         Array array = new Array(t.image);
-        array.setHasParameterDefault(true);
+        array.setHasParameterDefault(false);
         {if (true) return array;}
       break;
     case TABLE:
       jj_consume_token(TABLE);
       t = variablename();
         Table table = new Table(t.image);
-        table.setHasParameterDefault(true);
+        table.setHasParameterDefault(false);
         {if (true) return table;}
       break;
     case EXTENSION:
@@ -381,7 +381,7 @@ public class CSLRuleParser implements RuleParser, CSLRuleParserConstants {
       jj_consume_token(REFERENCE);
       t = variablename();
         ReferenceVariable refv = new ReferenceVariable(t.image);
-        refv.setHasParameterDefault(true);
+        refv.setHasParameterDefault(false);
         {if (true) return refv;}
       break;
     default:

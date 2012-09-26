@@ -181,6 +181,12 @@ public class Rule implements Serializable {
                 queue.setVariableValues(params);
             }
 
+            IValue returnVal = getReturnValue();
+            if (returnVal != null && returnVal instanceof RuleVariable) {
+            	RuleVariable rv = (RuleVariable)returnVal;
+            	rv.reset();
+            }
+            
             // run it
             boolean result = queue.process(queue);
 

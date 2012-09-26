@@ -363,7 +363,7 @@ RuleVariable parameter() :
     <RESULT> t = variablename()
     { 
         ResultVariable resv = new ResultVariable(t.image);
-        resv.setHasParameterDefault(true);
+        resv.setHasParameterDefault(false);
         return resv; 
     }
     |
@@ -388,14 +388,14 @@ RuleVariable parameter() :
     <ARRAY> t = variablename()
     { 
         Array array = new Array(t.image);
-        array.setHasParameterDefault(true);
+        array.setHasParameterDefault(false);
         return array; 
     }
     |
     <TABLE> t = variablename()
     { 
         Table table = new Table(t.image);
-        table.setHasParameterDefault(true);
+        table.setHasParameterDefault(false);
         return table; 
     }
     |
@@ -405,7 +405,7 @@ RuleVariable parameter() :
     <REFERENCE> t = variablename()
     { 
         ReferenceVariable refv = new ReferenceVariable(t.image);
-        refv.setHasParameterDefault(true);
+        refv.setHasParameterDefault(false);
         return refv; 
     }
 }

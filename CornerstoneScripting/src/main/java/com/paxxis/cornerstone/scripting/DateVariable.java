@@ -91,7 +91,7 @@ public class DateVariable extends RuleVariable {
             try {
             	parameterDefault = new Date(java.sql.Date.valueOf(val).getTime());
             } catch (Exception e) {
-                throw new RuntimeException("Bad date format used to set date default value: " + val);
+                throw new ScriptExecutionException(130, "Bad date format used to set date default value: " + val);
             }
     	}
 		setHasParameterDefault(true);
@@ -163,7 +163,7 @@ public class DateVariable extends RuleVariable {
                     setNow(params);
                     return new BooleanVariable(null, true);
                 default:
-                    throw new RuntimeException("Unexpected method name: " + name);
+                    throw new ScriptExecutionException(99, "Unexpected method name: " + name);
             }
     	}
 
@@ -211,7 +211,7 @@ public class DateVariable extends RuleVariable {
                 result.setValue(false);
             }
         } else {
-            throw new RuntimeException("Non Date value passed to after() method: " + getName());
+            throw new ScriptExecutionException(131, "Non Date value passed to after() method: " + getName());
         }
 
         return result;
@@ -246,7 +246,7 @@ public class DateVariable extends RuleVariable {
             try {
                 value = new Date(java.sql.Date.valueOf(dt).getTime());
             } catch (Exception e) {
-                throw new RuntimeException("Bad date format used to set date value: " + dt);
+                throw new ScriptExecutionException(132, "Bad date format used to set date value: " + dt);
             }
     	}
         

@@ -175,7 +175,7 @@ public class ResultVariable extends RuleVariable {
 	private IValue merge(List<IValue> params) {
 		IValue v = params.get(0);
 		if (!(v instanceof ResultVariable)) {
-			throw new RuntimeException("merge parameter must be a Result");
+			throw new ScriptExecutionException(301, "merge parameter must be a Result");
 		}
 
 		ResultVariable rv = (ResultVariable)v;

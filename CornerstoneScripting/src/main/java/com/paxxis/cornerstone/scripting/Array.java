@@ -124,7 +124,7 @@ public class Array extends RuleVariable {
                 case appendAsString:
                     return appendAsString(params);
                 default:
-                    throw new RuntimeException("No such method: " + name);
+                    throw new ScriptExecutionException(103, "No such method: " + name);
             }
     	}
 
@@ -242,7 +242,7 @@ public class Array extends RuleVariable {
         }
 
         if (!value.isArray()) {
-            throw new RuntimeException("Can't assign a non array value to array '" + getName() + "'.");
+            throw new ScriptExecutionException(104, "Can't assign a non array value to array '" + getName() + "'.");
         } else {
             // init this array with the new value
             Array aval = (Array)value;
@@ -275,20 +275,20 @@ public class Array extends RuleVariable {
     }
 
     public Double valueAsDouble() {
-        throw new RuntimeException("Can't get the Double value of an array");
+        throw new ScriptExecutionException(105, "Can't get the Double value of an array");
     }
 
     public Integer valueAsInteger() {
-        throw new RuntimeException("Can't get the Integer value of array '" + getName() + "'.");
+        throw new ScriptExecutionException(105, "Can't get the Integer value of array '" + getName() + "'.");
     }
 
     public Boolean valueAsBoolean() {
-        throw new RuntimeException("Can't get the Boolean value of array '" + getName() + "'.");
+        throw new ScriptExecutionException(105, "Can't get the Boolean value of array '" + getName() + "'.");
     }
 
     @Override
     public ResultVariable valueAsResult() {
-        throw new RuntimeException("Can't get the Result value of an array");
+        throw new ScriptExecutionException(105, "Can't get the Result value of an array");
     }
 
     public Object valueAsObject() {

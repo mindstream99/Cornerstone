@@ -123,7 +123,7 @@ public class ValueExpression extends IValue implements IBinaryExpression {
                 return 4;
         }
         
-        throw new RuntimeException("Invalid Operator");
+        throw new ScriptExecutionException(600, "Invalid Operator");
     }
     
     public void setOperator(Operator op, IValue exp) {

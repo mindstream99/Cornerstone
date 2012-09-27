@@ -54,7 +54,7 @@ public class WhileInstruction extends Instruction {
 	
 	ServiceContext context = block.getRuleSet().getRuntime().getServiceContext(); 
 	if (context != null && !context.allowsWhileLoops()) {
-	    throw new RuntimeException("The service context does not allow WHILE loops.");
+	    throw new ScriptExecutionException(700, "The service context does not allow WHILE loops.");
 	}
 	
         // set the rule set

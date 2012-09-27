@@ -174,7 +174,7 @@ public abstract class RuleVariable extends IValue {
     public void appendDependents(String name, List<RuleVariable> deps) {
         for (RuleVariable var : _dependents) {
             if (var.getName().equals(name)) {
-                throw new RuntimeException("Circular Reference To Variable '" + name + "'");
+                throw new ScriptExecutionException(401, "Circular Reference To Variable '" + name + "'");
             }
             
             deps.add(var);
@@ -259,7 +259,7 @@ public abstract class RuleVariable extends IValue {
     
     protected void checkUserMutable() {
         if (!userMutable) {
-            throw new RuntimeException("Variable '" + getName() + "' can't be modified directly.");
+            throw new ScriptExecutionException(402, "Variable '" + getName() + "' can't be modified directly.");
         }
     }
 

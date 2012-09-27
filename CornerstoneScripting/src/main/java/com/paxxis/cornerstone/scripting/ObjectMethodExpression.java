@@ -71,7 +71,7 @@ public class ObjectMethodExpression extends IValue {
             }
             
         } else if (!rv.isObject()) {
-            throw new RuntimeException("Variable '" + name + "' is not an object.");
+            throw new ScriptExecutionException(200, "Variable '" + name + "' is not an object.");
         }
 
         object = rv;
@@ -83,7 +83,7 @@ public class ObjectMethodExpression extends IValue {
         Rule r = ruleSet.getRule(name);
         if (r == null)
         {
-            throw new RuntimeException("Attempt to invoke unknown rule '" + name + "'.");
+            throw new ScriptExecutionException(201, "Attempt to invoke unknown rule '" + name + "'.");
         } else {
             RuleAccessor ra = new RuleAccessor(null, queue);
             ra.setRuntime(queue.getRuleSet().getRuntime());
@@ -99,7 +99,7 @@ public class ObjectMethodExpression extends IValue {
     
     public void setMethodName(String name) {
         if (object == null && !pendingResolution) {
-            throw new RuntimeException("Method '" + name + "' called on unknown object.");
+            throw new ScriptExecutionException(202, "Method '" + name + "' called on unknown object.");
         }
         
         methodName = name;
@@ -117,14 +117,14 @@ public class ObjectMethodExpression extends IValue {
             }
         } catch (Exception e) {
             if (object instanceof RuleAccessor) {
-                throw new RuntimeException("Invalid method name '" + methodName + "' on Rule " + ((RuleAccessor)object).getRuleName().valueAsString());
+                throw new ScriptExecutionException(221, "Invalid method name '" + methodName + "' on Rule " + ((RuleAccessor)object).getRuleName().valueAsString());
             }
             
-            throw new RuntimeException("Unknown method name '" + methodName + "' on Object " + ((RuleVariable)object).getName());
+            throw new ScriptExecutionException(222, "Unknown method name '" + methodName + "' on Object " + ((RuleVariable)object).getName());
         }
         
         if (!pendingResolution && (parameters.size() != pcount && pcount != -1)) {
-            throw new RuntimeException("Wrong number of parameters (" + parameters.size() + ") for calling " + methodName + " on Object ");
+            throw new ScriptExecutionException(223, "Wrong number of parameters (" + parameters.size() + ") for calling " + methodName + " on Object ");
         }
 
         if (object instanceof RuleAccessor) {
@@ -137,7 +137,7 @@ public class ObjectMethodExpression extends IValue {
                         Rule rule = queue.getRuleSet().getRule(ra.valueAsString());
                         RuleVariable variable = rule.getQueue().getVariable(dataName);
                         if (variable == null) {
-                            throw new RuntimeException("Unknown variable name '" + dataName + "' on Rule " + rule.getName());
+                            throw new ScriptExecutionException(224, "Unknown variable name '" + dataName + "' on Rule " + rule.getName());
                         }
                     }
                 }
@@ -148,7 +148,7 @@ public class ObjectMethodExpression extends IValue {
     private void checkReturn() {
         if (!object.methodHasReturn(methodName)) {
             // you shouldn't have called this!
-            throw new RuntimeException("Can't get value of method or rule without a return value");
+            throw new ScriptExecutionException(250, "Can't get value of method or rule without a return value");
         }
     }
     

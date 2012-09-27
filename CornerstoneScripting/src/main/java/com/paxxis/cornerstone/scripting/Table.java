@@ -211,7 +211,7 @@ public class Table extends RuleVariable {
         }
 
         if (!value.isTable()) {
-            throw new RuntimeException("Can't assign a non table value to table '" + getName() + "'.");
+            throw new ScriptExecutionException(501, "Can't assign a non table value to table '" + getName() + "'.");
         } else {
             // init this table with the new value
             Table aval = (Table)value;
@@ -237,7 +237,7 @@ public class Table extends RuleVariable {
      * @return it's value
      */
     public Double valueAsDouble() {
-        throw new RuntimeException("Can't get the Double value of a table");
+        throw new ScriptExecutionException(503, "Can't get the Double value of a table");
     }
 
     /**
@@ -245,7 +245,7 @@ public class Table extends RuleVariable {
      * @return it's value
      */
     public Integer valueAsInteger() {
-        throw new RuntimeException("Can't get the Integer value of a table");
+        throw new ScriptExecutionException(504, "Can't get the Integer value of a table");
     }
 
     /**
@@ -253,12 +253,12 @@ public class Table extends RuleVariable {
      * @return it's value
      */
     public Boolean valueAsBoolean() {
-        throw new RuntimeException("Can't get the Boolean value of a table");
+        throw new ScriptExecutionException(505, "Can't get the Boolean value of a table");
     }
 
     @Override
     public ResultVariable valueAsResult() {
-	throw new RuntimeException("Can't get the Result value of a table");
+	throw new ScriptExecutionException(506, "Can't get the Result value of a table");
     }
 
     /**
@@ -303,7 +303,7 @@ public class Table extends RuleVariable {
     protected IValue setColumnNames(List<IValue> params) {
         // the first parameter must be an array
         if (!(params.get(0) instanceof Array)) {
-            throw new RuntimeException("setColumnNames parameter must be an Array");
+            throw new ScriptExecutionException(510, "setColumnNames parameter must be an Array");
         }
 
         columnNames.clear();

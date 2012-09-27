@@ -25,6 +25,7 @@ import java.util.logging.Logger;
 import com.paxxis.cornerstone.scripting.Array;
 import com.paxxis.cornerstone.scripting.IValue;
 import com.paxxis.cornerstone.scripting.RuleVariable;
+import com.paxxis.cornerstone.scripting.ScriptExecutionException;
 import com.paxxis.cornerstone.scripting.StringVariable;
 
 /**
@@ -71,7 +72,7 @@ public class CSLExtensionHelper implements ExtensionHelper {
         }
 
         if (result == -1) {
-            throw new RuntimeException("Extension " + extension.getId() + " has no such method: " + name);
+            throw new ScriptExecutionException(101, "Extension " + extension.getId() + " has no such method: " + name);
         }
 
         return result;
@@ -128,7 +129,7 @@ public class CSLExtensionHelper implements ExtensionHelper {
                 return new StringVariable(null, result.toString());
             }
         } catch (Exception e) {
-            throw new RuntimeException("Extension " + extension.getId() + " invocation failure: " + e.getCause().getLocalizedMessage());
+            throw new ScriptExecutionException(102, "Extension " + extension.getId() + " invocation failure: " + e.getCause().getLocalizedMessage());
         }
     }
 

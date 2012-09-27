@@ -22,27 +22,22 @@ package com.paxxis.cornerstone.scripting;
  * @author Rob Englander
  *
  */
-public class AssertInstruction extends Instruction {
-    private static final long serialVersionUID = 1L;
+public class ScriptExecutionException extends RuntimeException {
+	private static final long serialVersionUID = 1L;
 
-    private IValue failMessage;
-
-    private IValue condition;
-    
-    // the rule itself
-    private Rule rule;
-    
-    public AssertInstruction(Rule rule, IValue condition, IValue failMessage) {
-	this.rule = rule;
-	this.condition = condition;
-	this.failMessage = failMessage;
-    }
-
-    public boolean process(InstructionQueue queue) {
-	if (false == condition.valueAsBoolean()) {
-	    throw new ScriptExecutionException(110, failMessage.valueAsString());
-	} else {
-	    return true;
+	private int code;
+	
+	public ScriptExecutionException(int code, String message) {
+		super(message);
+		this.code = code;
 	}
-    }
+
+	public ScriptExecutionException(int code, String message, Throwable cause) {
+		super(message, cause);
+		this.code = code;
+	}
+	
+	public int getResultCode() {
+		return code;
+	}
 }

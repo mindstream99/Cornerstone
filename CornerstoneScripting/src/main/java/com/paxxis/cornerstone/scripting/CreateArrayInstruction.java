@@ -52,8 +52,8 @@ public class CreateArrayInstruction extends Instruction {
         }
 
         if (size < 0) {
-            throw new RuntimeException("Array size cannot be less than 0." +
-                       "\nAttempt to set array '" + _name + "' to size: " + size);
+            throw new ScriptExecutionException(120, "Array size cannot be less than 0." +
+                       "  Attempt to set array '" + _name + "' to size: " + size);
         }
 
         a.initialize(size);

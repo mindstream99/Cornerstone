@@ -87,6 +87,7 @@ public class ResultVariable extends RuleVariable {
 			success = null;
 			resultCode = new Integer(0);
 			messages.clear();
+			mergedResults.clear();
 		}
 	}
 

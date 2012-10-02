@@ -23,12 +23,12 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 
+import com.paxxis.cornerstone.base.Strategy;
 import com.paxxis.cornerstone.scripting.extension.CSLExtension;
 import com.paxxis.cornerstone.scripting.extension.CSLExtensionHelper;
 import com.paxxis.cornerstone.scripting.extension.ExtensionHelper;
 import com.paxxis.cornerstone.scripting.extension.ExtensionManager;
 import com.paxxis.cornerstone.scripting.strategy.MacroExpansionStrategy;
-import com.paxxis.cornerstone.scripting.strategy.Strategy;
 
 /**
  * Provides service access toCSL objects, since CSL objects do not know anything about the

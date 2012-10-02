@@ -14,16 +14,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.paxxis.cornerstone.scripting.strategy;
-
-import com.paxxis.cornerstone.base.Strategy;
+package com.paxxis.cornerstone.base;
 
 /**
+ * A marker interface for registered strategies.
  * 
  * @author Rob Englander
  *
  */
-public interface MacroExpansionStrategy extends Strategy {
+public interface Strategy {
 
-    public String expand(String value);
 }

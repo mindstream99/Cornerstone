@@ -97,7 +97,7 @@ public abstract class CornerstoneConfigurable implements IManagedBean {
 	 * 
 	 * @return
 	 */
-	protected Map<String, Object> getPrefixedConfigurationValues() {
+	public Map<String, Object> getPrefixedConfigurationValues() {
 	    Collection<Map<String, Object>> allConfigItems = getAllPrefixedConfigurationValues();
 	    if (allConfigItems.isEmpty()) {
 	        return Collections.<String, Object>emptyMap();
@@ -457,7 +457,9 @@ public abstract class CornerstoneConfigurable implements IManagedBean {
     }
     
     public Collection<String> getConfigPropertyPrefixes() {
-        return configPropertyPrefixes;
+    	List<String> list = new ArrayList<String>();
+    	list.addAll(configPropertyPrefixes);
+        return list;
     }
 
     public void setConfigPropertyPrefixes(Collection<String> configPropertyPrefixes) {
@@ -468,7 +470,15 @@ public abstract class CornerstoneConfigurable implements IManagedBean {
     	this.useSystemProperties = val;
     }
     
+    public boolean isUseSystemProperties() {
+    	return this.useSystemProperties;
+    }
+    
     public void setConfigSystemPrefix(String prefix) {
     	this.configSystemPrefix = prefix;
+    }
+    
+    public String getConfigSystemPrefix() {
+    	return this.configSystemPrefix;
     }
 }

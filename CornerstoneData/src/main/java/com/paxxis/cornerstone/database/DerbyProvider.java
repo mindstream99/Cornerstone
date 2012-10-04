@@ -26,7 +26,7 @@ import org.apache.log4j.Logger;
  * @author Rob Englander
  *
  */
-public class DerbyProvider implements DatabaseConnectionProvider {
+public class DerbyProvider extends DatabaseConnectionProvider {
     private static final Logger LOGGER = Logger.getLogger(DerbyProvider.class);
     private static final String DERBYDRIVEREMBEDDED = "org.apache.derby.jdbc.EmbeddedDriver";
     

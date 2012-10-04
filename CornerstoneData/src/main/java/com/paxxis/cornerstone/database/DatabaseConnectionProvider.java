@@ -16,16 +16,28 @@
  */
 package com.paxxis.cornerstone.database;
 
+import com.paxxis.cornerstone.common.PasswordGenerator;
+
 /**
  * 
  * @author Rob Englander
  *
  */
-public interface DatabaseConnectionProvider {
+public abstract class DatabaseConnectionProvider {
 
-    public String getConnectionUrl(DatabaseConnectionPool pool);
-    public void postConnect(DatabaseConnectionPool pool, DatabaseConnection database) throws DatabaseException;
-    public void onShutdown(DatabaseConnectionPool pool);
-    public String getName();
-    public int getDefaultPort();
+	private PasswordGenerator passwordGenerator = null;
+
+    public void setPasswordGenerator(PasswordGenerator generator) {
+        passwordGenerator = generator;
+    }
+
+    public PasswordGenerator getPasswordGenerator() {
+    	return passwordGenerator;
+    }
+
+    public abstract String getConnectionUrl(DatabaseConnectionPool pool);
+    public abstract void postConnect(DatabaseConnectionPool pool, DatabaseConnection database) throws DatabaseException;
+    public abstract void onShutdown(DatabaseConnectionPool pool);
+    public abstract String getName();
+    public abstract int getDefaultPort();
 }

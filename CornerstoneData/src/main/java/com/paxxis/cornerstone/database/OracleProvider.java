@@ -21,7 +21,7 @@ package com.paxxis.cornerstone.database;
  * @author Rob Englander
  *
  */
-public class OracleProvider implements DatabaseConnectionProvider {
+public class OracleProvider extends DatabaseConnectionProvider {
 
     @Override
     public String getConnectionUrl(DatabaseConnectionPool pool) {

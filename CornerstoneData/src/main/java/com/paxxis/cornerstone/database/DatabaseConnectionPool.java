@@ -69,8 +69,6 @@ public class DatabaseConnectionPool extends AbstractBlockingObjectPool<DatabaseC
 
     private long _sweepCycle = DEFAULTSWEEPCYCLE;
 
-    private PasswordGenerator passwordGenerator = null;
-
     private boolean ensureConnected = true;
     private String ensureConnectedStatment = "select 1";
 
@@ -334,7 +332,7 @@ public class DatabaseConnectionPool extends AbstractBlockingObjectPool<DatabaseC
             throw new RuntimeException("typeProvider can't be null.");
         }
 
-        _dbPassword = passwordGenerator.encryptPassword(_dbPassword);
+        _dbPassword = typeProvider.getPasswordGenerator().encryptPassword(_dbPassword);
         super.initialize();     	
         _sweeper.start();
     }
@@ -351,10 +349,6 @@ public class DatabaseConnectionPool extends AbstractBlockingObjectPool<DatabaseC
     @Override
     protected PoolEntry createPoolEntry() {
         return new PoolEntry(create());
-    }
-
-    public void setPasswordGenerator(PasswordGenerator generator) {
-        passwordGenerator = generator;
     }
 
     public void setCatalog(String cat) {

@@ -21,7 +21,7 @@ package com.paxxis.cornerstone.database;
  * @author Rob Englander
  *
  */
-public class VerticaProvider implements DatabaseConnectionProvider {
+public class VerticaProvider extends DatabaseConnectionProvider {
 
     @Override
     public String getConnectionUrl(DatabaseConnectionPool pool) {

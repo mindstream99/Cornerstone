@@ -248,7 +248,7 @@ public abstract class CornerstoneConfigurable implements IManagedBean {
     	
     	Map<String, String> systemProps = new HashMap<String, String>();
         if (useSystemProperties) {
-            for (String prefix : this.configPropertyPrefixes) {
+            for (String prefix : prefixes) {
             	Properties properties = System.getProperties();
             	Set<Object> propNames = properties.keySet();
             	for (Object obj : propNames) {

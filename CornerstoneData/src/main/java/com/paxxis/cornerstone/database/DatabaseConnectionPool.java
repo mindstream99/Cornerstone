@@ -29,7 +29,6 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 
 import com.paxxis.cornerstone.common.AbstractBlockingObjectPool;
-import com.paxxis.cornerstone.common.PasswordGenerator;
 
 /**
  * Manages a pool of DatabaseConnection connections.
@@ -42,6 +41,7 @@ public class DatabaseConnectionPool extends AbstractBlockingObjectPool<DatabaseC
     private static final long ONEMINUTE = 60000L;
     private static final long DEFAULTIDLETHRESHOLD = 5L * ONEMINUTE;
     private static final long DEFAULTSWEEPCYCLE = ONEMINUTE;
+    private static final int DEFAULTREACHABLE = 1000;
 
     // the database parameters
     private String dbSid = null;
@@ -68,7 +68,8 @@ public class DatabaseConnectionPool extends AbstractBlockingObjectPool<DatabaseC
     private long _idleThreshold = DEFAULTIDLETHRESHOLD;
 
     private long _sweepCycle = DEFAULTSWEEPCYCLE;
-
+    private int reachableTimeout = DEFAULTREACHABLE;
+    
     private boolean ensureConnected = true;
     private String ensureConnectedStatment = "select 1";
 
@@ -222,7 +223,7 @@ public class DatabaseConnectionPool extends AbstractBlockingObjectPool<DatabaseC
             s = new Socket();
             s.setReuseAddress(true);
             SocketAddress sa = new InetSocketAddress(this._dbHostname, port);
-            s.connect(sa, 3000);
+            s.connect(sa, reachableTimeout);
         } catch (IOException e) {
             // that's just fine
             throw e;
@@ -260,7 +261,7 @@ public class DatabaseConnectionPool extends AbstractBlockingObjectPool<DatabaseC
 
         // if after the ping above we find the connection is closed,
         // try to reconnect it
-        if (!connection.isConnected())
+        if (!force && !connection.isConnected())
         {
             connect(connection);
         }
@@ -279,6 +280,7 @@ public class DatabaseConnectionPool extends AbstractBlockingObjectPool<DatabaseC
                 activeConnections.put(entry.getObject(), entry);
                 return entry.getObject();
             } else {
+                returnInstance(entry);
                 throw new Exception("Unable to borrow broken connection.");
             }
         } catch (Throwable t) {
@@ -400,6 +402,10 @@ public class DatabaseConnectionPool extends AbstractBlockingObjectPool<DatabaseC
         return database;
     }
 
+    public void setReachableTimeout(int val) {
+        this.reachableTimeout = val;
+    }
+    
     public void setExtraParameters(String params) {
         extraParameters = params;
     }

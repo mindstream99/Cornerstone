@@ -137,14 +137,16 @@ public abstract class AbstractBlockingObjectPool<T> extends CornerstoneConfigura
 				throw new RuntimeException("Object pool is empty");
 			}
 
-			if (entry != null) {
-				return validatePoolEntry(entry);
-			} else {
+			if (entry == null) {
 				// the borrower will have to wait until an instance
 				// is returned by another borrower
 				latch = new DataLatch();
 				borrowersInWaiting.add(new WaitingBorrower(latch, borrower));
 			}
+		}
+
+		if (entry != null) {
+            return validatePoolEntry(entry);
 		}
 
 		// Only getting here when entry is null

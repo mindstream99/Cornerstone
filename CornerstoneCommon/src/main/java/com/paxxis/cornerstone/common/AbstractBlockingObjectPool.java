@@ -37,16 +37,26 @@ public abstract class AbstractBlockingObjectPool<T> extends CornerstoneConfigura
 
 	public static class PoolEntry<T> {
 		private T object;
+        private long timestamp;
 
 		public PoolEntry(T object) {
 			this.object = object;
+			stamp();
 		}
 
 		public T getObject() {
 			return object;
 		}
 
-		public void shutdown() {
+        public long getTimestamp() {
+            return this.timestamp;
+        }
+
+        public void stamp() {
+            this.timestamp = System.currentTimeMillis();
+        }
+        
+        public void shutdown() {
 			this.object = null;
 		}
 
@@ -82,7 +92,15 @@ public abstract class AbstractBlockingObjectPool<T> extends CornerstoneConfigura
 
 	private boolean shutdown = false;
 
+	/** the initial pool size */
 	private int poolSize = 1;
+	
+	/** the minimum pool size */
+	private int minPoolSize = -1;
+	
+	/** the maximum pool size */
+	private int maxPoolSize = -1;
+	
 	private long borrowTimeout = 600000;
 
 	private BlockingThreadPoolExecutor executor = null;
@@ -91,14 +109,30 @@ public abstract class AbstractBlockingObjectPool<T> extends CornerstoneConfigura
 		this.executor = executor;
 	}
 
-	public void setPoolSize(int size) {
-		poolSize = size;
-	}
+    public void setPoolSize(int size) {
+        poolSize = size;
+    }
 
-	public int getPoolSize() {
-		return poolSize;
-	}
-	
+    public int getPoolSize() {
+        return poolSize;
+    }
+    
+    public void setMinPoolSize(int size) {
+        minPoolSize = size;
+    }
+
+    public int getMinPoolSize() {
+        return minPoolSize;
+    }
+    
+    public void setMaxPoolSize(int size) {
+        maxPoolSize = size;
+    }
+
+    public int getMaxPoolSize() {
+        return maxPoolSize;
+    }
+    
 	public void setBorrowTimeout(long borrowTimeout) {
 		this.borrowTimeout = borrowTimeout;
 	}
@@ -133,8 +167,12 @@ public abstract class AbstractBlockingObjectPool<T> extends CornerstoneConfigura
 				// there's a free entry, give it to this borrower.
 				entry = (P) freePool.remove(0);
 				activePool.put(entry, borrower);
-			} else if (activePool.isEmpty()) {
-				throw new RuntimeException("Object pool is empty");
+			} else {
+			    // if we haven't reached the upper limit then we create a new one
+			    if ((freePool.size() + activePool.size()) < maxPoolSize) {
+			        entry = (P)createPoolEntry();
+			        activePool.put(entry, borrower);
+			    }
 			}
 
 			if (entry == null) {
@@ -145,17 +183,15 @@ public abstract class AbstractBlockingObjectPool<T> extends CornerstoneConfigura
 			}
 		}
 
-		if (entry != null) {
-            return validatePoolEntry(entry);
+		if (entry == null) {
+	        // We don't want to waitForObject inside the synchronized block, so these are outside
+	        entry = (P) latch.waitForObject(this.borrowTimeout);
+	        if (latch.hasTimedout()) {
+	            throw new TimeoutException("Timeout of " + this.borrowTimeout + " reached waiting for pool entry");
+	        }
 		}
 
-		// Only getting here when entry is null
-		// We don't want to waitForObject inside the synchronized block, so these are outside
-		entry = (P) latch.waitForObject(this.borrowTimeout);
-		if (latch.hasTimedout()) {
-			throw new TimeoutException("Timeout of " + this.borrowTimeout + " reached waiting for pool entry");
-		}
-
+        entry.stamp();
 		return validatePoolEntry(entry);
 	}
 
@@ -222,6 +258,7 @@ public abstract class AbstractBlockingObjectPool<T> extends CornerstoneConfigura
 		WaitingBorrower waiting = null;
 
 		synchronized (semaphore) {
+		    entry.stamp();
 			entry.onReturn();
 			// take this one off the active pool
 			Object borrower = activePool.remove(entry);
@@ -255,6 +292,7 @@ public abstract class AbstractBlockingObjectPool<T> extends CornerstoneConfigura
 
 	public void initialize() {
 		super.initialize();
+		
 		Runnable r = new Runnable() {
 			public void run() {
 				synchronized (semaphore) {
@@ -273,7 +311,15 @@ public abstract class AbstractBlockingObjectPool<T> extends CornerstoneConfigura
 			}
 		};
 
-		if (executor == null) {
+		if (minPoolSize == -1) {
+		    minPoolSize = poolSize;
+		}
+		
+        if (maxPoolSize == -1) {
+            maxPoolSize = poolSize;
+        }
+
+        if (executor == null) {
 			r.run();
 		} else {
 			executor.submit(r);

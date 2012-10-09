@@ -62,9 +62,6 @@ public class DatabaseConnectionPool extends AbstractBlockingObjectPool<DatabaseC
 
     private DatabaseConnectionProvider typeProvider = null;
 
-    // the maximum number of instances in the pool
-    private int _maximum = 1;
-
     private long _idleThreshold = DEFAULTIDLETHRESHOLD;
 
     private long _sweepCycle = DEFAULTSWEEPCYCLE;
@@ -78,17 +75,10 @@ public class DatabaseConnectionPool extends AbstractBlockingObjectPool<DatabaseC
     private Map<DatabaseConnection, PoolEntry> activeConnections = 
             new HashMap<DatabaseConnection, PoolEntry>();
 
-    public static class PoolEntry extends AbstractBlockingObjectPool.PoolEntry<DatabaseConnection>
-    {
-        private long timestamp;
+    public static class PoolEntry extends AbstractBlockingObjectPool.PoolEntry<DatabaseConnection> {
 
         public PoolEntry(DatabaseConnection db) {
             super(db);
-            this.timestamp = System.currentTimeMillis();
-        }
-
-        public long getTimestamp() {
-            return this.timestamp;
         }
 
         @Override
@@ -144,12 +134,10 @@ public class DatabaseConnectionPool extends AbstractBlockingObjectPool<DatabaseC
     private Sweeper _sweeper = new Sweeper();
 
 
-    private void sweep()
-    {
+    private void sweep() {
         long now = System.currentTimeMillis();
 
-        synchronized (getSemaphore())
-        {
+        synchronized (getSemaphore()) {
             Map<AbstractBlockingObjectPool.PoolEntry<DatabaseConnection>, Object> activePool = getActivePool();
             int active = activePool.size();
 
@@ -158,30 +146,25 @@ public class DatabaseConnectionPool extends AbstractBlockingObjectPool<DatabaseC
 
             int total = active + free;
 
-            if (free > 0 && total > getPoolSize())
-            {
+            if (free > 0 && total > getMinPoolSize()) {
                 // how many should we remove?
-                int over = total - getPoolSize();
+                int over = total - getMinPoolSize();
                 int target = free - over;
-                if (free > target)
-                {
+                if (free > target) {
                     int count = free - target;
 
-                    if (count > 0)
-                    {
+                    if (count > 0) {
                         int removed = 0;
                         int last = free - 1;
-                        for (int i = last; i >= 0; i--)
-                        {
+                        for (int i = last; i >= 0; i--) {
                             PoolEntry entry = (PoolEntry) freePool.get(i);
-                            if ((now - entry.timestamp) >= _idleThreshold)
-                            {
+                            if ((now - entry.getTimestamp()) >= _idleThreshold) {
                                 entry.getObject().disconnect();
                                 freePool.remove(i);
                                 removed++;
 
-                                if (removed == count)
-                                {
+                                if (removed == count) {
+                                    LOGGER.info("Removed " + removed + " idle database connection(s) for " + getTypeProvider().getConnectionUrl(this));
                                     break;
                                 }
                             }
@@ -191,8 +174,7 @@ public class DatabaseConnectionPool extends AbstractBlockingObjectPool<DatabaseC
             }
 
             // reconnect any closed connections in the free pool
-            for (AbstractBlockingObjectPool.PoolEntry<DatabaseConnection> entry : freePool)
-            {
+            for (AbstractBlockingObjectPool.PoolEntry<DatabaseConnection> entry : freePool) {
                 try {
                     ensureConnection(entry.getObject());
                 } catch (DatabaseException e) {
@@ -516,26 +498,6 @@ public class DatabaseConnectionPool extends AbstractBlockingObjectPool<DatabaseC
     public String getDbName()
     {
         return _dbName;
-    }
-
-    public void setMinPoolSize(int minimum)
-    {
-        setPoolSize(minimum);
-    }
-
-    public int getMinPoolSize()
-    {
-        return this.getPoolSize();
-    }
-
-    public void setMaxPoolSize(int maximum)
-    {
-        _maximum = maximum;
-    }
-
-    public int getMaxPoolSize()
-    {
-        return _maximum;
     }
 
     public void setIdleThreshold(float minutes)

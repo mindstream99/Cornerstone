@@ -179,19 +179,22 @@ public class ResultVariable extends RuleVariable {
 			throw new ScriptExecutionException(301, "merge parameter must be a Result");
 		}
 
-		ResultVariable rv = (ResultVariable)v;
-		if (success == null || success) {
-			success = rv.success;
-		}
-
-		// rule variables are re-used, so we copy the merged variable before copying
-		ResultVariable result = new ResultVariable();
-		result.setValue(rv);
-		mergedResults.add(result);
-		
+        ResultVariable rv = (ResultVariable)v;
+		merge(rv);
 		return new BooleanVariable(null, true);
 	}
 
+	public void merge(ResultVariable rv) {
+        if (success == null || success) {
+            success = rv.success;
+        }
+
+        // rule variables are re-used, so we copy the merged variable before copying
+        ResultVariable result = new ResultVariable();
+        result.setValue(rv);
+        mergedResults.add(result);
+	}
+	
 	public void setResultCode(int code) {
 		resultCode = code;
 	}

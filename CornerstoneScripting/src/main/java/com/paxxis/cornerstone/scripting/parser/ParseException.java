@@ -68,7 +68,8 @@ public class ParseException extends Exception {
    * followng this token will (therefore) be the first error token.
    */
   public Token currentToken;
-
+  public boolean setToken = false;
+  
   /**
    * Each entry in this array is an array of integers.  Each array
    * of integers represents a sequence of tokens (by their ordinal
@@ -83,6 +84,16 @@ public class ParseException extends Exception {
    */
   public String[] tokenImage;
 
+  public void setToken(Token t) {
+      if (!setToken) {
+        currentToken = t;
+        setToken = true;
+      }
+  }
+  
+  public boolean isSetToken() {
+      return setToken;
+  }
   /**
    * It uses "currentToken" and "expectedTokenSequences" to generate a parse
    * error message and returns it.  If this object has been created
@@ -189,4 +200,4 @@ public class ParseException extends Exception {
    }
 
 }
-/* JavaCC - OriginalChecksum=f72b290bc3ce63cb22f6980d2f6a5314 (do not edit this line) */
+/* JavaCC - OriginalChecksum=45636f4c88697e8c38f40254208ca630 (do not edit this line) */

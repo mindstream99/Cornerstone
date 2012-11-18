@@ -16,7 +16,11 @@
  */
 
 options {
-    STATIC = false;
+  JAVA_UNICODE_ESCAPE = true;
+  ERROR_REPORTING = true;
+  STATIC = false;
+  JDK_VERSION = "1.5";
+  BUILD_PARSER = true;
 }
 
 /**
@@ -34,6 +38,7 @@ package com.paxxis.cornerstone.scripting.parser;
 
 import java.io.*;
 import java.util.*;
+import com.paxxis.cornerstone.scripting.parser.RuleParser;
 import com.paxxis.cornerstone.scripting.*;
 
 /**
@@ -47,27 +52,49 @@ import com.paxxis.cornerstone.scripting.*;
  * If you are generating an extended parser, you should change
  * CSLRuleParser to something that make sense for your use case.
  */
-public class CSLRuleParser implements RuleParser
-{
-	private static final String DEFAULTNAME = "default";
-	
+public class CSLRuleParser implements RuleParser {
+    
+    private static class ParameterPair {
+        RuleVariable var;
+        Token token;
+    }
+
+    private static final String DEFAULTNAME = "default";
+    
     protected String _sourceCode = null;
     protected String ruleSetName = DEFAULTNAME;
     protected int ruleCount = 0;
-    
+    public List<ParseException> syntaxErrors = new ArrayList<ParseException>();
+
     public CSLRuleParser() {
     }
     
     public void initialize(String contents) {
         StringReader rdr = new StringReader(contents);
-	    jj_input_stream = new SimpleCharStream(rdr, 1, 1);
-    	token_source = new CSLRuleParserTokenManager(jj_input_stream);
-    	token = new Token();
-    	this.ReInit(rdr);
+        jj_input_stream = new JavaCharStream(rdr, 1, 1);
+        token_source = new CSLRuleParserTokenManager(jj_input_stream);
+        token = new Token();
+        this.ReInit(rdr);
         _sourceCode = contents;
 
-		ruleSetName = DEFAULTNAME;
-		ruleCount = 0;
+        ruleSetName = DEFAULTNAME;
+        ruleCount = 0;
+    }
+
+    public void recover (ParseException ex, int recoveryPoint) {
+        recover(ex, recoveryPoint, 0);
+    }
+
+    public void recover (ParseException ex, int recoveryPoint, int offset) {
+        syntaxErrors.add (ex);
+        Token t;
+        do {
+            t = getNextToken ();
+        } while (t.kind != EOF && t.kind != recoveryPoint);
+        
+        for (int i = 0; i < offset; i++) {
+            t = getNextToken();
+        }
     }
 
     public String getSourceCode()
@@ -99,7 +126,7 @@ SPECIAL_TOKEN :
 <IN_MULTI_LINE_COMMENT>
 SPECIAL_TOKEN :
 {
-  <MULTI_LINE_COMMENT: "*/" > : DEFAULT
+  <MULTI_LINE_COMMENT: "*/" | "\u0000" > : DEFAULT
 }
 
 <IN_SINGLE_LINE_COMMENT,IN_MULTI_LINE_COMMENT>
@@ -108,15 +135,14 @@ MORE :
   < ~[] >
 }
 
+
 /**
  * Add any new tokens that you need if your language extensions require additional tokens.
  * Do Not remove any of the base tokens unless you are removing base grammar that uses them...................
  */
 TOKEN :
 {
-   < SINGLEQUOTE: ("'") >
-|  < DOUBLEQUOTE: ("\"") >
-|  < LBRACE: ("{") >
+   < LBRACE: ("{") >
 |  < RBRACE: ("}") >
 |  < LPAREN: ("(") >
 |  < RPAREN: (")") >
@@ -137,6 +163,7 @@ TOKEN :
 |  < LESSTHAN: ("<") >
 |  < GREATERTHANEQ: (">=") >
 |  < LESSTHANEQ: ("<=") >
+|  < DEF: ("DEF" | "def") >
 |  < DO: ("DO" | "do") >
 |  < WHEN: ("WHEN" | "when") >
 |  < SET: ("set" | "SET") >
@@ -179,6 +206,8 @@ TOKEN :
 |  < ASSERT: ("assert" | "ASSERT") >
 |  < METHODSEP: (":") >
 |  < VALUESEP: ("::") >
+|  < SEMICOLON: (";") >
+|  < NAMESPACESEP: ("$") >
 |  < IS: ("is" | "IS" | "are" | "ARE") >
 |  < AND: ("and" | "AND") >
 |  < OR: ("or" | "OR") >
@@ -195,30 +224,42 @@ TOKEN :
 |  < EXTENSION: ("Extension") >
 |  < PRINT: ("print" | "PRINT") >
 |  < NEWLINE: ("newLine") >
+|  < STRINGLITERAL: "\"" ( ~["\""] )* "\"" >
 |  < name: (["a"-"z","A"-"Z","@","_","."]) (["a"-"z","A"-"Z",".","_","@","?","&","0"-"9","\\"])* >
 |  < INTEGERLITERAL: ("-")? (["0"-"9"])+ >
 |  < DATELITERAL: (<INTEGERLITERAL> "/" <INTEGERLITERAL> "/" <INTEGERLITERAL>)  >
 |  < FLOATLITERAL: (["0"-"9"])+ "." (["0"-"9"])+ >
 }
 
+TOKEN :
+{
+   < UNKNOWN: ("#" | "^" | "?") >
+}
+
 void parseRuleSet(RuleSet ruleSet) :
 {
-	Token t;
+    Token t;
     Rule rule;
 }
 {
-    (rule = parseRule(ruleSet)
-    {
-        try
+    try {
+        (rule = parseRule(ruleSet)
         {
-            ruleSet.addRule(rule);
+            try
+            {
+                ruleSet.addRule(rule);
+            }
+            catch (Exception rce)
+            {
+                throw new ParseException(rce.getMessage());
+            }
         }
-        catch (Exception rce)
-        {
-            throw new ParseException(rce.getMessage());
-        }
+        )+
+    } catch (TokenMgrError e) {
+        ParseException pe = new ParseException(e.getMessage());
+        pe.setToken(getToken(0));
+        recover(pe, 0);
     }
-    )+
 
 }
 
@@ -229,37 +270,39 @@ Rule parseRule(RuleSet ruleSet) :
     boolean ruleSetDeclared = false;
 }
 {
-	{ ruleCount++; }
-  	(
-  		<RULESET> t = <name>
-  		{
-   	  		ruleSetName = t.image;
-   	  		ruleSetDeclared = true;
-  		}
-  	)?
-  	{
-  		if (ruleCount == 1 && !ruleSetDeclared) {
-            throw new ParseException("You must declare a ruleset before the first rule definition.");
-  		}
-  	}
-  	rule(theRule)
-  	{
-   		return theRule;
-  	}
+    { ruleCount++; }
+    (
+        <RULESET> t = <name>
+        {
+            ruleSetName = t.image;
+            ruleSetDeclared = true;
+        }
+    )?
+    {
+            if (ruleCount == 1 && !ruleSetDeclared) {
+                ParseException pe = new ParseException("You must declare a ruleset before the first rule definition.");
+                pe.setToken(getToken(1));
+                recover(pe, WHITESPACE);
+            }
+    }
+    rule(theRule)
+    {
+        return theRule;
+    }
 }
 
 void rule(Rule theRule) :
 {
-	String desc = null;
+    String desc = null;
     Token t;
     RuleVariable returnVariable = new StringVariable("#return") ;
 }
 {
   (
-  	  <ANNO_DESCRIPTION> desc = stringValue()
-  	  {
-  	  	  theRule.setDescription(desc);
-  	  }
+      <ANNO_DESCRIPTION> desc = stringValue()
+      {
+          theRule.setDescription(desc);
+      }
   )?
   (
       returnVariable = returnType()
@@ -268,16 +311,18 @@ void rule(Rule theRule) :
       theRule.setReturnValue(returnVariable);
   }
   ruleName(theRule)
-  "(" (ruleParams(theRule))? ")"
+  <LPAREN> (ruleParams(theRule))? <RPAREN>
   <LBRACE>
-  (<WHEN> ":" whenClauses(theRule))?
+  (<WHEN> <METHODSEP> whenClauses(theRule))?
   doClauses(theRule, theRule.getQueue())
-  (<ON> <ERROR> ":" doClauses(theRule, theRule.getErrorQueue()))?
+  (<ON> <ERROR> <METHODSEP> doClauses(theRule, theRule.getErrorQueue()))?
   <RBRACE>
 }
 
 RuleVariable returnType() :
-{}
+{
+    RuleVariable rv = null;
+}
 {
     <STRING> { return new StringVariable("#return"); }
     |
@@ -301,36 +346,48 @@ RuleVariable returnType() :
 void ruleParams(Rule theRule) :
 {}
 {
-   ruleParam(theRule) ("," ruleParam(theRule))*
+   try {
+        ruleParam(theRule) (<COMMA> ruleParam(theRule))*
+   } catch (ParseException pe) {
+        pe.setToken(getToken(0));
+        recover(pe, RPAREN);
+   }
 }
 
 void ruleParam(Rule theRule) :
 {
-    Token tname;
+    Token tname = null;
     RuleVariable param;
+    ParameterPair pair = null;
 }
 {
-    param = parameter()
-    {
-        try
+    try {
+        pair = parameter(tname)
         {
-            theRule.getQueue().addParameter(param);
+            param = pair.var;
+            try
+            {
+                theRule.getQueue().addParameter(param);
+            }
+            catch (RuleCreationException e)
+            {
+                Token tt = getToken(0);
+                StringBuffer buf = new StringBuffer(e.getMessage());
+                buf.append("\nRule: " + theRule.getName() + "\nLine " + tt.beginLine + " Column " + token.beginColumn);
+                throw new ParseException(buf.toString());
+            }
         }
-        catch (RuleCreationException e)
-        {
-            Token tt = getToken(0);
-            StringBuffer buf = new StringBuffer(e.getMessage());
-            buf.append("\nRule: " + theRule.getName() + "\nLine " + tt.beginLine + " Column " + token.beginColumn);
-            throw new ParseException(buf.toString());
-        }
+    } catch (ParseException pe) {
+        pe.setToken(getToken(0));
+        throw pe;
     }
 }
 
-RuleVariable parameter() :
+ParameterPair parameter(Token t) :
 {
-    Token t;
     Token defaultToken = null;
     String defaultValue = null;
+    ParameterPair pair = new ParameterPair();
 }
 {
     <STRING> t = variablename() (LOOKAHEAD(2) defaultValue = stringValue())?
@@ -339,7 +396,9 @@ RuleVariable parameter() :
         if (defaultValue != null) {
             sv.setParameterDefaultValue(defaultValue);
         }
-        return sv; 
+        pair.var = sv;
+        pair.token = t;
+        return pair; 
     }
     |
     <DOUBLE> t = variablename() (LOOKAHEAD(2) (defaultToken = doubleValue() | defaultToken = integerValue()))?
@@ -348,7 +407,9 @@ RuleVariable parameter() :
         if (defaultToken != null) {
             dv.setParameterDefaultValue(defaultToken.image);
         }
-        return dv; 
+        pair.var = dv;
+        pair.token = t;
+        return pair; 
     }
     |
     <INTEGER> t = variablename() (LOOKAHEAD(2) defaultToken = integerValue())?
@@ -357,14 +418,18 @@ RuleVariable parameter() :
         if (defaultToken != null) {
             iv.setParameterDefaultValue(defaultToken.image);
         }
-        return iv; 
+        pair.var = iv;
+        pair.token = t;
+        return pair; 
     }
     |
     <RESULT> t = variablename()
     { 
         ResultVariable resv = new ResultVariable(t.image);
         resv.setHasParameterDefault(false);
-        return resv; 
+        pair.var = resv;
+        pair.token = t;
+        return pair; 
     }
     |
     <DATE> t = variablename() (LOOKAHEAD(2) defaultValue = stringValue())?
@@ -373,7 +438,9 @@ RuleVariable parameter() :
         if (defaultToken != null) {
             dtv.setParameterDefaultValue(defaultToken.image);
         }
-        return dtv; 
+        pair.var = dtv;
+        pair.token = t;
+        return pair; 
     }
     |
     <BOOLEAN> t = variablename() (LOOKAHEAD(2) defaultToken = booleanValue())?
@@ -382,31 +449,52 @@ RuleVariable parameter() :
         if (defaultToken != null) {
             bv.setParameterDefaultValue(defaultToken.image);
         }
-        return bv; 
+        pair.var = bv;
+        pair.token = t;
+        return pair; 
     }
     |
     <ARRAY> t = variablename()
     { 
         Array array = new Array(t.image);
         array.setHasParameterDefault(false);
-        return array; 
+        pair.var = array;
+        pair.token = t;
+        return pair; 
     }
     |
     <TABLE> t = variablename()
     { 
         Table table = new Table(t.image);
         table.setHasParameterDefault(false);
-        return table; 
+        pair.var = table;
+        pair.token = t;
+        return pair; 
     }
     |
     <EXTENSION> t = variablename()
-    { return new Extension(t.image); }
+    { 
+        Extension ext = new Extension(t.image); 
+        pair.var = ext;
+        pair.token = t;
+        return pair; 
+    }
     |
     <REFERENCE> t = variablename()
     { 
         ReferenceVariable refv = new ReferenceVariable(t.image);
         refv.setHasParameterDefault(false);
-        return refv; 
+        pair.var = refv;
+        pair.token = t;
+        return pair; 
+    }
+    |
+    t = <name>
+    { 
+        ParseException pe = new ParseException("Invalid Variable Type: " + t.image +
+            "\nLine " + t.beginLine + " Column " + t.beginColumn);
+        pe.setToken(t);
+        throw pe;
     }
 }
 
@@ -424,40 +512,57 @@ Token variablename() :
 void doClauses(Rule theRule, InstructionQueue queue) :
 {}
 {
-   (LOOKAHEAD(2) doClause(theRule, queue))*
+   (LOOKAHEAD(2)
+       try {
+           doClause(theRule, queue)
+       } catch (ParseException pe) {
+           pe.setToken(getToken(0));
+           recover(pe, pe.currentToken.next.kind, 1);
+       }
+   )*
 }
 
 void doClause(Rule theRule, InstructionQueue queue) :
 {
 }
 {
-   LOOKAHEAD(3) nullObjectOperation(queue) ";"
-   |
-   LOOKAHEAD(2) defineVariableClause(queue) ";"
-   |
-   returnClause(theRule, queue) ";"
-   |
-   errorClause(theRule, queue) ";"
-   |
-   assertClause(theRule, queue) ";"
-   |
-   LOOKAHEAD(3) setVariableClause(queue) ";"
-   |
-   switchClause(theRule, queue)
-   |
-   ifClause(theRule, queue)
-   |
-   forEachClause(theRule, queue)
-   |
-   whileClause(theRule, queue)
-   |
-   breakClause(queue) ";"
-   |
-   printClause(queue) ";"
-   |
-   LOOKAHEAD(3) mergeResultsClause(queue) ";"
-   |
-   LOOKAHEAD(2) valueExpression(queue) ";"
+   try {
+    LOOKAHEAD(3) nullObjectOperation(queue) <SEMICOLON>
+    |
+    defineVariableClause(queue)
+    |
+    returnClause(theRule, queue)
+    |
+    errorClause(theRule, queue) <SEMICOLON>
+    |
+    assertClause(theRule, queue)
+    |
+    LOOKAHEAD(3) setVariableClause(queue)
+    |
+    switchClause(theRule, queue)
+    |
+    ifClause(theRule, queue)
+    |
+    forEachClause(theRule, queue)
+    |
+    whileClause(theRule, queue)
+    |
+    LOOKAHEAD(3) breakClause(queue)
+    |
+    printClause(queue)
+    |
+    mergeResultsClause(queue)
+    |
+    LOOKAHEAD(2) valueExpression(queue) <SEMICOLON>
+    |
+    <SEMICOLON>
+   } catch (ParseException pe) {
+      if (pe.currentToken == null) {
+          pe.setToken(token);
+      }
+      recover(pe, SEMICOLON);
+   }
+
 }
 
 void nullObjectOperation(InstructionQueue queue) :
@@ -479,27 +584,43 @@ void mergeResultsClause(InstructionQueue queue) :
     IValue target;
 }
 {
-    <MERGE> source = valueExpression(queue) <INTO> target = valueExpression(queue)
-    {
-        try {
-            if ( !(target instanceof ResultVariable) ) {
-                throw new RuleCreationException("Target of merge must be a Result."); 
+    try {
+        <MERGE> source = valueExpression(queue) <INTO> target = valueExpression(queue)
+        {
+            try {
+                if ( !(target instanceof ResultVariable) ) {
+                    throw new RuleCreationException("Target of merge must be a Result."); 
+                }
+
+                ResultVariable rv = (ResultVariable)target;
+                ObjectMethodExpression exp = new ObjectMethodExpression();
+                exp.setObjectName(rv.getName(), queue); 
+                exp.setMethodName("mergeWith"); 
+                exp.addParameter(source);
+
+                EvaluationInstruction ei = new EvaluationInstruction(exp);
+                ei.setLineNumber(token.beginLine);
+                queue.addInstruction(ei);
+            } catch (RuleCreationException rce) {
+                StringBuffer buffer = new StringBuffer(rce.getMessage());
+                buffer.append("\nLine " + token.beginLine + " Column " + token.beginColumn);
+                ParseException pe = new ParseException(buffer.toString());
+                pe.setToken(token);
+                throw pe;
             }
-            
-            ResultVariable rv = (ResultVariable)target;
-            ObjectMethodExpression exp = new ObjectMethodExpression();
-            exp.setObjectName(rv.getName(), queue); 
-            exp.setMethodName("mergeWith"); 
-            exp.addParameter(source);
-    
-            EvaluationInstruction ei = new EvaluationInstruction(exp);
-            ei.setLineNumber(token.beginLine);
-            queue.addInstruction(ei);
-        } catch (RuleCreationException rce) {
-            StringBuffer buffer = new StringBuffer(rce.getMessage());
-            buffer.append("\nLine " + token.beginLine + " Column " + token.beginColumn);
-            throw new ParseException(buffer.toString());
         }
+    } catch (ParseException pe) {
+        pe.setToken(getToken(1));
+        recover(pe, SEMICOLON);
+        return;
+    }
+
+
+    try {
+        <SEMICOLON>
+    } catch (ParseException pe) {
+        pe.setToken(getToken(1));
+        recover(pe, SEMICOLON);
     }
 }
 
@@ -508,17 +629,31 @@ void printClause(InstructionQueue queue) :
     IValue v;
 }
 {
-    <PRINT> v = valueExpression(queue)
-    {
-        PrintInstruction pi = new PrintInstruction(v);
-        pi.setLineNumber(token.beginLine);
-        queue.addInstruction(pi);
+    try {
+        <PRINT> v = valueExpression(queue)
+        {
+            PrintInstruction pi = new PrintInstruction(v);
+            pi.setLineNumber(token.beginLine);
+            queue.addInstruction(pi);
+        }
+    } catch (ParseException pe) {
+        pe.setToken(token);
+        recover(pe, SEMICOLON);
+        return;
+    }
+
+    try {
+        <SEMICOLON>
+    } catch (ParseException pe) {
+        pe.setToken(getToken(1));
+        recover(pe, SEMICOLON);
     }
 }
 
 void returnClause(Rule theRule, InstructionQueue queue) :
 {
     IValue v;
+    Token t;
 }
 {
     <RETURN>
@@ -535,10 +670,19 @@ void returnClause(Rule theRule, InstructionQueue queue) :
         {
             StringBuffer buffer = new StringBuffer(rce.getMessage());
             buffer.append("\nLine " + token.beginLine + " Column " + token.beginColumn);
-            throw new ParseException(buffer.toString());
+            ParseException pe = new ParseException(buffer.toString());
+            pe.setToken(token);
+            throw pe;
         }
         ri.setLineNumber(token.beginLine);
         queue.addInstruction(ri);
+    }
+
+    try {
+        <SEMICOLON>
+    } catch (ParseException pe) {
+        pe.setToken(getToken(1));
+        recover(pe, SEMICOLON);
     }
 }
 
@@ -551,7 +695,7 @@ void errorClause(Rule theRule, InstructionQueue queue) :
     <ERROR>
     (
         code = valueExpression(queue)
-    	(  <COMMA> desc = valueExpression(queue) )?
+        (  <COMMA> desc = valueExpression(queue) )?
     )
     {
         ErrorInstruction ri = new ErrorInstruction();
@@ -580,14 +724,21 @@ void assertClause(Rule theRule, InstructionQueue queue) :
     <ASSERT>
     (
         cond = valueExpression(queue)
-     	(
-    		<METHODSEP> msg = valueExpression(queue)
+        (
+            <METHODSEP> msg = valueExpression(queue)
         )?
     )
     {
         AssertInstruction ri = new AssertInstruction(theRule, cond, msg);
         ri.setLineNumber(token.beginLine);
         queue.addInstruction(ri);
+    }
+
+    try {
+        <SEMICOLON>
+    } catch (ParseException pe) {
+        pe.setToken(getToken(1));
+        recover(pe, SEMICOLON);
     }
 }
 
@@ -600,6 +751,13 @@ void breakClause(InstructionQueue queue) :
         bi.setLineNumber(token.beginLine);
         queue.addInstruction(bi);
     }
+
+    try {
+        <SEMICOLON>
+    } catch (ParseException pe) {
+        pe.setToken(getToken(1));
+        recover(pe, SEMICOLON);
+    }
 }
 
 void defineVariableClause(InstructionQueue queue) :
@@ -607,82 +765,170 @@ void defineVariableClause(InstructionQueue queue) :
     RuleVariable var = null;
     SetInstruction si;
     IValue v = null;
-    Token t;
+    Token t = null;
+    Token type = null;
+    Token macroToken = null;
     boolean durable = false;
     boolean dynamic = false;
     boolean macro = false;
+    boolean assignment = false;
 }
 {
-    ( 
-        <DURABLE>
-        { durable = true; }
-    )?
-    ( 
-        <DYNAMIC>
-        { dynamic = true; }
-    )?
-    ( 
-        <MACRO>
-        { macro = true; }
-    )?
-    (
-        LOOKAHEAD(2) var = parameter()
-        |
-        <ARRAY> <LPAREN> (v = valueExpression(queue))? <RPAREN> t = variablename()
-        {
-            var = new Array(t.image);
-            CreateArrayInstruction cai = new CreateArrayInstruction(t.image, v);
-            cai.setLineNumber(token.beginLine);
-            queue.addInstruction(cai);
-        }
-        |
-        <TABLE> t = variablename()
-        {
-            var = new Table(t.image);
-            CreateTableInstruction cti = new CreateTableInstruction(t.image);
-            cti.setLineNumber(token.beginLine);
-            queue.addInstruction(cti);
-        }
-        |
-        <RULE> t = variablename()
-        {
-            var = new RuleAccessor(t.image, queue);
-        }
-        |
-        <REFERENCE> t = variablename()
-        {
-            var = new ReferenceVariable(t.image);
-        }
-    )
-    {
-        try
+    try {
+        <DEF>
+        ( 
+            <DURABLE>
+            { durable = true; }
+        )?
+        ( 
+            <DYNAMIC>
+            { dynamic = true; }
+        )?
+        ( 
+            macroToken = <MACRO>
+            { macro = true; }
+        )?
+        (
+            try {
+                <STRING> t = variablename()
+                {
+                    var = new StringVariable(t.image);
+                }
+                |
+                <DOUBLE> t = variablename()
+                {
+                    var = new DoubleVariable(t.image);
+                }
+                |
+                <INTEGER> t = variablename()
+                {
+                    var = new IntegerVariable(t.image);
+                }
+                |
+                <RESULT> t = variablename()
+                {
+                    var = new ResultVariable(t.image);
+                }
+                |
+                <DATE> t = variablename()
+                {
+                    var = new DateVariable(t.image);
+                }
+                |
+                <BOOLEAN> t = variablename()
+                {
+                    var = new BooleanVariable(t.image);
+                }
+                |
+                <ARRAY> <LPAREN> (v = valueExpression(queue))? <RPAREN> t = variablename()
+                {
+                    var = new Array(t.image);
+                    CreateArrayInstruction cai = new CreateArrayInstruction(t.image, v);
+                    cai.setLineNumber(token.beginLine);
+                    queue.addInstruction(cai);
+                }
+                |
+                <TABLE> t = variablename()
+                {
+                    var = new Table(t.image);
+                    CreateTableInstruction cti = new CreateTableInstruction(t.image);
+                    cti.setLineNumber(token.beginLine);
+                    queue.addInstruction(cti);
+                }
+                |
+                <RULE> t = variablename()
+                {
+                    var = new RuleAccessor(t.image, queue);
+                }
+                |
+                <REFERENCE> t = variablename()
+                {
+                    var = new ReferenceVariable(t.image);
+                }
+                |
+                <EXTENSION> t = variablename()
+                {
+                    var = new Extension(t.image);
+                }
+                |
+                t = <name>
+                { 
+                    ParseException pe = new ParseException("Invalid Variable Type: " + t.image +
+                        "\nLine " + t.beginLine + " Column " + t.beginColumn);
+                    pe.setToken(t);
+                    throw pe;
+                }
+            } catch (ParseException pe) {
+                pe.setToken(getToken(1));
+                throw pe;
+            }
+        )
         {
             var.setDurable(durable);
             var.setDynamic(dynamic);
-            var.setMacro(macro);
-            queue.addVariable(var);
+            try {
+                queue.addVariable(var);
+            }
+            catch (RuleCreationException e)
+            {
+                StringBuffer buf = new StringBuffer(e.getMessage());
+                buf.append(" Line " + t.beginLine + " Column " + t.beginColumn);
+                ParseException pe = new ParseException(buf.toString());
+                pe.setToken(t);
+                throw pe;
+            }
+
+            try {
+                var.setMacro(macro);
+            }
+            catch (RuleCreationException e)
+            {
+                StringBuffer buf = new StringBuffer(e.getMessage());
+                buf.append(" Line " + macroToken.beginLine + " Column " + macroToken.beginColumn);
+                ParseException pe = new ParseException(buf.toString());
+                pe.setToken(macroToken);
+                throw pe;
+            }
         }
-        catch (RuleCreationException e)
-        {
-            Token tt = getToken(0);
-            StringBuffer buf = new StringBuffer(e.getMessage());
-            buf.append("\nLine " + tt.beginLine + " Column " + token.beginColumn);
-            throw new ParseException(buf.toString());
-        }
+    } catch (ParseException pe) {
+        pe.setToken(token);
+        recover(pe, SEMICOLON);
+        return;
     }
-    (
-        <ASSIGNMENT>
-        {
-            si = new SetInstruction();
-            si.addVariable(var);
+
+    try {
+        (
+            <ASSIGNMENT>
+            {
+                assignment = true;
+                si = new SetInstruction();
+                si.addVariable(var);
+            }
+            v = valueExpression(queue)
+            {
+                si.setValue(v);
+                si.setLineNumber(token.beginLine);
+                queue.addInstruction(si);
+            }
+        )?
+    } catch (ParseException pe) {
+        pe.setToken(getToken(0));
+        if (assignment) {
+            pe.setToken(getToken(1));
         }
-        v = valueExpression(queue)
-        {
-            si.setValue(v);
-            si.setLineNumber(token.beginLine);
-            queue.addInstruction(si);
+        recover(pe, SEMICOLON);
+        return;
+    }
+
+    try {
+        <SEMICOLON>
+    } catch (ParseException pe) {
+        pe.setToken(getToken(0));
+        if (!assignment) {
+            pe.setToken(getToken(1));
         }
-    )?
+        recover(pe, SEMICOLON);
+    }
 }
 
 void switchClause(Rule theRule, InstructionQueue queue) :
@@ -706,14 +952,14 @@ void switchClause(Rule theRule, InstructionQueue queue) :
          InstructionQueue q = new InstructionQueue();
          q.setParent(queue);
       }
-      s = constant() ":"
+      s = constant() <METHODSEP>
       doClauses(theRule, q)
       {
          inst.addCase(s, q);
       }
     )+
     (
-      <DEFCASE> ":"
+      <DEFCASE> <METHODSEP>
       {
          InstructionQueue q = new InstructionQueue();
          q.setParent(queue);
@@ -735,30 +981,38 @@ void forEachClause(Rule theRule, InstructionQueue queue) :
     Token t;
 }
 {
-    <FOREACH> <LPAREN> t = variablename() <IN> startValue = valueExpression(queue) <TO> endValue = valueExpression(queue) <RPAREN>
-    {
-        fei.getBlock().setParent(queue);
-        IntegerVariable index = new IntegerVariable(t.image, startValue.valueAsInteger());
-        index.setDurable(true);
-        index.setUserMutable(false);
+    try {
+        <FOREACH> <LPAREN> t = variablename() <IN> startValue = valueExpression(queue) <TO> endValue = valueExpression(queue) <RPAREN>
+        {
+            fei.getBlock().setParent(queue);
+            IntegerVariable index = new IntegerVariable(t.image, startValue.valueAsInteger());
+            index.setDurable(true);
+            index.setUserMutable(false);
 
-        try {
-        	fei.setIndexVariable(index);
-        } catch (RuleCreationException e) {
-            Token tt = getToken(0);
-            StringBuffer buf = new StringBuffer(e.getMessage());
-            buf.append("\nLine " + tt.beginLine + " Column " + token.beginColumn);
-            throw new ParseException(buf.toString());
+            try {
+                    fei.setIndexVariable(index);
+            } catch (RuleCreationException e) {
+                Token tt = getToken(0);
+                StringBuffer buf = new StringBuffer(e.getMessage());
+                buf.append("\nLine " + tt.beginLine + " Column " + token.beginColumn);
+                throw new ParseException(buf.toString());
+            }
+
+            fei.setIndexStartValue(startValue);
+            fei.setIndexEndValue(endValue);
+            fei.setLineNumber(token.beginLine);
+            queue.addInstruction(fei);
         }
-
-        fei.setIndexStartValue(startValue);
-        fei.setIndexEndValue(endValue);
-        fei.setLineNumber(token.beginLine);
-        queue.addInstruction(fei);
+        <LBRACE>
+        doClauses(theRule, fei.getBlock())
+        <RBRACE>
+    } catch (ParseException pe) {
+        if (!pe.isSetToken()) {
+            pe.currentToken = getToken(1);
+        }
+        recover(pe, RBRACE);
     }
-    <LBRACE>
-    doClauses(theRule, fei.getBlock())
-    <RBRACE>
+
 }
 
 void whileClause(Rule theRule, InstructionQueue queue) :
@@ -767,17 +1021,22 @@ void whileClause(Rule theRule, InstructionQueue queue) :
     WhileInstruction wi;
 }
 {
-    <WHILE> <LPAREN> condition = valueExpression(queue) <RPAREN>
-    {
-        wi = new WhileInstruction(queue);
-        wi.getBlock().setParent(queue);
-        wi.setCondition(condition);
-        wi.setLineNumber(token.beginLine);
-        queue.addInstruction(wi);
+    try {
+        <WHILE> <LPAREN> condition = valueExpression(queue) <RPAREN>
+        {
+            wi = new WhileInstruction(queue);
+            wi.getBlock().setParent(queue);
+            wi.setCondition(condition);
+            wi.setLineNumber(token.beginLine);
+            queue.addInstruction(wi);
+        }
+        <LBRACE>
+        doClauses(theRule, wi.getBlock())
+        <RBRACE>
+    } catch (ParseException pe) {
+        pe.setToken(getToken(1));
+        recover(pe, RBRACE);
     }
-    <LBRACE>
-    doClauses(theRule, wi.getBlock())
-    <RBRACE>
 }
 
 void ifClause(Rule theRule, InstructionQueue queue) :
@@ -787,32 +1046,37 @@ void ifClause(Rule theRule, InstructionQueue queue) :
     InstructionQueue q;
 }
 {
-    <IF> <LPAREN> condition = valueExpression(queue) <RPAREN>
-    {
-        ii.setCondition(condition);
-        ii.setLineNumber(token.beginLine);
-        queue.addInstruction(ii);
-        ii.getIfBlock().setParent(queue);
+    try {
+        <IF> <LPAREN> condition = valueExpression(queue) <RPAREN>
+        {
+            ii.setCondition(condition);
+            ii.setLineNumber(token.beginLine);
+            queue.addInstruction(ii);
+            ii.getIfBlock().setParent(queue);
+        }
+        <LBRACE>
+        doClauses(theRule, ii.getIfBlock())
+        <RBRACE>
+        (
+        LOOKAHEAD(2) <ELSE> <IF> <LPAREN> condition = valueExpression(queue) <RPAREN>
+        <LBRACE>
+        {
+            q = ii.addElseIfBlock(condition);
+            q.setParent(queue);
+        }
+        doClauses(theRule, q)
+        <RBRACE>
+        )*
+        (
+        <ELSE> <LBRACE>
+        { ii.getElseBlock().setParent(queue); }
+        doClauses(theRule, ii.getElseBlock())
+        <RBRACE>
+        )?
+    } catch (ParseException pe) {
+        pe.setToken(getToken(1));
+        recover(pe, RBRACE);
     }
-    <LBRACE>
-    doClauses(theRule, ii.getIfBlock())
-    <RBRACE>
-    (
-       LOOKAHEAD(2) <ELSE> <IF> <LPAREN> condition = valueExpression(queue) <RPAREN>
-       <LBRACE>
-       {
-           q = ii.addElseIfBlock(condition);
-           q.setParent(queue);
-       }
-       doClauses(theRule, q)
-       <RBRACE>
-    )*
-    (
-       <ELSE> <LBRACE>
-       { ii.getElseBlock().setParent(queue); }
-       doClauses(theRule, ii.getElseBlock())
-       <RBRACE>
-    )?
 }
 
 void setVariableClause(InstructionQueue queue) :
@@ -821,35 +1085,47 @@ void setVariableClause(InstructionQueue queue) :
     IValue v;
 }
 {
-    (
-       (
-          setvariables(queue, instr)
-          <ASSIGNMENT>
-          v = valueExpression(queue)
-          {
-             instr.setValue(v);
-          }
-       )
-       |
-       (
-          <SET> <TO>
-          v = valueExpression(queue)
-          {
-             instr.setValue(v);
-          }
-          ":" setvariables(queue, instr)
-       )
-    )
-    {
-        instr.setLineNumber(token.beginLine);
-        queue.addInstruction(instr);
+    try {
+      (
+        (
+            setvariables(queue, instr)
+            <ASSIGNMENT>
+            v = valueExpression(queue)
+            {
+                instr.setValue(v);
+            }
+        )
+        |
+        (
+            <SET> <TO>
+            v = valueExpression(queue)
+            {
+                instr.setValue(v);
+            }
+            <METHODSEP> setvariables(queue, instr)
+        )
+      )
+      {
+          instr.setLineNumber(token.beginLine);
+          queue.addInstruction(instr);
+      }
+    } catch (ParseException pe) {
+        pe.setToken(getToken(1));
+        recover(pe, RBRACE);
+    }
+    
+    try {
+        <SEMICOLON>
+    } catch (ParseException pe) {
+        pe.setToken(getToken(1));
+        recover(pe, SEMICOLON);
     }
 }
 
 void setvariables(InstructionQueue queue, SetInstruction instr) :
 {}
 {
-   setvariable(queue, instr) ("," setvariable(queue, instr))*
+   setvariable(queue, instr) (<COMMA> setvariable(queue, instr))*
 }
 
 void setvariable(InstructionQueue queue, SetInstruction instr) :
@@ -882,16 +1158,20 @@ void setvariable(InstructionQueue queue, SetInstruction instr) :
         RuleVariable rv = queue.getVariable(t.image);
         if (rv == null)
         {
-            throw new ParseException("Reference to undefined variable: " + t.image
+            ParseException pe = new ParseException("Reference to undefined variable: " + t.image
               + " at Line " + t.beginLine + " Column " + t.beginColumn);
+            pe.setToken(t);
+            throw pe;
         }
 
         if (isArray)
         {
             if (!rv.isArray())
             {
-                throw new ParseException("Attempt to index non array variable: " + t.image
+                ParseException pe = new ParseException("Attempt to index non array variable: " + t.image
                   + " at Line " + t.beginLine + " Column " + t.beginColumn);
+                pe.setToken(t);
+                throw pe;
             }
             rv = new ArrayIndexer(queue, (Array)rv, v);
         }
@@ -899,8 +1179,10 @@ void setvariable(InstructionQueue queue, SetInstruction instr) :
         {
             if (!rv.isTable())
             {
-                throw new ParseException("Attempt to index non table variable: " + t.image
+                ParseException pe = new ParseException("Attempt to index non table variable: " + t.image
                   + " at Line " + t.beginLine + " Column " + t.beginColumn);
+                pe.setToken(t);
+                throw pe;
             }
             rv = new TableIndexer(queue, (Table)rv, v, v2);
         }
@@ -918,34 +1200,42 @@ IValue valueExpression(InstructionQueue queue) :
     ValueExpression.Operator operator = ValueExpression.Operator.INVALID;
 }
 {
-  (
-    left = valueOperand(queue) 
-    {
-       exp.setOperand(true, left);
-    }
-    ( LOOKAHEAD(2) 
-        operator = valueOperator() right = valueOperand(queue)
+    try {
+        (
+        left = valueOperand(queue) 
         {
-            exp.setOperator(operator, right);
+            exp.setOperand(true, left);
         }
-    )*
-    |
-    <NOT> left = valueOperand(queue)
-    {
-       exp.setOperand(true, left);
-       exp.setOperator(ValueExpression.Operator.NOT, left);
+        ( LOOKAHEAD(2) 
+            operator = valueOperator() right = valueOperand(queue)
+            {
+                exp.setOperator(operator, right);
+            }
+        )*
+        |
+        <NOT> left = valueOperand(queue)
+        {
+            exp.setOperand(true, left);
+            exp.setOperator(ValueExpression.Operator.NOT, left);
+        }
+        )
+        {
+            if (exp.getRightOperand() == null)
+            {
+                return exp.getLeftOperand();
+            }
+            else
+            {
+                return exp;
+            }
+        }
+    } catch (ParseException pe) {
+        if (pe.currentToken == null) {
+            pe.setToken(getToken(1));
+        }
+        //recover(pe, SEMICOLON);
+        throw pe;
     }
-  )
-  {
-      if (exp.getRightOperand() == null)
-      {
-          return exp.getLeftOperand();
-      }
-      else
-      {
-          return exp;
-      }
-  }
 }
 
 Token booleanValue() :
@@ -989,16 +1279,16 @@ Token integerValue() :
 
 String stringValue() :
 {
+    Token token;
     String t;
 }
 {
     (
-        ( <SINGLEQUOTE>
-        t = grabToCharacter('\'')
-        )
-        |
-        ( <DOUBLEQUOTE>
-        t = grabToCharacter('"')
+        ( token = <STRINGLITERAL>
+            {
+                t = token.image;
+                t = t.substring(1, t.length() - 1);
+            }
         )
         |
         ( <NEWLINE>
@@ -1023,7 +1313,7 @@ void conditionClause(Rule theRule) :
     IValue v;
 }
 {
-   <CONDITION> v = valueExpression(theRule.getQueue()) ";"
+   <CONDITION> v = valueExpression(theRule.getQueue()) <SEMICOLON>
    {
       theRule.addCondition(v);
    }
@@ -1031,13 +1321,18 @@ void conditionClause(Rule theRule) :
 
 void ruleName(Rule theRule) :
 {
-  Token t;
+  Token t = null;
 }
 {
-  t = <name>
-  {
-     theRule.setName(ruleSetName + "$" + t.image);
-  }
+    try {
+        t = <name>
+        {
+            theRule.setName(ruleSetName + "$" + t.image);
+        }
+    } catch (ParseException pe) {
+        pe.setToken(getToken(1));
+        recover(pe, EOF);
+    }
 }
 
 ValueExpression.Operator valueOperator() :
@@ -1136,16 +1431,20 @@ IValue valueOperand(InstructionQueue queue) :
         RuleVariable rv = queue.getVariable(t.image);
         if (rv == null)
         {
-            throw new ParseException("Reference to undefined variable: " + t.image
+            ParseException pe = new ParseException("Reference to undefined variable: " + t.image
               + " at Line " + t.beginLine + " Column " + t.beginColumn);
+            pe.setToken(t);
+            throw pe;
         }
 
         if (isArray)
         {
             if (!rv.isArray())
             {
-                throw new ParseException("Attempt to index non array variable: " + t.image
+                ParseException pe = new ParseException("Attempt to index non array variable: " + t.image
                   + " at Line " + t.beginLine + " Column " + t.beginColumn);
+                pe.setToken(t);
+                throw pe;
             }
             rv = new ArrayIndexer(queue, (Array)rv, v);
         }
@@ -1153,8 +1452,10 @@ IValue valueOperand(InstructionQueue queue) :
         {
             if (!rv.isTable())
             {
-                throw new ParseException("Attempt to index non table variable: " + t.image
+                ParseException pe = new ParseException("Attempt to index non table variable: " + t.image
                   + " at Line " + t.beginLine + " Column " + t.beginColumn);
+                pe.setToken(t);
+                throw pe;
             }
             rv = new TableIndexer(queue, (Table)rv, v, v2);
         }
@@ -1196,7 +1497,7 @@ IValue arrayValue(InstructionQueue queue) :
     <LBRACKET>
     (
        v = valueExpression(queue) { vector.add(v); }
-       (","
+       (<COMMA>
           v = valueExpression(queue) { vector.add(v); }
        )*
     )?
@@ -1209,15 +1510,15 @@ IValue arrayValue(InstructionQueue queue) :
 
 IValue objectOperation(InstructionQueue queue) :
 {
-	IValue v;
+    IValue v;
 }
 {
     (
-		v = directObjectOperation(queue)
-	)
-	{
-		return v;
-	}
+        v = directObjectOperation(queue)
+    )
+    {
+        return v;
+    }
 }
 
 IValue objectDataValue(InstructionQueue queue) :
@@ -1230,7 +1531,7 @@ IValue objectDataValue(InstructionQueue queue) :
 }
 {
     ( LOOKAHEAD(2)
-       nameSpaceToken = <name> "$"
+       nameSpaceToken = <name> <NAMESPACESEP>
     )?
     nameToken = <name>
     { 
@@ -1249,7 +1550,15 @@ IValue objectDataValue(InstructionQueue queue) :
     { 
         exp.setMethodName("valueOf", true); 
         exp.addParameter(new StringVariable(null, t.image));
-        exp.validateParameters();
+        
+        try {
+            exp.validateParameters();
+        } catch (ScriptExecutionException s) {
+            //throw new ParseException(s + " at Line " + t.beginLine + " Column " + t.beginColumn);
+            ParseException pe = new ParseException(s + " at Line " + t.beginLine + " Column " + t.beginColumn);
+            pe.setToken(t);
+            throw pe;
+        }
         return exp;
         
     }
@@ -1266,7 +1575,7 @@ IValue directObjectOperation(InstructionQueue queue) :
 }
 {
     ( LOOKAHEAD(2)
-       nameSpaceToken = <name> "$"
+       nameSpaceToken = <name> <NAMESPACESEP>
     )?
     nameToken = <name>
     (
@@ -1301,7 +1610,7 @@ IValue directObjectOperation(InstructionQueue queue) :
         )
         { exp.addParameter(val); }
         (
-            ","
+            <COMMA>
             (
                 val = valueExpression(queue)
             )
@@ -1310,7 +1619,15 @@ IValue directObjectOperation(InstructionQueue queue) :
     )?
     <RPAREN>
     {
-        exp.validateParameters();
+        try {
+            exp.validateParameters();
+        } catch (ScriptExecutionException s) {
+            //throw new ParseException(s + " at Line " + t2.beginLine + " Column " + t2.beginColumn);
+            ParseException pe = new ParseException(s + " at Line " + t2.beginLine + " Column " + t2.beginColumn);
+            pe.setToken(t2);
+            throw pe;
+        }
+
         return exp;
     }
 }
@@ -1335,7 +1652,7 @@ JAVACODE
 String grabToCharacter(char grab)
 {
    StringBuffer buffer = new StringBuffer();
-   SimpleCharStream s = this.token_source.input_stream;
+   JavaCharStream s = this.token_source.input_stream;
 
    try
    {
@@ -1356,7 +1673,7 @@ String grabToCharacter(char grab)
              }
              else 
              {
-             	buffer.append(cc);
+                buffer.append(cc);
              }
           }
           else

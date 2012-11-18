@@ -124,7 +124,7 @@ public class ObjectMethodExpression extends IValue {
         }
         
         if (!pendingResolution && (parameters.size() != pcount && pcount != -1)) {
-            throw new ScriptExecutionException(223, "Wrong number of parameters (" + parameters.size() + ") for calling " + methodName + " on Object ");
+            throw new ScriptExecutionException(223, "Wrong number of parameters (" + parameters.size() + ") for calling " + methodName + " on Object " + ((RuleVariable)object).getName());
         }
 
         if (object instanceof RuleAccessor) {

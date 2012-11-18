@@ -22,175 +22,181 @@ public interface CSLRuleParserConstants {
   /** RegularExpression Id. */
   int MULTI_LINE_COMMENT = 5;
   /** RegularExpression Id. */
-  int SINGLEQUOTE = 7;
+  int LBRACE = 7;
   /** RegularExpression Id. */
-  int DOUBLEQUOTE = 8;
+  int RBRACE = 8;
   /** RegularExpression Id. */
-  int LBRACE = 9;
+  int LPAREN = 9;
   /** RegularExpression Id. */
-  int RBRACE = 10;
+  int RPAREN = 10;
   /** RegularExpression Id. */
-  int LPAREN = 11;
+  int LBRACKET = 11;
   /** RegularExpression Id. */
-  int RPAREN = 12;
+  int RBRACKET = 12;
   /** RegularExpression Id. */
-  int LBRACKET = 13;
+  int ASSIGNMENT = 13;
   /** RegularExpression Id. */
-  int RBRACKET = 14;
+  int PLUS = 14;
   /** RegularExpression Id. */
-  int ASSIGNMENT = 15;
+  int MINUS = 15;
   /** RegularExpression Id. */
-  int PLUS = 16;
+  int MULT = 16;
   /** RegularExpression Id. */
-  int MINUS = 17;
+  int DIV = 17;
   /** RegularExpression Id. */
-  int MULT = 18;
+  int COMMA = 18;
   /** RegularExpression Id. */
-  int DIV = 19;
+  int EQUALS = 19;
   /** RegularExpression Id. */
-  int COMMA = 20;
+  int NOTEQUALS = 20;
   /** RegularExpression Id. */
-  int EQUALS = 21;
+  int STREQUALS = 21;
   /** RegularExpression Id. */
-  int NOTEQUALS = 22;
+  int STRCONTAINS = 22;
   /** RegularExpression Id. */
-  int STREQUALS = 23;
+  int STRCAT = 23;
   /** RegularExpression Id. */
-  int STRCONTAINS = 24;
+  int GREATERTHAN = 24;
   /** RegularExpression Id. */
-  int STRCAT = 25;
+  int LESSTHAN = 25;
   /** RegularExpression Id. */
-  int GREATERTHAN = 26;
+  int GREATERTHANEQ = 26;
   /** RegularExpression Id. */
-  int LESSTHAN = 27;
+  int LESSTHANEQ = 27;
   /** RegularExpression Id. */
-  int GREATERTHANEQ = 28;
+  int DEF = 28;
   /** RegularExpression Id. */
-  int LESSTHANEQ = 29;
+  int DO = 29;
   /** RegularExpression Id. */
-  int DO = 30;
+  int WHEN = 30;
   /** RegularExpression Id. */
-  int WHEN = 31;
+  int SET = 31;
   /** RegularExpression Id. */
-  int SET = 32;
+  int TO = 32;
   /** RegularExpression Id. */
-  int TO = 33;
+  int MERGE = 33;
   /** RegularExpression Id. */
-  int MERGE = 34;
+  int INTO = 34;
   /** RegularExpression Id. */
-  int INTO = 35;
+  int ANNO_DESCRIPTION = 35;
   /** RegularExpression Id. */
-  int ANNO_DESCRIPTION = 36;
+  int RULESET = 36;
   /** RegularExpression Id. */
-  int RULESET = 37;
+  int RULE = 37;
   /** RegularExpression Id. */
-  int RULE = 38;
+  int SWITCH = 38;
   /** RegularExpression Id. */
-  int SWITCH = 39;
+  int CASE = 39;
   /** RegularExpression Id. */
-  int CASE = 40;
+  int EVENT = 40;
   /** RegularExpression Id. */
-  int EVENT = 41;
+  int TIMER = 41;
   /** RegularExpression Id. */
-  int TIMER = 42;
+  int DEFCASE = 42;
   /** RegularExpression Id. */
-  int DEFCASE = 43;
+  int CONDITION = 43;
   /** RegularExpression Id. */
-  int CONDITION = 44;
+  int CHANGES = 44;
   /** RegularExpression Id. */
-  int CHANGES = 45;
+  int RETURNS = 45;
   /** RegularExpression Id. */
-  int RETURNS = 46;
+  int RETURN = 46;
   /** RegularExpression Id. */
-  int RETURN = 47;
+  int RESULT = 47;
   /** RegularExpression Id. */
-  int RESULT = 48;
+  int TRUE = 48;
   /** RegularExpression Id. */
-  int TRUE = 49;
+  int FALSE = 49;
   /** RegularExpression Id. */
-  int FALSE = 50;
+  int REFERENCE = 50;
   /** RegularExpression Id. */
-  int REFERENCE = 51;
+  int VARIABLE = 51;
   /** RegularExpression Id. */
-  int VARIABLE = 52;
+  int START = 52;
   /** RegularExpression Id. */
-  int START = 53;
+  int DURABLE = 53;
   /** RegularExpression Id. */
-  int DURABLE = 54;
+  int DYNAMIC = 54;
   /** RegularExpression Id. */
-  int DYNAMIC = 55;
+  int MACRO = 55;
   /** RegularExpression Id. */
-  int MACRO = 56;
+  int AS = 56;
   /** RegularExpression Id. */
-  int AS = 57;
+  int ON = 57;
   /** RegularExpression Id. */
-  int ON = 58;
+  int BEFORE = 58;
   /** RegularExpression Id. */
-  int BEFORE = 59;
+  int AFTER = 59;
   /** RegularExpression Id. */
-  int AFTER = 60;
+  int FOREACH = 60;
   /** RegularExpression Id. */
-  int FOREACH = 61;
+  int IF = 61;
   /** RegularExpression Id. */
-  int IF = 62;
+  int IN = 62;
   /** RegularExpression Id. */
-  int IN = 63;
+  int ELSE = 63;
   /** RegularExpression Id. */
-  int ELSE = 64;
+  int ELSEIF = 64;
   /** RegularExpression Id. */
-  int ELSEIF = 65;
+  int WHILE = 65;
   /** RegularExpression Id. */
-  int WHILE = 66;
+  int BREAK = 66;
   /** RegularExpression Id. */
-  int BREAK = 67;
+  int ERROR = 67;
   /** RegularExpression Id. */
-  int ERROR = 68;
+  int ASSERT = 68;
   /** RegularExpression Id. */
-  int ASSERT = 69;
+  int METHODSEP = 69;
   /** RegularExpression Id. */
-  int METHODSEP = 70;
+  int VALUESEP = 70;
   /** RegularExpression Id. */
-  int VALUESEP = 71;
+  int SEMICOLON = 71;
   /** RegularExpression Id. */
-  int IS = 72;
+  int NAMESPACESEP = 72;
   /** RegularExpression Id. */
-  int AND = 73;
+  int IS = 73;
   /** RegularExpression Id. */
-  int OR = 74;
+  int AND = 74;
   /** RegularExpression Id. */
-  int NOT = 75;
+  int OR = 75;
   /** RegularExpression Id. */
-  int WAIT = 76;
+  int NOT = 76;
   /** RegularExpression Id. */
-  int UNTIL = 77;
+  int WAIT = 77;
   /** RegularExpression Id. */
-  int ARRAY = 78;
+  int UNTIL = 78;
   /** RegularExpression Id. */
-  int TABLE = 79;
+  int ARRAY = 79;
   /** RegularExpression Id. */
-  int INTEGER = 80;
+  int TABLE = 80;
   /** RegularExpression Id. */
-  int DOUBLE = 81;
+  int INTEGER = 81;
   /** RegularExpression Id. */
-  int BOOLEAN = 82;
+  int DOUBLE = 82;
   /** RegularExpression Id. */
-  int STRING = 83;
+  int BOOLEAN = 83;
   /** RegularExpression Id. */
-  int DATE = 84;
+  int STRING = 84;
   /** RegularExpression Id. */
-  int EXTENSION = 85;
+  int DATE = 85;
   /** RegularExpression Id. */
-  int PRINT = 86;
+  int EXTENSION = 86;
   /** RegularExpression Id. */
-  int NEWLINE = 87;
+  int PRINT = 87;
   /** RegularExpression Id. */
-  int name = 88;
+  int NEWLINE = 88;
   /** RegularExpression Id. */
-  int INTEGERLITERAL = 89;
+  int STRINGLITERAL = 89;
   /** RegularExpression Id. */
-  int DATELITERAL = 90;
+  int name = 90;
   /** RegularExpression Id. */
-  int FLOATLITERAL = 91;
+  int INTEGERLITERAL = 91;
+  /** RegularExpression Id. */
+  int DATELITERAL = 92;
+  /** RegularExpression Id. */
+  int FLOATLITERAL = 93;
+  /** RegularExpression Id. */
+  int UNKNOWN = 94;
 
   /** Lexical state. */
   int DEFAULT = 0;
@@ -206,10 +212,8 @@ public interface CSLRuleParserConstants {
     "\"//\"",
     "\"/*\"",
     "<SINGLE_LINE_COMMENT>",
-    "\"*/\"",
+    "<MULTI_LINE_COMMENT>",
     "<token of kind 6>",
-    "\"\\\'\"",
-    "\"\\\"\"",
     "\"{\"",
     "\"}\"",
     "\"(\"",
@@ -231,6 +235,7 @@ public interface CSLRuleParserConstants {
     "\"<\"",
     "\">=\"",
     "\"<=\"",
+    "<DEF>",
     "<DO>",
     "<WHEN>",
     "<SET>",
@@ -273,6 +278,8 @@ public interface CSLRuleParserConstants {
     "<ASSERT>",
     "\":\"",
     "\"::\"",
+    "\";\"",
+    "\"$\"",
     "<IS>",
     "<AND>",
     "<OR>",
@@ -289,12 +296,12 @@ public interface CSLRuleParserConstants {
     "\"Extension\"",
     "<PRINT>",
     "\"newLine\"",
+    "<STRINGLITERAL>",
     "<name>",
     "<INTEGERLITERAL>",
     "<DATELITERAL>",
     "<FLOATLITERAL>",
-    "\";\"",
-    "\"$\"",
+    "<UNKNOWN>",
   };
 
 }

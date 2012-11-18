@@ -34,7 +34,7 @@ public class CSLRuleParser implements RuleParser, CSLRuleParserConstants {
     protected String _sourceCode = null;
     protected String ruleSetName = DEFAULTNAME;
     protected int ruleCount = 0;
-    public List<ParseException> syntaxErrors = new ArrayList<ParseException>();
+    protected List<ParseException> syntaxErrors = new ArrayList<ParseException>();
 
     public CSLRuleParser() {
     }
@@ -49,6 +49,16 @@ public class CSLRuleParser implements RuleParser, CSLRuleParserConstants {
 
         ruleSetName = DEFAULTNAME;
         ruleCount = 0;
+    }
+
+    public boolean hasParseErrors() {
+        return syntaxErrors.size() > 0;
+    }
+
+    public List<ParseException> getParseErrors() {
+        List<ParseException> list = new ArrayList<ParseException>();
+        list.addAll(syntaxErrors);
+        return list;
     }
 
     public void recover (ParseException ex, int recoveryPoint) {
@@ -302,7 +312,7 @@ public class CSLRuleParser implements RuleParser, CSLRuleParserConstants {
             {
                 Token tt = getToken(0);
                 StringBuffer buf = new StringBuffer(e.getMessage());
-                buf.append("\u005cnRule: " + theRule.getName() + "\u005cnLine " + tt.beginLine + " Column " + token.beginColumn);
+                buf.append("\u005cnRule: " + theRule.getName() + " at Line " + tt.beginLine + " Column " + token.beginColumn);
                 {if (true) throw new ParseException(buf.toString());}
             }
     } catch (ParseException pe) {
@@ -454,7 +464,7 @@ public class CSLRuleParser implements RuleParser, CSLRuleParserConstants {
     case name:
       t = jj_consume_token(name);
         ParseException pe = new ParseException("Invalid Variable Type: " + t.image +
-            "\u005cnLine " + t.beginLine + " Column " + t.beginColumn);
+            " at Line " + t.beginLine + " Column " + t.beginColumn);
         pe.setToken(t);
         {if (true) throw pe;}
       break;
@@ -602,7 +612,7 @@ public class CSLRuleParser implements RuleParser, CSLRuleParserConstants {
                 queue.addInstruction(ei);
             } catch (RuleCreationException rce) {
                 StringBuffer buffer = new StringBuffer(rce.getMessage());
-                buffer.append("\u005cnLine " + token.beginLine + " Column " + token.beginColumn);
+                buffer.append(" at Line " + token.beginLine + " Column " + token.beginColumn);
                 ParseException pe = new ParseException(buffer.toString());
                 pe.setToken(token);
                 {if (true) throw pe;}
@@ -654,7 +664,7 @@ public class CSLRuleParser implements RuleParser, CSLRuleParserConstants {
         catch (RuleCreationException rce)
         {
             StringBuffer buffer = new StringBuffer(rce.getMessage());
-            buffer.append("\u005cnLine " + token.beginLine + " Column " + token.beginColumn);
+            buffer.append(" at Line " + token.beginLine + " Column " + token.beginColumn);
             ParseException pe = new ParseException(buffer.toString());
             pe.setToken(token);
             {if (true) throw pe;}
@@ -692,7 +702,7 @@ public class CSLRuleParser implements RuleParser, CSLRuleParserConstants {
         catch (RuleCreationException rce)
         {
             StringBuffer buffer = new StringBuffer(rce.getMessage());
-            buffer.append("\u005cnLine " + token.beginLine + " Column " + token.beginColumn);
+            buffer.append(" at Line " + token.beginLine + " Column " + token.beginColumn);
             {if (true) throw new ParseException(buffer.toString());}
         }
         ri.setLineNumber(token.beginLine);
@@ -863,7 +873,7 @@ public class CSLRuleParser implements RuleParser, CSLRuleParserConstants {
         case name:
           t = jj_consume_token(name);
                     ParseException pe = new ParseException("Invalid Variable Type: " + t.image +
-                        "\u005cnLine " + t.beginLine + " Column " + t.beginColumn);
+                        " at Line " + t.beginLine + " Column " + t.beginColumn);
                     pe.setToken(t);
                     {if (true) throw pe;}
           break;
@@ -1022,7 +1032,7 @@ public class CSLRuleParser implements RuleParser, CSLRuleParserConstants {
             } catch (RuleCreationException e) {
                 Token tt = getToken(0);
                 StringBuffer buf = new StringBuffer(e.getMessage());
-                buf.append("\u005cnLine " + tt.beginLine + " Column " + token.beginColumn);
+                buf.append(" at Line " + tt.beginLine + " Column " + token.beginColumn);
                 {if (true) throw new ParseException(buf.toString());}
             }
 
@@ -1682,7 +1692,7 @@ public class CSLRuleParser implements RuleParser, CSLRuleParserConstants {
             exp.validateParameters();
         } catch (ScriptExecutionException s) {
             //throw new ParseException(s + " at Line " + t.beginLine + " Column " + t.beginColumn);
-            ParseException pe = new ParseException(s + " at Line " + t.beginLine + " Column " + t.beginColumn);
+            ParseException pe = new ParseException(s.getMessage() + " at Line " + t.beginLine + " Column " + t.beginColumn);
             pe.setToken(t);
             {if (true) throw pe;}
         }
@@ -1769,7 +1779,7 @@ public class CSLRuleParser implements RuleParser, CSLRuleParserConstants {
             exp.validateParameters();
         } catch (ScriptExecutionException s) {
             //throw new ParseException(s + " at Line " + t2.beginLine + " Column " + t2.beginColumn);
-            ParseException pe = new ParseException(s + " at Line " + t2.beginLine + " Column " + t2.beginColumn);
+            ParseException pe = new ParseException(s.getMessage() + " at Line " + t2.beginLine + " Column " + t2.beginColumn);
             pe.setToken(t2);
             {if (true) throw pe;}
         }
@@ -1990,33 +2000,6 @@ public class CSLRuleParser implements RuleParser, CSLRuleParserConstants {
     try { return !jj_3_20(); }
     catch(LookaheadSuccess ls) { return true; }
     finally { jj_save(19, xla); }
-  }
-
-  private boolean jj_3R_101() {
-    if (jj_scan_token(name)) return true;
-    Token xsp;
-    xsp = jj_scanpos;
-    if (jj_3R_103()) jj_scanpos = xsp;
-    return false;
-  }
-
-  private boolean jj_3R_99() {
-    if (jj_scan_token(STRING)) return true;
-    return false;
-  }
-
-  private boolean jj_3R_23() {
-    if (jj_3R_68()) return true;
-    return false;
-  }
-
-  private boolean jj_3R_74() {
-    if (jj_scan_token(SWITCH)) return true;
-    Token xsp;
-    xsp = jj_scanpos;
-    if (jj_3R_99()) jj_scanpos = xsp;
-    if (jj_scan_token(LPAREN)) return true;
-    return false;
   }
 
   private boolean jj_3R_19() {
@@ -2832,6 +2815,33 @@ public class CSLRuleParser implements RuleParser, CSLRuleParserConstants {
     if (jj_scan_token(LBRACKET)) return true;
     if (jj_3R_20()) return true;
     if (jj_scan_token(RBRACKET)) return true;
+    return false;
+  }
+
+  private boolean jj_3R_101() {
+    if (jj_scan_token(name)) return true;
+    Token xsp;
+    xsp = jj_scanpos;
+    if (jj_3R_103()) jj_scanpos = xsp;
+    return false;
+  }
+
+  private boolean jj_3R_99() {
+    if (jj_scan_token(STRING)) return true;
+    return false;
+  }
+
+  private boolean jj_3R_23() {
+    if (jj_3R_68()) return true;
+    return false;
+  }
+
+  private boolean jj_3R_74() {
+    if (jj_scan_token(SWITCH)) return true;
+    Token xsp;
+    xsp = jj_scanpos;
+    if (jj_3R_99()) jj_scanpos = xsp;
+    if (jj_scan_token(LPAREN)) return true;
     return false;
   }
 

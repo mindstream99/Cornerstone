@@ -31,47 +31,48 @@ public class ParserManager {
     private String parserClassName = null;
 
     public <P extends RuleParser> P process(String code, RuleSet ruleSet) throws Exception {
-	return process((P)null, code, ruleSet);
+        return process((P)null, code, ruleSet);
     }
 
     @SuppressWarnings("unchecked")
     public <P extends RuleParser> P process(P parser, String code, RuleSet ruleSet) throws Exception {
-	if (parser == null) {
-	    Class<?> parserClass = Class.forName(parserClassName);
-	    if (!RuleParser.class.isAssignableFrom(parserClass)) {
-		throw new Exception(parserClassName + " is not an instance of RuleParser");
-	    }
+        if (parser == null) {
+            Class<?> parserClass = Class.forName(parserClassName);
+            if (!RuleParser.class.isAssignableFrom(parserClass)) {
+                throw new Exception(parserClassName + " is not an instance of RuleParser");
+            }
 
-	    parser = (P)parserClass.newInstance();
-	}
+            parser = (P)parserClass.newInstance();
+        }
 
-	parser.initialize(code);
-	parser.parseRuleSet(ruleSet);
-	return parser;
+        parser.initialize(code);
+        parser.parseRuleSet(ruleSet);
+
+        return parser;
     }
 
     public CSLRuntime createRuntime() {
-	CSLRuntime rt = new CSLRuntime();
-	rt.setServiceContext(serviceContext);
-	return rt;
+        CSLRuntime rt = new CSLRuntime();
+        rt.setServiceContext(serviceContext);
+        return rt;
     }
 
     public void initialize() {
-	if (serviceContext == null) {
-	    throw new RuntimeException("serviceContext property can't be null.");
-	}
+        if (serviceContext == null) {
+            throw new RuntimeException("serviceContext property can't be null.");
+        }
 
-	if (parserClassName == null) {
-	    throw new RuntimeException("parserClassName property can't be null.");
-	}
+        if (parserClassName == null) {
+            throw new RuntimeException("parserClassName property can't be null.");
+        }
     }
 
     public void setParserClassName(String name) {
-	this.parserClassName = name;
+        this.parserClassName = name;
     }
 
     public void setServiceContext(ServiceContext context) {
-	this.serviceContext = context;
+        this.serviceContext = context;
     }
 
 }

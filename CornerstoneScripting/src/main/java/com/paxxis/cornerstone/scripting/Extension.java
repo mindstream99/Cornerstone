@@ -27,8 +27,11 @@ import com.paxxis.cornerstone.scripting.parser.CSLRuntime;
  * @author Robert Englander
  */
 public class Extension extends RuleVariable {
-
-    private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 2L;
+    private static MethodProvider<Extension> methodProvider = new MethodProvider<Extension>(Extension.class);
+    static {
+        methodProvider.initialize();
+    }
 
     private ExtensionHelper helper = null;
 
@@ -40,10 +43,16 @@ public class Extension extends RuleVariable {
         super(name);
     }
 
-    public boolean isNull() {
-      return false;
+    @Override
+    protected MethodProvider<Extension> getMethodProvider() {
+        return methodProvider;
     }
-    
+
+    @CSLMethod
+    public IValue isNull() {
+        return new BooleanVariable(null, false);
+    }
+
     @Override
     public String getType() {
         return "Extension";
@@ -57,9 +66,9 @@ public class Extension extends RuleVariable {
         super.setRuntime(agent);
         init();
     }
-    
+
     private void init() {
-	ServiceContext provider = runtime.getServiceContext();
+        ServiceContext provider = runtime.getServiceContext();
         if (provider == null) {
             throw new RuntimeException("No Service Context Provider available");
         }
@@ -73,15 +82,15 @@ public class Extension extends RuleVariable {
     }
 
     public boolean methodHasReturn(String name) {
-	return helper.methodHasReturn(name);
+        return helper.methodHasReturn(name);
     }
 
     public int getMethodParameterCount(String name) {
-	return helper.getMethodParameterCount(name);
+        return helper.getMethodParameterCount(name);
     }
 
     public IValue executeMethod(String name, List<IValue> params) {
-	return helper.executeMethod(name, params);
+        return helper.executeMethod(name, params);
     }
 
     @Override
@@ -89,7 +98,7 @@ public class Extension extends RuleVariable {
         // if the value being assigned is an object expression,
         // then we need to evaluate it
         @SuppressWarnings("unused")
-	IValue value = val;
+        IValue value = val;
         if (val instanceof ObjectMethodExpression)
         {
             ObjectMethodExpression m = (ObjectMethodExpression)val;
@@ -121,23 +130,23 @@ public class Extension extends RuleVariable {
 
     @Override
     public Double valueAsDouble() {
-    	if (isNull()) {
-    	    return null;
-    	}
+        if (isNull().valueAsBoolean()) {
+            return null;
+        }
         return 0.0;
     }
 
     @Override
     public Integer valueAsInteger() {
-    	if (isNull()) {
-    	    return null;
-    	}
+        if (isNull().valueAsBoolean()) {
+            return null;
+        }
         return 0;
     }
 
     @Override
     public Boolean valueAsBoolean() {
-        return !isNull();
+        return !isNull().valueAsBoolean();
     }
 
     @Override

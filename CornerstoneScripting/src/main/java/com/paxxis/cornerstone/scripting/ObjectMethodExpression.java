@@ -20,6 +20,8 @@ package com.paxxis.cornerstone.scripting;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.paxxis.cornerstone.scripting.parser.ParseException;
+
 /**
  *
  * @author Robert Englander
@@ -117,14 +119,14 @@ public class ObjectMethodExpression extends IValue {
             }
         } catch (Exception e) {
             if (object instanceof RuleAccessor) {
-                throw new ScriptExecutionException(221, "Invalid method name '" + methodName + "' on Rule " + ((RuleAccessor)object).getRuleName().valueAsString());
+                throw new ScriptExecutionException(221, "Invalid method name " + methodName + " on Rule " + ((RuleAccessor)object).getRuleName().valueAsString());
             }
             
-            throw new ScriptExecutionException(222, "Unknown method name '" + methodName + "' on Object " + ((RuleVariable)object).getName());
+            throw new ScriptExecutionException(222, "Unknown method name " + ((RuleVariable)object).getType() + "." + methodName + " on variable " + ((RuleVariable)object).getName());
         }
         
         if (!pendingResolution && (parameters.size() != pcount && pcount != -1)) {
-            throw new ScriptExecutionException(223, "Wrong number of parameters (" + parameters.size() + ") for calling " + methodName + " on Object " + ((RuleVariable)object).getName());
+            throw new ScriptExecutionException(223, "Wrong number of parameters (" + parameters.size() + ") for calling " + ((RuleVariable)object).getType() + "." + methodName + " on variable " + ((RuleVariable)object).getName());
         }
 
         if (object instanceof RuleAccessor) {
@@ -207,6 +209,10 @@ public class ObjectMethodExpression extends IValue {
 
 
     public IValue execute() {
-        return object.executeMethod(methodName, parameters);
+        try {
+            return object.executeMethod(methodName, parameters);
+        } catch (ParseException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

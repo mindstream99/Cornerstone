@@ -26,26 +26,10 @@ import java.util.List;
  * @author Robert Englander
  */
 public class Table extends RuleVariable {
-    private static final long serialVersionUID = 1L;
-
-    private static enum Methods {
-        setColumnNames,
-        setPrimaryColumn,
-        setSecondaryColumn,
-        setTitle,
-        setColumnFormat;
-        
-	public static boolean contains(String name) {
-	    boolean contains = false;
-	    for (Methods option : Methods.values()) {
-		if (option.toString().equals(name)) {
-		    contains = true;
-		    break;
-		}
-	    }
-		
-	    return contains;
-	}
+    private static final long serialVersionUID = 2L;
+    private static MethodProvider<Table> methodProvider = new MethodProvider<Table>(Table.class);
+    static {
+        methodProvider.initialize();
     }
 
     // the underlying array of values
@@ -56,7 +40,7 @@ public class Table extends RuleVariable {
 
     // column formats
     private HashMap<Integer, String> columnFormats = new HashMap<Integer, String>();
-    
+
     public Table() {
     }
 
@@ -64,23 +48,29 @@ public class Table extends RuleVariable {
         super(name);
     }
 
-    public boolean isNull() {
-    	return false;
+    @Override
+    protected MethodProvider<Table> getMethodProvider() {
+        return methodProvider;
     }
-    
+
+    @CSLMethod
+    public IValue isNull() {
+        return new BooleanVariable(null, false);
+    }
+
     public String getColumnFormat(int col) {
-    	String fmt = columnFormats.get(col);
-    	return fmt; 
+        String fmt = columnFormats.get(col);
+        return fmt; 
     }
-    
+
     public List<IValue> getColumnNames() {
         return columnNames;
     }
-    
+
     public HashMap<Integer, String> getColumnFormats() {
-    	return columnFormats;
+        return columnFormats;
     }
-    
+
     public String getType() {
         return "Table";
     }
@@ -101,53 +91,20 @@ public class Table extends RuleVariable {
 
         columnNames.clear();
         columnFormats.clear();
-        
+
         for (IValue name : table.getColumnNames()) {
             columnNames.add(new StringVariable(null, name.valueAsString()));
         }
-        
+
         columnFormats.putAll(table.getColumnFormats());
     }
 
     public void resetValue() {
-    	if (this.getHasParameterDefault()) {
+        if (this.getHasParameterDefault()) {
             elements = new ArrayList<ArrayList<IValue>>();
             columnNames = new ArrayList<IValue>();
             columnFormats = new HashMap<Integer, String>();
-    	}
-    }
-
-    public boolean methodHasReturn(String name) {
-    	if (Methods.contains(name)) {
-    		return false;
-    	}
-        return super.methodHasReturn(name);
-    }
-
-    public int getMethodParameterCount(String name) {
-    	if (Methods.contains(name)) {
-            switch (Methods.valueOf(name)) {
-                case setColumnNames:
-                    return 1;
-                case setColumnFormat:
-                    return 2;
-            }
-    	}
-
-        return super.getMethodParameterCount(name);
-    }
-
-    public IValue executeMethod(String name, List<IValue> params) {
-    	if (Methods.contains(name)) {
-            switch (Methods.valueOf(name)) {
-                case setColumnNames:
-                    return setColumnNames(params);
-                case setColumnFormat:
-                    return setColumnFormat(params);
-            }
-    	}
-
-        return super.executeMethod(name, params);
+        }
     }
 
     public List<IValue> getRow(int idx) {
@@ -258,7 +215,7 @@ public class Table extends RuleVariable {
 
     @Override
     public ResultVariable valueAsResult() {
-	throw new ScriptExecutionException(506, "Can't get the Result value of a table");
+        throw new ScriptExecutionException(506, "Can't get the Result value of a table");
     }
 
     /**
@@ -280,18 +237,16 @@ public class Table extends RuleVariable {
         return table;
     }
 
-    protected IValue setColumnFormat(List<IValue> params) {
-    	// the first parameter is the column index
-    	int col = params.get(0).valueAsInteger();
-    	
-    	// the second parameter is the format
-    	String fmt = params.get(1).valueAsString();
-    	
-    	columnFormats.put(col, fmt);
+    @CSLMethod
+    public IValue setColumnFormat(IValue colIdx, IValue colFmt) {
+        int col = colIdx.valueAsInteger();
+        String fmt = colFmt.valueAsString();
 
-    	return new BooleanVariable(null, true);
+        columnFormats.put(col, fmt);
+
+        return new BooleanVariable(null, true);
     }
-    
+
     public void setColumns(List<String> names) {
         columnNames.clear();
         int cnt = names.size();
@@ -299,16 +254,16 @@ public class Table extends RuleVariable {
             columnNames.add(new StringVariable(null, names.get(i)));
         }
     }
-    
-    protected IValue setColumnNames(List<IValue> params) {
-        // the first parameter must be an array
-        if (!(params.get(0) instanceof Array)) {
+
+    @CSLMethod
+    public IValue setColumnNames(IValue param) {
+        if (!(param instanceof Array)) {
             throw new ScriptExecutionException(510, "setColumnNames parameter must be an Array");
         }
 
         columnNames.clear();
 
-        Array names = (Array)params.get(0);
+        Array names = (Array)param;
         int cnt = names.size();
         for (int i = 0; i < cnt; i++) {
             columnNames.add(new StringVariable(null, names.valueAt(i).valueAsString()));

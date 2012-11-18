@@ -26,25 +26,12 @@ import java.util.List;
  * @author Robert Englander
  */
 public class RuleAccessor extends RuleVariable {
-    private static final long serialVersionUID = 1L;
-
-    private static enum Methods {
-        invoke,
-        valueOf;
-        
-	public static boolean contains(String name) {
-	    boolean contains = false;
-	    for (Methods option : Methods.values()) {
-		if (option.toString().equals(name)) {
-		    contains = true;
-		    break;
-		}
-	    }
-
-	    return contains;
-	}
+    private static final long serialVersionUID = 2L;
+    private static MethodProvider<RuleAccessor> methodProvider = new MethodProvider<RuleAccessor>(RuleAccessor.class);
+    static {
+        methodProvider.initialize();
     }
-    
+
     // the name of the rule to invoke
     private StringVariable ruleName = new StringVariable(null, "");
 
@@ -54,23 +41,29 @@ public class RuleAccessor extends RuleVariable {
     public RuleAccessor() {
 
     }
-    
+
     public RuleAccessor(String name, InstructionQueue queue) {
         super(name);
         instructionQueue = queue;
     }
 
-    public boolean isNull() {
-    	return false;
+    @Override
+    protected MethodProvider<RuleAccessor> getMethodProvider() {
+        return methodProvider;
     }
-    
+
+    @CSLMethod
+    public IValue isNull() {
+        return new BooleanVariable(null, false);
+    }
+
     public void resetValue() {
     }
-    
+
     public String getType() {
         return "Rule Accessor";
     }
-    
+
     /**
      * Sets the value; in this case it's the rule name.
      * @param val
@@ -113,53 +106,13 @@ public class RuleAccessor extends RuleVariable {
         return this;
     }
 
-    public boolean methodHasReturn(String name) {
-    	if (Methods.contains(name)) {
-            switch (Methods.valueOf(name)) {
-                case invoke:
-                    Rule rule = instructionQueue.getRuleSet().getRule(getRuleName().valueAsString());
-                    return rule.hasReturnValue();
-                case valueOf:
-                    return true;
-            }
-    	}
-
-        return super.methodHasReturn(name);
-    }
-
-    public int getMethodParameterCount(String name) {
-    	if (Methods.contains(name)) {
-            switch (Methods.valueOf(name)) {
-                case invoke:
-                    return -1; // this means we aren't tracking the count
-                case valueOf:
-                    return 1;
-            }
-    	}
-
-        return super.getMethodParameterCount(name);
-    }
-
-    public IValue executeMethod(String name, List<IValue> params) {
-    	if (Methods.contains(name)) {
-            switch (Methods.valueOf(name)) {
-                case invoke:
-                    return invokeRule(params);
-                case valueOf:
-                    return getRuleValue(params);
-            }
-    	}
-
-        return super.executeMethod(name, params);
-    }
-
-    IValue getRuleValue(List<IValue> params) {
+    public IValue valueOf(List<IValue> params) {
         Rule rule = instructionQueue.getRuleSet().getRule(getRuleName().valueAsString());
         RuleVariable rv = rule.getQueue().getVariable(params.get(0).valueAsString());
         return rv;
     }
-    
-    IValue invokeRule(List<IValue> params) {
+
+    public IValue invoke(List<IValue> params) {
         Rule rule = instructionQueue.getRuleSet().getRule(getRuleName().valueAsString());
         rule.invoke(params);
 
@@ -171,10 +124,34 @@ public class RuleAccessor extends RuleVariable {
     }
 
     public StringVariable getRuleName() {
-	return ruleName;
+        return ruleName;
     }
 
     public void setRuleName(StringVariable ruleName) {
-	this.ruleName = ruleName;
+        this.ruleName = ruleName;
     }
-}
+
+    public boolean methodHasReturn(String name) {
+        if (name.equals("invoke")) {
+            Rule rule = instructionQueue.getRuleSet().getRule(getRuleName().valueAsString());
+            return rule.hasReturnValue();
+        } else {
+            return true;
+        }
+    }
+
+    public int getMethodParameterCount(String name) {
+        if (name.equals("invoke")) {
+            return -1;
+        } else {
+            return 1;
+        }
+    }
+
+    public IValue executeMethod(String name, List<IValue> params) {
+        if (name.equals("invoke")) {
+            return invoke(params);
+        } else {
+            return valueOf(params);
+        }
+    }}

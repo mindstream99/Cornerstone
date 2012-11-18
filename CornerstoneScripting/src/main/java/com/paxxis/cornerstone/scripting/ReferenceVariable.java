@@ -24,28 +24,37 @@ package com.paxxis.cornerstone.scripting;
  * @author Robert Englander
  */
 public class ReferenceVariable extends RuleVariable {
-    private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 2L;
+    private static MethodProvider<ReferenceVariable> methodProvider = new MethodProvider<ReferenceVariable>(ReferenceVariable.class);
+    static {
+        methodProvider.initialize();
+    }
 
     // the expression that is being referenced
     private IValue ref = null;
 
     public ReferenceVariable() {
     }
-    
+
     public ReferenceVariable(String name) {
         super(name);
+    }
+
+    @Override
+    protected MethodProvider<ReferenceVariable> getMethodProvider() {
+        return methodProvider;
     }
 
     public String getType() {
         return "Reference";
     }
-    
+
     public void resetValue() {
-    	if (!this.getHasParameterDefault()) {
+        if (!this.getHasParameterDefault()) {
             ref = null;
-    	}
+        }
     }
-    
+
     protected void setValue(IValue val) {
         ref = val;
         if (runtime != null) {
@@ -53,45 +62,46 @@ public class ReferenceVariable extends RuleVariable {
         }
     }
 
-    public boolean isNull() {
-	boolean isNull = ref == null;
-	if (!isNull) {
-	    // parameter passing can result in a null reference being injected into
-	    // a reference parameter, so we need to consider that possibility.
-	    if (ref instanceof ReferenceVariable) {
-		ReferenceVariable rv = (ReferenceVariable)ref;
-		isNull = rv.isNull();
-	    }
-	}
-		
-	return isNull;
+    @CSLMethod
+    public IValue isNull() {
+        boolean isNull = ref == null;
+        if (!isNull) {
+            // parameter passing can result in a null reference being injected into
+            // a reference parameter, so we need to consider that possibility.
+            if (ref instanceof ReferenceVariable) {
+                ReferenceVariable rv = (ReferenceVariable)ref;
+                isNull = rv.isNull().valueAsBoolean();
+            }
+        }
+
+        return new BooleanVariable(null, isNull);
     }
-	
+
     public String valueAsString() {
-    	if (isNull()) {
-    	    return null;
-    	}
+        if (isNull().valueAsBoolean()) {
+            return null;
+        }
         return ref.valueAsString();
     }
 
     public Double valueAsDouble() {
-    	if (isNull()) {
-    	    return null;
-    	}
+        if (isNull().valueAsBoolean()) {
+            return null;
+        }
         return ref.valueAsDouble();
     }
 
     public Integer valueAsInteger() {
-    	if (isNull()) {
-    	    return null;
-    	}
+        if (isNull().valueAsBoolean()) {
+            return null;
+        }
         return ref.valueAsInteger();
     }
 
     public Boolean valueAsBoolean() {
-    	if (isNull()) {
-    	    return null;
-    	}
+        if (isNull().valueAsBoolean()) {
+            return null;
+        }
         return ref.valueAsBoolean();
     }
 
@@ -102,9 +112,9 @@ public class ReferenceVariable extends RuleVariable {
     }
 
     public Object valueAsObject() {
-    	if (isNull()) {
-    	    return null;
-    	}
+        if (isNull().valueAsBoolean()) {
+            return null;
+        }
         return ref.valueAsObject();
     }
 

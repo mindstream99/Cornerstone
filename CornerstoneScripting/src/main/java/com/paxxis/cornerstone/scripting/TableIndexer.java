@@ -22,7 +22,11 @@ package com.paxxis.cornerstone.scripting;
  * @author Robert Englander
  */
 public class TableIndexer extends RuleVariable {
-    private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 2L;
+    private static MethodProvider<TableIndexer> methodProvider = new MethodProvider<TableIndexer>(TableIndexer.class);
+    static {
+        methodProvider.initialize();
+    }
 
     // the table variable
     private Table table = null;
@@ -33,12 +37,12 @@ public class TableIndexer extends RuleVariable {
     public TableIndexer() {
 
     }
-    
+
     /**
      * Constructs the indexer.
      */
     public TableIndexer(InstructionQueue queue,
-                        Table table, IValue row, IValue col) {
+            Table table, IValue row, IValue col) {
         // we'll use the same name
         super(table.getName());
 
@@ -47,10 +51,15 @@ public class TableIndexer extends RuleVariable {
         this.colIndex = col;
     }
 
-    public boolean isNull() {
-    	return null == table;
+    @Override
+    protected MethodProvider<TableIndexer> getMethodProvider() {
+        return methodProvider;
     }
-    
+
+    public IValue isNull() {
+        return new BooleanVariable(null, null == table);
+    }
+
     public String getType() {
         return "Table Index";
     }
@@ -79,23 +88,23 @@ public class TableIndexer extends RuleVariable {
     }
 
     public Double valueAsDouble() {
-    	if (isNull()) {
-    	    return null;
-    	}
+        if (isNull().valueAsBoolean()) {
+            return null;
+        }
         return table.valueAt(rowIndex.valueAsInteger(), colIndex.valueAsInteger()).valueAsDouble();
     }
 
     public Integer valueAsInteger() {
-    	if (isNull()) {
-    	    return null;
-    	}
+        if (isNull().valueAsBoolean()) {
+            return null;
+        }
         return table.valueAt(rowIndex.valueAsInteger(), colIndex.valueAsInteger()).valueAsInteger();
     }
 
     public Boolean valueAsBoolean() {
-    	if (isNull()) {
-    	    return null;
-    	}
+        if (isNull().valueAsBoolean()) {
+            return null;
+        }
         return table.valueAt(rowIndex.valueAsInteger(), colIndex.valueAsInteger()).valueAsBoolean();
     }
 

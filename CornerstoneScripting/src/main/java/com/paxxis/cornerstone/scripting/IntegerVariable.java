@@ -21,7 +21,11 @@ package com.paxxis.cornerstone.scripting;
  * @author Robert Englander
  */
 public class IntegerVariable extends RuleVariable {
-    private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 2L;
+    private static MethodProvider<IntegerVariable> methodProvider = new MethodProvider<IntegerVariable>(IntegerVariable.class);
+    static {
+        methodProvider.initialize();
+    }
 
     // the value
     private Integer value = null;
@@ -45,8 +49,14 @@ public class IntegerVariable extends RuleVariable {
         this.value = value;
     }
     
-    public boolean isNull() {
-    	return null == value;
+    @Override
+    protected MethodProvider<IntegerVariable> getMethodProvider() {
+        return methodProvider;
+    }
+
+    @CSLMethod
+    public IValue isNull() {
+    	return new BooleanVariable(null, null == value);
     }
 
     public String getType() {
@@ -110,35 +120,35 @@ public class IntegerVariable extends RuleVariable {
     }
 
     public Object valueAsObject() {
-    	if (isNull()) {
+    	if (isNull().valueAsBoolean()) {
     	    return null;
     	}
         return new Integer(value);
     }
 
     public String valueAsString() {
-    	if (isNull()) {
+    	if (isNull().valueAsBoolean()) {
     	    return null;
     	}
         return Integer.toString(value);
     }
 
     public Double valueAsDouble() {
-    	if (isNull()) {
+    	if (isNull().valueAsBoolean()) {
     	    return null;
     	}
         return (double)value.intValue();
     }
 
     public Integer valueAsInteger() {
-    	if (isNull()) {
+    	if (isNull().valueAsBoolean()) {
     	    return null;
     	}
         return value;
     }
 
     public Boolean valueAsBoolean() {
-    	if (isNull()) {
+    	if (isNull().valueAsBoolean()) {
     	    return null;
     	}
         return value.intValue() == 1;

@@ -64,7 +64,7 @@ public class CSLRuleParser implements RuleParser {
     protected String _sourceCode = null;
     protected String ruleSetName = DEFAULTNAME;
     protected int ruleCount = 0;
-    public List<ParseException> syntaxErrors = new ArrayList<ParseException>();
+    protected List<ParseException> syntaxErrors = new ArrayList<ParseException>();
 
     public CSLRuleParser() {
     }
@@ -79,6 +79,16 @@ public class CSLRuleParser implements RuleParser {
 
         ruleSetName = DEFAULTNAME;
         ruleCount = 0;
+    }
+
+    public boolean hasParseErrors() {
+        return syntaxErrors.size() > 0;
+    }
+    
+    public List<ParseException> getParseErrors() {
+        List<ParseException> list = new ArrayList<ParseException>();
+        list.addAll(syntaxErrors);
+        return list;
     }
 
     public void recover (ParseException ex, int recoveryPoint) {
@@ -373,7 +383,7 @@ void ruleParam(Rule theRule) :
             {
                 Token tt = getToken(0);
                 StringBuffer buf = new StringBuffer(e.getMessage());
-                buf.append("\nRule: " + theRule.getName() + "\nLine " + tt.beginLine + " Column " + token.beginColumn);
+                buf.append("\nRule: " + theRule.getName() + " at Line " + tt.beginLine + " Column " + token.beginColumn);
                 throw new ParseException(buf.toString());
             }
         }
@@ -492,7 +502,7 @@ ParameterPair parameter(Token t) :
     t = <name>
     { 
         ParseException pe = new ParseException("Invalid Variable Type: " + t.image +
-            "\nLine " + t.beginLine + " Column " + t.beginColumn);
+            " at Line " + t.beginLine + " Column " + t.beginColumn);
         pe.setToken(t);
         throw pe;
     }
@@ -603,7 +613,7 @@ void mergeResultsClause(InstructionQueue queue) :
                 queue.addInstruction(ei);
             } catch (RuleCreationException rce) {
                 StringBuffer buffer = new StringBuffer(rce.getMessage());
-                buffer.append("\nLine " + token.beginLine + " Column " + token.beginColumn);
+                buffer.append(" at Line " + token.beginLine + " Column " + token.beginColumn);
                 ParseException pe = new ParseException(buffer.toString());
                 pe.setToken(token);
                 throw pe;
@@ -669,7 +679,7 @@ void returnClause(Rule theRule, InstructionQueue queue) :
         catch (RuleCreationException rce)
         {
             StringBuffer buffer = new StringBuffer(rce.getMessage());
-            buffer.append("\nLine " + token.beginLine + " Column " + token.beginColumn);
+            buffer.append(" at Line " + token.beginLine + " Column " + token.beginColumn);
             ParseException pe = new ParseException(buffer.toString());
             pe.setToken(token);
             throw pe;
@@ -707,7 +717,7 @@ void errorClause(Rule theRule, InstructionQueue queue) :
         catch (RuleCreationException rce)
         {
             StringBuffer buffer = new StringBuffer(rce.getMessage());
-            buffer.append("\nLine " + token.beginLine + " Column " + token.beginColumn);
+            buffer.append(" at Line " + token.beginLine + " Column " + token.beginColumn);
             throw new ParseException(buffer.toString());
         }
         ri.setLineNumber(token.beginLine);
@@ -854,7 +864,7 @@ void defineVariableClause(InstructionQueue queue) :
                 t = <name>
                 { 
                     ParseException pe = new ParseException("Invalid Variable Type: " + t.image +
-                        "\nLine " + t.beginLine + " Column " + t.beginColumn);
+                        " at Line " + t.beginLine + " Column " + t.beginColumn);
                     pe.setToken(t);
                     throw pe;
                 }
@@ -994,7 +1004,7 @@ void forEachClause(Rule theRule, InstructionQueue queue) :
             } catch (RuleCreationException e) {
                 Token tt = getToken(0);
                 StringBuffer buf = new StringBuffer(e.getMessage());
-                buf.append("\nLine " + tt.beginLine + " Column " + token.beginColumn);
+                buf.append(" at Line " + tt.beginLine + " Column " + token.beginColumn);
                 throw new ParseException(buf.toString());
             }
 
@@ -1555,7 +1565,7 @@ IValue objectDataValue(InstructionQueue queue) :
             exp.validateParameters();
         } catch (ScriptExecutionException s) {
             //throw new ParseException(s + " at Line " + t.beginLine + " Column " + t.beginColumn);
-            ParseException pe = new ParseException(s + " at Line " + t.beginLine + " Column " + t.beginColumn);
+            ParseException pe = new ParseException(s.getMessage() + " at Line " + t.beginLine + " Column " + t.beginColumn);
             pe.setToken(t);
             throw pe;
         }
@@ -1623,7 +1633,7 @@ IValue directObjectOperation(InstructionQueue queue) :
             exp.validateParameters();
         } catch (ScriptExecutionException s) {
             //throw new ParseException(s + " at Line " + t2.beginLine + " Column " + t2.beginColumn);
-            ParseException pe = new ParseException(s + " at Line " + t2.beginLine + " Column " + t2.beginColumn);
+            ParseException pe = new ParseException(s.getMessage() + " at Line " + t2.beginLine + " Column " + t2.beginColumn);
             pe.setToken(t2);
             throw pe;
         }

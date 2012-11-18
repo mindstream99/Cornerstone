@@ -17,35 +17,18 @@
 
 package com.paxxis.cornerstone.scripting;
 
+import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.List;
 
 /**
  *
  * @author Robert Englander
  */
 public class DateVariable extends RuleVariable {
-    private static final long serialVersionUID = 1L;
-
-    private static enum Methods {
-        isAfter,
-        setNow,
-        incrementDays,
-        incrementHours,
-        incrementMinutes,
-        incrementSeconds;
-        
-	public static boolean contains(String name) {
-	    boolean contains = false;
-	    for (Methods option : Methods.values()) {
-		if (option.toString().equals(name)) {
-		    contains = true;
-		    break;
-		}
-	    }
-		
-	    return contains;
-	}
+    private static final long serialVersionUID = 2L;
+    private static MethodProvider<DateVariable> methodProvider = new MethodProvider<DateVariable>(DateVariable.class);
+    static {
+        methodProvider.initialize();
     }
 
     // the value
@@ -70,6 +53,11 @@ public class DateVariable extends RuleVariable {
         setValue(value);
     }
 
+    @Override
+    protected MethodProvider<DateVariable> getMethodProvider() {
+        return methodProvider;
+    }
+    
     public String getType() {
         return "Date";
     }
@@ -89,7 +77,11 @@ public class DateVariable extends RuleVariable {
     	    this.parameterDefault = null;
     	} else {
             try {
-            	parameterDefault = new Date(java.sql.Date.valueOf(val).getTime());
+                try {
+                    parameterDefault = new Date(java.sql.Timestamp.valueOf(val).getTime());
+                } catch (Exception ee) {
+                    parameterDefault = new Date(java.sql.Date.valueOf(val).getTime());
+                }
             } catch (Exception e) {
                 throw new ScriptExecutionException(130, "Bad date format used to set date default value: " + val);
             }
@@ -97,115 +89,64 @@ public class DateVariable extends RuleVariable {
 		setHasParameterDefault(true);
 	}
 
-	public boolean isNull() {
-    	return null == value;
+	@CSLMethod
+	public IValue isNull() {
+    	return new BooleanVariable(null, null == value);
     }
 
-    /**
-     * Returns a boolean value that indicates if a
-     * particular method has a return value.
-     * @param name the method name
-     * @return true if it has a return value, false otherwise.
-     */
-    public boolean methodHasReturn(String name) {
-	if (Methods.contains(name)) {
-	    switch (Methods.valueOf(name)) {
-	    	case isAfter:
-	    	    return true;
-	    	default:
-	    	    return false;
-	    }
-	}
-		
-        return super.methodHasReturn(name);
+    @CSLMethod
+    public IValue format(IValue fmt) {
+        SimpleDateFormat formatter = new SimpleDateFormat(fmt.valueAsString());
+        String res = formatter.format(value);
+        return new StringVariable(null, res);
     }
 
-    public int getMethodParameterCount(String name) {
-
-    	if (Methods.contains(name)) {
-    	    switch (Methods.valueOf(name)) {
-    	    	case incrementDays:
-    	    	case incrementHours:
-    	    	case incrementMinutes:
-    	    	case incrementSeconds:
-            	case isAfter:
-                    return 1;
-                case setNow:
-                    return 0;
-                default:
-                    return 0;
-            }
-    	}
-        
-        return super.getMethodParameterCount(name);
-    }
-
-    /**
-     * Executes the specified method.  The parameters to
-     * the method are supplied as an array of values.
-     * @param name the method name
-     * @param params the parameters to pass to the method.
-     * @return the return value of the method
-     */
-    public IValue executeMethod(String name, List<IValue> params) {
-    	
-    	if (Methods.contains(name)) {
-    	    Methods m = Methods.valueOf(name);
-            switch (m) {
-    	    	case incrementDays:
-    	    	case incrementHours:
-    	    	case incrementMinutes:
-    	    	case incrementSeconds:
-    	    	    return increment(params, m);
-                case isAfter:
-                    return isAfter(params);
-                case setNow:
-                    setNow(params);
-                    return new BooleanVariable(null, true);
-                default:
-                    throw new ScriptExecutionException(99, "Unexpected method name: " + name);
-            }
-    	}
-
-        return super.executeMethod(name, params);
-    }
-
-    public IValue increment(List<IValue> params, Methods m) {
-        BooleanVariable result = new BooleanVariable(null, true);
-        long inc = params.get(0).valueAsInteger();
-        switch (m) {
-            case incrementDays:
-        	inc = inc * 24 * 60 * 60 * 1000;
-	    	break;
-	    case incrementHours:
-	    	inc = inc * 60 * 60 * 1000;
-	    	break;
-	    case incrementMinutes:
-	    	inc = inc * 60 * 1000;
-	    	break;
-	    case incrementSeconds:
-	    	inc = inc * 1000;
-	    	break;
-        }
-        
+    private IValue increment(long inc) {
         long newVal = inc + value.getTime();
         Date temp = new Date(newVal);
         this.setValue(new DateVariable(null, temp), true);
-        
-        return result;
+        return new BooleanVariable(null, true);
     }
     
-    public void setNow(List<IValue> params) {
+    @CSLMethod
+    public IValue incrementDays(IValue incr) {
+        long inc = incr.valueAsInteger();
+        inc = inc * 24 * 60 * 60 * 1000;
+        return increment(inc);
+    }
+    
+    @CSLMethod
+    public IValue incrementHours(IValue incr) {
+        long inc = incr.valueAsInteger();
+        inc = inc * 60 * 60 * 1000;
+        return increment(inc);
+    }
+    
+    @CSLMethod
+    public IValue incrementMinutes(IValue incr) {
+        long inc = incr.valueAsInteger();
+        inc = inc * 60 * 1000;
+        return increment(inc);
+    }
+    
+    @CSLMethod
+    public IValue incrementSeconds(IValue incr) {
+        long inc = incr.valueAsInteger();
+        inc = inc * 1000;
+        return increment(inc);
+    }
+
+    @CSLMethod
+    public void setNow() {
         Date temp = new Date();
         this.setValue(new DateVariable(null, temp), true);
     }
 
-    public IValue isAfter(List<IValue> params) {
-        // there should be 1 parameter and it has to
-        // be a Date variable
+    @CSLMethod
+    public IValue isAfter(IValue param) {
         BooleanVariable result = new BooleanVariable(null);
-        if (params.get(0) instanceof DateVariable) {
-            if (value.compareTo((Date)params.get(0).valueAsObject()) > 0) {
+        if (param instanceof DateVariable) {
+            if (value.compareTo((Date)param.valueAsObject()) > 0) {
                 result.setValue(true);
             } else {
                 result.setValue(false);
@@ -244,7 +185,11 @@ public class DateVariable extends RuleVariable {
     	    value = null;
     	} else {
             try {
-                value = new Date(java.sql.Date.valueOf(dt).getTime());
+                try {
+                    parameterDefault = new Date(java.sql.Timestamp.valueOf(dt).getTime());
+                } catch (Exception ee) {
+                    parameterDefault = new Date(java.sql.Date.valueOf(dt).getTime());
+                }
             } catch (Exception e) {
                 throw new ScriptExecutionException(132, "Bad date format used to set date value: " + dt);
             }
@@ -270,7 +215,7 @@ public class DateVariable extends RuleVariable {
     		return "null";
     	} 
     	
-    	java.sql.Date dt = new java.sql.Date(value.getTime());
+    	java.sql.Timestamp dt = new java.sql.Timestamp(value.getTime());
     	return dt.toString();
     }
 

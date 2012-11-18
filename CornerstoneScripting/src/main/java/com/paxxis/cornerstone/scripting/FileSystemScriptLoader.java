@@ -23,6 +23,7 @@ import java.io.FileReader;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.paxxis.cornerstone.scripting.parser.ParseException;
 import com.paxxis.cornerstone.scripting.parser.RuleParser;
 
 /**
@@ -63,7 +64,7 @@ public class FileSystemScriptLoader implements ScriptLoader {
 
             System.exit(0);
         } catch (Exception e) {
-            e.printStackTrace();
+            System.out.println(e.getMessage());
             System.exit(1);
         }
 
@@ -130,10 +131,18 @@ public class FileSystemScriptLoader implements ScriptLoader {
         try {
             RuleSet ruleSet = new RuleSet(sourceName, "", parserManager.createRuntime());
             File source = new File(sourceName);
-            loadSource(null, source, true, ruleSet);
-            
+            RuleParser parser = loadSource(null, source, true, ruleSet);
             if (extraRules != null) {
                 parserManager.process(extraRules, ruleSet);
+            }
+            
+            if (parser.hasParseErrors()) {
+                List<ParseException> list = parser.getParseErrors();
+                StringBuilder builder = new StringBuilder();
+                for (ParseException p : list) {
+                    builder.append(p.getMessage()).append("\n");
+                }
+                throw new ParseException(builder.toString());
             }
             
             ruleSet.resoveRuleReferences();

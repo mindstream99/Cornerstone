@@ -27,6 +27,10 @@ package com.paxxis.cornerstone.scripting;
  */
 public class ArrayIndexer extends RuleVariable {
     private static final long serialVersionUID = 1L;
+    private static MethodProvider<ArrayIndexer> methodProvider = new MethodProvider<ArrayIndexer>(ArrayIndexer.class);
+    static {
+        methodProvider.initialize();
+    }
 
     // the array variable
     private Array array;
@@ -37,7 +41,12 @@ public class ArrayIndexer extends RuleVariable {
     public ArrayIndexer() {
 
     }
-    
+
+    @Override
+    protected MethodProvider<ArrayIndexer> getMethodProvider() {
+        return methodProvider;
+    }
+
     /**
      * Constructs the indexer.
      * @param queue the queue it belongs to
@@ -54,8 +63,9 @@ public class ArrayIndexer extends RuleVariable {
         this.index = index;
     }
 
-    public boolean isNull() {
-    	return null == index;
+    @CSLMethod
+    public IValue isNull() {
+    	return new BooleanVariable(null, null == index);
     }
     
     public String getType() {
@@ -74,7 +84,7 @@ public class ArrayIndexer extends RuleVariable {
     }
 
     public Object valueAsObject() {
-    	if (isNull()) {
+    	if (isNull().valueAsBoolean()) {
     	    return null;
     	}
     	
@@ -82,7 +92,7 @@ public class ArrayIndexer extends RuleVariable {
     }
 
     public String valueAsString() {
-    	if (isNull()) {
+    	if (isNull().valueAsBoolean()) {
     	    return null;
     	}
     	
@@ -90,7 +100,7 @@ public class ArrayIndexer extends RuleVariable {
     }
 
     public Double valueAsDouble() {
-    	if (isNull()) {
+    	if (isNull().valueAsBoolean()) {
     	    return null;
     	}
     	
@@ -98,7 +108,7 @@ public class ArrayIndexer extends RuleVariable {
     }
 
     public Integer valueAsInteger() {
-    	if (isNull()) {
+    	if (isNull().valueAsBoolean()) {
     	    return null;
     	}
     	
@@ -106,7 +116,7 @@ public class ArrayIndexer extends RuleVariable {
     }
 
     public Boolean valueAsBoolean() {
-    	if (isNull()) {
+    	if (isNull().valueAsBoolean()) {
     	    return null;
     	}
     	

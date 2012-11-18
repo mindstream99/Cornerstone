@@ -33,26 +33,11 @@ import java.util.List;
  *
  */
 public class ResultVariable extends RuleVariable {
-	private static final long serialVersionUID = 1L;
-
-	private static enum Methods {
-		isSuccess,
-		getResultCode,
-		getMessages,
-		mergeWith;
-
-		public static boolean contains(String name) {
-			boolean contains = false;
-			for (Methods option : Methods.values()) {
-				if (option.toString().equals(name)) {
-					contains = true;
-					break;
-				}
-			}
-
-			return contains;
-		}
-	}
+    private static final long serialVersionUID = 2L;
+    private static MethodProvider<ResultVariable> methodProvider = new MethodProvider<ResultVariable>(ResultVariable.class);
+    static {
+        methodProvider.initialize();
+    }
 
 	// the result (true for success, false for failure)
 	private Boolean success = null;
@@ -74,8 +59,13 @@ public class ResultVariable extends RuleVariable {
 		super(name);
 	}
 
-	public boolean isNull() {
-		return null == success;
+    @Override
+    protected MethodProvider<ResultVariable> getMethodProvider() {
+        return methodProvider;
+    }
+
+    public IValue isNull() {
+		return new BooleanVariable(null, null == success);
 	}
 
 	public String getType() {
@@ -100,56 +90,13 @@ public class ResultVariable extends RuleVariable {
 	    return this.resultCode;
 	}
 	
-	public boolean methodHasReturn(String name) {
-		if (Methods.contains(name)) {
-			switch (Methods.valueOf(name)) {
-			case isSuccess:
-			case getResultCode:
-			case getMessages:
-				return true;
-			}
-		}
-
-		return super.methodHasReturn(name);
-	}
-
-	public int getMethodParameterCount(String name) {
-		if (Methods.contains(name)) {
-			switch (Methods.valueOf(name)) {
-			case mergeWith:
-				return 1;
-			case isSuccess:
-			case getResultCode:
-			case getMessages:
-				return 0;
-			}
-		}
-
-		return super.getMethodParameterCount(name);
-	}
-
-	public IValue executeMethod(String name, List<IValue> params) {
-		if (Methods.contains(name)) {
-			switch (Methods.valueOf(name)) {
-			case isSuccess:
-				return isSuccess(params);
-			case getResultCode:
-				return getResultCode(params);
-			case getMessages:
-				return getMessages(params);
-			case mergeWith:
-				return merge(params);
-			}
-		}
-
-		return super.executeMethod(name, params);
-	}
-
-	private IValue isSuccess(List<IValue> params) {
+	@CSLMethod
+	public IValue isSuccess() {
 		return new BooleanVariable(null, success);
 	}
 
-	private IValue getResultCode(List<IValue> params) {
+	@CSLMethod
+	public IValue getResCode() {
 		return new IntegerVariable(null, resultCode);
 	}
 
@@ -161,7 +108,8 @@ public class ResultVariable extends RuleVariable {
 		return mergedResults;
 	}
 	
-	private IValue getMessages(List<IValue> params) {
+	@CSLMethod
+	public IValue getResultMessages() {
 		Array msgs = new Array();
 		List<IValue> list = new ArrayList<IValue>();
 		for (String msg : messages) {
@@ -173,13 +121,13 @@ public class ResultVariable extends RuleVariable {
 		return msgs;
 	}
 
-	private IValue merge(List<IValue> params) {
-		IValue v = params.get(0);
-		if (!(v instanceof ResultVariable)) {
+	@CSLMethod
+	public IValue merge(IValue param) {
+		if (!(param instanceof ResultVariable)) {
 			throw new ScriptExecutionException(301, "merge parameter must be a Result");
 		}
 
-        ResultVariable rv = (ResultVariable)v;
+        ResultVariable rv = (ResultVariable)param;
 		merge(rv);
 		return new BooleanVariable(null, true);
 	}
@@ -246,7 +194,7 @@ public class ResultVariable extends RuleVariable {
 	 */
 	 public Object valueAsObject()
 	{
-		if (isNull()) {
+		if (isNull().valueAsBoolean()) {
 			return null;
 		}
 
@@ -258,7 +206,7 @@ public class ResultVariable extends RuleVariable {
 	 */
 	 public String valueAsString()
 	{
-		if (isNull()) {
+		if (isNull().valueAsBoolean()) {
 			return null;
 		}
 
@@ -277,7 +225,7 @@ public class ResultVariable extends RuleVariable {
 	 */
 	 public Double valueAsDouble()
 	 {
-		 if (isNull()) {
+		 if (isNull().valueAsBoolean()) {
 			 return null;
 		 }
 
@@ -296,7 +244,7 @@ public class ResultVariable extends RuleVariable {
 	  */
 	 public Integer valueAsInteger()
 	 {
-		 if (isNull()) {
+		 if (isNull().valueAsBoolean()) {
 			 return null;
 		 }
 
@@ -315,7 +263,7 @@ public class ResultVariable extends RuleVariable {
 	  */
 	 public Boolean valueAsBoolean()
 	 {
-		 if (isNull()) {
+		 if (isNull().valueAsBoolean()) {
 			 return null;
 		 }
 

@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.paxxis.cornerstone.scripting.parser.CSLRuntime;
+import com.paxxis.cornerstone.scripting.parser.ParseException;
 
 /**
  * All rule variables are subclasses of this class.
@@ -29,38 +30,36 @@ import com.paxxis.cornerstone.scripting.parser.CSLRuntime;
  */
 public abstract class RuleVariable extends IValue {
 
-    private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 2L;
 
-    private static enum Methods {
-	isNull
-    }
-	
     // the parameter name
     private String _name = null;
 
     // direct listeners of changes
     private final ArrayList<VariableChangeListener> _listeners = new ArrayList<VariableChangeListener>();
-    
+
     // the runtime
     protected transient CSLRuntime runtime = null;
 
     // durable?
     private boolean _durable = false;
-    
+
     // dynamic?
     private boolean _dynamic = false;
-    
+
     // use macro expansion?
     private boolean macro = false;
-    
+
     private boolean hasParameterDefault = false;
 
     // can user change the value through script expressions?
     private boolean userMutable = true;
-    
+
     private IValue _expression = null;
     private List<RuleVariable> _dependents = new ArrayList<RuleVariable>();
     private List<RuleVariable> _dependencies = new ArrayList<RuleVariable>();
+
+    protected abstract MethodProvider<? extends RuleVariable> getMethodProvider();
     
     /**
      * this method is called from with RuleVariable.  It manages dependent variable triggering
@@ -74,7 +73,7 @@ public abstract class RuleVariable extends IValue {
     public RuleVariable() {
 
     }
-    
+
     public void addVariableChangeListener(VariableChangeListener listener) {
         synchronized (_listeners) {
             if (!_listeners.contains(listener)) {
@@ -82,19 +81,19 @@ public abstract class RuleVariable extends IValue {
             }
         }
     }
-    
+
     @SuppressWarnings("unchecked")
     public void notifyVariableChangeListeners() {
         List<VariableChangeListener> listeners = null;
         synchronized (_listeners) {
             listeners = (ArrayList<VariableChangeListener>)_listeners.clone();
         }
-        
+
         for (VariableChangeListener listener : listeners) {
             listener.onChange(this);
         }
     }
-    
+
     public void reset() {
         clearDependents();
         resetValue();
@@ -102,15 +101,15 @@ public abstract class RuleVariable extends IValue {
 
     public void setParameterDefaultValue(String val) {
     }
-    
+
     public void setHasParameterDefault(boolean val) {
-	this.hasParameterDefault = val;
+        this.hasParameterDefault = val;
     }
-    
+
     public boolean getHasParameterDefault() {
-	return this.hasParameterDefault;
+        return this.hasParameterDefault;
     }
-    
+
     public final void setValue(IValue val, boolean trigger) {
         if (trigger) {
             buildDependencies(val);
@@ -122,19 +121,19 @@ public abstract class RuleVariable extends IValue {
             recalcDependents();
         }
     }
-    
+
     public void addDependent(RuleVariable dep) {
         if (!_dependents.contains(dep)) {
             _dependents.add(dep);
         }
     }
-    
+
     public void removeDependent(RuleVariable dep) {
         if (_dependents.contains(dep)) {
             _dependents.remove(dep);
         }
     }
-    
+
     public void findVariables(List<RuleVariable> deps) {
         if (getName() != null) {
             deps.add(this);
@@ -146,19 +145,19 @@ public abstract class RuleVariable extends IValue {
             for (RuleVariable var : _dependencies) {
                 var.removeDependent(this);
             }
-            
+
             _dependencies.clear();
         }
     }
-    
+
     protected void buildDependencies(IValue exp) {
         if (_dynamic) {
             for (RuleVariable var : _dependencies) {
                 var.removeDependent(this);
             }
-            
+
             _dependencies.clear();
-            
+
             exp.findVariables(_dependencies);
 
             for (RuleVariable var : _dependencies) {
@@ -166,17 +165,17 @@ public abstract class RuleVariable extends IValue {
                     var.addDependent(this);
                 }
             }
-            
+
             _expression = exp;
         }
     }
-    
+
     public void appendDependents(String name, List<RuleVariable> deps) {
         for (RuleVariable var : _dependents) {
             if (var.getName().equals(name)) {
                 throw new ScriptExecutionException(401, "Circular Reference To Variable '" + name + "'");
             }
-            
+
             deps.add(var);
             var.appendDependents(name, deps);
         }
@@ -185,10 +184,10 @@ public abstract class RuleVariable extends IValue {
     protected void recalcDependents() {
         // get an ordered list of variables dependent on this change, traversing
         // all the way down the tree
-	ExtendedArrayList<RuleVariable> depVars = new ExtendedArrayList<RuleVariable>();
+        ExtendedArrayList<RuleVariable> depVars = new ExtendedArrayList<RuleVariable>();
         appendDependents(getName(), depVars);
         int last = depVars.size() - 1;
-        
+
         List<RuleVariable> calcVars = new ArrayList<RuleVariable>();
         for (int i = 0; i <= last; i++) {
             RuleVariable v = depVars.get(i);
@@ -197,12 +196,12 @@ public abstract class RuleVariable extends IValue {
             if (next <= last) {
                 keep = !depVars.subList(next, last).contains(v);
             }
-            
+
             if (keep) {
                 calcVars.add(v);
             }
         }
-        
+
         for (RuleVariable var : calcVars) {
             var.recalc();
         }
@@ -211,23 +210,23 @@ public abstract class RuleVariable extends IValue {
     protected void recalc() {
         setValue(_expression.evaluate(), false);
     }
-    
+
     public void setDurable(boolean durable) {
         _durable = durable;
     }
-    
+
     public boolean isDurable() {
         return _durable;
     }
-    
+
     public void setDynamic(boolean dynamic) {
         _dynamic = dynamic;
     }
-    
+
     public boolean isDynamic() {
         return _dynamic;
     }
-    
+
     public void setUserMutable(boolean userMutable) {
         this.userMutable = userMutable;
     }
@@ -235,28 +234,28 @@ public abstract class RuleVariable extends IValue {
     public boolean isUserMutable() {
         return userMutable;
     }
-    
+
     /**
      * Subclasses that support macro expansion must override this.
      */
     public boolean supportsMacroExpansion() {
-	return false;
+        return false;
     }
-    
+
     public void setMacro(boolean macro) throws RuleCreationException {
-	if (macro) {
-	    if (supportsMacroExpansion()) {
-		this.macro = macro;
-	    } else {
-		throw new RuleCreationException(this.getType() + " type does not support macro expansion.");
-	    }
-	}
+        if (macro) {
+            if (supportsMacroExpansion()) {
+                this.macro = macro;
+            } else {
+                throw new RuleCreationException(this.getType() + " type does not support macro expansion.");
+            }
+        }
     }
-    
+
     public boolean isMacro() {
-	return macro;
+        return macro;
     }
-    
+
     protected void checkUserMutable() {
         if (!userMutable) {
             throw new ScriptExecutionException(402, "Variable '" + getName() + "' can't be modified directly.");
@@ -293,48 +292,34 @@ public abstract class RuleVariable extends IValue {
     }
 
     public boolean methodHasReturn(String name) {
-	switch (Methods.valueOf(name)) {
-	    case isNull:
-		return true;
-	}
-		
-	return false;
+        return getMethodProvider().hasReturn(name);
     }
 
     public int getMethodParameterCount(String name) {
-	switch (Methods.valueOf(name)) {
-	    case isNull:
-		return 0;
-	}
-		
-	return 0;
+        return getMethodProvider().getParameterCount(name);
     }
 
-    public IValue executeMethod(String name, List<IValue> params) {
-	switch (Methods.valueOf(name)) {
-	    case isNull:
-		return new BooleanVariable(null, isNull());
-	}
-	
-	return null;
+    public IValue executeMethod(String name, List<IValue> params) throws ParseException {
+        return getMethodProvider().execute(this, name, params);
     }
-    
+
     /**
      * Is the object null?
      */
-    public abstract boolean isNull();
+    @CSLMethod
+    public abstract IValue isNull();
 
     public abstract String getType();
-    
+
     public CSLRuntime getRuntime() {
-    	return runtime;
+        return runtime;
     }
-    
+
     public void setRuntime(CSLRuntime rt) {
         runtime = rt;
     }
 
-	public String getDefaultValue() {
-		return "null";
-	}
+    public String getDefaultValue() {
+        return "null";
+    }
 }

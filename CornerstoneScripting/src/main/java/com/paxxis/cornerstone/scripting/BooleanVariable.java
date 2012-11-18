@@ -25,8 +25,13 @@ package com.paxxis.cornerstone.scripting;
  * @author Robert Englander
  */
 public class BooleanVariable extends RuleVariable {
-	private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 2L;
 
+    private static MethodProvider<BooleanVariable> methodProvider = new MethodProvider<BooleanVariable>(BooleanVariable.class);
+	static {
+	    methodProvider.initialize();
+	}
+	
 	// the value
 	private Boolean value = null;
 	private Boolean parameterDefault = null;
@@ -34,6 +39,11 @@ public class BooleanVariable extends RuleVariable {
 	public BooleanVariable() {
 	}
 
+	@Override
+	protected MethodProvider<BooleanVariable> getMethodProvider() {
+	    return methodProvider;
+	}
+	
 	/**
 	 * Constructs the variable
 	 * @param name the name of the variable, or null if anonymous
@@ -42,8 +52,9 @@ public class BooleanVariable extends RuleVariable {
 		super(name);
 	}
 
-	public boolean isNull() {
-		return null == value;
+	@CSLMethod
+	public IValue isNull() {
+		return new BooleanVariable(null, null == value);
 	}
 
 	public String getType() {
@@ -110,7 +121,7 @@ public class BooleanVariable extends RuleVariable {
 	 */
 	 public Object valueAsObject()
 	{
-		if (isNull()) {
+		if (isNull().valueAsBoolean()) {
 			return null;
 		}
 
@@ -122,7 +133,7 @@ public class BooleanVariable extends RuleVariable {
 	  */
 	 public String valueAsString()
 	 {
-		 if (isNull()) {
+		 if (isNull().valueAsBoolean()) {
 			 return null;
 		 }
 
@@ -141,7 +152,7 @@ public class BooleanVariable extends RuleVariable {
 	  */
 	 public Double valueAsDouble()
 	 {
-		 if (isNull()) {
+		 if (isNull().valueAsBoolean()) {
 			 return null;
 		 }
 
@@ -160,7 +171,7 @@ public class BooleanVariable extends RuleVariable {
 	  */
 	 public Integer valueAsInteger()
 	 {
-		 if (isNull()) {
+		 if (isNull().valueAsBoolean()) {
 			 return null;
 		 }
 
@@ -179,7 +190,7 @@ public class BooleanVariable extends RuleVariable {
 	  */
 	 public Boolean valueAsBoolean()
 	 {
-		 if (isNull()) {
+		 if (value == null) {
 			 return null;
 		 }
 

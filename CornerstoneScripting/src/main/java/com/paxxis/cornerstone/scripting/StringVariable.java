@@ -17,31 +17,15 @@
 
 package com.paxxis.cornerstone.scripting;
 
-import java.util.List;
 
 /**
  * @author Robert Englander
  */
 public class StringVariable extends RuleVariable {
-    private static final long serialVersionUID = 1L;
-
-    private static enum Methods {
-        length,
-        makeUpperCase,
-        subString,
-        contains;
-        
-	public static boolean contains(String name) {
-	    boolean contains = false;
-	    for (Methods option : Methods.values()) {
-		if (option.toString().equals(name)) {
-		    contains = true;
-		    break;
-		}
-	    }
-		
-	    return contains;
-	}
+    private static final long serialVersionUID = 2L;
+    private static MethodProvider<StringVariable> methodProvider = new MethodProvider<StringVariable>(StringVariable.class);
+    static {
+        methodProvider.initialize();
     }
 
     // the value
@@ -51,7 +35,7 @@ public class StringVariable extends RuleVariable {
     public StringVariable() {
 
     }
-    
+
     public StringVariable(String name) {
         super(name);
     }
@@ -60,81 +44,39 @@ public class StringVariable extends RuleVariable {
         super(name);
         this.value = value;
     }
-    
-    public boolean isNull() {
-    	return null == value;
+
+    @Override
+    protected MethodProvider<StringVariable> getMethodProvider() {
+        return methodProvider;
+    }
+
+    @CSLMethod
+    public IValue isNull() {
+        return new BooleanVariable(null, null == value);
     }
 
     public String getType() {
         return "String";
     }
-    
-	public String getDefaultValue() {
-		return (parameterDefault == null) ? "null" : parameterDefault;
-	}
+
+    public String getDefaultValue() {
+        return (parameterDefault == null) ? "null" : parameterDefault;
+    }
 
     public void resetValue() {
-	if (this.getHasParameterDefault() && value == null) {
-	    value = parameterDefault;
-	}
+        if (this.getHasParameterDefault() && value == null) {
+            value = parameterDefault;
+        }
     }
-    
+
     public void setParameterDefaultValue(String val) {
-	parameterDefault = val;
-	setHasParameterDefault(true);
+        parameterDefault = val;
+        setHasParameterDefault(true);
     }
-    
+
     @Override
     public boolean supportsMacroExpansion() {
-	return true;
-    }
-
-    public boolean methodHasReturn(String name) {
-    	if (Methods.contains(name)) {
-            switch (Methods.valueOf(name)) {
-                case length:
-                case subString:
-                case contains:
-                    return true;
-            }
-    	}
-
-        return super.methodHasReturn(name);
-    }
-
-    public int getMethodParameterCount(String name) {
-    	if (Methods.contains(name)) {
-            switch (Methods.valueOf(name)) {
-                case length:
-                    return 0;
-                case makeUpperCase:
-                    return 0;
-                case subString:
-                    return 2;
-                case contains:
-                    return 1;
-            }
-    	}
-
-        return super.getMethodParameterCount(name);
-    }
-
-    public IValue executeMethod(String name, List<IValue> params) {
-    	if (Methods.contains(name)) {
-            switch (Methods.valueOf(name)) {
-                case length:
-                    return getLength(params);
-                case makeUpperCase:
-                    makeUpperCase(params);
-                    return new BooleanVariable(null,true);
-                case subString:
-                    return subString(params);
-                case contains:
-                    return contains(params);
-            }
-    	}
-
-        return super.executeMethod(name, params);
+        return true;
     }
 
     /**
@@ -143,20 +85,21 @@ public class StringVariable extends RuleVariable {
      * @param params
      * @return
      */
-    private IValue contains(List<IValue> params) {
-        String sub = params.get(0).valueAsString();
+    @CSLMethod
+    public IValue contains(IValue param) {
+        String sub = param.valueAsString();
         boolean contains = -1 != value.indexOf(sub);
         return new BooleanVariable(null, contains);
     }
 
-    private IValue getLength(List<IValue> params) {
-        // we don't use any parameters
+    @CSLMethod
+    public IValue length() {
         int size = value.length();
         return new IntegerVariable(null, size);
     }
 
-    private void makeUpperCase(List<IValue> params) {
-        // this function doesn't use any parameters
+    @CSLMethod
+    public void makeUpperCase() {
         setValue(new StringVariable(null, value.toUpperCase()));
     }
 
@@ -169,9 +112,10 @@ public class StringVariable extends RuleVariable {
      * Throws:
      *       IndexOutOfBoundsException - if the beginIndex is negative, or endIndex is larger than the length of this String object, or beginIndex is larger than endIndex.
      */
-    private IValue subString(List<IValue> params) {
-        int beginIndex = params.get(0).valueAsInteger();
-        int endIndex = params.get(1).valueAsInteger();
+    @CSLMethod
+    public IValue subString(IValue start, IValue end) {
+        int beginIndex = start.valueAsInteger();
+        int endIndex = end.valueAsInteger();
         String substring = value.substring(beginIndex, endIndex);
         return new StringVariable("",substring);
     }
@@ -190,51 +134,51 @@ public class StringVariable extends RuleVariable {
     }
 
     private void setValue(RuleVariable rv) {
-	value = renderAsString(rv.valueAsString());
+        value = renderAsString(rv.valueAsString());
     }
 
     protected String renderAsString(String val) {
-	String v = val;
-	if (isMacro()) {
-	    v = runtime.performMacroExpansion(v);
-	}
-	
-	return v;
+        String v = val;
+        if (isMacro()) {
+            v = runtime.performMacroExpansion(v);
+        }
+
+        return v;
     }
-    
+
     public Object valueAsObject() {
         return value;
     }
 
     public String valueAsString() {
-	return renderAsString(value);
+        return renderAsString(value);
     }
 
     public Double valueAsDouble() {
-    	if (isNull()) {
-    	    return null;
-    	}
+        if (isNull().valueAsBoolean()) {
+            return null;
+        }
 
-    	double result = Double.valueOf(value).doubleValue();
+        double result = Double.valueOf(value).doubleValue();
         return result;
     }
 
     public Integer valueAsInteger() {
-    	if (isNull()) {
-    	    return null;
-    	}
+        if (isNull().valueAsBoolean()) {
+            return null;
+        }
 
-    	// we need to truncate doubles...
+        // we need to truncate doubles...
         int result = valueAsDouble().intValue();
         return result;
     }
 
     public Boolean valueAsBoolean() {
-    	if (isNull()) {
-    	    return null;
-    	}
+        if (isNull().valueAsBoolean()) {
+            return null;
+        }
 
-    	return value.equals("true");
+        return value.equals("true");
     }
 
     @Override

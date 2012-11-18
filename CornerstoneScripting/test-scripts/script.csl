@@ -3,7 +3,7 @@ ruleset sss
 execute(Date startDate) {
    assert startDate:isNull();
    def String s1 = "sdsdsd";
-   def Double d1 = 42.0;
+   def Ddouble d1 = 42.0;
    def Integer y = 0;
    def dynamic Integer z = (1 + y * 100);
    foreach (i in 1 to 300) {
@@ -21,7 +21,7 @@ execute(Date startDate) {
    }
    
    def Date dt;
-   dt:setNow();
+   dt:setNow(2);
    def dynamic String xxx = "The date is " | dt ;
    foreach (i in 1 to 10) {
       dt:incrementDays(1);

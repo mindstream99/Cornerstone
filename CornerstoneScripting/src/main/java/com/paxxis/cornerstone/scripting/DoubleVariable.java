@@ -22,15 +22,19 @@ package com.paxxis.cornerstone.scripting;
  * @author Robert Englander
  */
 public class DoubleVariable extends RuleVariable {
-    private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 2L;
+    private static MethodProvider<DoubleVariable> methodProvider = new MethodProvider<DoubleVariable>(DoubleVariable.class);
+    static {
+        methodProvider.initialize();
+    }
 
     // the value
     private Double value = null;
     private Double parameterDefault = null;
-    
+
     public DoubleVariable() {
     }
-    
+
     public DoubleVariable(String name) {
         super(name);
     }
@@ -45,33 +49,39 @@ public class DoubleVariable extends RuleVariable {
         this.value = new Double(value);
     }
 
-	public String getDefaultValue() {
-		return (parameterDefault == null) ? "null" : parameterDefault.toString();
-	}
+    @Override
+    protected MethodProvider<DoubleVariable> getMethodProvider() {
+        return methodProvider;
+    }
+
+    public String getDefaultValue() {
+        return (parameterDefault == null) ? "null" : parameterDefault.toString();
+    }
 
     public void setParameterDefaultValue(String val) {
-	if (val == null) {
-	    parameterDefault = null;
-	} else {
-	    parameterDefault = new Double(val);
-	}
-	setHasParameterDefault(true);
+        if (val == null) {
+            parameterDefault = null;
+        } else {
+            parameterDefault = new Double(val);
+        }
+        setHasParameterDefault(true);
     }
-    
-    public boolean isNull() {
-    	return null == value;
+
+    @CSLMethod
+    public IValue isNull() {
+        return new BooleanVariable(null, null == value);
     }
-    
+
     public String getType() {
         return "Double";
     }
-    
+
     public void resetValue() {
-	if (this.getHasParameterDefault() && value == null) {
-	    value = parameterDefault;
-	}
+        if (this.getHasParameterDefault() && value == null) {
+            value = parameterDefault;
+        }
     }
-    
+
     protected void setValue(IValue val) {
         if (val instanceof RuleVariable) {
             RuleVariable rv = (RuleVariable)val;
@@ -86,57 +96,57 @@ public class DoubleVariable extends RuleVariable {
     }
 
     private void setValue(RuleVariable rv) {
-    	if (rv instanceof DoubleVariable) {
-    	    DoubleVariable dv = (DoubleVariable)rv;
-    	    value = dv.value;
-    	} else {
-    	    Double sval = rv.valueAsDouble();
-    	    if (sval == null) {
-    		value = null;
-    	    } else {
-    		value = sval;
-    	    }
-    	}
+        if (rv instanceof DoubleVariable) {
+            DoubleVariable dv = (DoubleVariable)rv;
+            value = dv.value;
+        } else {
+            Double sval = rv.valueAsDouble();
+            if (sval == null) {
+                value = null;
+            } else {
+                value = sval;
+            }
+        }
     }
 
     public Object valueAsObject() {
-    	if (isNull()) {
-    	    return null;
-    	}
+        if (isNull().valueAsBoolean()) {
+            return null;
+        }
 
-    	return new Double(value);
+        return new Double(value);
     }
 
     public String valueAsString() {
-    	if (isNull()) {
-    	    return null;
-    	}
+        if (isNull().valueAsBoolean()) {
+            return null;
+        }
 
-    	return Double.toString(value);
+        return Double.toString(value);
     }
 
     public Double valueAsDouble() {
-    	if (isNull()) {
-    	    return null;
-    	}
+        if (isNull().valueAsBoolean()) {
+            return null;
+        }
 
-    	return value;
+        return value;
     }
 
     public Integer valueAsInteger() {
-    	if (isNull()) {
-    	    return null;
-    	}
+        if (isNull().valueAsBoolean()) {
+            return null;
+        }
 
-    	return value.intValue();
+        return value.intValue();
     }
 
     public Boolean valueAsBoolean() {
-    	if (isNull()) {
-    	    return null;
-    	}
+        if (isNull().valueAsBoolean()) {
+            return null;
+        }
 
-    	return value == 1.0;
+        return value == 1.0;
     }
 
     @Override

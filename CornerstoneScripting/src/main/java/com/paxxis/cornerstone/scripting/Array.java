@@ -28,35 +28,25 @@ import java.util.List;
  */
 public class Array extends RuleVariable {
 
-    private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 2L;
     private static final String ARRAY = "Array";
-    
-    private static enum Methods {
-        size,
-        contains,
-        grow,
-        appendAsString;
-        
-        public static boolean contains(String name) {
-            boolean contains = false;
-            for (Methods option : Methods.values()) {
-		if (option.toString().equals(name)) {
-		    contains = true;
-		    break;
-		}
-            }
-	
-            return contains;
-        }
-        
-    }
 
+    private static MethodProvider<Array> methodProvider = new MethodProvider<Array>(Array.class);
+    static {
+        methodProvider.initialize();
+    }
+    
     private List<IValue> elements = null;
 
     public Array() {
 
     }
     
+    @Override
+    protected MethodProvider<Array> getMethodProvider() {
+        return methodProvider;
+    }
+
     /**
      * @param name the name of the array variable.
      */
@@ -64,8 +54,9 @@ public class Array extends RuleVariable {
         super(name);
     }
 
-    public boolean isNull() {
-    	return null == elements;
+    @CSLMethod
+    public IValue isNull() {
+    	return new BooleanVariable(null, null == elements);
     }
 
     public String getType() {
@@ -78,59 +69,6 @@ public class Array extends RuleVariable {
     	}
     }
     
-    public boolean methodHasReturn(String name) {
-    	if (Methods.contains(name)) {
-    	    switch (Methods.valueOf(name)) {
-                case size:
-                case contains:
-                    return true;
-                default:
-                    return false;
-            }
-    	}
-
-        return super.methodHasReturn(name);
-    }
-
-    public int getMethodParameterCount(String name) {
-
-    	if (Methods.contains(name)) {
-    	    switch (Methods.valueOf(name)) {
-                case size:
-                    return 0;
-                case contains:
-                    return 1;
-                case grow:
-                    return 1;
-                case appendAsString:
-                    return 1;
-                default:
-                    return 0;
-            }
-    	}
-        
-        return super.getMethodParameterCount(name);
-    }
-    
-    public IValue executeMethod(String name, List<IValue> params) {
-    	if (Methods.contains(name)) {
-            switch (Methods.valueOf(name)) {
-                case size:
-                    return getSize(params);
-                case contains:
-                    return contains(params);
-                case grow:
-                    return grow(params);
-                case appendAsString:
-                    return appendAsString(params);
-                default:
-                    throw new ScriptExecutionException(103, "No such method: " + name);
-            }
-    	}
-
-        return super.executeMethod(name, params);
-    }
-
     /**
      * Initializes the array to the specified size.
      * @param size the size of the array.
@@ -312,12 +250,12 @@ public class Array extends RuleVariable {
      * @param params
      * @return
      */
-    protected IValue appendAsString(List<IValue> params) {
-        IValue param = params.get(0);
+    @CSLMethod
+    public IValue appendAsString(IValue param) {
         if (param.isArray()) {
             Array array = (Array)param;
             int oldSize = size();
-            grow(array.size());
+            grow(new IntegerVariable(null, array.size()));
             int newSize = size();
             int j = 0;
             for (int i = oldSize; i < newSize; i++) {
@@ -326,7 +264,7 @@ public class Array extends RuleVariable {
             }
         } else {
             int oldSize = size();
-            grow(1);
+            grow(new IntegerVariable(null, 1));
             elements.set(oldSize, new StringVariable(null, param.valueAsString()));
         }
 
@@ -341,16 +279,9 @@ public class Array extends RuleVariable {
      * the number of new rows to add to the array.
      * @return true
      */
-    protected IValue grow(List<IValue> params) {
-        int newRows = params.get(0).valueAsInteger();
-        grow(newRows);
-        return new BooleanVariable(null, true);
-    }
-
-    /**
-     * @param size the size to grow by
-     */
-    void grow(int size) {
+    @CSLMethod
+    public void grow(IValue sz) {
+        int size = sz.valueAsInteger();
         for (int i = 0; i < size; i++) {
             elements.add(null);
         }
@@ -360,7 +291,8 @@ public class Array extends RuleVariable {
      * Returns the size of the array.
      * @return the size
      */
-    protected IValue getSize(List<IValue> params) {
+    @CSLMethod
+    public IValue getSize() {
         return new IntegerVariable(null, size());
     }
 
@@ -371,9 +303,10 @@ public class Array extends RuleVariable {
      * @return true if the value is contained in the array,
      *         false otherwise
      */
-    protected IValue contains(List<IValue> params) {
+    @CSLMethod
+    public IValue contains(IValue val) {
         // grab the parameter value as a string
-        String value = params.get(0).valueAsString();
+        String value = val.valueAsString();
 
         // iterate over the values in the array, comparing
         // them to the parameter value.  if a match is

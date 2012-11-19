@@ -62,44 +62,43 @@ public class ReferenceVariable extends RuleVariable {
         }
     }
 
-    @CSLMethod
-    public IValue isNull() {
+    public boolean isValueNull() {
         boolean isNull = ref == null;
         if (!isNull) {
             // parameter passing can result in a null reference being injected into
             // a reference parameter, so we need to consider that possibility.
             if (ref instanceof ReferenceVariable) {
                 ReferenceVariable rv = (ReferenceVariable)ref;
-                isNull = rv.isNull().valueAsBoolean();
+                isNull = rv.isValueNull();
             }
         }
 
-        return new BooleanVariable(null, isNull);
+        return isNull;
     }
 
     public String valueAsString() {
-        if (isNull().valueAsBoolean()) {
+        if (isValueNull()) {
             return null;
         }
         return ref.valueAsString();
     }
 
     public Double valueAsDouble() {
-        if (isNull().valueAsBoolean()) {
+        if (isValueNull()) {
             return null;
         }
         return ref.valueAsDouble();
     }
 
     public Integer valueAsInteger() {
-        if (isNull().valueAsBoolean()) {
+        if (isValueNull()) {
             return null;
         }
         return ref.valueAsInteger();
     }
 
     public Boolean valueAsBoolean() {
-        if (isNull().valueAsBoolean()) {
+        if (isValueNull()) {
             return null;
         }
         return ref.valueAsBoolean();
@@ -112,7 +111,7 @@ public class ReferenceVariable extends RuleVariable {
     }
 
     public Object valueAsObject() {
-        if (isNull().valueAsBoolean()) {
+        if (isValueNull()) {
             return null;
         }
         return ref.valueAsObject();

@@ -56,8 +56,8 @@ public class TableIndexer extends RuleVariable {
         return methodProvider;
     }
 
-    public IValue isNull() {
-        return new BooleanVariable(null, null == table);
+    public boolean isValueNull() {
+        return null == table;
     }
 
     public String getType() {
@@ -88,21 +88,21 @@ public class TableIndexer extends RuleVariable {
     }
 
     public Double valueAsDouble() {
-        if (isNull().valueAsBoolean()) {
+        if (isValueNull()) {
             return null;
         }
         return table.valueAt(rowIndex.valueAsInteger(), colIndex.valueAsInteger()).valueAsDouble();
     }
 
     public Integer valueAsInteger() {
-        if (isNull().valueAsBoolean()) {
+        if (isValueNull()) {
             return null;
         }
         return table.valueAt(rowIndex.valueAsInteger(), colIndex.valueAsInteger()).valueAsInteger();
     }
 
     public Boolean valueAsBoolean() {
-        if (isNull().valueAsBoolean()) {
+        if (isValueNull()) {
             return null;
         }
         return table.valueAt(rowIndex.valueAsInteger(), colIndex.valueAsInteger()).valueAsBoolean();

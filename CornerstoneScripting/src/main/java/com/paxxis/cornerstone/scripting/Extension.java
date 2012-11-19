@@ -48,9 +48,8 @@ public class Extension extends RuleVariable {
         return methodProvider;
     }
 
-    @CSLMethod
-    public IValue isNull() {
-        return new BooleanVariable(null, false);
+    public boolean isValueNull() {
+        return false;
     }
 
     @Override
@@ -130,7 +129,7 @@ public class Extension extends RuleVariable {
 
     @Override
     public Double valueAsDouble() {
-        if (isNull().valueAsBoolean()) {
+        if (isValueNull()) {
             return null;
         }
         return 0.0;
@@ -138,7 +137,7 @@ public class Extension extends RuleVariable {
 
     @Override
     public Integer valueAsInteger() {
-        if (isNull().valueAsBoolean()) {
+        if (isValueNull()) {
             return null;
         }
         return 0;
@@ -146,7 +145,7 @@ public class Extension extends RuleVariable {
 
     @Override
     public Boolean valueAsBoolean() {
-        return !isNull().valueAsBoolean();
+        return !isValueNull();
     }
 
     @Override

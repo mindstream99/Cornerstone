@@ -67,9 +67,8 @@ public class DoubleVariable extends RuleVariable {
         setHasParameterDefault(true);
     }
 
-    @CSLMethod
-    public IValue isNull() {
-        return new BooleanVariable(null, null == value);
+    public boolean isValueNull() {
+        return null == value;
     }
 
     public String getType() {
@@ -110,7 +109,7 @@ public class DoubleVariable extends RuleVariable {
     }
 
     public Object valueAsObject() {
-        if (isNull().valueAsBoolean()) {
+        if (isValueNull()) {
             return null;
         }
 
@@ -118,7 +117,7 @@ public class DoubleVariable extends RuleVariable {
     }
 
     public String valueAsString() {
-        if (isNull().valueAsBoolean()) {
+        if (isValueNull()) {
             return null;
         }
 
@@ -126,7 +125,7 @@ public class DoubleVariable extends RuleVariable {
     }
 
     public Double valueAsDouble() {
-        if (isNull().valueAsBoolean()) {
+        if (isValueNull()) {
             return null;
         }
 
@@ -134,7 +133,7 @@ public class DoubleVariable extends RuleVariable {
     }
 
     public Integer valueAsInteger() {
-        if (isNull().valueAsBoolean()) {
+        if (isValueNull()) {
             return null;
         }
 
@@ -142,7 +141,7 @@ public class DoubleVariable extends RuleVariable {
     }
 
     public Boolean valueAsBoolean() {
-        if (isNull().valueAsBoolean()) {
+        if (isValueNull()) {
             return null;
         }
 

@@ -52,9 +52,8 @@ public class BooleanVariable extends RuleVariable {
 		super(name);
 	}
 
-	@CSLMethod
-	public IValue isNull() {
-		return new BooleanVariable(null, null == value);
+	public boolean isValueNull() {
+		return null == value;
 	}
 
 	public String getType() {
@@ -121,7 +120,7 @@ public class BooleanVariable extends RuleVariable {
 	 */
 	 public Object valueAsObject()
 	{
-		if (isNull().valueAsBoolean()) {
+		if (isValueNull()) {
 			return null;
 		}
 
@@ -133,7 +132,7 @@ public class BooleanVariable extends RuleVariable {
 	  */
 	 public String valueAsString()
 	 {
-		 if (isNull().valueAsBoolean()) {
+		 if (isValueNull()) {
 			 return null;
 		 }
 
@@ -152,7 +151,7 @@ public class BooleanVariable extends RuleVariable {
 	  */
 	 public Double valueAsDouble()
 	 {
-		 if (isNull().valueAsBoolean()) {
+		 if (isValueNull()) {
 			 return null;
 		 }
 
@@ -171,7 +170,7 @@ public class BooleanVariable extends RuleVariable {
 	  */
 	 public Integer valueAsInteger()
 	 {
-		 if (isNull().valueAsBoolean()) {
+		 if (isValueNull()) {
 			 return null;
 		 }
 

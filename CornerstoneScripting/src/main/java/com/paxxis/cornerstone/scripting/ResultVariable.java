@@ -64,8 +64,8 @@ public class ResultVariable extends RuleVariable {
         return methodProvider;
     }
 
-    public IValue isNull() {
-		return new BooleanVariable(null, null == success);
+    public boolean isValueNull() {
+		return null == success;
 	}
 
 	public String getType() {
@@ -194,7 +194,7 @@ public class ResultVariable extends RuleVariable {
 	 */
 	 public Object valueAsObject()
 	{
-		if (isNull().valueAsBoolean()) {
+		if (isValueNull()) {
 			return null;
 		}
 
@@ -206,7 +206,7 @@ public class ResultVariable extends RuleVariable {
 	 */
 	 public String valueAsString()
 	{
-		if (isNull().valueAsBoolean()) {
+		if (isValueNull()) {
 			return null;
 		}
 
@@ -225,7 +225,7 @@ public class ResultVariable extends RuleVariable {
 	 */
 	 public Double valueAsDouble()
 	 {
-		 if (isNull().valueAsBoolean()) {
+		 if (isValueNull()) {
 			 return null;
 		 }
 
@@ -244,7 +244,7 @@ public class ResultVariable extends RuleVariable {
 	  */
 	 public Integer valueAsInteger()
 	 {
-		 if (isNull().valueAsBoolean()) {
+		 if (isValueNull()) {
 			 return null;
 		 }
 
@@ -263,7 +263,7 @@ public class ResultVariable extends RuleVariable {
 	  */
 	 public Boolean valueAsBoolean()
 	 {
-		 if (isNull().valueAsBoolean()) {
+		 if (isValueNull()) {
 			 return null;
 		 }
 

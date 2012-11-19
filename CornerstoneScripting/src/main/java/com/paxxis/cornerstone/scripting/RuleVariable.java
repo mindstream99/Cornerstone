@@ -303,11 +303,12 @@ public abstract class RuleVariable extends IValue {
         return getMethodProvider().execute(this, name, params);
     }
 
-    /**
-     * Is the object null?
-     */
+    protected abstract boolean isValueNull();
+    
     @CSLMethod
-    public abstract IValue isNull();
+    public final IValue isNull() {
+        return new BooleanVariable(null, isValueNull());
+    }
 
     public abstract String getType();
 

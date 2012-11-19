@@ -54,9 +54,8 @@ public class IntegerVariable extends RuleVariable {
         return methodProvider;
     }
 
-    @CSLMethod
-    public IValue isNull() {
-    	return new BooleanVariable(null, null == value);
+    public boolean isValueNull() {
+    	return null == value;
     }
 
     public String getType() {
@@ -120,35 +119,35 @@ public class IntegerVariable extends RuleVariable {
     }
 
     public Object valueAsObject() {
-    	if (isNull().valueAsBoolean()) {
+    	if (isValueNull()) {
     	    return null;
     	}
         return new Integer(value);
     }
 
     public String valueAsString() {
-    	if (isNull().valueAsBoolean()) {
+    	if (isValueNull()) {
     	    return null;
     	}
         return Integer.toString(value);
     }
 
     public Double valueAsDouble() {
-    	if (isNull().valueAsBoolean()) {
+    	if (isValueNull()) {
     	    return null;
     	}
         return (double)value.intValue();
     }
 
     public Integer valueAsInteger() {
-    	if (isNull().valueAsBoolean()) {
+    	if (isValueNull()) {
     	    return null;
     	}
         return value;
     }
 
     public Boolean valueAsBoolean() {
-    	if (isNull().valueAsBoolean()) {
+    	if (isValueNull()) {
     	    return null;
     	}
         return value.intValue() == 1;

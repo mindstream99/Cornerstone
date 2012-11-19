@@ -63,9 +63,8 @@ public class ArrayIndexer extends RuleVariable {
         this.index = index;
     }
 
-    @CSLMethod
-    public IValue isNull() {
-    	return new BooleanVariable(null, null == index);
+    public boolean isValueNull() {
+    	return null == index;
     }
     
     public String getType() {
@@ -84,7 +83,7 @@ public class ArrayIndexer extends RuleVariable {
     }
 
     public Object valueAsObject() {
-    	if (isNull().valueAsBoolean()) {
+    	if (isValueNull()) {
     	    return null;
     	}
     	
@@ -92,7 +91,7 @@ public class ArrayIndexer extends RuleVariable {
     }
 
     public String valueAsString() {
-    	if (isNull().valueAsBoolean()) {
+    	if (isValueNull()) {
     	    return null;
     	}
     	
@@ -100,7 +99,7 @@ public class ArrayIndexer extends RuleVariable {
     }
 
     public Double valueAsDouble() {
-    	if (isNull().valueAsBoolean()) {
+    	if (isValueNull()) {
     	    return null;
     	}
     	
@@ -108,7 +107,7 @@ public class ArrayIndexer extends RuleVariable {
     }
 
     public Integer valueAsInteger() {
-    	if (isNull().valueAsBoolean()) {
+    	if (isValueNull()) {
     	    return null;
     	}
     	
@@ -116,7 +115,7 @@ public class ArrayIndexer extends RuleVariable {
     }
 
     public Boolean valueAsBoolean() {
-    	if (isNull().valueAsBoolean()) {
+    	if (isValueNull()) {
     	    return null;
     	}
     	

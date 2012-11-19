@@ -50,9 +50,8 @@ public class StringVariable extends RuleVariable {
         return methodProvider;
     }
 
-    @CSLMethod
-    public IValue isNull() {
-        return new BooleanVariable(null, null == value);
+    public boolean isValueNull() {
+        return null == value;
     }
 
     public String getType() {
@@ -155,7 +154,7 @@ public class StringVariable extends RuleVariable {
     }
 
     public Double valueAsDouble() {
-        if (isNull().valueAsBoolean()) {
+        if (isValueNull()) {
             return null;
         }
 
@@ -164,7 +163,7 @@ public class StringVariable extends RuleVariable {
     }
 
     public Integer valueAsInteger() {
-        if (isNull().valueAsBoolean()) {
+        if (isValueNull()) {
             return null;
         }
 
@@ -174,7 +173,7 @@ public class StringVariable extends RuleVariable {
     }
 
     public Boolean valueAsBoolean() {
-        if (isNull().valueAsBoolean()) {
+        if (isValueNull()) {
             return null;
         }
 

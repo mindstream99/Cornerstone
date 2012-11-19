@@ -52,9 +52,8 @@ public class RuleAccessor extends RuleVariable {
         return methodProvider;
     }
 
-    @CSLMethod
-    public IValue isNull() {
-        return new BooleanVariable(null, false);
+    public boolean isValueNull() {
+        return false;
     }
 
     public void resetValue() {

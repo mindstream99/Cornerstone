@@ -54,9 +54,8 @@ public class Array extends RuleVariable {
         super(name);
     }
 
-    @CSLMethod
-    public IValue isNull() {
-    	return new BooleanVariable(null, null == elements);
+    public boolean isValueNull() {
+    	return null == elements;
     }
 
     public String getType() {

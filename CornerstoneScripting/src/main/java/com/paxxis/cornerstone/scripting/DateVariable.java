@@ -89,9 +89,8 @@ public class DateVariable extends RuleVariable {
 		setHasParameterDefault(true);
 	}
 
-	@CSLMethod
-	public IValue isNull() {
-    	return new BooleanVariable(null, null == value);
+	public boolean isValueNull() {
+    	return null == value;
     }
 
     @CSLMethod

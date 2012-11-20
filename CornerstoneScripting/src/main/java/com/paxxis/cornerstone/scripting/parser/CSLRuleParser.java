@@ -117,7 +117,7 @@ public class CSLRuleParser implements RuleParser, CSLRuleParserConstants {
           break label_1;
         }
       }
-    } catch (TokenMgrError e) {
+    } catch (Throwable e) {
         ParseException pe = new ParseException(e.getMessage());
         pe.setToken(getToken(0));
         recover(pe, 0);

@@ -1,4 +1,4 @@
-ruleset sss
+ruleset appnexus
 // ddff
 execute(Date startDate) {
    assert startDate:isNull();

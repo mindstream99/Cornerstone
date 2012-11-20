@@ -18,6 +18,7 @@
 package com.paxxis.cornerstone.scripting;
 
 import com.paxxis.cornerstone.scripting.parser.CSLRuntime;
+import com.paxxis.cornerstone.scripting.parser.ParseException;
 import com.paxxis.cornerstone.scripting.parser.RuleParser;
 
 /**
@@ -46,8 +47,16 @@ public class ParserManager {
         }
 
         parser.initialize(code);
-        parser.parseRuleSet(ruleSet);
-
+        
+        try {
+        	parser.parseRuleSet(ruleSet);
+        } catch (ParseException pe) {
+        	// nothing to do here.  the caller will look at the parser to see if there are any errors.
+        	int x = 1;
+        } catch (Exception e) {
+        	int x = 1;
+        }
+        
         return parser;
     }
 

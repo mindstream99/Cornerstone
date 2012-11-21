@@ -122,7 +122,7 @@ public class ResultVariable extends RuleVariable {
 	}
 
 	@CSLMethod
-	public IValue merge(IValue param) {
+	public IValue mergeWith(IValue param) {
 		if (!(param instanceof ResultVariable)) {
 			throw new ScriptExecutionException(301, "merge parameter must be a Result");
 		}

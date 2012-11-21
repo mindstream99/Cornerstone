@@ -92,21 +92,40 @@ public class CSLRuleParser implements RuleParser {
     }
 
     public void recover (ParseException ex, int recoveryPoint) {
-        recover(ex, recoveryPoint, 0);
+    	int[] a = {recoveryPoint};
+    	recover(ex, a);
+    }
+    
+    public void recover (ParseException ex, int[] recoveryPoints) {
+        recover(ex, recoveryPoints, 0);
     }
 
     public void recover (ParseException ex, int recoveryPoint, int offset) {
+    	int[] a = {recoveryPoint};
+		recover(ex, a, offset);    
+    }
+    
+    public void recover (ParseException ex, int[] recoveryPoints, int offset) {
         syntaxErrors.add (ex);
         Token t;
         do {
             t = getNextToken ();
-        } while (t.kind != EOF && t.kind != recoveryPoint);
+        } while (t.kind != EOF && !matches(t.kind, recoveryPoints));
         
         for (int i = 0; i < offset; i++) {
             t = getNextToken();
         }
     }
 
+    public boolean matches(int k, int[] list) {
+    	for (int l : list) {
+    		if (l == k) {
+    			return true;
+    		}
+    	}
+    	return false;
+    }
+    
     public String getSourceCode()
     {
         return _sourceCode;
@@ -534,6 +553,7 @@ void doClauses(Rule theRule, InstructionQueue queue) :
 
 void doClause(Rule theRule, InstructionQueue queue) :
 {
+	Token t = null;
 }
 {
    try {
@@ -564,6 +584,13 @@ void doClause(Rule theRule, InstructionQueue queue) :
     mergeResultsClause(queue)
     |
     LOOKAHEAD(2) valueExpression(queue) <SEMICOLON>
+    |
+    t = <name>
+    { 
+        ParseException pe = new ParseException("Unknown Variable or Keyword " + t.image + " at Line " + t.beginLine + " Column " + t.beginColumn);
+        pe.setToken(t);
+        throw pe;
+    }
     |
     <SEMICOLON>
    } catch (ParseException pe) {

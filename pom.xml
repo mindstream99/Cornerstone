@@ -8,7 +8,7 @@
     <groupId>com.paxxis</groupId>
     <artifactId>CornerstoneAll</artifactId>
     <packaging>pom</packaging>
-    <version>1.10.2</version>
+    <version>1.10.3</version>
     <name>Cornerstone All</name>
     <url>http://www.paxxis.org</url>
 

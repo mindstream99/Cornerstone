@@ -185,9 +185,9 @@ public class DateVariable extends RuleVariable {
     	} else {
             try {
                 try {
-                    parameterDefault = new Date(java.sql.Timestamp.valueOf(dt).getTime());
+                    value = new Date(java.sql.Timestamp.valueOf(dt).getTime());
                 } catch (Exception ee) {
-                    parameterDefault = new Date(java.sql.Date.valueOf(dt).getTime());
+                    value = new Date(java.sql.Date.valueOf(dt).getTime());
                 }
             } catch (Exception e) {
                 throw new ScriptExecutionException(132, "Bad date format used to set date value: " + dt);

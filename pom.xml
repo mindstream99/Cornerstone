@@ -10,7 +10,7 @@
     <packaging>pom</packaging>
     <version>1.10.3</version>
     <name>Cornerstone All</name>
-    <url>http://www.paxxis.com</url>
+    <url>http://www.paxxis.org</url>
 
     <scm>
         <connection>scm:git:ssh://gerrit.paxxis.com:29418/Cornerstone</connection>

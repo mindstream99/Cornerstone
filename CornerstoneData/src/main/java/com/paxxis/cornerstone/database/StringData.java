@@ -121,4 +121,9 @@ public class StringData implements IDataValue {
         StringReader reader = new StringReader(_data);
         stmt.setCharacterStream(idx, reader, _data.length());
 	}
+
+	@Override
+	public Boolean asBoolean() {
+		return "1".equals(_data);
+	}
 }

@@ -79,4 +79,9 @@ public class FloatData implements IDataValue {
 	public void insert(PreparedStatement stmt, int idx) throws SQLException {
         stmt.setFloat(idx, _data);
 	}
+
+	@Override
+	public Boolean asBoolean() {
+		return null;
+	}
 }

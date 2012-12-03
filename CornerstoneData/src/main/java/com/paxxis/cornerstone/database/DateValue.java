@@ -92,4 +92,9 @@ public class DateValue implements IDataValue {
     	java.sql.Date dt = new java.sql.Date(_data.getTime());
     	stmt.setDate(idx, dt);
     }
+
+	@Override
+	public Boolean asBoolean() {
+		return null;
+	}
 }

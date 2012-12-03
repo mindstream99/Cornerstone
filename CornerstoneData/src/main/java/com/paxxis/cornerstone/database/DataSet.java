@@ -708,6 +708,11 @@ class DataSet implements IDataSet
                     case Types.TIMESTAMP:
                         valObj = new DateValue(_resultSet.getTimestamp(columnNumber));
                         break;
+                        
+                    case Types.BIT:
+                    	valObj = new BitData(_resultSet.getBoolean(columnNumber));
+                    	break;
+                    	
                     default: {
                         throw new DatabaseException("columnName="+columnName+"  unknown data type"+getColumnType());
                     }

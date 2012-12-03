@@ -37,6 +37,7 @@ public interface IDataValue extends Serializable
     public Integer asInteger();
     public Long asLong();
     public Date asDate();
+    public Boolean asBoolean();
     public boolean isNull();
     public InstanceId asInstanceId();
     

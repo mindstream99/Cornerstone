@@ -79,4 +79,9 @@ public class LongData implements IDataValue {
 	public void insert(PreparedStatement stmt, int idx) throws SQLException {
         stmt.setLong(idx, _data);
 	}
+
+	@Override
+	public Boolean asBoolean() {
+		return 1L == _data;
+	}
 }

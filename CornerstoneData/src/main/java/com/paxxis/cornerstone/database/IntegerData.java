@@ -79,4 +79,9 @@ public class IntegerData implements IDataValue {
 	public void insert(PreparedStatement stmt, int idx) throws SQLException {
         stmt.setInt(idx, _data);
 	}
+
+	@Override
+	public Boolean asBoolean() {
+		return 1==_data;
+	}
 }

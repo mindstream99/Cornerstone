@@ -79,4 +79,9 @@ public class DoubleData implements IDataValue {
 	public void insert(PreparedStatement stmt, int idx) throws SQLException {
         stmt.setDouble(idx, _data);
 	}
+
+	@Override
+	public Boolean asBoolean() {
+		return null;
+	}
 }

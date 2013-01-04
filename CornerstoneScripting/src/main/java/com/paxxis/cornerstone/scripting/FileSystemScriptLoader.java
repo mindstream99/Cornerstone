@@ -133,7 +133,7 @@ public class FileSystemScriptLoader implements ScriptLoader {
             File source = new File(sourceName);
             RuleParser parser = loadSource(null, source, true, ruleSet);
             if (extraRules != null) {
-                parserManager.process(extraRules, ruleSet);
+                parserManager.process(parser, extraRules, ruleSet);
             }
             
             if (parser.hasParseErrors()) {

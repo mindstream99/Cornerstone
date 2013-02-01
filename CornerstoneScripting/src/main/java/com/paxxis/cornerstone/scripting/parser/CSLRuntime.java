@@ -18,8 +18,11 @@
 package com.paxxis.cornerstone.scripting.parser;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
+import com.paxxis.cornerstone.base.Strategy;
 import com.paxxis.cornerstone.scripting.InstructionQueue;
 import com.paxxis.cornerstone.scripting.Rule;
 import com.paxxis.cornerstone.scripting.RuleSet;
@@ -40,6 +43,7 @@ public class CSLRuntime implements Serializable {
 
     // a context provider
     transient private ServiceContext serviceContext = null;
+	transient private List<Strategy> strategies = new ArrayList<Strategy>();
 
     public CSLRuntime() {
     }
@@ -97,6 +101,22 @@ public class CSLRuntime implements Serializable {
     	}
     	
     	return ruleSet.getSessionParameters();
+	}
+
+	public void attachStrategy(Strategy strategy) {
+		this.strategies.add(strategy);
+	}
+
+	@SuppressWarnings("unchecked")
+	public <T extends Strategy> T getStrategy(Class<T> clazz) {
+		T result = null;
+		for (Strategy strategy : strategies) {
+			if (clazz.isAssignableFrom(strategy.getClass())) {
+				result = (T) strategy;
+				break;
+			}
+		}
+		return result;
 	}
 
 }

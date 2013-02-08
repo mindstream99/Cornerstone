@@ -262,10 +262,6 @@ public abstract class AbstractBlockingObjectPool<T> extends CornerstoneConfigura
 			entry.onReturn();
 			// take this one off the active pool
 			Object borrower = activePool.remove(entry);
-			if (borrower == null) {
-				logger.error("Unknown entry returned to pool: " + entry);
-				return;
-			}
 
 			boolean abandoned = abandonedPool.containsKey(entry);	    
 			if (abandoned) {
@@ -273,6 +269,11 @@ public abstract class AbstractBlockingObjectPool<T> extends CornerstoneConfigura
 				return;
 			}
 
+            if (borrower == null) {
+                logger.error("Unknown entry returned to pool: " + entry);
+                return;
+            }
+			
 			while (!borrowersInWaiting.isEmpty()) {
 				// give this one to the next borrower
 				waiting = borrowersInWaiting.removeFirst();

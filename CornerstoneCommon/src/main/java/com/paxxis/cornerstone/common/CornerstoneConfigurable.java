@@ -208,7 +208,16 @@ public abstract class CornerstoneConfigurable implements IManagedBean {
         return (T) value;
 	}
 	
-    public void onChange(String configPropName) {
+	/**
+	 * This method is called by the framework after the onChange(...) method is called for each changed
+	 * property.  This method should be overridden by classes that want to take some action after configuration
+	 * changes have been made.
+	 */
+	public void onPropertyChangesComplete() {
+		
+	}
+
+	public boolean onChange(String configPropName) {
     	// the actual property name we want is the key mapped to this configPropName.
         // we don't support this for non string mappings (yet).
     	Collection<String> props = new ArrayList<String>();
@@ -237,7 +246,9 @@ public abstract class CornerstoneConfigurable implements IManagedBean {
     	}
     	
     	props.add(configPropName); //why do we do this?
-    	loadConfigurationPropertyValues(props, true);
+    	boolean result = loadConfigurationPropertyValues(props, true);
+    	
+    	return result;
     }
     
     protected Collection<String> getAllPrefixes() {
@@ -325,16 +336,19 @@ public abstract class CornerstoneConfigurable implements IManagedBean {
     
     /**
      * Load property values from the configuration.
+     * @return 
      */
-    private void loadConfigurationPropertyValues(Collection<String> props, boolean changes) {
+    private boolean loadConfigurationPropertyValues(Collection<String> props, boolean changes) {
         CornerstoneConfiguration config = getCornerstoneConfiguration();
         if (config == null) {
-            return;
+            return false;
         }
         
 
         Method[] methods = this.getClass().getMethods();
-        
+
+        boolean madeChanges = false;
+
         for (String propName : props) {
         	Object configObject = _propertyMap.get(propName);
         	if (configObject == null) {
@@ -387,6 +401,7 @@ public abstract class CornerstoneConfigurable implements IManagedBean {
                     
                     try {
                         method.invoke(this, objValue);
+                        madeChanges = true;
                     } catch (Exception e) {
                         throw new RuntimeException(e);
                     }
@@ -396,6 +411,8 @@ public abstract class CornerstoneConfigurable implements IManagedBean {
             } //for (Method method : methods)
             
     	} //for (String propName : props)
+        
+        return madeChanges;
     }
 
     @SuppressWarnings("rawtypes")

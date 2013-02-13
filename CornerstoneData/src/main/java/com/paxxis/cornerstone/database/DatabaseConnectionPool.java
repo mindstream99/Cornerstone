@@ -308,7 +308,20 @@ public class DatabaseConnectionPool extends AbstractBlockingObjectPool<DatabaseC
         }
     }
 
+    public void onPropertyChangesComplete() {
 
+    	synchronized (getSemaphore()) {
+            List<AbstractBlockingObjectPool.PoolEntry<DatabaseConnection>> freePool = getFreePool();
+            for (com.paxxis.cornerstone.common.AbstractBlockingObjectPool.PoolEntry<DatabaseConnection> entry : freePool) {
+                entry.getObject().disconnect();
+            }
+
+            freePool.clear();
+            initialize();
+        }
+    	
+    }
+    
     @Override
     public void initialize()
     {

@@ -1,6 +1,8 @@
 package com.paxxis.cornerstone.common;
 
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.WeakHashMap;
@@ -51,11 +53,23 @@ public class CornerstoneConfiguration implements IManagedBean {
     	localMap.putAll(overrideConfig.getLocalPropertyMap());
     }
     
-    public void modifyParameter(ConfigurationChange change) {
-    	localPropertyMap.put(change.getName(), change.getNewValue());
-    	for (CornerstoneConfigurable cfg : registeredConfigurables.keySet()) {
-    		cfg.onChange(change.getName());
+    public void modifyParameter(Collection<ConfigurationChange> changes) {
+    	HashSet<CornerstoneConfigurable> changedConfigurables = new HashSet<CornerstoneConfigurable>();
+    	
+    	for (ConfigurationChange change : changes) {
+        	localPropertyMap.put(change.getName(), change.getNewValue());
+
+        	for (CornerstoneConfigurable cfg : registeredConfigurables.keySet()) {
+        		if (cfg.onChange(change.getName())) {
+        			changedConfigurables.add(cfg);
+        		}
+        	}
     	}
+    	
+    	for (CornerstoneConfigurable config : changedConfigurables) {
+    		config.onPropertyChangesComplete();
+    	}
+
     }
     
     public Map<String, Object> findParameters(String startsWith) {

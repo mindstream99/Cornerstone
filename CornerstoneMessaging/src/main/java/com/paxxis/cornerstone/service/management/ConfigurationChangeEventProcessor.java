@@ -47,9 +47,7 @@ public class ConfigurationChangeEventProcessor extends EventMessageProcessor<Con
 	protected void process(ConfigurationChangeEvent eventMessage) throws Exception {
 		Collection<ConfigurationChange> changes = eventMessage.getConfigurationChanges();
 		for (DatabaseBackedConfiguration configuration : configurations) {
-			for (ConfigurationChange change : changes) {
-				configuration.modifyParameter(change);
-			}
+			configuration.modifyParameter(changes);
 		}
 	}
 	

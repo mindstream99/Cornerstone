@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -173,20 +174,21 @@ public abstract class CornerstoneConfigurable implements IManagedBean {
 	    String configPropName = null;
 	    Object value = null;
 	    for (String prefix : prefixes) {
-	        configPropName = prefix + "." + propName;
+	        String cPropName = prefix + "." + propName;
 	        //the last prefix defined always overrides previous config items...
-	        Object temp = config.getObjectValue(configPropName);
+	        Object temp = config.getObjectValue(cPropName);
 	        if (temp != null) {
 	            if (value != null && logger.isDebugEnabled()) {
 	                logger.debug(
 	                        "Config item " + 
-	                        configPropName + 
+	                        cPropName + 
 	                        " with value " +
 	                        temp +
 	                        " has overriden previous value " +
 	                        value);
 	            }
 	            value = temp;
+	            configPropName = cPropName;
 	        }
 	    }
 	    
@@ -220,7 +222,7 @@ public abstract class CornerstoneConfigurable implements IManagedBean {
 	public boolean onChange(String configPropName) {
     	// the actual property name we want is the key mapped to this configPropName.
         // we don't support this for non string mappings (yet).
-    	Collection<String> props = new ArrayList<String>();
+    	HashSet<String> props = new HashSet<String>();
     	for (String key : _propertyMap.keySet()) {
     		Object obj = _propertyMap.get(key);
     		if (obj instanceof String) {
@@ -231,7 +233,7 @@ public abstract class CornerstoneConfigurable implements IManagedBean {
     		}
     	}
     	
-    	for (String prefix : configPropertyPrefixes) {
+    	for (String prefix : getAllPrefixes()) {
     	    //lets see if the propName starts with any of our defined prefixes..
     	    if (configPropName.startsWith(prefix) && configPropName.charAt(prefix.length()) == '.') {
     	        //it does so lets add it to the list to be configured and also add it to our
@@ -239,13 +241,12 @@ public abstract class CornerstoneConfigurable implements IManagedBean {
     	        //NOTE: this logic will only happen if a property was ADDED to the database
     	        //post startup - if the item was in the db on startup it will already be in propertyMap
     	        //due to being found via reflectConfigurationPropertyValues which ran in initialization 
-    	        String property = configPropName.substring(prefix.length());
+    	        String property = configPropName.substring(prefix.length() + 1);
     	        props.add(property);
     	        _propertyMap.put(property, configPropName);
     	    }
     	}
     	
-    	props.add(configPropName); //why do we do this?
     	boolean result = loadConfigurationPropertyValues(props, true);
     	
     	return result;

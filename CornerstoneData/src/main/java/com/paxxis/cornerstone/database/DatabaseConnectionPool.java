@@ -56,6 +56,8 @@ public class DatabaseConnectionPool extends AbstractBlockingObjectPool<DatabaseC
     private String catalog = "???";
     private String extraParameters = "";
 
+    private String resourceName = "Unnamed";
+    
     private boolean autoCommit = false;
     private DatabaseConnection.TransactionIsolation transactionIsolation = 
             DatabaseConnection.TransactionIsolation.TRANSACTION_READ_UNCOMMITTED;
@@ -164,7 +166,7 @@ public class DatabaseConnectionPool extends AbstractBlockingObjectPool<DatabaseC
                                 removed++;
 
                                 if (removed == count) {
-                                    LOGGER.info("Removed " + removed + " idle database connection(s) for " + getTypeProvider().getConnectionUrl(this));
+                                    LOGGER.info(resourceName + " pool removed " + removed + " idle database connection(s) for " + getTypeProvider().getConnectionUrl(this));
                                     break;
                                 }
                             }
@@ -356,6 +358,14 @@ public class DatabaseConnectionPool extends AbstractBlockingObjectPool<DatabaseC
         return catalog;
     }
 
+    public void setResourceName(String name) {
+    	this.resourceName = name;
+    }
+    
+    public String getResourceName() {
+    	return resourceName;
+    }
+    
     public void connect(DatabaseConnection database) throws DatabaseException
     {
         try

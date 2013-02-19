@@ -179,6 +179,8 @@ public class ResultVariable extends RuleVariable {
 			resultCode = dv.resultCode;
 			messages.clear();
 			messages.addAll(dv.messages);
+			mergedResults.clear();
+			mergedResults.addAll(dv.mergedResults);
 		} else {
 			Boolean sval = rv.valueAsBoolean();
 			if (sval == null) {
@@ -284,4 +286,16 @@ public class ResultVariable extends RuleVariable {
 		 return this;
 	 }
 
+	public List<Integer> getResultCodes() {
+		List<Integer> resultCodes = new ArrayList<Integer>();
+		collectResultCodes(this, resultCodes);
+		return resultCodes;
+	}
+
+	private void collectResultCodes(ResultVariable rv, List<Integer> resultCodes) {
+		resultCodes.add(rv.getResultCode());
+		for (ResultVariable merged : rv.getMerged()) {
+			collectResultCodes(merged, resultCodes);
+		}
+	}
 }

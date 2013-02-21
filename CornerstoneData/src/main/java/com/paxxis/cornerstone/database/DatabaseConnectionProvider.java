@@ -16,6 +16,7 @@
  */
 package com.paxxis.cornerstone.database;
 
+import com.paxxis.cornerstone.common.EncryptionHandler;
 import com.paxxis.cornerstone.common.PasswordGenerator;
 
 /**
@@ -25,16 +26,30 @@ import com.paxxis.cornerstone.common.PasswordGenerator;
  */
 public abstract class DatabaseConnectionProvider {
 
-	private PasswordGenerator passwordGenerator = null;
+	private EncryptionHandler encryptionHandler = null;
 
+	@Deprecated
     public void setPasswordGenerator(PasswordGenerator generator) {
-        passwordGenerator = generator;
+        if (generator instanceof EncryptionHandler) {
+            encryptionHandler = (EncryptionHandler)generator;
+        } else {
+            throw new RuntimeException("passwordGenerator must be instance of EncryptionHandler");
+        }
     }
 
+    @Deprecated
     public PasswordGenerator getPasswordGenerator() {
-    	return passwordGenerator;
+    	return encryptionHandler;
     }
 
+    public void setEncryptionHandler(EncryptionHandler handler) {
+        this.encryptionHandler = handler;
+    }
+    
+    public EncryptionHandler getEncryptionHandler() {
+        return encryptionHandler;
+    }
+    
     public abstract String getConnectionUrl(DatabaseConnectionPool pool);
     public abstract void postConnect(DatabaseConnectionPool pool, DatabaseConnection database) throws DatabaseException;
     public abstract void onShutdown(DatabaseConnectionPool pool);

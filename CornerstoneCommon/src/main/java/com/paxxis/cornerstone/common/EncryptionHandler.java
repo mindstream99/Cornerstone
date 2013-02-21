@@ -1,6 +1,6 @@
 /*
- * Copyright 2010 the original author or authors.
- * Copyright 2009 Paxxis Technology LLC
+ * Copyright 2013 the original author or authors.
+ * Copyright 2013 Paxxis Technology LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,16 +14,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.paxxis.cornerstone.common;
 
-/**
- * 
- * @author Robert Englander
- * @deprecated
- *
- */
-public interface PasswordGenerator {
+public interface EncryptionHandler extends PasswordGenerator {
 
-	public String encryptPassword(String password);
+    public void setEncryptionKey(String key);
+    public void setEncryptionKeyFile(String fileName);
+    public String encrypt(String unencryptedString);
+    public String decrypt(String encryptedString);
+
 }

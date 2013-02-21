@@ -49,6 +49,7 @@ public class DatabaseConnectionPool extends AbstractBlockingObjectPool<DatabaseC
     private Integer _dbPort = null;
     private String _dbUsername = null;
     private String _dbPassword = null;
+    private boolean passwordDecrypted = false;
     private String _dbName = null;
     private String _dbDriver = null;
     private String _dbUrlPrefix = null;
@@ -331,7 +332,11 @@ public class DatabaseConnectionPool extends AbstractBlockingObjectPool<DatabaseC
             throw new RuntimeException("typeProvider can't be null.");
         }
 
-        _dbPassword = typeProvider.getPasswordGenerator().encryptPassword(_dbPassword);
+        if (!passwordDecrypted) {
+            _dbPassword = typeProvider.getEncryptionHandler().decrypt(_dbPassword);
+            passwordDecrypted = true;
+        }
+        
         super.initialize();     	
         _sweeper.start();
     }
@@ -501,6 +506,7 @@ public class DatabaseConnectionPool extends AbstractBlockingObjectPool<DatabaseC
     public void setDbPassword(String pw)
     {
         _dbPassword = pw;
+        passwordDecrypted = false;
     }
 
     public String getDbPassword()

@@ -17,16 +17,13 @@
 
 package com.paxxis.cornerstone.common;
 
+import com.paxxis.cornerstone.encryption.NullEncryptionHandler;
+
 /**
  * 
- * @author Robert Englander
+ * @deprecated Use NullEncryptionHandler instead
  *
  */
-public class PasswordPassThrough implements PasswordGenerator {
-
-	@Override
-	public String encryptPassword(String password) {
-		return password;
-	}
+public class PasswordPassThrough extends NullEncryptionHandler {
 
 }

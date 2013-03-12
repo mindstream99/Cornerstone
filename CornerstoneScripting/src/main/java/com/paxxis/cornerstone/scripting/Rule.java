@@ -39,6 +39,10 @@ public class Rule implements Serializable {
 	// the description
 	private String description = "";
 
+	// if true then this rule should not be called from outside the execution environment.
+	// it's up to the execution processor to respect this property setting.
+	private boolean isPrivate = false;
+	
 	// the conditions for firing can be boolean
 	// conditions.
 	private List<IValue> booleanConditions = new ArrayList<IValue>();
@@ -138,6 +142,14 @@ public class Rule implements Serializable {
 		return description;
 	}
 
+	public void setPrivate(boolean priv) {
+		this.isPrivate = priv;
+	}
+	
+	public boolean isPrivate() {
+		return isPrivate;
+	}
+	
 	public InstructionQueue getQueue() {
 		return queue;
 	}

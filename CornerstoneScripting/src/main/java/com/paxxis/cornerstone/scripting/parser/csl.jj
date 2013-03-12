@@ -200,6 +200,7 @@ TOKEN :
 |  < MERGE: ("merge" | "MERGE") >
 |  < INTO: ("into" | "INTO") >
 |  < ANNO_DESCRIPTION: ("@description" | "@Description" | "@DESCRIPTION") >
+|  < ANNO_PRIVATE: ("@private" | "@Private" | "@PRIVATE") >
 |  < RULESET: ("ruleset" | "RULESET") >
 |  < RULE: ("rule" | "Rule" | "RULE") >
 |  < SWITCH: ("switch" | "SWITCH") >
@@ -214,7 +215,7 @@ TOKEN :
 |  < RESULT: ("Result") >
 |  < TRUE: ("true" | "TRUE") >
 |  < FALSE: ("false" | "FALSE") >
-|  < REFERENCE: ("Reference") >
+|  < REFERENCE: ("Reference" | "Expression") >
 |  < VARIABLE: ("variable" | "VARIABLE") >
 |  < START: ("start" | "START") >
 |  < DURABLE: ("durable" | "DURABLE") >
@@ -328,11 +329,8 @@ void rule(Rule theRule) :
 }
 {
   (
-      <ANNO_DESCRIPTION> desc = stringValue()
-      {
-          theRule.setDescription(desc);
-      }
-  )?
+      ruleAnnotations(theRule)
+  )*
   (
       returnVariable = returnType()
   )?
@@ -346,6 +344,24 @@ void rule(Rule theRule) :
   doClauses(theRule, theRule.getQueue())
   (<ON> <ERROR> <METHODSEP> doClauses(theRule, theRule.getErrorQueue()))?
   <RBRACE>
+}
+
+void ruleAnnotations(Rule theRule) :
+{    String desc = null;
+}
+{  (
+      <ANNO_DESCRIPTION> desc = stringValue()
+      {
+          theRule.setDescription(desc);
+      }
+  )
+  |
+  (
+      <ANNO_PRIVATE>
+      {
+          theRule.setPrivate(true);
+      }
+  )
 }
 
 RuleVariable returnType() :

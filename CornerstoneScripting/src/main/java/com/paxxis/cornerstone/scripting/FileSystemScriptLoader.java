@@ -21,6 +21,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import com.paxxis.cornerstone.scripting.parser.ParseException;
@@ -36,6 +37,8 @@ public class FileSystemScriptLoader implements ScriptLoader {
     private String sourceName = null;
     private boolean useSubDirectories = true;
     private ParserManager parserManager = null;
+    private List<String> includedSuffixes = new ArrayList<String>();
+    private List<String> excludedSuffixes = new ArrayList<String>();
 
     public static void main(String[] args) {
         FileSystemScriptLoader loader = new FileSystemScriptLoader();
@@ -82,16 +85,51 @@ public class FileSystemScriptLoader implements ScriptLoader {
         this.parserManager = parserCreator;
     }
 
+    public void setIncludedSuffixes(Collection<String> suffixes) {
+    	this.includedSuffixes.addAll(suffixes);
+    }
+    
+    public void setExcludedSuffixes(Collection<String> suffixes) {
+    	this.excludedSuffixes.addAll(suffixes);
+    }
+    
     public void initialize() {
         if (sourceName == null) {
-            throw new RuntimeException("SourceName property can't be null");
+            throw new RuntimeException("sourceName property can't be null");
         }
 
         if (parserManager == null) {
-            throw new RuntimeException("ParserCreator property can't be null");
+            throw new RuntimeException("parserCreator property can't be null");
+        }
+        
+        if (!(excludedSuffixes.isEmpty() || includedSuffixes.isEmpty())) {
+            throw new RuntimeException("includedSuffixes and excludedSuffixes can't both be used");
         }
     }
 
+    private boolean isAllowableSuffix(String name) {
+    	boolean result = true;
+    	name = name.toLowerCase();
+    	if (!includedSuffixes.isEmpty()) {
+    		result = false;
+    		for (String suff : includedSuffixes) {
+        		if (name.endsWith(suff.toLowerCase())) {
+        			result = true;
+        			break;
+        		}
+    		}
+    	} else if (!excludedSuffixes.isEmpty()) {
+    		for (String suff : excludedSuffixes) {
+        		if (name.endsWith(suff.toLowerCase())) {
+        			result = false;
+        			break;
+        		}
+    		}
+    	}
+    	
+    	return result;
+    }
+    
     private RuleParser loadSource(RuleParser ruleParser, File source, boolean recursive, RuleSet ruleSet) throws Exception {
         try {
             if (source.isDirectory()) {
@@ -102,7 +140,7 @@ public class FileSystemScriptLoader implements ScriptLoader {
                         ruleParser = loadSource(ruleParser, f, useSubDirectories, ruleSet);
                     }
                 }
-            } else {
+            } else if (isAllowableSuffix(source.getName())) {
                 StringBuilder buffer = new StringBuilder();
 
                 FileReader fr = new FileReader(source);

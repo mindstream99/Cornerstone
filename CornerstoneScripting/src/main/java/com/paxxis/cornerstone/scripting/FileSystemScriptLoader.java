@@ -22,7 +22,9 @@ import java.io.File;
 import java.io.FileReader;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import com.paxxis.cornerstone.scripting.parser.ParseException;
 import com.paxxis.cornerstone.scripting.parser.RuleParser;
@@ -37,8 +39,7 @@ public class FileSystemScriptLoader implements ScriptLoader {
     private String sourceName = null;
     private boolean useSubDirectories = true;
     private ParserManager parserManager = null;
-    private List<String> includedSuffixes = new ArrayList<String>();
-    private List<String> excludedSuffixes = new ArrayList<String>();
+    private Set<String> suffixes = new HashSet<String>();
 
     public static void main(String[] args) {
         FileSystemScriptLoader loader = new FileSystemScriptLoader();
@@ -54,10 +55,15 @@ public class FileSystemScriptLoader implements ScriptLoader {
             Rule rule = ruleSet.getRule(methodName);
 
             if (rule == null) {
-                System.err.println("No such script method: " + methodName);
+                System.err.println("No such rule named " + methodName);
                 System.exit(1);
             }
 
+            if (rule.isPrivate()) {
+                System.err.println("Can't invoke private rule named " + methodName);
+                System.exit(1);
+            }
+            
             List<IValue> params = new ArrayList<IValue>();
             boolean result = rule.process(params);
 
@@ -85,13 +91,11 @@ public class FileSystemScriptLoader implements ScriptLoader {
         this.parserManager = parserCreator;
     }
 
-    public void setIncludedSuffixes(Collection<String> suffixes) {
-    	this.includedSuffixes.addAll(suffixes);
-    }
-    
-    public void setExcludedSuffixes(Collection<String> suffixes) {
-    	this.excludedSuffixes.addAll(suffixes);
-    }
+    public void setSuffixes(Collection<String> suffixes) {
+    	for (String suf : suffixes) {
+  		   this.suffixes.add(suf.toLowerCase());
+   		}
+   	}
     
     public void initialize() {
         if (sourceName == null) {
@@ -101,27 +105,16 @@ public class FileSystemScriptLoader implements ScriptLoader {
         if (parserManager == null) {
             throw new RuntimeException("parserCreator property can't be null");
         }
-        
-        if (!(excludedSuffixes.isEmpty() || includedSuffixes.isEmpty())) {
-            throw new RuntimeException("includedSuffixes and excludedSuffixes can't both be used");
-        }
     }
 
     private boolean isAllowableSuffix(String name) {
     	boolean result = true;
     	name = name.toLowerCase();
-    	if (!includedSuffixes.isEmpty()) {
+    	if (!suffixes.isEmpty()) {
     		result = false;
-    		for (String suff : includedSuffixes) {
-        		if (name.endsWith(suff.toLowerCase())) {
+    		for (String suff : suffixes) {
+        		if (name.endsWith(suff)) {
         			result = true;
-        			break;
-        		}
-    		}
-    	} else if (!excludedSuffixes.isEmpty()) {
-    		for (String suff : excludedSuffixes) {
-        		if (name.endsWith(suff.toLowerCase())) {
-        			result = false;
         			break;
         		}
     		}

@@ -12,7 +12,7 @@
     <parent>
         <groupId>com.paxxis</groupId>
         <artifactId>CornerstoneAll</artifactId>
-        <version>1.13.0-SNAPSHOT</version>
+        <version>1.13.0</version>
     </parent>
 
     <!-- This is here for GWT because it needs the source code in the build artifact -->

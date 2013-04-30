@@ -19,6 +19,7 @@ package com.paxxis.cornerstone.common;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
@@ -57,7 +58,7 @@ public class BlockingThreadPoolExecutor {
 	}
 	
     // the thread pool executor
-    private ThreadPoolExecutor executor = null;
+	private ThreadPoolExecutor executor = null;
 
     // halted (pending work from a halted _executor)
     private ArrayList<Runnable> halted = new ArrayList<Runnable>();
@@ -110,14 +111,18 @@ public class BlockingThreadPoolExecutor {
     public BlockingThreadPoolExecutor() {
     }
     
+    protected ThreadPoolExecutor createThreadPoolExecutor() {
+    	return new ThreadPoolExecutor(
+                poolSize, 
+                poolSize, 
+                0, 
+                TimeUnit.MILLISECONDS, 
+                new OfferBlockingQueue<Runnable>(maxRunnables),
+				new DefaultThreadFactory(threadPoolName));
+    }
+    
     public void initialize() {
-        executor = new ThreadPoolExecutor(
-                            poolSize, 
-                            poolSize, 
-                            0, 
-                            TimeUnit.MILLISECONDS, 
-        					new OfferBlockingQueue<Runnable>(maxRunnables),
-        					new DefaultThreadFactory(threadPoolName));
+        executor = createThreadPoolExecutor();
         executor.prestartAllCoreThreads();
     }
 
@@ -141,27 +146,33 @@ public class BlockingThreadPoolExecutor {
 		this.threadPoolName = threadPoolName;
 	}
 
+    public String getThreadPoolName() {
+    	return threadPoolName;
+    }
+    
 	public void setPoolSize(int poolSize) {
 		this.poolSize = poolSize;
+	}
+	
+	public int getPoolSize() {
+		return poolSize;
 	}
 
 	public void setMaxRunnables(int maxRunnables) {
 		this.maxRunnables = maxRunnables;
 	}
 
+	public int getMaxRunnables() {
+		return maxRunnables;
+	}
+	
 	public boolean isHalted() {
         return isHalted;
     }
     
     public void restart() {
         if (isHalted) {
-            executor = new ThreadPoolExecutor(
-                                poolSize, 
-                                poolSize, 
-                                0, 
-                                TimeUnit.MILLISECONDS, 
-								new OfferBlockingQueue<Runnable>(maxRunnables),
-								new DefaultThreadFactory(threadPoolName));
+            executor = createThreadPoolExecutor();
             
             for (Runnable work : halted) {
                 submit(work);

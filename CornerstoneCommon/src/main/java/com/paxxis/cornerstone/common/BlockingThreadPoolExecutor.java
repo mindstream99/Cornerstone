@@ -19,7 +19,6 @@ package com.paxxis.cornerstone.common;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ArrayBlockingQueue;
-import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
@@ -31,7 +30,7 @@ import com.paxxis.cornerstone.service.ShutdownListener;
  *
  * @author Robert Englander  
  */
-public class BlockingThreadPoolExecutor {
+public class BlockingThreadPoolExecutor extends CornerstoneConfigurable {
 	
 	/**
 	 * This is a blocking queue that blocks on the offer method.  Normally the offer method will
@@ -133,7 +132,7 @@ public class BlockingThreadPoolExecutor {
      * @param message 
      */
     public void submit(Runnable runnable) {
-        executor.execute(runnable);
+        executor.submit(runnable);
     }
     
     public void halt() {

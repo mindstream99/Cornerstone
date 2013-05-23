@@ -64,7 +64,7 @@ public abstract class CornerstoneConfigurable implements IManagedBean {
     private Collection<String> configPropertyPrefixes = new ArrayList<String>();
     
 	/** a prefix found in system variables to prepend onto any supplied prefixes */ 
-	private String configSystemPrefix = null;
+	private List<String> configSystemPrefixes = new ArrayList<String>();
 	
 	/** get properties directly from system variables based on prefixes */
 	private boolean useSystemProperties = false;
@@ -260,8 +260,8 @@ public abstract class CornerstoneConfigurable implements IManagedBean {
         }
 
         // add any prefixes from the system prefix to the end of the list
-    	if (configSystemPrefix != null) {
-    		String prefix = System.getProperty(configSystemPrefix);
+    	for (String sysPrefix : configSystemPrefixes) {
+    		String prefix = System.getProperty(sysPrefix);
             List<String> list = new ArrayList<String>();
     		if (prefix != null) {
                 for (String pref : prefixes) {
@@ -518,10 +518,16 @@ public abstract class CornerstoneConfigurable implements IManagedBean {
     }
     
     public void setConfigSystemPrefix(String prefix) {
-    	this.configSystemPrefix = prefix;
+    	this.configSystemPrefixes.clear();
+    	this.configSystemPrefixes.add(prefix);
     }
     
-    public String getConfigSystemPrefix() {
-    	return this.configSystemPrefix;
+    public void setConfigSystemPrefixes(Collection<String> prefs) {
+    	this.configSystemPrefixes.clear();
+    	configSystemPrefixes.addAll(prefs);
+    }
+
+    public Collection<String> getConfigSystemPrefixes() {
+    	return this.configSystemPrefixes;
     }
 }

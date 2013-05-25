@@ -37,7 +37,7 @@ import org.apache.log4j.Logger;
  *
  * @author Robert Englander
  */
-public abstract class CornerstoneConfigurable implements IManagedBean {
+public class CornerstoneConfigurable implements IManagedBean {
 
 	public interface ChangeListener {
 		public void onChange(String propName, Object value);

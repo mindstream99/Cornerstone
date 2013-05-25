@@ -121,6 +121,7 @@ public class BlockingThreadPoolExecutor extends CornerstoneConfigurable {
     }
     
     public void initialize() {
+        super.initialize();
         executor = createThreadPoolExecutor();
         executor.prestartAllCoreThreads();
     }

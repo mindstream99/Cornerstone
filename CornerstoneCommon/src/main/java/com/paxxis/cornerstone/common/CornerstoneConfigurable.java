@@ -68,10 +68,21 @@ public class CornerstoneConfigurable implements IManagedBean {
 	
 	/** get properties directly from system variables based on prefixes */
 	private boolean useSystemProperties = false;
+	
+	/** an optional name */
+	private String name = null;
 
 	public CornerstoneConfigurable() {
     }
     
+	public void setName(String name) {
+	    this.name = name;
+	}
+	
+	public String getName() {
+	    return name;
+	}
+	
     public void addConfigurableListener(ChangeListener listener) {
     	synchronized (listeners) {
     		if (!listeners.contains(listener)) {

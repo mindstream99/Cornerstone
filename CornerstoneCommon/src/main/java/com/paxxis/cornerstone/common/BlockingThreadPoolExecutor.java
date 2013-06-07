@@ -66,6 +66,7 @@ public class BlockingThreadPoolExecutor extends CornerstoneConfigurable {
     private String threadPoolName = null;
     private int poolSize = 10;
     private int maxRunnables = 10;
+    private boolean startOnInitialize = true;
     
     
     /**
@@ -110,6 +111,10 @@ public class BlockingThreadPoolExecutor extends CornerstoneConfigurable {
     public BlockingThreadPoolExecutor() {
     }
     
+    public void setStartOnInitialize(boolean start) {
+        this.startOnInitialize = start;
+    }
+    
     protected ThreadPoolExecutor createThreadPoolExecutor() {
     	return new ThreadPoolExecutor(
                 poolSize, 
@@ -122,6 +127,13 @@ public class BlockingThreadPoolExecutor extends CornerstoneConfigurable {
     
     public void initialize() {
         super.initialize();
+        
+        if (startOnInitialize) {
+            start();
+        }
+    }
+
+    public void start() {
         executor = createThreadPoolExecutor();
         executor.prestartAllCoreThreads();
     }

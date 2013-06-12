@@ -72,7 +72,28 @@ public class CornerstoneConfigurable implements IManagedBean {
 	/** an optional name */
 	private String name = null;
 
+    /** the character to split lists on */
+    private String listSplit = ",";
+
+    /** the character to split map entries on */
+    private String mapEntrySplit = ",";
+    
+    /** the character to split map keys from values */
+    private String mapKeyValueSplit = ":";
+    
 	public CornerstoneConfigurable() {
+    }
+    
+    public void setListSplit(String val) {
+        this.listSplit = val;
+    }
+    
+    public void setMapEntrySplit(String val) {
+        this.mapEntrySplit = val;
+    }
+    
+    public void setKeyValueSplit(String val) {
+        this.mapKeyValueSplit = val;
     }
     
 	public void setName(String name) {
@@ -208,7 +229,7 @@ public class CornerstoneConfigurable implements IManagedBean {
 	    }
 	    
         if (defaultValue != null) {
-            value = convert(defaultValue.getClass(), value);
+            value = convert(defaultValue.getClass(), value, null);
         }
         
         if (registerForChanges) {
@@ -339,7 +360,7 @@ public class CornerstoneConfigurable implements IManagedBean {
             }
 
             try {
-                method.invoke(this, convert(params[0], value));
+                method.invoke(this, convert(params[0], value, method));
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
@@ -409,7 +430,7 @@ public class CornerstoneConfigurable implements IManagedBean {
                 Class<?>[] paramClasses = method.getParameterTypes();
                 if (paramClasses.length == 1) {
                     // this is the one we want, so convert the value to this type
-                    Object objValue = convert(paramClasses[0], value);
+                    Object objValue = convert(paramClasses[0], value, method);
                     
                     try {
                         method.invoke(this, objValue);
@@ -428,7 +449,7 @@ public class CornerstoneConfigurable implements IManagedBean {
     }
 
     @SuppressWarnings("rawtypes")
-    private Object convert(Class cls, Object value) {
+    private Object convert(Class cls, Object value, Method method) {
         Object objValue = null;
         if (cls.getName().equals("java.lang.String")) {
             objValue = String.valueOf(value);
@@ -443,7 +464,11 @@ public class CornerstoneConfigurable implements IManagedBean {
         } else if (cls.getName().equals("boolean")) {
             objValue = Boolean.valueOf(value.toString());
         } else if (cls.getName().equals("java.util.List")) {
-        	objValue = value;                                    
+            objValue = convertToList(value, method.getAnnotation(CollectionProperty.class));
+        } else if (cls.getName().equals("java.util.Collection")) {
+            objValue = convertToList(value, method.getAnnotation(CollectionProperty.class));
+        } else if (cls.getName().equals("java.util.Map")) { 
+            objValue = convertToMap(value, method.getAnnotation(MapProperty.class));
         } else {
             //this covers any class (Enums most importantly) that has
             //a static valueOf(java.lang.String) method
@@ -459,6 +484,47 @@ public class CornerstoneConfigurable implements IManagedBean {
         }
         
         return objValue;
+    }
+
+    @SuppressWarnings("rawtypes")
+    private Map<?,?> convertToMap(Object value, MapProperty annotation) {
+        Class<?> keyType = String.class;
+        Class<?> valueType = String.class;
+        
+        if (annotation != null) {
+            keyType = annotation.keyType();
+            valueType = annotation.valueType();
+        }
+        
+        Map<Object, Object> map = new HashMap<Object, Object>();
+        
+        String[] entries = value.toString().split(mapEntrySplit);
+        for (String entry : entries) {
+            String[] pairs = entry.split(mapKeyValueSplit);
+            Object key = convert(keyType, pairs[0].trim(), null);
+            Object val = convert(valueType, pairs[1].trim(), null);
+            map.put(key, val);
+        }
+        
+        return map;
+    }
+    
+    @SuppressWarnings("rawtypes")
+    private List<?> convertToList(Object value, CollectionProperty annotation) {
+        Class<?> valueType = String.class;
+
+        if (annotation != null) {
+            valueType = annotation.valueType();
+        }
+        List<Object> list = new ArrayList<Object>();
+        
+        String[] entries = value.toString().split(listSplit);
+        for (String entry : entries) {
+            Object val = convert(valueType, entry.trim(), null);
+            list.add(val);
+        }
+        
+        return list;
     }
     
     /**

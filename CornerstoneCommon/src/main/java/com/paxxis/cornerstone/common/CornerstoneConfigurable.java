@@ -72,28 +72,7 @@ public class CornerstoneConfigurable implements IManagedBean {
 	/** an optional name */
 	private String name = null;
 
-    /** the character to split lists on */
-    private String listSplit = ",";
-
-    /** the character to split map entries on */
-    private String mapEntrySplit = ",";
-    
-    /** the character to split map keys from values */
-    private String mapKeyValueSplit = ":";
-    
 	public CornerstoneConfigurable() {
-    }
-    
-    public void setListSplit(String val) {
-        this.listSplit = val;
-    }
-    
-    public void setMapEntrySplit(String val) {
-        this.mapEntrySplit = val;
-    }
-    
-    public void setKeyValueSplit(String val) {
-        this.mapKeyValueSplit = val;
     }
     
 	public void setName(String name) {
@@ -498,11 +477,24 @@ public class CornerstoneConfigurable implements IManagedBean {
         
         Map<Object, Object> map = new HashMap<Object, Object>();
         
-        String[] entries = value.toString().split(mapEntrySplit);
+        // strip out newlines
+        value = value.toString().replace('\n',' ');
+        value = value.toString().replace('\r',' ');
+
+        // replace all of the slash-comma entries with a \r
+        value = value.toString().replace("\\,", "\r");
+        String[] entries = value.toString().trim().split(",");
         for (String entry : entries) {
-            String[] pairs = entry.split(mapKeyValueSplit);
-            Object key = convert(keyType, pairs[0].trim(), null);
-            Object val = convert(valueType, pairs[1].trim(), null);
+            // put back the commas
+            entry = entry.trim().replace("\r", ",");
+            
+            // replace all of the slash-equals sign with \r
+            entry = entry.trim().replace("\\=", "\r");
+            String[] pairs = entry.trim().split("=");
+            
+            // put back the equals signs
+            Object key = convert(keyType, pairs[0].replace("\r", "=").trim(), null);
+            Object val = convert(valueType, pairs[1].replace("\r", "=").trim(), null);
             map.put(key, val);
         }
         
@@ -518,8 +510,17 @@ public class CornerstoneConfigurable implements IManagedBean {
         }
         List<Object> list = new ArrayList<Object>();
         
-        String[] entries = value.toString().split(listSplit);
+        // strip out newlines
+        value = value.toString().replace('\n',' ');
+        value = value.toString().replace('\r',' ');
+
+        // replace all of the slash-comma entries with a \r
+        value = value.toString().replace("\\,", "\r");
+        String[] entries = value.toString().trim().split(",");
         for (String entry : entries) {
+            // put back the commas
+            entry = entry.trim().replace("\r", ",");
+
             Object val = convert(valueType, entry.trim(), null);
             list.add(val);
         }

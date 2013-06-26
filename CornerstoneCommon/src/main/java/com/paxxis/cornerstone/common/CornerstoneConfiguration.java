@@ -15,10 +15,20 @@ public class CornerstoneConfiguration implements IManagedBean {
     private Map<String, Object> localMap = null;
     private Map<CornerstoneConfigurable, Object> registeredConfigurables = 
     				new WeakHashMap<CornerstoneConfigurable, Object>();
-
+    
+    private ConfigurationResolver resolver = null;
+    
     public CornerstoneConfiguration() {
     }
 
+    public void setConfigurationResolver(ConfigurationResolver resolver) {
+        this.resolver = resolver;
+    }
+    
+    public ConfigurationResolver getConfigurationResolver() {
+        return resolver;
+    }
+    
     protected void setup() {
     }
     

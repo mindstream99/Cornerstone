@@ -12,7 +12,7 @@ import com.paxxis.cornerstone.base.management.ConfigurationChange;
 public class CornerstoneConfiguration implements IManagedBean {
     
 	private Map<String, Object> localPropertyMap = new HashMap<String, Object>();
-    private Map<String, Object> localMap = null;
+    private Map<String, Object> localMap = new HashMap<String, Object>();
     private Map<CornerstoneConfigurable, Object> registeredConfigurables = 
     				new WeakHashMap<CornerstoneConfigurable, Object>();
     
@@ -35,9 +35,7 @@ public class CornerstoneConfiguration implements IManagedBean {
     @Override
     public final void initialize() {
     	setup();
-        if (localMap != null) {
-            localPropertyMap.putAll(localMap);
-        }
+        localPropertyMap.putAll(localMap);
     }
     
     @Override

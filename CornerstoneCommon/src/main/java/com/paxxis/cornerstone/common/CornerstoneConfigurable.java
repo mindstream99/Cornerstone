@@ -522,19 +522,28 @@ public class CornerstoneConfigurable implements IManagedBean {
         }
         List<Object> list = new ArrayList<Object>();
         
-        // strip out newlines
-        value = value.toString().replace('\n',' ');
-        value = value.toString().replace('\r',' ');
+        if (value instanceof List<?>) {
+        	List<?> vList = (List<?>)value;
+        	for (Object obj : vList) {
+                Object val = convert(valueType, obj.toString(), null);
+                list.add(val);
+        	}
+        } else {
+            
+            // strip out newlines
+            value = value.toString().replace('\n',' ');
+            value = value.toString().replace('\r',' ');
 
-        // replace all of the slash-comma entries with a \r
-        value = value.toString().replace("\\,", "\r");
-        String[] entries = value.toString().trim().split(",");
-        for (String entry : entries) {
-            // put back the commas
-            entry = entry.trim().replace("\r", ",");
+            // replace all of the slash-comma entries with a \r
+            value = value.toString().replace("\\,", "\r");
+            String[] entries = value.toString().trim().split(",");
+            for (String entry : entries) {
+                // put back the commas
+                entry = entry.trim().replace("\r", ",");
 
-            Object val = convert(valueType, entry.trim(), null);
-            list.add(val);
+                Object val = convert(valueType, entry.trim(), null);
+                list.add(val);
+            }
         }
         
         return list;

@@ -57,6 +57,9 @@ public class ServiceBusMessageReceiver extends CornerstoneConfigurable implement
     // teardown pending flag
     boolean _teardownPending = false;
     
+    // max messages in flight
+    private int maxMessagesInFlight = 10000;
+    
     /**
      * Creates a new instance of ServiceBusMessageReceiver
      */
@@ -70,6 +73,10 @@ public class ServiceBusMessageReceiver extends CornerstoneConfigurable implement
         	MessageGroup group = router.getMessageGroup();
         	setMessageSelector(group.getMessageSelector());
     	}
+    }
+    
+    public void setMaxMessagesInFlight(int value) {
+        this.maxMessagesInFlight = value;
     }
     
     public void setExclusive(boolean val) {
@@ -197,6 +204,7 @@ public class ServiceBusMessageReceiver extends CornerstoneConfigurable implement
         try
         {
             // initialize the message handler
+            _messageHandler.setMaxMessagesInFlight(maxMessagesInFlight);
             _messageHandler.init(
                     _destinationName,
                     _connector.getSession(), 

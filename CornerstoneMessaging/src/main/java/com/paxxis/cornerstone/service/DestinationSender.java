@@ -191,7 +191,7 @@ public class DestinationSender extends CornerstoneConfigurable
 
     	try {
             Message message = prepareMessage(msg, payloadType);
-            messageSender.send(message);
+            messageSender.send(message, deliveryMode, 0, timeToLive);
         } catch (JMSException je) {
             logger.error(je);
             ErrorMessage errorMsg = new ErrorMessage();
@@ -215,10 +215,10 @@ public class DestinationSender extends CornerstoneConfigurable
                 MessageProducer sender = connector.createMessageProducer(destinationName);
                 sender.setDeliveryMode(deliveryMode);
                 sender.setTimeToLive(timeToLive);
-                sender.send(message);
+                sender.send(message, deliveryMode, 0, timeToLive);
                 sender.close();
             } else {
-                messageSender.send(message);
+                messageSender.send(message, deliveryMode, 0, timeToLive);
             }
         } catch (JMSException je) {
             logger.error(je);

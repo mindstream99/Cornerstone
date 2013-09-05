@@ -22,13 +22,14 @@ package com.paxxis.cornerstone.base;
  * @author Robert Englander
  */
 public abstract class RequestMessage extends Message {
-	private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 2L;
     
 	private long correlator = -1;
     
     private long requestSentOn;
     private long requestReceivedOn;
     
+    private String jmsxGroupID = null;
     
     public void setCorrelator(long value) {
         correlator = value;
@@ -36,6 +37,14 @@ public abstract class RequestMessage extends Message {
     
     public long getCorrelator() {
         return correlator;
+    }
+
+    public void setJmsxGroupID(String jmsxGroupID) {
+        this.jmsxGroupID = jmsxGroupID;
+    }
+
+    public String getJmsxGroupID() {
+        return jmsxGroupID;
     }
 
     /**

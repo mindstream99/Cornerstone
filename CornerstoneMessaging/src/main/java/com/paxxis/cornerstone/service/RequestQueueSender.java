@@ -18,7 +18,6 @@
 package com.paxxis.cornerstone.service;
 
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 
 import javax.jms.JMSException;
@@ -74,8 +73,7 @@ public class RequestQueueSender extends DestinationSender implements QueueSender
         }
 
 		if (this.listenerMap == null) {
-			this.listenerMap = new MapMaker().concurrencyLevel(concurrencyLevel)
-					.expireAfterWrite(this.listenerTimeout, TimeUnit.MILLISECONDS).makeMap();
+			this.listenerMap = new MapMaker().concurrencyLevel(concurrencyLevel).makeMap();
 		}
     }
     

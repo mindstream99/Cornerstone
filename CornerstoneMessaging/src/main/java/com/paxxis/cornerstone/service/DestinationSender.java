@@ -246,6 +246,11 @@ public class DestinationSender extends CornerstoneConfigurable
         if (replyToName != null) {
         	message.setStringProperty(MessagingConstants.HeaderConstant.ReplyToName.name(), replyToName);
         }
+        
+        String jmsxGroup = requestMessage.getJmsxGroupID();
+        if (jmsxGroup != null) {
+            message.setStringProperty("JMSXGroupID", jmsxGroup);
+        }
 		
 		return message;
     }

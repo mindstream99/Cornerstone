@@ -229,25 +229,19 @@ public class DatabaseConnectionPool extends AbstractBlockingObjectPool<DatabaseC
         try {
             try {
                 checkReachable();
-            } catch (DatabaseException de) {
-            } catch (IOException ioe) {
+            } catch (Exception e) {
                 force = true;
                 String url = typeProvider.getConnectionUrl(this);
-                throw new Exception(url + " is unreachable");
+                throw new Exception(url + " is unreachable: " + e.getMessage());
             }
 
             // just send any old statement; essentially like doing a ping
             connection.executeStatement(getEnsureConnectedStatment());
-        }
-        catch (Exception e)
-        {
+        } catch (Exception e) {
             connection.disconnect(force);
         }
 
-        // if after the ping above we find the connection is closed,
-        // try to reconnect it
-        if (!force && !connection.isConnected())
-        {
+        if (!connection.isConnected()) {
             connect(connection);
         }
     }

@@ -150,7 +150,7 @@ public class DatabaseConnection implements IDatabaseConnection {
             try {   
                 close();
                 
-                if (!force) {
+                if (connection != null) {
                     connection.close();
                 }
             } catch (SQLException ex) {   
@@ -165,7 +165,11 @@ public class DatabaseConnection implements IDatabaseConnection {
         //we reverse the list because it is nice to close resources in reverse order of opening them...
         Collections.reverse(closeables);
         for (CloseableResource closeable : closeables) {
-            closeable.close();
+            try {
+                closeable.close();
+            } catch (Throwable t) {
+                logger.error("failed to close resource. " + t.getMessage());
+            }
         }
         closeables.clear();
     }

@@ -71,6 +71,7 @@ public class DatabaseConnectionPool extends AbstractBlockingObjectPool<DatabaseC
     private int reachableTimeout = DEFAULTREACHABLE;
     
     private boolean ensureConnected = true;
+    private boolean ensureReachable = true;
     private String ensureConnectedStatment = "select 1";
 
     //FIXME this is a work around to keep the api for borrowing connections the same in Chime
@@ -187,58 +188,61 @@ public class DatabaseConnectionPool extends AbstractBlockingObjectPool<DatabaseC
     }
 
     public void checkReachable() throws DatabaseException, IOException {
-        int port;
-        if (_dbPort != null) {
-            port = _dbPort;
-        } else {
-            port = this.getTypeProvider().getDefaultPort();
-        }
-
-        SecurityManager manager = System.getSecurityManager();
-        if (manager != null) {
-            try {
-                manager.checkConnect(_dbHostname, port);
-            } catch (SecurityException se) {
-                throw new DatabaseException(se);
+        if (isEnsureReachable()) {
+            int port;
+            if (_dbPort != null) {
+                port = _dbPort;
+            } else {
+                port = this.getTypeProvider().getDefaultPort();
             }
-        }
 
-        Socket s = null;
-        try {
-            s = new Socket();
-            s.setReuseAddress(true);
-            SocketAddress sa = new InetSocketAddress(this._dbHostname, port);
-            s.connect(sa, reachableTimeout);
-        } catch (IOException e) {
-            // that's just fine
-            throw e;
-        } catch (Throwable e) {
-            throw new DatabaseException(e);
-        } finally {
-            if (s != null) {
+            SecurityManager manager = System.getSecurityManager();
+            if (manager != null) {
                 try {
-                    s.close();
-                } catch (IOException e) {
+                    manager.checkConnect(_dbHostname, port);
+                } catch (SecurityException se) {
+                    throw new DatabaseException(se);
+                }
+            }
+
+            Socket s = null;
+            try {
+                s = new Socket();
+                s.setReuseAddress(true);
+                SocketAddress sa = new InetSocketAddress(this._dbHostname, port);
+                s.connect(sa, reachableTimeout);
+            } catch (IOException e) {
+                // that's just fine
+                throw e;
+            } catch (Throwable e) {
+                throw new DatabaseException(e);
+            } finally {
+                if (s != null) {
+                    try {
+                        s.close();
+                    } catch (IOException e) {
+                    }
                 }
             }
         }
     }
     
     public void ensureConnection(DatabaseConnection connection) throws DatabaseException {
-        boolean force = false;
         try {
             try {
                 checkReachable();
             } catch (Exception e) {
-                force = true;
+                connection.disconnect(true);
                 String url = typeProvider.getConnectionUrl(this);
                 throw new Exception(url + " is unreachable: " + e.getMessage());
             }
 
-            // just send any old statement; essentially like doing a ping
-            connection.executeStatement(getEnsureConnectedStatment());
+            if (isEnsureConnected()) {
+                // just send any old statement; essentially like doing a ping
+                connection.executeStatement(getEnsureConnectedStatment());
+            }
         } catch (Exception e) {
-            connection.disconnect(force);
+            connection.disconnect(true);
         }
 
         if (!connection.isConnected()) {
@@ -286,11 +290,10 @@ public class DatabaseConnectionPool extends AbstractBlockingObjectPool<DatabaseC
      */
     @Override
     protected <P extends AbstractBlockingObjectPool.PoolEntry<DatabaseConnection>> P validatePoolEntry(P entry) {
-        if (isEnsureConnected()) {
-            try {
-                ensureConnection(entry.getObject());
-            } catch (DatabaseException e) {
-            }
+        try {
+            ensureConnection(entry.getObject());
+        } catch (DatabaseException e) {
+            LOGGER.error(e.getMessage());
         }
         return super.validatePoolEntry(entry);
     }
@@ -539,6 +542,14 @@ public class DatabaseConnectionPool extends AbstractBlockingObjectPool<DatabaseC
 
     public boolean isEnsureConnected() {
         return this.ensureConnected;
+    }
+
+    public void setEnsureReachable(boolean reachable) {
+        this.ensureReachable = reachable;
+    }
+
+    public boolean isEnsureReachable() {
+        return this.ensureReachable;
     }
 
     public void setEnsureConnectedStatment(String ensureConnectedStatment) {

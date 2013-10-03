@@ -69,7 +69,7 @@ public class RequestQueueSender extends DestinationSender implements QueueSender
             //use for the thread pool :(
             this.messageExecutor = new BlockingThreadPoolExecutor();
             this.messageExecutor.setThreadPoolName(this.getClass().getSimpleName());
-            this.initialize();
+            this.messageExecutor.initialize();
         }
 
 		if (this.listenerMap == null) {

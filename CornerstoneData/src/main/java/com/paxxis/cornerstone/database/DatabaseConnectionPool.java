@@ -22,9 +22,9 @@ import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.net.SocketAddress;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.log4j.Logger;
 
@@ -77,7 +77,7 @@ public class DatabaseConnectionPool extends AbstractBlockingObjectPool<DatabaseC
     //FIXME this is a work around to keep the api for borrowing connections the same in Chime
     //will be removed on future refactorings...
     private Map<DatabaseConnection, PoolEntry> activeConnections = 
-            new HashMap<DatabaseConnection, PoolEntry>();
+            new ConcurrentHashMap<DatabaseConnection, PoolEntry>();
 
     public static class PoolEntry extends AbstractBlockingObjectPool.PoolEntry<DatabaseConnection> {
 

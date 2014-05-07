@@ -9,3 +9,5 @@ CornerstoneScripting/test-scripts/
 .externalToolBuilders
 tags
 crap
+.idea
+*.iml

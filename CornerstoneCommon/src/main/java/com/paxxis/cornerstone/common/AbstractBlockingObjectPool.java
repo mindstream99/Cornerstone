@@ -143,6 +143,10 @@ public abstract class AbstractBlockingObjectPool<T> extends CornerstoneConfigura
 		}
 	}
 
+    protected <P extends PoolEntry<T>> P borrow() {
+        return this.borrow(this);
+    }
+
 	/**
 	 *
 	 * @param borrower

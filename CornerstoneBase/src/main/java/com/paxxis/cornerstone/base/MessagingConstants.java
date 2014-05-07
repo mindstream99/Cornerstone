@@ -45,18 +45,24 @@ public class MessagingConstants {
     }
 
     public enum PayloadType {
-        Invalid(INVALID),
-		JavaObjectPayload(JAVAOBJECTPAYLOAD),
-		JsonObjectPayload(JSONOBJECTPAYLOAD);
+        Invalid(INVALID, null),
+		JavaObjectPayload(JAVAOBJECTPAYLOAD, "application/x-java-serialized-object"),
+		JsonObjectPayload(JSONOBJECTPAYLOAD, "application/json");
 
         private int value;
+        private String contentType;
 
-        private PayloadType(int val) {
-            value = val;
+        private PayloadType(int val, String contentType) {
+            this.value = val;
+            this.contentType = contentType;
         }
 
         public int getValue() {
             return value;
+        }
+
+        public String getContentType() {
+            return contentType;
         }
 
         public static PayloadType valueOf(int val) {

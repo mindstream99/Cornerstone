@@ -124,9 +124,8 @@ public class JSONObject implements JSONValue
         JSONValue val = get(name);
         
         String result = null;
-        if (val != null && val instanceof JSONString)
-        {
-            result = ((JSONString)val).getValue();
+        if (val != null) {
+    		result = val.getObjectValue().toString();
         }
         
         return result;

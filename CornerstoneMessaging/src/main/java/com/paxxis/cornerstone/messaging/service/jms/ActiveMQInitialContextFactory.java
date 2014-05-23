@@ -17,7 +17,7 @@
 
 package com.paxxis.cornerstone.messaging.service.jms;
 
-import com.paxxis.cornerstone.service.JndiInitialContextFactory;
+import com.paxxis.cornerstone.messaging.service.JndiInitialContextFactory;
 
 /**
  * @author Robert Englander

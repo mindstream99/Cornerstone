@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package com.paxxis.cornerstone.service.shell;
+package com.paxxis.cornerstone.messaging.service.shell;
 
 import java.lang.reflect.UndeclaredThrowableException;
 import java.util.ArrayList;
@@ -47,8 +47,8 @@ import org.springframework.context.support.GenericApplicationContext;
 import org.springframework.core.io.FileSystemResource;
 
 import com.paxxis.cornerstone.database.DatabaseUpdater;
-import com.paxxis.cornerstone.service.IServiceBusManager;
-import com.paxxis.cornerstone.service.IServiceController;
+import com.paxxis.cornerstone.messaging.service.IServiceBusManager;
+import com.paxxis.cornerstone.messaging.service.IServiceController;
 
 /**
  * Shell provides a basic command line interface to administrative functions.

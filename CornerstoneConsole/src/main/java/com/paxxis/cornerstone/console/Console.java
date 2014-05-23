@@ -10,17 +10,15 @@ import org.springframework.context.support.FileSystemXmlApplicationContext;
 
 import com.paxxis.cornerstone.base.management.ConfigurationChange;
 import com.paxxis.cornerstone.base.management.ConfigurationChangeEvent;
-import com.paxxis.cornerstone.common.JavaObjectPayload;
 import com.paxxis.cornerstone.database.DatabaseConnection;
 import com.paxxis.cornerstone.database.DatabaseConnectionPool;
 import com.paxxis.cornerstone.database.IDataSet;
-import com.paxxis.cornerstone.service.DestinationPublisherPool;
-import com.paxxis.cornerstone.service.DestinationSender;
+import com.paxxis.cornerstone.messaging.service.DestinationSender;
 
 public class Console {
     private static final Logger logger = Logger.getLogger(Console.class);
 
-    private DestinationPublisherPool<DestinationSender> senderPool;
+    private DestinationSender sender;
     private DatabaseConnectionPool dbPool;
     
     public static void main(String[] args) throws Exception {
@@ -47,7 +45,7 @@ public class Console {
         FileSystemXmlApplicationContext ctx = new FileSystemXmlApplicationContext("CornerstoneConsoleFactory.xml");
         ctx.registerShutdownHook();
         ctx.getBeanFactory().preInstantiateSingletons();
-        senderPool = (DestinationPublisherPool<DestinationSender>) ctx.getBean("publisherPool");
+        sender = (DestinationSender) ctx.getBean("publisherPool");
         dbPool = (DatabaseConnectionPool)ctx.getBean("configurationPool");
     }
 
@@ -80,7 +78,7 @@ public class Console {
             change.setName(name);
             change.setNewValue(value);
             event.addConfigurationChange(change);
-            senderPool.publish(event, new JavaObjectPayload());
+            sender.publish(event);
     		
     	} catch (Exception e) {
     		logger.error(e);
@@ -89,11 +87,11 @@ public class Console {
     	System.exit(0);
     }
 
-    public DestinationPublisherPool<DestinationSender> getQueueSender() {
-    	return senderPool;
+    public DestinationSender getQueueSender() {
+    	return sender;
     }
     
-    public void setQueueSender(DestinationPublisherPool<DestinationSender> sender) {
-        this.senderPool = sender;
+    public void setQueueSender(DestinationSender sender) {
+        this.sender = sender;
     }
 }

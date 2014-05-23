@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package com.paxxis.cornerstone.service;
+package com.paxxis.cornerstone.messaging.service;
 
 import java.util.Hashtable;
 import java.util.List;

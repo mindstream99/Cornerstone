@@ -20,7 +20,6 @@ package com.paxxis.cornerstone.messaging.service;
 import com.paxxis.cornerstone.common.CornerstoneConfigurable;
 import com.paxxis.cornerstone.common.ScheduledExecutionPool;
 import com.paxxis.cornerstone.messaging.common.Session;
-import com.paxxis.cornerstone.service.JndiInitialContextFactory;
 import com.paxxis.cornerstone.service.ShutdownListener;
 import org.apache.log4j.Logger;
 

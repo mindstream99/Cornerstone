@@ -24,7 +24,7 @@ import com.paxxis.cornerstone.messaging.common.MessageListener;
 import com.paxxis.cornerstone.messaging.common.MessagePayload;
 import com.paxxis.cornerstone.messaging.common.MessageProducer;
 import com.paxxis.cornerstone.messaging.common.Session;
-import com.paxxis.cornerstone.service.JndiInitialContextFactory;
+import com.paxxis.cornerstone.messaging.service.JndiInitialContextFactory;
 
 import javax.jms.JMSException;
 import javax.naming.NamingException;

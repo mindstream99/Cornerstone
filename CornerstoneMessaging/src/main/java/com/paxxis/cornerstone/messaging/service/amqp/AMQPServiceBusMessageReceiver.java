@@ -17,16 +17,13 @@
 
 package com.paxxis.cornerstone.messaging.service.amqp;
 
-import com.paxxis.cornerstone.messaging.common.Destination;
+import java.util.HashMap;
+import java.util.Map;
+
 import com.paxxis.cornerstone.messaging.common.Session;
 import com.paxxis.cornerstone.messaging.common.amqp.AMQPDestination;
 import com.paxxis.cornerstone.messaging.common.amqp.AMQPSession;
-import com.paxxis.cornerstone.messaging.common.jms.JMSDestination;
 import com.paxxis.cornerstone.messaging.service.ServiceBusMessageReceiver;
-import org.apache.activemq.command.ActiveMQQueue;
-
-import java.util.HashMap;
-import java.util.Map;
 
 
 /**

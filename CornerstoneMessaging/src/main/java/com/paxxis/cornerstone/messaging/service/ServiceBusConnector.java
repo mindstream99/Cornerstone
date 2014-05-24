@@ -86,7 +86,7 @@ public abstract class ServiceBusConnector extends CornerstoneConfigurable
     // the connection factory name
     private String _connectionFactoryName = "";
     
-    // the JMS message acknowledge mode
+    // the message acknowledge mode
     private int ackMode = Session.AUTO_ACKNOWLEDGE;
     
     // indicates whether or not the connection should be established at startup
@@ -139,7 +139,7 @@ public abstract class ServiceBusConnector extends CornerstoneConfigurable
                 }
                 catch (Exception ee)
                 {
-                    _logger.error("Unexpected error in JMS reconnector", ee);
+                    _logger.error("Unexpected error in reconnector", ee);
                 }
             }
         }
@@ -429,7 +429,7 @@ public abstract class ServiceBusConnector extends CornerstoneConfigurable
 
     protected void onConnectionFailed(Throwable t)
     {
-        _logger.warn("JMS connection failure", t);
+        _logger.warn("Service Bus connection failure", t);
 
         // ask all the connector clients to perform their setup steps
         for (IServiceBusConnectorClient client : _connectorClients)

@@ -229,6 +229,10 @@ public class DestinationSender extends CornerstoneConfigurable
             RequestMessage requestMessage,
             MessagingConstants.PayloadType payloadType) {
 
+    	if (this.messageSender == null) {
+    		this.setup();
+    	}
+    	
         requestMessage.setRequestSentOn(System.currentTimeMillis());
 
         Message message = connector.getSession().createMessage(requestMessage, payloadType);

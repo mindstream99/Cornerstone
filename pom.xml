@@ -11,7 +11,7 @@
 
     <scm>
         <connection>scm:git:ssh://gerrit.paxxis.com:29418/Cornerstone</connection>
-        <url>http://gerrit.paxxis.com:8081/gitweb?p=Cornerstone</url>
+        <url>http://gpaxxis.com:8081/gitweb?p=Cornerstone</url>
     </scm>
 
     <modules>

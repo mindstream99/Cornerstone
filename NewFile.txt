@@ -1,1 +1,1 @@
-This is the newly modified contents of NewFile.txt
+SomeContent

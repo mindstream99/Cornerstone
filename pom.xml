@@ -5,7 +5,7 @@
     <groupId>com.paxxis</groupId>
     <artifactId>CornerstoneAll</artifactId>
     <packaging>pom</packaging>
-    <version>2.0.5-SNAPSHOT</version>
+    <version>2.0.6-SNAPSHOT</version>
     <name>Cornerstone All</name>
     <url>http://www.paxxis.org</url>
 
